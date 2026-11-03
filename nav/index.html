@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f2">
+<title>网址大全 · 热门网站导航</title>
+<style>
+:root{--ink:#111827;--ink-2:#374151;--ink-3:#6b7280;--line:#e5e7eb;--bg:#f6f5f2;--paper:#fff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1000px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(246,245,242,.9);
+  backdrop-filter:saturate(160%) blur(12px);-webkit-backdrop-filter:saturate(160%) blur(12px);
+  border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.topbar .wrap{display:flex;align-items:center;gap:12px;min-height:54px}
+.back{font-size:13.5px;color:var(--ink-2);display:inline-flex;align-items:center;gap:5px;
+  padding:7px 10px;border-radius:999px;transition:background .16s}
+.back:hover{background:#ebe9e4}
+.topbar .t{font-size:14px;font-weight:650;letter-spacing:-.01em}
+.searchbox{margin-left:auto;flex:0 0 auto}
+h1{margin:0 0 8px;font-size:clamp(24px,4.4vw,34px);line-height:1.25;font-weight:800;letter-spacing:-.02em}
+.hero{padding:clamp(28px,5vw,48px) 0 8px}
+.lede{margin:0;color:var(--ink-3);font-size:14.5px;line-height:1.7;max-width:40em}
+.searchwrap{position:relative;margin:22px 0 6px}
+#q{width:100%;font:inherit;font-size:15px;padding:13px 44px 13px 42px;border-radius:12px;
+  border:1px solid var(--line);background:var(--paper);color:var(--ink);outline:none;
+  transition:border-color .16s,box-shadow .16s}
+#q:focus{border-color:#9ca3af;box-shadow:0 0 0 3px rgba(17,24,39,.06)}
+#q::placeholder{color:#9ca3af}
+.sicon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:15px;pointer-events:none}
+#clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;
+  color:#9ca3af;font-size:18px;line-height:1;padding:6px 8px;cursor:pointer;display:none;border-radius:8px}
+#clear:hover{background:#f0eeea;color:var(--ink-2)}
+.count{margin:10px 0 0;font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 0}
+.chips a{font-size:12.5px;color:var(--ink-2);background:var(--paper);border:1px solid var(--line);
+  border-radius:999px;padding:5px 11px;transition:border-color .16s,background .16s}
+.chips a:hover{border-color:#9ca3af;background:#fff}
+.cat{padding:clamp(22px,3.6vw,34px) 0 4px;border-top:1px solid var(--line);margin-top:clamp(18px,3vw,28px)}
+.cat:first-of-type{border-top:0}
+.cat h2{margin:0 0 12px;font-size:clamp(16px,2.2vw,19px);font-weight:750;
+  display:flex;align-items:baseline;gap:9px;letter-spacing:-.01em}
+.cat h2 em{font-style:normal;font-size:11.5px;font-weight:600;color:var(--ink-3);
+  font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:8px}
+.site{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:10px;
+  background:var(--paper);border:1px solid var(--line);transition:border-color .16s,transform .16s,box-shadow .16s}
+.site:hover{border-color:#9ca3af;transform:translateY(-1px);box-shadow:0 8px 18px -12px rgba(16,24,40,.3)}
+.site:active{transform:none}
+.dot{flex:0 0 auto;width:6px;height:6px;border-radius:50%;background:#9ca3af;margin-top:8px;opacity:.7}
+.site:hover .dot{background:var(--ink)}
+.sbody{display:block;min-width:0}
+.sname{display:block;font-size:14.5px;font-weight:650;letter-spacing:-.005em;line-height:1.4}
+.sdesc{display:block;margin:2px 0 0;font-size:12.5px;color:var(--ink-3);line-height:1.6}
+.hit{background:#fff3c4;border-radius:3px;padding:0 1px}
+.empty{display:none;padding:48px 0;text-align:center;color:var(--ink-3);font-size:14px}
+.foot{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 44px;color:var(--ink-3);font-size:12.5px;line-height:1.8}
+@media (max-width:560px){
+  .sites{grid-template-columns:1fr;gap:7px}
+  .topbar .t{display:none}
+  .site{padding:10px 12px}
+  /* 分类标签改为单行横滑，避免占据过多首屏高度 */
+  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+    margin:14px -16px 0;padding:0 16px 2px;-webkit-overflow-scrolling:touch}
+  .chips::-webkit-scrollbar{display:none}
+  .chips a{flex:0 0 auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <a class="back" href="../">← 返回资源中心</a>
+    <div class="t">网址大全</div>
+  </div>
+</header>
+<main class="wrap">
+  <div class="hero">
+    <h1>网址大全 · 热门网站导航</h1>
+    <p class="lede">精选常用优质站点，分类直达、即点即用。输入关键词可同时匹配名称、简介与域名，全部在新标签页打开。</p>
+    <div class="searchwrap">
+      <span class="sicon">⌕</span>
+      <input id="q" type="search" placeholder="搜索站点，如 知网、数据、AI …" autocomplete="off" enterkeyhint="search">
+      <button id="clear" type="button" aria-label="清空">×</button>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="chips"><a href="#c1">学术与科研</a><a href="#c2">搜索引擎</a><a href="#c3">AI 智能</a><a href="#c4">AI 技术社区</a><a href="#c5">社交通讯</a><a href="#c6">热点论坛</a><a href="#c7">视频娱乐</a><a href="#c8">小说阅读</a><a href="#c9">电商购物</a><a href="#c10">新闻资讯</a><a href="#c11">办公效率</a><a href="#c12">出行地图</a><a href="#c13">学习成长</a><a href="#c14">开发者</a><a href="#c15">音乐音频</a><a href="#c16">金融理财</a></div>
+  </div>
+<section class="cat" id="c1">
+      <h2>学术与科研 <em>13</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.cnki.net" target="_blank" rel="noopener noreferrer" data-s="中国知网 cnki.net"><span class="dot"></span><span class="sbody"><span class="sname">中国知网</span><span class="sdesc">中文学术文献总库，期刊、学位论文、会议与年鉴检索下载。</span></span></a>
+        <a class="site" href="https://www.wanfangdata.com.cn" target="_blank" rel="noopener noreferrer" data-s="万方数据 wanfangdata.com.cn"><span class="dot"></span><span class="sbody"><span class="sname">万方数据</span><span class="sdesc">期刊、学位论文、专利与标准数据库，理工与医学文献见长。</span></span></a>
+        <a class="site" href="https://www.cqvip.com" target="_blank" rel="noopener noreferrer" data-s="维普期刊 cqvip.com"><span class="dot"></span><span class="sbody"><span class="sname">维普期刊</span><span class="sdesc">中文科技期刊数据库，文献收录年限长，适合回溯检索。</span></span></a>
+        <a class="site" href="https://xueshu.baidu.com" target="_blank" rel="noopener noreferrer" data-s="百度学术 xueshu.baidu.com"><span class="dot"></span><span class="sbody"><span class="sname">百度学术</span><span class="sdesc">中英文文献一站式检索，可直接跳转全文来源。</span></span></a>
+        <a class="site" href="https://scholar.google.com" target="_blank" rel="noopener noreferrer" data-s="google scholar scholar.google.com"><span class="dot"></span><span class="sbody"><span class="sname">Google Scholar</span><span class="sdesc">全球学术检索，引文追踪、作者主页与引用提醒。</span></span></a>
+        <a class="site" href="https://www.webofscience.com" target="_blank" rel="noopener noreferrer" data-s="web of science webofscience.com"><span class="dot"></span><span class="sbody"><span class="sname">Web of Science</span><span class="sdesc">SCIE/SSCI 收录查询与引文分析平台，投稿选刊常用。</span></span></a>
+        <a class="site" href="https://www.stats.gov.cn" target="_blank" rel="noopener noreferrer" data-s="国家统计局 stats.gov.cn"><span class="dot"></span><span class="sbody"><span class="sname">国家统计局</span><span class="sdesc">官方统计公报、统计年鉴与月度数据发布。</span></span></a>
+        <a class="site" href="https://data.stats.gov.cn" target="_blank" rel="noopener noreferrer" data-s="国家数据 data.stats.gov.cn"><span class="dot"></span><span class="sbody"><span class="sname">国家数据</span><span class="sdesc">国家统计局数据库，分省分行业时间序列可在线导出。</span></span></a>
+        <a class="site" href="https://www.nsfc.gov.cn" target="_blank" rel="noopener noreferrer" data-s="国家自然科学基金委 nsfc.gov.cn"><span class="dot"></span><span class="sbody"><span class="sname">国家自然科学基金委</span><span class="sdesc">基金项目指南、资助成果与结题信息查询。</span></span></a>
+        <a class="site" href="http://www.nopss.gov.cn" target="_blank" rel="noopener noreferrer" data-s="全国哲学社会科学工作办 nopss.gov.cn"><span class="dot"></span><span class="sbody"><span class="sname">全国哲学社会科学工作办</span><span class="sdesc">国家社科基金项目公告、立项与成果信息。</span></span></a>
+        <a class="site" href="https://www.moe.gov.cn" target="_blank" rel="noopener noreferrer" data-s="教育部 moe.gov.cn"><span class="dot"></span><span class="sbody"><span class="sname">教育部</span><span class="sdesc">教育政策文件、专业目录与教学质量国家标准。</span></span></a>
+        <a class="site" href="https://www.icourse163.org" target="_blank" rel="noopener noreferrer" data-s="中国大学mooc icourse163.org"><span class="dot"></span><span class="sbody"><span class="sname">中国大学MOOC</span><span class="sdesc">高校课程在线学习平台，可作课前预习与课后拓展。</span></span></a>
+        <a class="site" href="https://www.xuetangx.com" target="_blank" rel="noopener noreferrer" data-s="学堂在线 xuetangx.com"><span class="dot"></span><span class="sbody"><span class="sname">学堂在线</span><span class="sdesc">清华大学发起的慕课平台，理工与数据类课程较多。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c2">
+      <h2>搜索引擎 <em>6</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.baidu.com" target="_blank" rel="noopener noreferrer" data-s="百度 baidu.com"><span class="dot"></span><span class="sbody"><span class="sname">百度</span><span class="sdesc">全球最大中文搜索引擎，支持网页、图片、视频、地图、百科综合检索。</span></span></a>
+        <a class="site" href="https://www.google.com" target="_blank" rel="noopener noreferrer" data-s="google google.com"><span class="dot"></span><span class="sbody"><span class="sname">Google</span><span class="sdesc">全球领先搜索引擎，强大的信息检索、翻译与学术搜索能力。</span></span></a>
+        <a class="site" href="https://cn.bing.com" target="_blank" rel="noopener noreferrer" data-s="必应 cn.bing.com"><span class="dot"></span><span class="sbody"><span class="sname">必应</span><span class="sdesc">微软旗下搜索，每日精美壁纸，内置 Copilot AI 问答。</span></span></a>
+        <a class="site" href="https://www.sogou.com" target="_blank" rel="noopener noreferrer" data-s="搜狗 sogou.com"><span class="dot"></span><span class="sbody"><span class="sname">搜狗</span><span class="sdesc">腾讯旗下搜索，独家微信文章与公众号内容检索。</span></span></a>
+        <a class="site" href="https://www.so.com" target="_blank" rel="noopener noreferrer" data-s="360搜索 so.com"><span class="dot"></span><span class="sbody"><span class="sname">360搜索</span><span class="sdesc">主打干净安全、无广告干扰的搜索体验。</span></span></a>
+        <a class="site" href="https://duckduckgo.com" target="_blank" rel="noopener noreferrer" data-s="duckduckgo duckduckgo.com"><span class="dot"></span><span class="sbody"><span class="sname">DuckDuckGo</span><span class="sdesc">注重隐私保护的搜索引擎，不追踪、不留存用户记录。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c3">
+      <h2>AI 智能 <em>8</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.doubao.com" target="_blank" rel="noopener noreferrer" data-s="豆包 doubao.com"><span class="dot"></span><span class="sbody"><span class="sname">豆包</span><span class="sdesc">字节跳动旗下 AI 助手，支持对话、写作、生图、语音与智能体。</span></span></a>
+        <a class="site" href="https://www.deepseek.com" target="_blank" rel="noopener noreferrer" data-s="deepseek deepseek.com"><span class="dot"></span><span class="sbody"><span class="sname">DeepSeek</span><span class="sdesc">深度求索开源大模型，推理与编程能力突出，免费使用。</span></span></a>
+        <a class="site" href="https://www.kimi.com" target="_blank" rel="noopener noreferrer" data-s="kimi kimi.com"><span class="dot"></span><span class="sbody"><span class="sname">Kimi</span><span class="sdesc">月之暗面长文本 AI 助手，支持超长文档阅读与资料总结。</span></span></a>
+        <a class="site" href="https://tongyi.aliyun.com" target="_blank" rel="noopener noreferrer" data-s="通义千问 tongyi.aliyun.com"><span class="dot"></span><span class="sbody"><span class="sname">通义千问</span><span class="sdesc">阿里巴巴大模型，多模态理解与办公创作智能助手。</span></span></a>
+        <a class="site" href="https://yiyan.baidu.com" target="_blank" rel="noopener noreferrer" data-s="文心一言 yiyan.baidu.com"><span class="dot"></span><span class="sbody"><span class="sname">文心一言</span><span class="sdesc">百度旗下大模型，中文知识问答与内容创作。</span></span></a>
+        <a class="site" href="https://chatglm.cn" target="_blank" rel="noopener noreferrer" data-s="智谱清言 chatglm.cn"><span class="dot"></span><span class="sbody"><span class="sname">智谱清言</span><span class="sdesc">清华系智谱 AI 推出的国产大模型对话产品。</span></span></a>
+        <a class="site" href="https://metaso.cn" target="_blank" rel="noopener noreferrer" data-s="秘塔ai metaso.cn"><span class="dot"></span><span class="sbody"><span class="sname">秘塔AI</span><span class="sdesc">无广告 AI 元搜索，联网检索并自动整理引用来源。</span></span></a>
+        <a class="site" href="https://chat.openai.com" target="_blank" rel="noopener noreferrer" data-s="chatgpt chat.openai.com"><span class="dot"></span><span class="sbody"><span class="sname">ChatGPT</span><span class="sdesc">OpenAI 推出的全球知名 AI 对话助手，支持多模态与插件。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c4">
+      <h2>AI 技术社区 <em>11</em></h2>
+      <div class="sites">
+        <a class="site" href="https://modelscope.cn" target="_blank" rel="noopener noreferrer" data-s="魔搭社区 modelscope.cn"><span class="dot"></span><span class="sbody"><span class="sname">魔搭社区</span><span class="sdesc">阿里达摩院模型开源社区，模型下载、在线体验与开发者讨论。</span></span></a>
+        <a class="site" href="https://tianchi.aliyun.com" target="_blank" rel="noopener noreferrer" data-s="天池社区 tianchi.aliyun.com"><span class="dot"></span><span class="sbody"><span class="sname">天池社区</span><span class="sdesc">阿里云数据科学竞赛平台，算法工程师实战与交流。</span></span></a>
+        <a class="site" href="https://aistudio.baidu.com" target="_blank" rel="noopener noreferrer" data-s="ai studio aistudio.baidu.com"><span class="dot"></span><span class="sbody"><span class="sname">AI Studio</span><span class="sdesc">百度飞桨深度学习社区，免费 GPU 算力、教程与项目。</span></span></a>
+        <a class="site" href="https://52cv.net" target="_blank" rel="noopener noreferrer" data-s="我爱计算机视觉 52cv.net"><span class="dot"></span><span class="sbody"><span class="sname">我爱计算机视觉</span><span class="sdesc">CV 领域专业博客，论文解读、资源汇总与招聘。</span></span></a>
+        <a class="site" href="https://huggingface.co" target="_blank" rel="noopener noreferrer" data-s="hugging face huggingface.co"><span class="dot"></span><span class="sbody"><span class="sname">Hugging Face</span><span class="sdesc">全球最大 AI 模型开源社区，模型、数据集与在线讨论区。</span></span></a>
+        <a class="site" href="https://www.kaggle.com" target="_blank" rel="noopener noreferrer" data-s="kaggle kaggle.com"><span class="dot"></span><span class="sbody"><span class="sname">Kaggle</span><span class="sdesc">数据科学竞赛平台，公开数据集、Notebook 与排行榜。</span></span></a>
+        <a class="site" href="https://paperswithcode.com" target="_blank" rel="noopener noreferrer" data-s="papers with code paperswithcode.com"><span class="dot"></span><span class="sbody"><span class="sname">Papers With Code</span><span class="sdesc">AI 论文配套代码、数据集与各任务 SOTA 榜单。</span></span></a>
+        <a class="site" href="https://arxiv.org" target="_blank" rel="noopener noreferrer" data-s="arxiv arxiv.org"><span class="dot"></span><span class="sbody"><span class="sname">arXiv</span><span class="sdesc">康奈尔大学论文预印本平台，CS 与 AI 论文首发地。</span></span></a>
+        <a class="site" href="https://www.reddit.com/r/MachineLearning" target="_blank" rel="noopener noreferrer" data-s="r/machinelearning reddit.com"><span class="dot"></span><span class="sbody"><span class="sname">r/MachineLearning</span><span class="sdesc">Reddit 机器学习主版块，前沿论文与行业讨论。</span></span></a>
+        <a class="site" href="https://www.reddit.com/r/LocalLLaMA" target="_blank" rel="noopener noreferrer" data-s="r/localllama reddit.com"><span class="dot"></span><span class="sbody"><span class="sname">r/LocalLLaMA</span><span class="sdesc">本地部署大模型热门社区，量化、微调与踩坑经验。</span></span></a>
+        <a class="site" href="https://www.lesswrong.com" target="_blank" rel="noopener noreferrer" data-s="lesswrong lesswrong.com"><span class="dot"></span><span class="sbody"><span class="sname">LessWrong</span><span class="sdesc">AI 对齐、理性思考与长期治理研究社区。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c5">
+      <h2>社交通讯 <em>7</em></h2>
+      <div class="sites">
+        <a class="site" href="https://weixin.qq.com" target="_blank" rel="noopener noreferrer" data-s="微信 weixin.qq.com"><span class="dot"></span><span class="sbody"><span class="sname">微信</span><span class="sdesc">国民级社交应用，网页端聊天、公众号阅读与小程序入口。</span></span></a>
+        <a class="site" href="https://weibo.com" target="_blank" rel="noopener noreferrer" data-s="微博 weibo.com"><span class="dot"></span><span class="sbody"><span class="sname">微博</span><span class="sdesc">新浪社交媒体，热搜与即时突发事件第一平台。</span></span></a>
+        <a class="site" href="https://www.xiaohongshu.com" target="_blank" rel="noopener noreferrer" data-s="小红书 xiaohongshu.com"><span class="dot"></span><span class="sbody"><span class="sname">小红书</span><span class="sdesc">生活方式分享社区，美妆穿搭、旅行美食种草决策平台。</span></span></a>
+        <a class="site" href="https://www.zhihu.com" target="_blank" rel="noopener noreferrer" data-s="知乎 zhihu.com"><span class="dot"></span><span class="sbody"><span class="sname">知乎</span><span class="sdesc">高质量问答社区，专业知识、经验与观点深度分享。</span></span></a>
+        <a class="site" href="https://www.douban.com" target="_blank" rel="noopener noreferrer" data-s="豆瓣 douban.com"><span class="dot"></span><span class="sbody"><span class="sname">豆瓣</span><span class="sdesc">书影音评分、书评影评与文艺青年兴趣社区。</span></span></a>
+        <a class="site" href="https://im.qq.com" target="_blank" rel="noopener noreferrer" data-s="qq im.qq.com"><span class="dot"></span><span class="sbody"><span class="sname">QQ</span><span class="sdesc">腾讯即时通讯，在线状态、空间与 QQ 邮箱入口。</span></span></a>
+        <a class="site" href="https://web.telegram.org" target="_blank" rel="noopener noreferrer" data-s="telegram web.telegram.org"><span class="dot"></span><span class="sbody"><span class="sname">Telegram</span><span class="sdesc">加密即时通讯软件，频道与群组资源丰富。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c6">
+      <h2>热点论坛 <em>11</em></h2>
+      <div class="sites">
+        <a class="site" href="https://tieba.baidu.com" target="_blank" rel="noopener noreferrer" data-s="百度贴吧 tieba.baidu.com"><span class="dot"></span><span class="sbody"><span class="sname">百度贴吧</span><span class="sdesc">全球最大中文社区，兴趣贴吧汇聚，从追星到游戏无所不有。</span></span></a>
+        <a class="site" href="https://www.hupu.com" target="_blank" rel="noopener noreferrer" data-s="虎扑 hupu.com"><span class="dot"></span><span class="sbody"><span class="sname">虎扑</span><span class="sdesc">体育与男性向社区，步行街热议、NBA 与数码话题集散地。</span></span></a>
+        <a class="site" href="https://bbs.nga.cn" target="_blank" rel="noopener noreferrer" data-s="nga玩家社区 bbs.nga.cn"><span class="dot"></span><span class="sbody"><span class="sname">NGA玩家社区</span><span class="sdesc">硬核游戏玩家论坛，硬核讨论与新游戏资讯爆料。</span></span></a>
+        <a class="site" href="https://www.newsmth.org" target="_blank" rel="noopener noreferrer" data-s="水木社区 newsmth.org"><span class="dot"></span><span class="sbody"><span class="sname">水木社区</span><span class="sdesc">清华系老牌 BBS，水木情怀，中老年人深度讨论社区。</span></span></a>
+        <a class="site" href="https://www.kdnet.net" target="_blank" rel="noopener noreferrer" data-s="凯迪社区 kdnet.net"><span class="dot"></span><span class="sbody"><span class="sname">凯迪社区</span><span class="sdesc">时政评论论坛，猫眼看人版块观点犀利、多元声音。</span></span></a>
+        <a class="site" href="https://www.chiphell.com" target="_blank" rel="noopener noreferrer" data-s="chiphell chiphell.com"><span class="dot"></span><span class="sbody"><span class="sname">Chiphell</span><span class="sdesc">数码硬件发烧友论坛，装机、外设、晒单与装机文化。</span></span></a>
+        <a class="site" href="https://www.v2ex.com" target="_blank" rel="noopener noreferrer" data-s="v2ex v2ex.com"><span class="dot"></span><span class="sbody"><span class="sname">V2EX</span><span class="sdesc">创意工作者社区，程序员、设计师与创业者日常吐槽交流。</span></span></a>
+        <a class="site" href="https://www.reddit.com" target="_blank" rel="noopener noreferrer" data-s="reddit reddit.com"><span class="dot"></span><span class="sbody"><span class="sname">Reddit</span><span class="sdesc">全球最大英文论坛，Subreddit 分版覆盖一切兴趣与话题。</span></span></a>
+        <a class="site" href="https://www.quora.com" target="_blank" rel="noopener noreferrer" data-s="quora quora.com"><span class="dot"></span><span class="sbody"><span class="sname">Quora</span><span class="sdesc">英文问答社区，类知乎，各行业专家深度回答与观点。</span></span></a>
+        <a class="site" href="https://news.ycombinator.com" target="_blank" rel="noopener noreferrer" data-s="hacker news news.ycombinator.com"><span class="dot"></span><span class="sbody"><span class="sname">Hacker News</span><span class="sdesc">Y Combinator 科技创业论坛，黑客与创业者每日必读。</span></span></a>
+        <a class="site" href="https://www.4chan.org" target="_blank" rel="noopener noreferrer" data-s="4chan 4chan.org"><span class="dot"></span><span class="sbody"><span class="sname">4chan</span><span class="sdesc">匿名图版论坛，网络亚文化、meme 与流行梗的发源地。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c7">
+      <h2>视频娱乐 <em>8</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.douyin.com" target="_blank" rel="noopener noreferrer" data-s="抖音 douyin.com"><span class="dot"></span><span class="sbody"><span class="sname">抖音</span><span class="sdesc">字节跳动短视频平台，记录美好生活，日活超 7 亿。</span></span></a>
+        <a class="site" href="https://www.kuaishou.com" target="_blank" rel="noopener noreferrer" data-s="快手 kuaishou.com"><span class="dot"></span><span class="sbody"><span class="sname">快手</span><span class="sdesc">记录世界记录你，短视频与直播带货平台。</span></span></a>
+        <a class="site" href="https://www.bilibili.com" target="_blank" rel="noopener noreferrer" data-s="哔哩哔哩 bilibili.com"><span class="dot"></span><span class="sbody"><span class="sname">哔哩哔哩</span><span class="sdesc">知名弹幕视频站，番剧、UP 主创作与 ACG 文化社区。</span></span></a>
+        <a class="site" href="https://www.iqiyi.com" target="_blank" rel="noopener noreferrer" data-s="爱奇艺 iqiyi.com"><span class="dot"></span><span class="sbody"><span class="sname">爱奇艺</span><span class="sdesc">百度旗下长视频平台，海量正版影视与独播综艺。</span></span></a>
+        <a class="site" href="https://v.qq.com" target="_blank" rel="noopener noreferrer" data-s="腾讯视频 v.qq.com"><span class="dot"></span><span class="sbody"><span class="sname">腾讯视频</span><span class="sdesc">腾讯长视频平台，独播剧、动漫与纪录片资源丰富。</span></span></a>
+        <a class="site" href="https://youku.com" target="_blank" rel="noopener noreferrer" data-s="优酷 youku.com"><span class="dot"></span><span class="sbody"><span class="sname">优酷</span><span class="sdesc">阿里旗下长视频平台，这世界很酷。</span></span></a>
+        <a class="site" href="https://www.mgtv.com" target="_blank" rel="noopener noreferrer" data-s="芒果tv mgtv.com"><span class="dot"></span><span class="sbody"><span class="sname">芒果TV</span><span class="sdesc">湖南卫视旗下视频平台，综艺独播优势明显。</span></span></a>
+        <a class="site" href="https://www.netflix.com" target="_blank" rel="noopener noreferrer" data-s="netflix netflix.com"><span class="dot"></span><span class="sbody"><span class="sname">Netflix</span><span class="sdesc">全球流媒体巨头，海量原创剧集与电影。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c8">
+      <h2>小说阅读 <em>11</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.qidian.com" target="_blank" rel="noopener noreferrer" data-s="起点中文网 qidian.com"><span class="dot"></span><span class="sbody"><span class="sname">起点中文网</span><span class="sdesc">阅文集团旗下男频网文龙头，玄幻、都市、科幻首发阵地。</span></span></a>
+        <a class="site" href="https://www.jjwxc.net" target="_blank" rel="noopener noreferrer" data-s="晋江文学城 jjwxc.net"><span class="dot"></span><span class="sbody"><span class="sname">晋江文学城</span><span class="sdesc">女频言情小说龙头，耽美、古言、现言原创重镇。</span></span></a>
+        <a class="site" href="https://fanqienovel.com" target="_blank" rel="noopener noreferrer" data-s="番茄小说 fanqienovel.com"><span class="dot"></span><span class="sbody"><span class="sname">番茄小说</span><span class="sdesc">字节跳动旗下免费正版小说平台，海量网文免费读。</span></span></a>
+        <a class="site" href="https://www.qimao.com" target="_blank" rel="noopener noreferrer" data-s="七猫小说 qimao.com"><span class="dot"></span><span class="sbody"><span class="sname">七猫小说</span><span class="sdesc">免费正版阅读平台，书库丰富、阅读体验清爽。</span></span></a>
+        <a class="site" href="https://weread.qq.com" target="_blank" rel="noopener noreferrer" data-s="微信读书 weread.qq.com"><span class="dot"></span><span class="sbody"><span class="sname">微信读书</span><span class="sdesc">腾讯旗下正版阅读，出版书与网文一体，无限卡畅读。</span></span></a>
+        <a class="site" href="https://www.zongheng.com" target="_blank" rel="noopener noreferrer" data-s="纵横中文网 zongheng.com"><span class="dot"></span><span class="sbody"><span class="sname">纵横中文网</span><span class="sdesc">老牌网文平台，历史、军事、玄幻精品众多。</span></span></a>
+        <a class="site" href="https://www.17k.com" target="_blank" rel="noopener noreferrer" data-s="17k小说 17k.com"><span class="dot"></span><span class="sbody"><span class="sname">17K小说</span><span class="sdesc">综合网文平台，军旅、都市与悬疑分类强势。</span></span></a>
+        <a class="site" href="https://b.faloo.com" target="_blank" rel="noopener noreferrer" data-s="飞卢小说 b.faloo.com"><span class="dot"></span><span class="sbody"><span class="sname">飞卢小说</span><span class="sdesc">同人小说与快穿爽文为主，更新快、节奏密集。</span></span></a>
+        <a class="site" href="https://read.douban.com" target="_blank" rel="noopener noreferrer" data-s="豆瓣阅读 read.douban.com"><span class="dot"></span><span class="sbody"><span class="sname">豆瓣阅读</span><span class="sdesc">豆瓣旗下原创文学，中篇、悬疑与女性题材精品。</span></span></a>
+        <a class="site" href="https://www.ciweimao.com" target="_blank" rel="noopener noreferrer" data-s="刺猬猫 ciweimao.com"><span class="dot"></span><span class="sbody"><span class="sname">刺猬猫</span><span class="sdesc">二次元轻小说平台，同人与脑洞网文聚集地。</span></span></a>
+        <a class="site" href="https://www.wattpad.com" target="_blank" rel="noopener noreferrer" data-s="wattpad wattpad.com"><span class="dot"></span><span class="sbody"><span class="sname">Wattpad</span><span class="sdesc">海外最大原创小说社区，全球作者连载互动。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c9">
+      <h2>电商购物 <em>8</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.taobao.com" target="_blank" rel="noopener noreferrer" data-s="淘宝 taobao.com"><span class="dot"></span><span class="sbody"><span class="sname">淘宝</span><span class="sdesc">阿里巴巴 C2C 电商平台，万能的淘宝，品类齐全。</span></span></a>
+        <a class="site" href="https://www.tmall.com" target="_blank" rel="noopener noreferrer" data-s="天猫 tmall.com"><span class="dot"></span><span class="sbody"><span class="sname">天猫</span><span class="sdesc">阿里巴巴 B2C 平台，品牌正品旗舰店与超市。</span></span></a>
+        <a class="site" href="https://www.jd.com" target="_blank" rel="noopener noreferrer" data-s="京东 jd.com"><span class="dot"></span><span class="sbody"><span class="sname">京东</span><span class="sdesc">自营电商起家，当日达物流与 3C 正品保障。</span></span></a>
+        <a class="site" href="https://www.pinduoduo.com" target="_blank" rel="noopener noreferrer" data-s="拼多多 pinduoduo.com"><span class="dot"></span><span class="sbody"><span class="sname">拼多多</span><span class="sdesc">社交电商，百亿补贴与拼团低价，农产品优势。</span></span></a>
+        <a class="site" href="https://www.vip.com" target="_blank" rel="noopener noreferrer" data-s="唯品会 vip.com"><span class="dot"></span><span class="sbody"><span class="sname">唯品会</span><span class="sdesc">品牌特卖电商，折扣名牌服饰美妆好物。</span></span></a>
+        <a class="site" href="https://www.suning.com" target="_blank" rel="noopener noreferrer" data-s="苏宁易购 suning.com"><span class="dot"></span><span class="sbody"><span class="sname">苏宁易购</span><span class="sdesc">家电 3C 零售龙头，线上线下门店同步。</span></span></a>
+        <a class="site" href="https://www.goofish.com" target="_blank" rel="noopener noreferrer" data-s="闲鱼 goofish.com"><span class="dot"></span><span class="sbody"><span class="sname">闲鱼</span><span class="sdesc">阿里旗下二手闲置交易平台，买卖二手好物。</span></span></a>
+        <a class="site" href="https://www.smzdm.com" target="_blank" rel="noopener noreferrer" data-s="什么值得买 smzdm.com"><span class="dot"></span><span class="sbody"><span class="sname">什么值得买</span><span class="sdesc">消费决策与折扣爆料平台，好价与晒单社区。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c10">
+      <h2>新闻资讯 <em>7</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.toutiao.com" target="_blank" rel="noopener noreferrer" data-s="今日头条 toutiao.com"><span class="dot"></span><span class="sbody"><span class="sname">今日头条</span><span class="sdesc">字节跳动资讯聚合，算法推荐个性化新闻与视频。</span></span></a>
+        <a class="site" href="https://news.qq.com" target="_blank" rel="noopener noreferrer" data-s="腾讯新闻 news.qq.com"><span class="dot"></span><span class="sbody"><span class="sname">腾讯新闻</span><span class="sdesc">腾讯旗下综合新闻门户，热点与深度报道。</span></span></a>
+        <a class="site" href="https://news.163.com" target="_blank" rel="noopener noreferrer" data-s="网易新闻 news.163.com"><span class="dot"></span><span class="sbody"><span class="sname">网易新闻</span><span class="sdesc">网易新闻门户，独特跟帖文化与原创栏目。</span></span></a>
+        <a class="site" href="https://news.sina.com.cn" target="_blank" rel="noopener noreferrer" data-s="新浪新闻 news.sina.com.cn"><span class="dot"></span><span class="sbody"><span class="sname">新浪新闻</span><span class="sdesc">新浪门户，突发新闻与财经体育资讯。</span></span></a>
+        <a class="site" href="https://www.thepaper.cn" target="_blank" rel="noopener noreferrer" data-s="澎湃新闻 thepaper.cn"><span class="dot"></span><span class="sbody"><span class="sname">澎湃新闻</span><span class="sdesc">上海报业集团旗下时政与思想类新媒体。</span></span></a>
+        <a class="site" href="https://www.ifeng.com" target="_blank" rel="noopener noreferrer" data-s="凤凰网 ifeng.com"><span class="dot"></span><span class="sbody"><span class="sname">凤凰网</span><span class="sdesc">凤凰卫视旗下综合资讯，国际化视野。</span></span></a>
+        <a class="site" href="https://www.guancha.cn" target="_blank" rel="noopener noreferrer" data-s="观察者网 guancha.cn"><span class="dot"></span><span class="sbody"><span class="sname">观察者网</span><span class="sdesc">时政军事与国际评论，青年思想社区。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c11">
+      <h2>办公效率 <em>7</em></h2>
+      <div class="sites">
+        <a class="site" href="https://docs.qq.com" target="_blank" rel="noopener noreferrer" data-s="腾讯文档 docs.qq.com"><span class="dot"></span><span class="sbody"><span class="sname">腾讯文档</span><span class="sdesc">在线协作文档表格，免费多人实时编辑。</span></span></a>
+        <a class="site" href="https://www.feishu.cn" target="_blank" rel="noopener noreferrer" data-s="飞书 feishu.cn"><span class="dot"></span><span class="sbody"><span class="sname">飞书</span><span class="sdesc">字节跳动协作平台，文档、表格、日历、会议一体。</span></span></a>
+        <a class="site" href="https://www.yuque.com" target="_blank" rel="noopener noreferrer" data-s="语雀 yuque.com"><span class="dot"></span><span class="sbody"><span class="sname">语雀</span><span class="sdesc">阿里旗下知识管理与团队文档写作平台。</span></span></a>
+        <a class="site" href="https://www.notion.so" target="_blank" rel="noopener noreferrer" data-s="notion notion.so"><span class="dot"></span><span class="sbody"><span class="sname">Notion</span><span class="sdesc">All-in-one 笔记与数据库协作工具，全球流行。</span></span></a>
+        <a class="site" href="https://shimo.im" target="_blank" rel="noopener noreferrer" data-s="石墨文档 shimo.im"><span class="dot"></span><span class="sbody"><span class="sname">石墨文档</span><span class="sdesc">轻量级在线协作文档，简洁易用。</span></span></a>
+        <a class="site" href="https://www.dingtalk.com" target="_blank" rel="noopener noreferrer" data-s="钉钉 dingtalk.com"><span class="dot"></span><span class="sbody"><span class="sname">钉钉</span><span class="sdesc">阿里企业办公平台，打卡、审批、视频会议。</span></span></a>
+        <a class="site" href="https://work.weixin.qq.com" target="_blank" rel="noopener noreferrer" data-s="企业微信 work.weixin.qq.com"><span class="dot"></span><span class="sbody"><span class="sname">企业微信</span><span class="sdesc">腾讯企业沟通与内部办公管理工具。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c12">
+      <h2>出行地图 <em>7</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.12306.cn" target="_blank" rel="noopener noreferrer" data-s="12306 12306.cn"><span class="dot"></span><span class="sbody"><span class="sname">12306</span><span class="sdesc">中国铁路官方购票平台，高铁动车火车票唯一官方渠道。</span></span></a>
+        <a class="site" href="https://www.ctrip.com" target="_blank" rel="noopener noreferrer" data-s="携程 ctrip.com"><span class="dot"></span><span class="sbody"><span class="sname">携程</span><span class="sdesc">综合旅行平台，机票、酒店、火车票、度假预订。</span></span></a>
+        <a class="site" href="https://www.qunar.com" target="_blank" rel="noopener noreferrer" data-s="去哪儿 qunar.com"><span class="dot"></span><span class="sbody"><span class="sname">去哪儿</span><span class="sdesc">旅游搜索引擎，机酒价格比价与预订。</span></span></a>
+        <a class="site" href="https://www.fliggy.com" target="_blank" rel="noopener noreferrer" data-s="飞猪 fliggy.com"><span class="dot"></span><span class="sbody"><span class="sname">飞猪</span><span class="sdesc">阿里旗下旅行平台，度假、酒店、门票套餐。</span></span></a>
+        <a class="site" href="https://www.amap.com" target="_blank" rel="noopener noreferrer" data-s="高德地图 amap.com"><span class="dot"></span><span class="sbody"><span class="sname">高德地图</span><span class="sdesc">国民级导航地图，打车、公交、骑行出行一体。</span></span></a>
+        <a class="site" href="https://map.baidu.com" target="_blank" rel="noopener noreferrer" data-s="百度地图 map.baidu.com"><span class="dot"></span><span class="sbody"><span class="sname">百度地图</span><span class="sdesc">百度旗下地图导航与定位、路线规划服务。</span></span></a>
+        <a class="site" href="https://www.didiglobal.com" target="_blank" rel="noopener noreferrer" data-s="滴滴出行 didiglobal.com"><span class="dot"></span><span class="sbody"><span class="sname">滴滴出行</span><span class="sdesc">一键叫车出行平台，快车、专车、顺风车。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c13">
+      <h2>学习成长 <em>6</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.icourse163.org" target="_blank" rel="noopener noreferrer" data-s="中国大学mooc icourse163.org"><span class="dot"></span><span class="sbody"><span class="sname">中国大学MOOC</span><span class="sdesc">教育部官方慕课平台，985/211 名校免费公开课。</span></span></a>
+        <a class="site" href="https://www.coursera.org" target="_blank" rel="noopener noreferrer" data-s="coursera coursera.org"><span class="dot"></span><span class="sbody"><span class="sname">Coursera</span><span class="sdesc">国际名校在线课程，完成可获证书与学位。</span></span></a>
+        <a class="site" href="https://study.163.com" target="_blank" rel="noopener noreferrer" data-s="网易云课堂 study.163.com"><span class="dot"></span><span class="sbody"><span class="sname">网易云课堂</span><span class="sdesc">职业技能在线学习平台，编程、设计、职场课程。</span></span></a>
+        <a class="site" href="https://time.geekbang.org" target="_blank" rel="noopener noreferrer" data-s="极客时间 time.geekbang.org"><span class="dot"></span><span class="sbody"><span class="sname">极客时间</span><span class="sdesc">IT 技术人成长课堂，体系化专栏与训练营。</span></span></a>
+        <a class="site" href="https://www.imooc.com" target="_blank" rel="noopener noreferrer" data-s="慕课网 imooc.com"><span class="dot"></span><span class="sbody"><span class="sname">慕课网</span><span class="sdesc">程序员实战编程学习平台，免费+付费课程。</span></span></a>
+        <a class="site" href="https://baike.baidu.com" target="_blank" rel="noopener noreferrer" data-s="百度百科 baike.baidu.com"><span class="dot"></span><span class="sbody"><span class="sname">百度百科</span><span class="sdesc">中文网络百科全书，词条查询与科普。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c14">
+      <h2>开发者 <em>6</em></h2>
+      <div class="sites">
+        <a class="site" href="https://github.com" target="_blank" rel="noopener noreferrer" data-s="github github.com"><span class="dot"></span><span class="sbody"><span class="sname">GitHub</span><span class="sdesc">全球最大代码托管与开源协作社区。</span></span></a>
+        <a class="site" href="https://gitee.com" target="_blank" rel="noopener noreferrer" data-s="gitee gitee.com"><span class="dot"></span><span class="sbody"><span class="sname">Gitee</span><span class="sdesc">国内代码托管平台，访问速度快、企业服务完善。</span></span></a>
+        <a class="site" href="https://stackoverflow.com" target="_blank" rel="noopener noreferrer" data-s="stack overflow stackoverflow.com"><span class="dot"></span><span class="sbody"><span class="sname">Stack Overflow</span><span class="sdesc">程序员问答社区，编程问题首选。</span></span></a>
+        <a class="site" href="https://juejin.cn" target="_blank" rel="noopener noreferrer" data-s="掘金 juejin.cn"><span class="dot"></span><span class="sbody"><span class="sname">掘金</span><span class="sdesc">开发者技术分享社区，前端、后端、AI 文章。</span></span></a>
+        <a class="site" href="https://www.csdn.net" target="_blank" rel="noopener noreferrer" data-s="csdn csdn.net"><span class="dot"></span><span class="sbody"><span class="sname">CSDN</span><span class="sdesc">中文 IT 技术社区，博客、下载、课程。</span></span></a>
+        <a class="site" href="https://www.oschina.net" target="_blank" rel="noopener noreferrer" data-s="开源中国 oschina.net"><span class="dot"></span><span class="sbody"><span class="sname">开源中国</span><span class="sdesc">国内开源技术资讯、软件镜像与项目托管。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c15">
+      <h2>音乐音频 <em>6</em></h2>
+      <div class="sites">
+        <a class="site" href="https://y.qq.com" target="_blank" rel="noopener noreferrer" data-s="qq音乐 y.qq.com"><span class="dot"></span><span class="sbody"><span class="sname">QQ音乐</span><span class="sdesc">正版曲库音乐平台，海量华语与欧美歌曲。</span></span></a>
+        <a class="site" href="https://music.163.com" target="_blank" rel="noopener noreferrer" data-s="网易云音乐 music.163.com"><span class="dot"></span><span class="sbody"><span class="sname">网易云音乐</span><span class="sdesc">音乐社区，评论文化与个性化歌单推荐。</span></span></a>
+        <a class="site" href="https://www.kugou.com" target="_blank" rel="noopener noreferrer" data-s="酷狗音乐 kugou.com"><span class="dot"></span><span class="sbody"><span class="sname">酷狗音乐</span><span class="sdesc">数字音乐播放平台，直播与 K 歌功能。</span></span></a>
+        <a class="site" href="https://www.ximalaya.com" target="_blank" rel="noopener noreferrer" data-s="喜马拉雅 ximalaya.com"><span class="dot"></span><span class="sbody"><span class="sname">喜马拉雅</span><span class="sdesc">在线音频平台，有声书、播客、相声评书。</span></span></a>
+        <a class="site" href="https://www.qingting.fm" target="_blank" rel="noopener noreferrer" data-s="蜻蜓fm qingting.fm"><span class="dot"></span><span class="sbody"><span class="sname">蜻蜓FM</span><span class="sdesc">广播电台与音频聚合平台。</span></span></a>
+        <a class="site" href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" data-s="spotify spotify.com"><span class="dot"></span><span class="sbody"><span class="sname">Spotify</span><span class="sdesc">全球流媒体音乐平台，海量曲库与个性化推荐。</span></span></a>
+      </div>
+    </section>
+
+    <section class="cat" id="c16">
+      <h2>金融理财 <em>6</em></h2>
+      <div class="sites">
+        <a class="site" href="https://www.alipay.com" target="_blank" rel="noopener noreferrer" data-s="支付宝 alipay.com"><span class="dot"></span><span class="sbody"><span class="sname">支付宝</span><span class="sdesc">蚂蚁集团支付与生活服务平台，缴费、理财、出行。</span></span></a>
+        <a class="site" href="https://www.1234567.com.cn" target="_blank" rel="noopener noreferrer" data-s="天天基金 1234567.com.cn"><span class="dot"></span><span class="sbody"><span class="sname">天天基金</span><span class="sdesc">东方财富旗下基金查询、估值与交易平台。</span></span></a>
+        <a class="site" href="https://www.eastmoney.com" target="_blank" rel="noopener noreferrer" data-s="东方财富 eastmoney.com"><span class="dot"></span><span class="sbody"><span class="sname">东方财富</span><span class="sdesc">财经门户，股票行情、资讯与数据中心。</span></span></a>
+        <a class="site" href="https://xueqiu.com" target="_blank" rel="noopener noreferrer" data-s="雪球 xueqiu.com"><span class="dot"></span><span class="sbody"><span class="sname">雪球</span><span class="sdesc">投资者交流社区，组合跟踪与行情讨论。</span></span></a>
+        <a class="site" href="https://www.cmbchina.com" target="_blank" rel="noopener noreferrer" data-s="招商银行 cmbchina.com"><span class="dot"></span><span class="sbody"><span class="sname">招商银行</span><span class="sdesc">网上银行，个人金融与信用卡服务。</span></span></a>
+        <a class="site" href="https://www.10jqka.com.cn" target="_blank" rel="noopener noreferrer" data-s="同花顺 10jqka.com.cn"><span class="dot"></span><span class="sbody"><span class="sname">同花顺</span><span class="sdesc">股票行情与炒股软件，资讯、数据与交易中心。</span></span></a>
+      </div>
+    </section>
+  <div class="empty" id="empty">没有匹配的站点，换个关键词试试。</div>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <p>共 <b>128</b> 个站点、<b>16</b> 个分类。「学术与科研」为本课程群按教学科研需要补充，「其余分类」由《网址大全 · 热门网站导航》整理沉淀；链接指向第三方网站，内容与可用性由站点方负责。</p>
+  </div>
+</footer>
+<script>
+(function(){
+  var q=document.getElementById('q'), clr=document.getElementById('clear');
+  var cnt=document.getElementById('count'), empty=document.getElementById('empty');
+  var cats=[].slice.call(document.querySelectorAll('.cat'));
+  var sites=[].slice.call(document.querySelectorAll('.site'));
+  var total=sites.length;
+  sites.forEach(function(el){
+    el.dataset.s=(el.dataset.s||'')+' '+(el.querySelector('.sname').textContent)+' '+(el.querySelector('.sdesc').textContent||'');
+    el.dataset.s=el.dataset.s.toLowerCase();
+  });
+  function apply(){
+    var k=q.value.trim().toLowerCase();
+    clr.style.display=k?'block':'none';
+    if(!k){
+      sites.forEach(function(el){el.style.display='';});
+      cats.forEach(function(c){c.style.display='';});
+      empty.style.display='none';
+      cnt.textContent='共 '+total+' 个站点';
+      return;
+    }
+    var shown=0;
+    sites.forEach(function(el){
+      var ok=el.dataset.s.indexOf(k)>-1;
+      el.style.display=ok?'':'none';
+      if(ok)shown++;
+    });
+    cats.forEach(function(c){
+      var n=c.querySelectorAll('.site:not([style*="none"])').length;
+      c.style.display=n?'':'none';
+    });
+    empty.style.display=shown?'none':'block';
+    cnt.textContent=shown+' / '+total+' 个站点匹配「'+q.value.trim()+'」';
+  }
+  q.addEventListener('input',apply);
+  clr.addEventListener('click',function(){q.value='';apply();q.focus();});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='/'&&document.activeElement!==q){e.preventDefault();q.focus();}
+    if(e.key==='Escape'&&document.activeElement===q){q.value='';apply();}
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
