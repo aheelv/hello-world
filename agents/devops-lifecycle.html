@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevOps 全生命周期演示 · 从一次提交到生产运行</title>
+<style>
+/* ============================================================
+   设计令牌 —— 克制的专业配色（浅色主题）
+   ============================================================ */
+:root{
+  --bg:#eceff4;
+  --surface:#ffffff;
+  --surface-2:#f7f9fc;
+  --surface-3:#eff3f9;
+  --border:#dfe5ee;
+  --border-2:#cbd5e3;
+  --text:#0f172a;
+  --text-2:#44516a;
+  --muted:#78859c;
+  --accent:#2563eb;
+  --accent-2:#1d4ed8;
+  --accent-soft:#e8efff;
+
+  /* 六个环节的克制色相 */
+  --s0:#4f46e5;  /* 需求 */
+  --s1:#0369a1;  /* 设计 */
+  --s2:#0f766e;  /* 开发 */
+  --s3:#b45309;  /* 测试 */
+  --s4:#c2410c;  /* 发布 */
+  --s5:#6d28d9;  /* 运维 */
+  --loop:#7c3aed;
+
+  --radius:13px;
+  --radius-sm:9px;
+  --sh-1:0 1px 2px rgba(15,23,42,.05), 0 2px 8px rgba(15,23,42,.05);
+  --sh-2:0 6px 20px rgba(15,23,42,.10);
+  --sh-3:0 16px 40px rgba(15,23,42,.16);
+  --font:"Inter","PingFang SC","Microsoft YaHei","Hiragino Sans GB","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono","SFMono-Regular",Consolas,Menlo,monospace;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font);color:var(--text);line-height:1.6;
+  background:
+    radial-gradient(1100px 520px at 8% -8%, #ffffff 0%, rgba(255,255,255,0) 62%),
+    linear-gradient(180deg,#f5f7fa 0%, var(--bg) 100%);
+  min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   顶栏
+   ============================================================ */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);padding:13px 22px 11px;
+}
+.topbar-inner{max-width:1500px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:11px;min-width:0;}
+.brand-logo{
+  width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;
+  background:linear-gradient(140deg,#1e293b,#0f172a);color:#7dd3fc;
+  font-size:18px;font-weight:800;box-shadow:0 4px 12px rgba(15,23,42,.22);
+}
+.brand h1{margin:0;font-size:16.5px;font-weight:700;letter-spacing:.2px;line-height:1.3;}
+.brand p{margin:1px 0 0;font-size:12px;color:var(--muted);}
+.brand-sub{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;}
+.chip{
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);
+}
+
+/* ============================================================
+   控制条
+   ============================================================ */
+.controls{max-width:1500px;margin:12px auto 0;padding:0 22px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+.bar{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--sh-1);padding:9px 13px;display:flex;align-items:center;gap:11px;flex-wrap:wrap;
+}
+.btn{
+  font-family:inherit;font-size:13px;font-weight:600;border:1px solid var(--border-2);
+  background:#fff;color:var(--text);border-radius:9px;padding:7px 13px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:.15s ease;
+}
+.btn:hover:not(:disabled){background:var(--surface-3);border-color:#a9b8ce;transform:translateY(-1px);box-shadow:var(--sh-1);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn.primary{background:linear-gradient(180deg,#3b73ee,#2158d8);border-color:#1f55cc;color:#fff;box-shadow:0 3px 9px rgba(37,99,235,.26);}
+.btn.primary:hover:not(:disabled){background:linear-gradient(180deg,#4a7ff2,#2660e2);}
+.btn .ico{font-size:13px;line-height:1;}
+
+.scrub{flex:1;min-width:240px;display:flex;align-items:center;gap:11px;}
+.scrub input[type=range]{
+  -webkit-appearance:none;appearance:none;flex:1;height:5px;border-radius:99px;outline:none;
+  background:linear-gradient(90deg,var(--accent) var(--p,0%), #dfe5ee var(--p,0%));cursor:pointer;
+}
+.scrub input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#fff;
+  border:3px solid var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(15,23,42,.24);
+}
+.scrub input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer;}
+.scrub-val{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600;min-width:44px;text-align:right;}
+
+.speed{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);font-weight:600;}
+.speed input[type=range]{
+  -webkit-appearance:none;appearance:none;width:110px;height:5px;border-radius:99px;outline:none;
+  background:linear-gradient(90deg,var(--accent) var(--sp,33%), #dfe5ee var(--sp,33%));cursor:pointer;
+}
+.speed input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer;
+}
+.speed-val{font-variant-numeric:tabular-nums;color:var(--accent);min-width:36px;}
+
+/* ============================================================
+   主体
+   ============================================================ */
+.shell{max-width:1500px;margin:16px auto 40px;padding:0 22px;}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--sh-1);overflow:hidden;}
+.panel-head{
+  display:flex;align-items:center;gap:10px;padding:10px 15px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);background:linear-gradient(180deg,#fcfdfe,#f6f8fb);
+}
+.panel-head h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.2px;}
+.panel-head .sub{font-size:11.5px;color:var(--muted);font-weight:500;}
+.spacer{margin-left:auto;}
+
+/* ============================================================
+   流水线舞台
+   ============================================================ */
+.stage-wrap{margin-bottom:14px;}
+.stage{position:relative;padding:16px 24px 104px;}
+#rail{position:absolute;left:0;top:0;z-index:1;overflow:visible;pointer-events:none;}
+.rail-base{fill:none;stroke:#d3dce8;stroke-width:3;stroke-linecap:round;}
+.rail-prog-fill{fill:none;stroke:var(--accent);stroke-width:3.2;stroke-linecap:round;opacity:0;}
+.rail-prog{fill:none;stroke:#8fc0ff;stroke-width:3.2;stroke-linecap:round;stroke-dasharray:8 12;animation:march 1s linear infinite;}
+.rail-arrow{fill:none;stroke:none;}
+@keyframes march{to{stroke-dashoffset:-20;}}
+.rail-tick{stroke:#c3cfdf;stroke-width:2;stroke-linecap:round;}
+.rail-loop{fill:none;stroke:var(--loop);stroke-width:2.4;stroke-dasharray:7 8;opacity:.72;}
+.rail-loop.live{opacity:1;animation:march2 1s linear infinite;}
+@keyframes march2{to{stroke-dashoffset:-30;}}
+.loop-label{
+  position:absolute;z-index:4;font-size:10.5px;font-weight:700;color:var(--loop);
+  background:#f3eeff;border:1px solid #ddd0fb;border-radius:999px;padding:3px 9px;white-space:nowrap;
+  transform:translate(-50%,-50%);pointer-events:none;transition:opacity .3s;
+}
+.loop-label.v{transform:translate(0,-50%);font-size:10px;padding:3px 8px;}
+
+/* 节点 */
+.stations{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;}
+.station{position:relative;width:118px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;}
+.st-badge{
+  width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:21px;
+  background:#fff;border:2px solid var(--border-2);color:var(--text-2);
+  box-shadow:var(--sh-1);transition:transform .28s cubic-bezier(.34,1.3,.64,1), border-color .28s, box-shadow .28s, background .28s;
+}
+.st-text{display:flex;flex-direction:column;align-items:center;}
+.st-name{font-size:13.5px;font-weight:700;margin-top:9px;line-height:1.25;}
+.st-en{font-size:10.5px;color:var(--muted);font-weight:600;letter-spacing:.3px;margin-top:1px;}
+.st-check{
+  position:absolute;top:-4px;right:11px;width:17px;height:17px;border-radius:50%;
+  background:var(--s-done,#0f766e);color:#fff;font-size:10px;display:none;place-items:center;
+  border:2px solid #fff;box-shadow:var(--sh-1);
+}
+.station.done .st-check{display:grid;}
+.station.done .st-badge{border-color:var(--sc,#0f766e);background:var(--sc-bg,#eef7f5);}
+.station.active .st-badge{
+  border-color:var(--sc);background:var(--sc-bg);
+  transform:scale(1.14);box-shadow:0 0 0 5px var(--sc-glow), var(--sh-2);
+}
+.station.active .st-name{color:var(--sc);}
+.station:hover .st-badge{transform:scale(1.07);}
+
+/* 流转中的代码块 */
+.codeblock{
+  position:absolute;z-index:6;left:0;top:0;pointer-events:none;
+  display:flex;align-items:center;gap:8px;padding:7px 12px 7px 9px;border-radius:11px;
+  background:linear-gradient(160deg,#1e293b,#0b1220);color:#e2e8f0;
+  border:1px solid #334155;box-shadow:0 8px 22px rgba(15,23,42,.3), 0 0 0 1px rgba(255,255,255,.04);
+  will-change:transform;white-space:nowrap;
+}
+.codeblock::after{
+  content:"";position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;
+  border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.22),transparent 70%);
+  animation:pulse 2.1s ease-out infinite;z-index:-1;
+}
+@keyframes pulse{0%{transform:scale(.55);opacity:.9;}100%{transform:scale(1.25);opacity:0;}}
+.cb-icon{
+  width:24px;height:24px;border-radius:7px;flex:none;display:grid;place-items:center;font-size:13px;
+  background:rgba(125,211,252,.16);color:#7dd3fc;border:1px solid rgba(125,211,252,.26);
+}
+.cb-text{display:flex;flex-direction:column;line-height:1.25;}
+.cb-main{font-family:var(--mono);font-size:11.5px;font-weight:600;color:#f1f5f9;letter-spacing:.2px;}
+.cb-sub{font-size:9.5px;color:#94a3b8;font-weight:600;}
+
+/* ============================================================
+   环节详情
+   ============================================================ */
+.detail-grid{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(0,1fr);gap:14px;margin-bottom:14px;}
+.stage-detail{padding:16px 18px 18px;}
+.sd-top{display:flex;align-items:center;gap:11px;margin-bottom:12px;flex-wrap:wrap;}
+.sd-icon{
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none;
+  background:var(--sc-bg,#eef2f7);border:1.5px solid var(--sc,#94a3b8);
+}
+.sd-title{min-width:0;}
+.sd-title h3{margin:0;font-size:18px;font-weight:700;letter-spacing:.2px;}
+.sd-title p{margin:1px 0 0;font-size:11.5px;color:var(--muted);font-weight:600;}
+.sd-artifact{
+  margin-left:auto;font-size:11.5px;font-weight:700;color:var(--text-2);
+  background:var(--surface-3);border:1px solid var(--border);border-radius:999px;padding:5px 12px;white-space:nowrap;
+}
+.sd-artifact b{color:var(--sc);font-family:var(--mono);font-weight:700;}
+.sd-problem{
+  font-size:13.5px;color:var(--text-2);line-height:1.75;background:var(--surface-2);
+  border-left:3px solid var(--sc);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:11px 14px;margin:0 0 15px;
+}
+.sec-title{
+  font-size:10.5px;font-weight:800;letter-spacing:.8px;color:var(--muted);
+  margin:0 0 9px;display:flex;align-items:center;gap:7px;
+}
+.sec-title::after{content:"";flex:1;height:1px;background:var(--border);}
+.practice{display:flex;gap:11px;padding:9px 0;border-bottom:1px dashed var(--border);}
+.practice:last-child{border-bottom:none;padding-bottom:0;}
+.pr-ico{
+  width:28px;height:28px;border-radius:8px;flex:none;display:grid;place-items:center;font-size:14px;
+  background:var(--surface-3);border:1px solid var(--border);
+}
+.pr-body{min-width:0;}
+.pr-term{font-size:13px;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.pr-tag{
+  font-size:9.5px;font-weight:800;letter-spacing:.4px;padding:1.5px 6px;border-radius:5px;
+  background:var(--sc-bg,#eef2f7);color:var(--sc,#475569);border:1px solid var(--border);
+}
+.pr-desc{font-size:12.5px;color:var(--text-2);line-height:1.65;}
+
+/* 术语表 */
+.glossary-body{padding:14px 16px 16px;}
+.term{border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:8px;background:var(--surface-2);}
+.term:last-child{margin-bottom:0;}
+.term-t{font-size:12.5px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:7px;}
+.term-t::before{content:"";width:4px;height:13px;border-radius:2px;background:var(--sc,#94a3b8);flex:none;}
+.term-d{font-size:12px;color:var(--text-2);line-height:1.65;}
+
+/* ============================================================
+   底部知识卡片
+   ============================================================ */
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.note{padding:14px 16px 15px;}
+.note h4{margin:0 0 6px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.note p{margin:0;font-size:12.5px;color:var(--text-2);line-height:1.7;}
+.note .n-ico{
+  width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:13px;flex:none;
+  background:var(--accent-soft);color:var(--accent);
+}
+.metric-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;}
+.metric{
+  font-size:11px;font-weight:600;color:var(--text-2);background:var(--surface-2);
+  border:1px solid var(--border);border-radius:7px;padding:4px 9px;
+}
+.metric b{color:var(--accent);font-weight:700;}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width:1080px){
+  .detail-grid{grid-template-columns:1fr;}
+  .notes{grid-template-columns:1fr;}
+}
+@media (max-width:760px){
+  .topbar{padding:11px 14px 9px;}
+  .controls{padding:0 14px;}
+  .shell{padding:0 14px;}
+  .brand-sub{display:none;}
+  .stage{padding:12px 14px 64px 46px;}
+  .stations{flex-direction:column;gap:20px;align-items:stretch;}
+  .station{width:auto;flex-direction:row;align-items:center;text-align:left;gap:0;padding-left:82px;min-height:46px;}
+  .st-badge{position:absolute;left:18px;top:0;width:46px;height:46px;}
+  .st-check{left:44px;right:auto;top:-3px;}
+  .st-text{align-items:flex-start;}
+  .st-name{margin-top:0;font-size:13px;}
+  .st-en{margin-top:0;}
+  .codeblock{padding:5px;border-radius:9px;}
+  .cb-text{display:none;}
+  .cb-icon{width:22px;height:22px;}
+  .sd-artifact{margin-left:0;}
+}
+@media (max-width:520px){
+  .brand h1{font-size:15px;}
+  .btn{padding:6px 10px;font-size:12px;}
+  .scrub-val{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-logo">∞</div>
+      <div>
+        <h1>DevOps 全生命周期演示</h1>
+        <p>一次代码提交，如何被自动化流水线送进生产，并带着运维反馈重新回到需求</p>
+      </div>
+    </div>
+    <div class="brand-sub">
+      <span class="chip">持续集成 CI</span>
+      <span class="chip">持续交付 CD</span>
+      <span class="chip">可观测性</span>
+      <span class="chip">基础设施即代码</span>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="bar">
+    <button class="btn primary" id="btnPlay"><span class="ico">▶</span><span id="playLabel">播放</span></button>
+    <button class="btn" id="btnPrev"><span class="ico">◀</span>上一环节</button>
+    <button class="btn" id="btnNext">下一环节<span class="ico">▶</span></button>
+    <button class="btn" id="btnReset"><span class="ico">↺</span>重置</button>
+    <div class="speed">
+      <span>速度</span>
+      <input type="range" id="speed" min="0.5" max="3" step="0.25" value="1">
+      <span class="speed-val" id="speedVal">1.00×</span>
+    </div>
+  </div>
+  <div class="bar scrub">
+    <span style="font-size:12px;color:var(--muted);font-weight:600">进度</span>
+    <input type="range" id="scrub" min="0" max="1000" value="0">
+    <span class="scrub-val" id="scrubVal">0%</span>
+  </div>
+</div>
+
+<main class="shell">
+
+  <!-- ============ 流水线 ============ -->
+  <section class="panel stage-wrap">
+    <div class="panel-head">
+      <h2>交付流水线</h2>
+      <span class="sub">点击任一环节可直接跳转</span>
+      <span class="spacer"></span>
+      <span class="sub" id="cycleNote">流水线运行中 · 代码正沿轨道流转</span>
+    </div>
+    <div class="stage" id="stage">
+      <svg id="rail" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="stations" id="stations"></div>
+      <div class="codeblock" id="codeblock">
+        <span class="cb-icon">⎇</span>
+        <span class="cb-text"><span class="cb-main" id="cbMain">—</span><span class="cb-sub" id="cbSub">—</span></span>
+      </div>
+      <div class="loop-label" id="loopLabel">↺ 运维反馈 → 新需求</div>
+    </div>
+  </section>
+
+  <!-- ============ 环节详情 + 术语 ============ -->
+  <div class="detail-grid">
+    <section class="panel stage-detail" id="stageDetail"></section>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>关键术语</h2>
+        <span class="sub">本环节涉及的核心概念</span>
+      </div>
+      <div class="glossary-body" id="glossary"></div>
+    </section>
+  </div>
+
+  <!-- ============ 知识卡片 ============ -->
+  <div class="notes">
+    <section class="panel note">
+      <h4><span class="n-ico">◎</span>DevOps 不等于工具链</h4>
+      <p>工具只解决自动化问题，DevOps 的核心是让开发、测试、运维共享同一个目标与同一条流水线：<b>谁构建、谁测试、谁部署，都由同一条自动化流水线完成</b>，而不是把工作丢给下一个团队。</p>
+    </section>
+    <section class="panel note">
+      <h4><span class="n-ico">📈</span>如何衡量效果</h4>
+      <p>Google DORA 研究提出的四项指标被广泛用于评估交付效能，它们描述的是交付速度与质量的平衡：</p>
+      <div class="metric-row">
+        <span class="metric">部署频率 <b>DF</b></span>
+        <span class="metric">变更前置时间 <b>LT</b></span>
+        <span class="metric">变更失败率 <b>CFR</b></span>
+        <span class="metric">恢复时间 <b>MTTR</b></span>
+      </div>
+    </section>
+    <section class="panel note">
+      <h4><span class="n-ico">↺</span>为什么是闭环而非直线</h4>
+      <p>运维阶段发现的性能瓶颈、线上事故与用户反馈，会变成新的需求重新进入第一环节。<b>DevOps 是一条闭环流水线</b>：交付只是终点，把生产环境的真实问题快速带回开发，才是持续改进的来源。</p>
+    </section>
+  </div>
+
+</main>
+
+<script>
+"use strict";
+
+/* ============================================================
+   1. 内容数据：六个环节的 DevOps 实践与术语
+   ============================================================ */
+const STAGES = [
+  {
+    key:"plan", name:"需求", en:"Plan · Define", icon:"📋", color:"#4f46e5",
+    bg:"#eef0fe", glow:"rgba(79,70,229,.14)",
+    artifact:"变更请求 CR-42",
+    block:["CR-42", "需求已就绪"],
+    problem:"在写第一行代码之前，如何让「要做什么」变得可交付、可度量，并且不偏离业务目标？",
+    practices:[
+      { ico:"🧩", tag:"Small Batches", term:"小批量需求切片", desc:"把需求拆成 1~2 周内可交付的增量。批次越小，集成冲突与返工越少，部署失败的影响面也越小。" },
+      { ico:"🗺️", tag:"Value Stream", term:"价值流分析", desc:"画出从需求到上线的真实流程，包含等待与返工时间，据此定位真正的瓶颈，而不是凭感觉优化。" },
+      { ico:"📄", tag:"Requirements as Code", term:"需求即代码", desc:"用户故事与验收标准与代码同仓版本管理，需求变更同样要经过评审，可追溯、可回滚。" },
+      { ico:"🏗️", tag:"IaC", term:"基础设施即代码", desc:"环境定义以声明式配置纳入版本库。环境不再是「某位同事的笔记本」，任何人都能一键重建出一致的测试环境。" }
+    ],
+    terms:[
+      { t:"IaC（Infrastructure as Code）", d:"用声明式代码描述服务器、网络、容器等基础设施，使其可版本化、可评审、可重复创建，是环境一致性的前提。" },
+      { t:"Small Batches（小批量）", d:"小颗粒、频繁的交付批次。批次越小，反馈越快，单次变更失败时需要回滚的范围也越小。" },
+      { t:"Lead Time for Changes（变更前置时间）", d:"从代码提交到生产环境生效所经历的时间。DORA 四项指标之一，用来衡量交付速度。" }
+    ]
+  },
+  {
+    key:"design", name:"设计", en:"Design · Architect", icon:"📐", color:"#0369a1",
+    bg:"#e7f2f9", glow:"rgba(3,105,161,.14)",
+    artifact:"设计契约 v3",
+    block:["契约 v3", "架构已冻结"],
+    problem:"设计决策如何沉淀为可执行的约束，而不是散落在会议纪要和某个人的脑子里？",
+    practices:[
+      { ico:"📝", tag:"ADR", term:"架构决策记录", desc:"把关键取舍写成「背景—决策—后果」的短文档，随代码一起版本化。半年后仍能回答「当初为什么这么定」。" },
+      { ico:"🤝", tag:"Contract First", term:"契约优先", desc:"先定义接口契约（如 OpenAPI / Protobuf）再并行开发。前端、后端与上下游可以同时动工，而不是互相等。" },
+      { ico:"👀", tag:"Preview Env", term:"预览环境", desc:"每个合并请求自动用 IaC 起一个临时环境，评审者能真正点开页面看效果，而不只是读 diff。" },
+      { ico:"🔀", tag:"GitOps", term:"以 Git 为事实源", desc:"期望状态写在仓库里，由控制器持续把实际状态调谐到期望状态。评审即变更，变更即部署意图。" }
+    ],
+    terms:[
+      { t:"ADR（Architecture Decision Record）", d:"架构决策记录：一份短文档，记录某次技术决策的背景、选项与后果，随代码库一起演进。" },
+      { t:"Preview Environment（预览环境）", d:"为每个合并请求自动创建的临时可交互环境，用完即销毁，让评审从「看代码」升级为「看效果」。" },
+      { t:"Contract Testing（契约测试）", d:"验证服务之间的接口契约与具体实现是否一致的自动化测试，是并行开发的安全网。" },
+      { t:"GitOps", d:"以 Git 仓库作为基础设施的唯一事实源，由控制器不断比对期望状态与实际状态并自动纠偏。" }
+    ]
+  },
+  {
+    key:"dev", name:"开发", en:"Develop · Code", icon:"⌨️", color:"#0f766e",
+    bg:"#e6f4f1", glow:"rgba(15,118,110,.14)",
+    artifact:"提交 9f3c1a2",
+    block:["9f3c1a2", "已推送"],
+    problem:"代码如何频繁、可信地合入主干，而不是在开发者本地攒成一个大惊小怪？",
+    practices:[
+      { ico:"⚡", tag:"CI", term:"持续集成", desc:"每次提交自动触发构建、单元测试与静态检查，秒级给出「这次改动是否安全」的结论。" },
+      { ico:"👥", tag:"Code Review", term:"分支策略与代码评审", desc:"小粒度 Pull Request + 必需评审人。PR 越小越容易审，出了问题也更容易定位与回滚。" },
+      { ico:"🧹", tag:"Pre-commit", term:"提交前检查", desc:"格式化、静态检查、单元测试下沉到本地提交钩子，把问题拦在推远端之前，节省 CI 时间。" },
+      { ico:"🏷️", tag:"Versioning", term:"构建产物版本化", desc:"以提交哈希（SHA）标记构建产物，让「这个镜像对应哪次提交」永远可追溯。" }
+    ],
+    terms:[
+      { t:"CI（Continuous Integration）", d:"持续集成：频繁把变更合入主干，由自动化构建与测试持续验证主干可用性。" },
+      { t:"Pipeline（流水线）", d:"把构建、测试、部署等步骤按顺序编排起来的自动化工作流，通常以 YAML 等配置文件描述。" },
+      { t:"Build（构建）", d:"把源码编译或打包成可运行产物的过程，例如生成容器镜像或可执行包。" },
+      { t:"Immutable Artifact（不可变制品）", d:"一旦构建完成就不再修改的产物。同一份镜像从测试环境原样晋升到生产环境，避免「测的和上线的不一样」。" }
+    ]
+  },
+  {
+    key:"test", name:"测试", en:"Test · Verify", icon:"🧪", color:"#b45309",
+    bg:"#fdf3e3", glow:"rgba(180,83,9,.14)",
+    artifact:"构建 #482",
+    block:["构建 #482", "质量门禁通过"],
+    problem:"如何让「质量」变成一个自动判定、不靠人情放行的关卡？",
+    practices:[
+      { ico:"🔺", tag:"Test Pyramid", term:"自动化测试分层", desc:"大量单元测试 + 适量集成测试 + 少量端到端测试，在反馈速度与覆盖信心之间取得平衡。" },
+      { ico:"🚧", tag:"Quality Gate", term:"质量门禁", desc:"覆盖率阈值、静态扫描、依赖漏洞任一不达标，流水线直接失败并阻断合并与发布。" },
+      { ico:"⏪", tag:"Shift Left", term:"测试左移", desc:"把缺陷发现尽量前移到编码与提交阶段。缺陷发现得越晚，修复成本呈数量级上升。" },
+      { ico:"🔐", tag:"SAST / SCA", term:"安全与依赖扫描", desc:"在流水线里集成静态安全扫描与依赖漏洞检查，把安全问题挡在发布之前。" }
+    ],
+    terms:[
+      { t:"Quality Gate（质量门禁）", d:"流水线上的自动判定阈值，例如覆盖率或扫描结果；未达标即阻断后续步骤，不允许人工跳过。" },
+      { t:"SAST（静态应用安全测试）", d:"在不运行程序的情况下扫描源码与字节码以发现漏洞，常被集成进 CI 阶段。" },
+      { t:"Shift Left（左移）", d:"把测试、评审与安全检查尽量提前到开发早期，用更低的成本消除缺陷。" },
+      { t:"Flaky Test（不稳定测试）", d:"时好时坏的测试。它会拖垮流水线并削弱对门禁的信任，需要被隔离与治理。" }
+    ]
+  },
+  {
+    key:"release", name:"发布", en:"Release · Deploy", icon:"🚀", color:"#c2410c",
+    bg:"#fdeee7", glow:"rgba(194,65,12,.14)",
+    artifact:"镜像 v2.14.0",
+    block:["v2.14.0", "正在灰度"],
+    problem:"如何把「上线」从一场高风险仪式，变成低风险、可回滚的日常操作？",
+    practices:[
+      { ico:"🔁", tag:"CI/CD", term:"持续交付流水线", desc:"测试通过即自动部署到生产环境。人的职责从「执行操作」转为「做决策与承担风险」。" },
+      { ico:"📦", tag:"Container", term:"容器化与镜像仓库", desc:"应用与依赖打包为镜像，制品与运行环境解耦，让测试环境与生产环境保持一致。" },
+      { ico:"🕊️", tag:"Canary", term:"金丝雀发布", desc:"先向小比例流量发布新版本并观察指标，一旦异常立即回滚，把爆炸半径控制在最小。" },
+      { ico:"🚩", tag:"Feature Flag", term:"特性开关", desc:"把「部署代码」与「对用户开启功能」解耦，实现不重新部署就能关闭或放量。" }
+    ],
+    terms:[
+      { t:"CD（Continuous Delivery）", d:"持续交付：保证主干上的任何一次提交都可以随时发布到生产环境。" },
+      { t:"Canary Release（金丝雀发布）", d:"先向小比例用户或流量发布新版本并观察指标，确认稳定后再逐步扩大范围。" },
+      { t:"Blue-Green Deployment（蓝绿部署）", d:"准备两套对等环境，通过切换流量完成发布与回滚，回滚即把流量切回旧环境。" },
+      { t:"Feature Flag（特性开关）", d:"不重新部署即可控制功能是否对用户生效的开关，常用于灰度与快速止损。" }
+    ]
+  },
+  {
+    key:"ops", name:"运维", en:"Operate · Observe", icon:"📡", color:"#6d28d9",
+    bg:"#f0ebfd", glow:"rgba(109,40,217,.14)",
+    artifact:"生产运行中",
+    block:["v2.14.0", "生产运行中"],
+    problem:"上线之后，如何判断系统是否健康，并让反馈快速回到开发？",
+    practices:[
+      { ico:"🔭", tag:"Observability", term:"可观测性三支柱", desc:"指标（Metrics）、日志（Logs）、链路追踪（Traces）互相印证，从「能监控」升级为「能定位到具体请求」。" },
+      { ico:"🚨", tag:"On-call", term:"事件响应与值班", desc:"明确的告警分级、升级路径与值班轮值，保证出问题时知道谁处理、如何升级。" },
+      { ico:"🧯", tag:"Postmortem", term:"事故复盘", desc:"无指责文化复盘事故成因，产出可执行的改进项并直接进入需求池，而不是停在文档里。" },
+      { ico:"🧬", tag:"Chaos", term:"混沌工程", desc:"在受控条件下主动注入故障，验证系统韧性是否真的达标，而不是停留在纸面设计。" }
+    ],
+    terms:[
+      { t:"Observability（可观测性）", d:"通过系统对外输出的信号推断其内部状态的能力，比单纯的监控更进一步。" },
+      { t:"SLI / SLO", d:"服务等级指标与目标，例如「本月可用性达到 99.9%」，为工程决策提供可量化的依据。" },
+      { t:"Postmortem（事故复盘）", d:"对事故成因的无指责复盘，重点是产出可执行的改进措施并跟踪闭环。" },
+      { t:"MTTR（平均恢复时间）", d:"Mean Time To Restore，从故障发生到服务恢复的平均时长，DORA 四项指标之一。" }
+    ]
+  }
+];
+
+/* ============================================================
+   2. 运行时状态
+   ============================================================ */
+const state = {
+  pos: 0,            // 0..6 连续位置（6 = 反馈弧回到需求）
+  playing: false,
+  paused: false,
+  speed: 1,
+  active: 0,
+  jumping: false,
+  scrubbing: false
+};
+const SEG_MS = 3800;        // 每段耗时（1x 速度）
+const N = STAGES.length;
+
+/* DOM */
+const $ = id => document.getElementById(id);
+const stageEl = $("stage"), svgEl = $("rail"), stationsEl = $("stations");
+const blockEl = $("codeblock"), loopLabel = $("loopLabel");
+const detailEl = $("stageDetail"), glossEl = $("glossary");
+
+/* ============================================================
+   3. 构建节点
+   ============================================================ */
+function buildStations(){
+  STAGES.forEach((s, i) => {
+    const el = document.createElement("div");
+    el.className = "station";
+    el.dataset.i = i;
+    el.style.setProperty("--sc", s.color);
+    el.style.setProperty("--sc-bg", s.bg);
+    el.style.setProperty("--sc-glow", s.glow);
+    el.innerHTML = `
+      <div class="st-badge">${s.icon}</div>
+      <div class="st-check">✓</div>
+      <div class="st-text">
+        <div class="st-name">${s.name}</div>
+        <div class="st-en">${s.en}</div>
+      </div>`;
+    el.addEventListener("click", () => jumpTo(i));
+    stationsEl.appendChild(el);
+  });
+}
+
+/* ============================================================
+   4. 几何计算（桌面横向 / 移动纵向自动切换）
+   ============================================================ */
+const geom = { horizontal:true, nodes:[], railPath:null, loopPath:null, loopLen:0, railLen:0, box:null };
+
+function stageBox(){
+  const s = stageEl.getBoundingClientRect();
+  const cs = getComputedStyle(stageEl);
+  const pl = parseFloat(cs.paddingLeft)||0, pt = parseFloat(cs.paddingTop)||0;
+  const pr = parseFloat(cs.paddingRight)||0, pb = parseFloat(cs.paddingBottom)||0;
+  return {
+    ox: s.left + (parseFloat(cs.borderLeftWidth)||0) + pl,
+    oy: s.top + (parseFloat(cs.borderTopWidth)||0) + pt,
+    pl: pl, pt: pt,
+    w: Math.max(1, stageEl.clientWidth - pl - pr),
+    h: Math.max(1, stageEl.clientHeight - pt - pb)
+  };
+}
+
+function computeGeometry(){
+  const box = stageBox();
+  geom.box = box;
+
+  const badges = [...stationsEl.querySelectorAll(".st-badge")].map(el => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left - box.ox + r.width/2, y: r.top - box.oy + r.height/2, w: r.width, h: r.height };
+  });
+  if (!badges.length) return;
+
+  const horizontal = Math.abs(badges[N-1].x - badges[0].x) > Math.abs(badges[N-1].y - badges[0].y);
+  geom.horizontal = horizontal;
+
+  const ns = "http://www.w3.org/2000/svg";
+  const row = stationsEl.getBoundingClientRect();
+  const rowBottom = row.bottom - box.oy;
+
+  if (horizontal){
+    // 轨道在节点行下方，节点徽标用短竖线接入轨道
+    const railY = rowBottom + 34;
+    geom.nodes = badges.map(b => ({ x: b.x, y: railY, badge: b, i: badges.indexOf(b) }));
+    geom.railY = railY;
+    geom.loopY = railY + 46;
+  } else {
+    // 纵向：轨道在节点徽标左侧，节点用短横线接入轨道
+    const railX = badges[0].x - badges[0].w/2 - 18;
+    geom.nodes = badges.map((b, i) => ({ x: railX, y: b.y, badge: b, i }));
+    geom.railX = railX;
+    geom.loopX = railX - 20;
+  }
+
+  // --- 绘制（SVG 覆盖整个 stage，坐标 = 内容坐标 + padding 偏移） ---
+  svgEl.innerHTML = "";
+  svgEl.style.left = "0px"; svgEl.style.top = "0px";
+  svgEl.style.width = stageEl.clientWidth + "px";
+  svgEl.style.height = stageEl.clientHeight + "px";
+  svgEl.setAttribute("viewBox", `0 0 ${stageEl.clientWidth} ${stageEl.clientHeight}`);
+  const P = (x, y) => `${(box.pl + x).toFixed(1)} ${(box.pt + y).toFixed(1)}`;
+
+  const mk = (tag, attrs, parent) => {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svgEl).appendChild(e);
+    return e;
+  };
+
+  // defs（箭头 + 进度裁剪区）
+  const defs = mk("defs", {});
+  const mkArrow = (id, color) => {
+    const m = mk("marker", {id, viewBox:"0 0 10 10", refX:"8", refY:"5",
+      markerWidth:"5.5", markerHeight:"5.5", orient:"auto-start-reverse"}, defs);
+    mk("path", {d:"M0,0 L10,5 L0,10 z", fill:color}, m);
+  };
+  mkArrow("ar-accent", "#2563eb");
+  mkArrow("ar-loop", "#7c3aed");
+  const clip = mk("clipPath", {id:"clipProg"}, defs);
+  geom.clipRect = mk("rect", {x:0, y:0, width:0, height:0}, clip);
+
+  // 主轨道
+  const a0 = geom.nodes[0], aN = geom.nodes[N-1];
+  const railD = `M ${P(a0.x, a0.y)} L ${P(aN.x, aN.y)}`;
+  geom.railPath = mk("path", {class:"rail-base", d: railD});
+  geom.railProg = mk("path", {class:"rail-prog-fill", d: railD});
+  geom.railFlow = mk("path", {class:"rail-prog", d: railD, "clip-path":"url(#clipProg)"});
+  geom.railLen = geom.railPath.getTotalLength();
+
+  // 流动箭头（每帧移动到进度头部）
+  geom.arrowEl = mk("path", {class:"rail-arrow", d:"M 0 0 L 0.1 0", "marker-end":"url(#ar-accent)"});
+
+  // 刻度线（轨道 ↔ 徽标）
+  geom.nodes.forEach(n => {
+    const d = horizontal
+      ? `M ${P(n.badge.x, n.badge.y + n.badge.h/2 + 2)} L ${P(n.badge.x, n.y - 2)}`
+      : `M ${P(n.badge.x - n.badge.w/2 - 2, n.badge.y)} L ${P(n.x + 2, n.badge.y)}`;
+    mk("path", {class:"rail-tick", d});
+  });
+
+  // 反馈弧：从运维沿管道回到需求
+  const lp = geom.nodes[N-1], lq = geom.nodes[0];
+  let loopD;
+  if (horizontal){
+    const r = 18;
+    loopD = `M ${P(lp.x, lp.y+2)} V ${P(lp.x, geom.loopY - r)} Q ${P(lp.x, geom.loopY)} ${P(lp.x - r, geom.loopY)}
+             H ${P(lq.x + r, geom.loopY)} Q ${P(lq.x, geom.loopY)} ${P(lq.x, geom.loopY - r)} V ${P(lq.x, lq.y + 8)}`;
+  } else {
+    const r = 16;
+    loopD = `M ${P(lp.x - 2, lp.y)} H ${P(geom.loopX + r, lp.y)} Q ${P(geom.loopX, lp.y)} ${P(geom.loopX, lp.y - r)}
+             V ${P(lq.y + r, lq.y)} Q ${P(geom.loopX, lq.y)} ${P(geom.loopX + r, lq.y)} H ${P(lq.x - 6, lq.y)}`;
+  }
+  geom.loopPath = mk("path", {class:"rail-loop", d: loopD});
+  geom.loopLen = geom.loopPath.getTotalLength();
+  geom.loopPath.setAttribute("marker-end","url(#ar-loop)");
+
+  // 反馈标签位置
+  loopLabel.classList.toggle("v", !horizontal);
+  if (horizontal){
+    loopLabel.style.left = (box.pl + (lp.x + lq.x)/2) + "px";
+    loopLabel.style.top  = (box.pt + geom.loopY) + "px";
+  } else {
+    // 纵向：标签放在左下角管道末端，避免压住节点文字
+    loopLabel.style.left = (box.pl + geom.loopX + 4) + "px";
+    loopLabel.style.top  = (box.pt + lp.y + 42) + "px";
+  }
+}
+
+/* ============================================================
+   5. 位置计算：沿轨道 / 沿反馈弧
+   ============================================================ */
+function posOnRail(p){
+  // p ∈ [0, N-1]，映射到节点之间的线性插值
+  const i = Math.min(N-2, Math.max(0, Math.floor(p)));
+  const f = Math.min(1, Math.max(0, p - i));
+  const a = geom.nodes[i], b = geom.nodes[i+1];
+  return { x: a.x + (b.x-a.x)*f, y: a.y + (b.y-a.y)*f };
+}
+function posOnLoop(t){
+  const L = geom.loopLen * Math.min(1, Math.max(0, t));
+  const pt = geom.loopPath.getPointAtLength(L);
+  return { x: pt.x, y: pt.y };
+}
+function blockPoint(p){
+  if (p >= N-1){
+    const t = Math.min(1, p - (N-1));
+    return posOnLoop(t);
+  }
+  return posOnRail(p);
+}
+
+/* ============================================================
+   6. 渲染
+   ============================================================ */
+let lastActive = -1;
+
+function render(){
+  if (!geom.railPath) return;
+  const p = state.pos;
+  const box = geom.box;
+
+  // 代码块位置（元素位于 stage 内，坐标需加回 padding 偏移）
+  const pt = blockPoint(p);
+  blockEl.style.transform =
+    `translate(${(box.pl + pt.x).toFixed(1)}px, ${(box.pt + pt.y).toFixed(1)}px) translate(-50%,-50%)`;
+
+  // 轨道进度：实心已通过段 + 行进虚线 + 流动箭头
+  const prog = Math.min(1, Math.max(0, p / (N-1)));
+  geom.railProg.style.strokeDasharray = `${geom.railLen*prog} ${geom.railLen+10}`;
+  geom.railProg.style.opacity = prog > 0.001 ? "1" : "0";
+
+  const a0 = geom.nodes[0], aN = geom.nodes[N-1], b = box;
+  if (geom.horizontal){
+    geom.clipRect.setAttribute("x", (b.pl + Math.min(a0.x,aN.x) - 2).toFixed(1));
+    geom.clipRect.setAttribute("y", (b.pt + a0.y - 14).toFixed(1));
+    geom.clipRect.setAttribute("width", (Math.abs(aN.x-a0.x)*prog + 2).toFixed(1));
+    geom.clipRect.setAttribute("height", "28");
+  } else {
+    geom.clipRect.setAttribute("x", (b.pl + a0.x - 14).toFixed(1));
+    geom.clipRect.setAttribute("y", (b.pt + Math.min(a0.y,aN.y) - 2).toFixed(1));
+    geom.clipRect.setAttribute("width", "28");
+    geom.clipRect.setAttribute("height", (Math.abs(aN.y-a0.y)*prog + 2).toFixed(1));
+  }
+  // 箭头略微前移，避免被代码块完全遮挡
+  const headLen = Math.min(geom.railLen, geom.railLen * prog + 17);
+  const head = geom.railPath.getPointAtLength(headLen);
+  geom.arrowEl.setAttribute("d", geom.horizontal
+    ? `M ${(head.x-0.5).toFixed(1)} ${head.y.toFixed(1)} L ${(head.x+0.5).toFixed(1)} ${head.y.toFixed(1)}`
+    : `M ${head.x.toFixed(1)} ${(head.y-0.5).toFixed(1)} L ${head.x.toFixed(1)} ${(head.y+0.5).toFixed(1)}`);
+  geom.arrowEl.style.opacity = prog > 0.005 ? "1" : "0";
+
+  // 当前环节（走完反馈弧、回到需求时切换到第 1 环）
+  const idx = (p >= N - 0.03) ? 0 : Math.min(N-1, Math.max(0, Math.floor(p)));
+  if (idx !== lastActive){
+    lastActive = idx;
+    state.active = idx;
+    renderDetail(idx);
+  }
+
+  // 节点状态
+  const stations = stationsEl.children;
+  for (let i = 0; i < N; i++){
+    const el = stations[i];
+    el.classList.toggle("active", i === idx);
+    el.classList.toggle("done", i < idx || (idx === 0 && p >= N - 0.03));
+  }
+
+  // 反馈弧高亮
+  const onLoop = p > N-1 - 0.02;
+  geom.loopPath.classList.toggle("live", onLoop);
+  loopLabel.style.opacity = onLoop ? "1" : ".5";
+
+  // 流转物文案
+  const st = STAGES[idx];
+  const arriving = p >= N - 0.03;
+  $("cbMain").textContent = arriving ? "反馈单 FB-07" : st.block[0];
+  $("cbSub").textContent  = arriving ? "运维数据 → 新需求" : st.block[1];
+  blockEl.style.borderColor = arriving ? "#7c3aed" : "#334155";
+
+  // 进度条（反馈弧段不计入百分比，上限 100%）
+  const pct = Math.min(100, Math.max(0, Math.round((p/(N-1))*100)));
+  if (!state.scrubbing) $("scrub").value = Math.round(Math.min(1, p/(N-1))*1000);
+  $("scrub").style.setProperty("--p", pct + "%");
+  $("scrubVal").textContent = pct + "%";
+}
+
+function renderDetail(idx){
+  const s = STAGES[idx];
+  detailEl.style.setProperty("--sc", s.color);
+  detailEl.style.setProperty("--sc-bg", s.bg);
+  detailEl.style.setProperty("--sc-glow", s.glow);
+  glossEl.style.setProperty("--sc", s.color);
+
+  detailEl.innerHTML = `
+    <div class="sd-top">
+      <div class="sd-icon">${s.icon}</div>
+      <div class="sd-title">
+        <h3>${s.name}</h3>
+        <p>${s.en} · 环节 ${idx+1} / ${N}</p>
+      </div>
+      <div class="sd-artifact">当前流转物 · <b>${s.artifact}</b></div>
+    </div>
+    <p class="sd-problem">${s.problem}</p>
+    <div class="sec-title">本环节的 DevOps 实践</div>
+    ${s.practices.map(p => `
+      <div class="practice">
+        <div class="pr-ico">${p.ico}</div>
+        <div class="pr-body">
+          <div class="pr-term">${p.term}<span class="pr-tag">${p.tag}</span></div>
+          <div class="pr-desc">${p.desc}</div>
+        </div>
+      </div>`).join("")}`;
+
+  glossEl.innerHTML = s.terms.map(t => `
+    <div class="term">
+      <div class="term-t">${t.t}</div>
+      <div class="term-d">${t.d}</div>
+    </div>`).join("");
+}
+
+/* ============================================================
+   7. 动画循环
+   ============================================================ */
+let lastTs = null;
+function tick(ts){
+  if (lastTs === null) lastTs = ts;
+  const dt = ts - lastTs; lastTs = ts;
+  if (state.playing && !state.paused && !state.scrubbing && !state.jumping){
+    state.pos += (dt * state.speed) / SEG_MS;
+    if (state.pos >= N){
+      state.pos -= N;
+      $("cycleNote").textContent = "闭环完成 · 生产反馈已回流为新需求";
+      setTimeout(()=>{ $("cycleNote").textContent = "流水线运行中 · 代码正沿轨道流转"; }, 2200);
+    }
+  }
+  render();
+  requestAnimationFrame(tick);
+}
+
+/* ============================================================
+   8. 跳转 / 控制
+   ============================================================ */
+let jumpRaf = null;
+function jumpTo(idx){
+  const cur = state.pos;
+  const curIdx = Math.min(N-1, Math.floor(cur));
+  let target;
+  if (idx > curIdx){
+    target = idx;                                   // 向前：沿轨道推进
+  } else if (idx === curIdx){
+    target = idx;
+  } else if (curIdx >= N-1){
+    target = N - 0.001;                             // 在末端：走反馈弧回到需求
+  } else {
+    target = idx;                                   // 向前回退：沿轨道反向定位
+  }
+  const from = cur;
+  const dir = target - from;
+  const dur = 760, start = performance.now();
+  state.jumping = true;
+  if (jumpRaf) cancelAnimationFrame(jumpRaf);
+  const step = now => {
+    const k = Math.min(1, (now - start)/dur);
+    const e = 1 - Math.pow(1-k, 3);
+    state.pos = from + dir*e;
+    if (k < 1){ jumpRaf = requestAnimationFrame(step); }
+    else { state.pos = target; state.jumping = false; }
+  };
+  jumpRaf = requestAnimationFrame(step);
+}
+
+function setPlaying(v){
+  if (v && state.pos >= N-1.0005) state.pos = 0;
+  state.playing = v;
+  state.paused = false;
+  $("playLabel").textContent = v ? "暂停" : "播放";
+  $("btnPlay").querySelector(".ico").textContent = v ? "❚❚" : "▶";
+  $("btnPlay").classList.toggle("primary", !v);
+}
+
+function reset(){
+  if (jumpRaf) cancelAnimationFrame(jumpRaf);
+  state.pos = 0; state.playing = false; state.paused = false;
+  state.jumping = false; lastActive = -1;
+  setPlaying(false);
+  renderDetail(0);
+  render();
+  $("cycleNote").textContent = "流水线运行中 · 代码正沿轨道流转";
+}
+
+$("btnPlay").addEventListener("click", () => {
+  if (state.playing){ state.paused = !state.paused; $("playLabel").textContent = state.paused ? "继续" : "暂停"; }
+  else setPlaying(true);
+});
+$("btnPrev").addEventListener("click", () => {
+  const cur = state.active;
+  jumpTo(cur === 0 ? N-1 : cur-1);
+});
+$("btnNext").addEventListener("click", () => {
+  jumpTo((state.active + 1) % N);
+});
+$("btnReset").addEventListener("click", reset);
+
+const speedEl = $("speed");
+speedEl.addEventListener("input", () => {
+  state.speed = parseFloat(speedEl.value);
+  $("speedVal").textContent = state.speed.toFixed(2) + "×";
+  speedEl.style.setProperty("--sp", ((state.speed-0.5)/2.5*100) + "%");
+});
+
+const scrub = $("scrub");
+scrub.addEventListener("pointerdown", () => { state.scrubbing = true; });
+window.addEventListener("pointerup", () => { state.scrubbing = false; });
+scrub.addEventListener("input", () => {
+  state.scrubbing = true;
+  const t = parseFloat(scrub.value)/1000 * (N-1);
+  state.pos = t;
+  render();
+});
+scrub.addEventListener("change", () => { state.scrubbing = false; });
+
+document.addEventListener("keydown", e => {
+  if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  if (e.code === "Space"){ e.preventDefault(); $("btnPlay").click(); }
+  else if (e.code === "ArrowRight"){ e.preventDefault(); $("btnNext").click(); }
+  else if (e.code === "ArrowLeft"){ e.preventDefault(); $("btnPrev").click(); }
+  else if (e.key === "r" || e.key === "R"){ reset(); }
+});
+
+/* ============================================================
+   9. 初始化
+   ============================================================ */
+buildStations();
+computeGeometry();
+renderDetail(0);
+render();
+
+const ro = new ResizeObserver(() => { computeGeometry(); render(); });
+ro.observe(stageEl);
+window.addEventListener("resize", () => { computeGeometry(); render(); });
+window.addEventListener("load", () => { computeGeometry(); render(); });
+setTimeout(() => { computeGeometry(); render(); }, 80);
+requestAnimationFrame(tick);
+</script>
+
+<style id="portal-back-style">
+#portal-back{position:fixed;right:14px;bottom:14px;z-index:9999;
+  right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));
+  display:inline-flex;align-items:center;gap:6px;
+  font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:#fff;background:rgba(17,24,39,.82);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:9px 15px;text-decoration:none;
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:.72;transition:opacity .18s,transform .18s}
+#portal-back:hover{opacity:1;transform:translateY(-1px)}
+#portal-back:active{transform:none}
+@media print{#portal-back{display:none}}
+</style>
+<a id="portal-back" href="../../" title="返回资源中心">← 资源中心</a>
+</body>
+</html>
