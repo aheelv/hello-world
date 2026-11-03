@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>单纯形法 · 交互式教学课件</title>
+<style>
+/* ============================================================
+   模块 S1：设计令牌与全局画布
+   固定 1280×720 设计画布，JS 等比缩放，任何分辨率无滚动条
+   ============================================================ */
+:root{
+  --bg-a:#eef2f8; --bg-b:#e6ecf6;
+  --surface:#ffffff; --surface-2:#f6f8fc; --surface-3:#eef3fa;
+  --border:#dde4ee; --border-2:#c6d1e0;
+  --text:#141d2b; --text-2:#44516a; --muted:#7a879d;
+  --p1:#2563eb; --p1-bg:#e6efff; --p1-bd:#a9c4fb;      /* 主色·入基/强调 */
+  --p2:#c2740b; --p2-bg:#fdf2df; --p2-bd:#eec98a;      /* 琥珀·出基/警示 */
+  --p3:#0e7490; --p3-bg:#e2f4f8;                        /* 青·基变量 */
+  --ok:#15803d; --ok-bg:#e7f6ec;
+  --no:#d92d20; --no-bg:#fdeceb;                        /* 枢轴/错误 */
+  --r:14px; --r-sm:9px;
+  --sh-1:0 1px 2px rgba(15,23,42,.05),0 2px 10px rgba(15,23,42,.06);
+  --sh-2:0 8px 26px rgba(15,23,42,.10);
+  --font:"Inter","PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  --math:"Cambria Math","STIX Two Math","Times New Roman",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg-a);}
+body{font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input{font-family:inherit;}
+
+/* —— 固定设计画布：1280×720，transform 等比缩放居中 —— */
+#stage{
+  position:fixed;left:50%;top:50%;width:1280px;height:720px;
+  transform:translate(-50%,-50%) scale(1);
+  background:
+    radial-gradient(900px 420px at 8% -10%, #ffffff 0%, rgba(255,255,255,0) 55%),
+    radial-gradient(760px 420px at 104% 112%, #e3ecff 0%, rgba(227,236,255,0) 60%),
+    linear-gradient(160deg,var(--bg-a),var(--bg-b));
+  overflow:hidden;
+}
+#stage::before{ /* 淡网格装饰 */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(20,29,43,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(20,29,43,.045) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 100%);
+  -webkit-mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 100%);
+}
+
+/* ============================================================
+   模块 S2：课件骨架 —— 顶栏 / 幻灯片区 / 底栏
+   ============================================================ */
+#topbar{position:absolute;left:0;right:0;top:0;height:52px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 30px;z-index:30;}
+#topbar .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-2);letter-spacing:.4px;}
+#topbar .brand .logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#0e7490);
+  display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;box-shadow:var(--sh-1);}
+#topbar .meta{display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--muted);}
+#topbar .meta b{color:var(--text-2);font-weight:600;}
+#progress{position:absolute;left:0;top:52px;height:3px;width:100%;background:rgba(20,29,43,.06);z-index:30;}
+#progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2563eb,#0e7490);
+  transition:width .5s cubic-bezier(.22,.61,.36,1);}
+
+#deck{position:absolute;left:0;right:0;top:52px;bottom:56px;}
+
+#chrome{position:absolute;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 26px;z-index:30;}
+#dots{display:flex;align-items:center;gap:7px;}
+#dots button{width:9px;height:9px;border-radius:50%;background:rgba(20,29,43,.16);transition:.25s;position:relative;}
+#dots button:hover{background:rgba(20,29,43,.34);transform:scale(1.25);}
+#dots button.on{background:var(--p1);width:22px;border-radius:5px;}
+#dots button.done{background:rgba(37,99,235,.42);}
+#navbtns{display:flex;align-items:center;gap:10px;}
+.navbtn{display:flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);color:var(--text-2);font-size:13.5px;
+  box-shadow:var(--sh-1);transition:.2s;}
+.navbtn:hover:not(:disabled){border-color:var(--p1-bd);color:var(--p1);transform:translateY(-1px);}
+.navbtn:disabled{opacity:.38;cursor:not-allowed;}
+.navbtn .k{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:0 5px;line-height:16px;}
+#pageNum{font-size:12.5px;color:var(--muted);min-width:74px;text-align:center;font-variant-numeric:tabular-nums;}
+#pageNum b{color:var(--text-2);font-size:14px;}
+
+/* ============================================================
+   模块 S3：幻灯片切换与元素级动画
+   ============================================================ */
+.slide{position:absolute;inset:0;padding:34px 56px 18px;opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateX(3.6%);display:flex;flex-direction:column;
+  transition:opacity .4s ease,transform .52s cubic-bezier(.22,.61,.36,1),visibility 0s linear .52s;}
+.slide.pos-left{transform:translateX(-3.6%);}
+.slide.active{opacity:1;visibility:visible;pointer-events:auto;transform:none;
+  transition:opacity .5s ease .1s,transform .58s cubic-bezier(.22,.61,.36,1) .1s;}
+
+/* 元素级入场：进入本页时按 --d 依次上浮 */
+.a{opacity:0;}
+.slide.active .a{animation:rise .6s cubic-bezier(.22,.61,.36,1) forwards;animation-delay:var(--d,0s);}
+@keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.slide.active .a.pop{animation-name:pop;}
+@keyframes pop{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:none;}}
+.slide.active .a.slidex{animation-name:slidex;}
+@keyframes slidex{from{opacity:0;transform:translateX(-22px);}to{opacity:1;transform:none;}}
+
+/* 页眉：章节徽标 + 标题 */
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex:none;
+  padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.shead .ch{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--p1);
+  background:var(--p1-bg);border:1px solid var(--p1-bd);border-radius:999px;padding:3px 12px;margin-bottom:8px;}
+.shead h2{font-size:25px;font-weight:700;letter-spacing:.3px;}
+.shead .sub{font-size:13px;color:var(--muted);margin-top:3px;}
+.shead .hint{font-size:12.5px;color:var(--muted);text-align:right;line-height:1.6;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:18px 20px;}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-2);
+  background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;}
+.m{font-family:var(--math);font-style:italic;}
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 20px;border-radius:11px;
+  font-size:14.5px;font-weight:600;transition:.2s;border:1px solid transparent;}
+.btn-p{background:var(--p1);color:#fff;box-shadow:0 6px 18px rgba(37,99,235,.32);}
+.btn-p:hover{background:#1d4fd8;transform:translateY(-1px);}
+.btn-g{background:var(--surface);border-color:var(--border-2);color:var(--text-2);}
+.btn-g:hover{border-color:var(--p1-bd);color:var(--p1);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+
+/* ============================================================
+   模块 S4：封面与结束页
+   ============================================================ */
+.cover{display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;padding:0 30px;position:relative;}
+.cover .badge{display:inline-flex;width:fit-content;align-items:center;gap:8px;font-size:13px;color:var(--p1);
+  background:var(--p1-bg);border:1px solid var(--p1-bd);border-radius:999px;padding:6px 16px;margin-bottom:26px;}
+.cover h1{font-size:66px;font-weight:800;letter-spacing:2px;line-height:1.12;}
+.cover h1 em{font-style:normal;background:linear-gradient(120deg,#2563eb,#0e7490);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.cover .en{font-size:16px;color:var(--muted);letter-spacing:5px;margin-top:12px;text-transform:uppercase;}
+.cover .lead{font-size:17px;color:var(--text-2);margin-top:22px;max-width:640px;line-height:1.8;}
+.cover .chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;}
+.cover .go{margin-top:38px;display:flex;align-items:center;gap:16px;}
+.cover .keyhint{font-size:12.5px;color:var(--muted);}
+.cover svg.deco{position:absolute;right:70px;top:44%;transform:translateY(-50%);opacity:.9;pointer-events:none;}
+
+.fin{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:0;text-align:center;}
+.fin h1{font-size:52px;font-weight:800;letter-spacing:2px;}
+.fin .sub{color:var(--text-2);font-size:16.5px;margin-top:16px;line-height:1.9;}
+.fin .rep{display:flex;gap:16px;margin-top:34px;}
+.fin .repcard{min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:18px 22px;}
+.fin .repcard h4{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:8px;}
+.fin .repcard .v{font-size:30px;font-weight:800;color:var(--p1);}
+.fin .repcard .v.dim{color:var(--muted);font-size:20px;font-weight:600;}
+.fin .acts{display:flex;gap:14px;margin-top:36px;}
+
+/* ============================================================
+   模块 S5：目录页
+   ============================================================ */
+.toc{display:grid;grid-template-columns:400px 1fr;gap:34px;flex:1;min-height:0;}
+.goal li{list-style:none;display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px dashed var(--border);
+  font-size:14.5px;color:var(--text-2);line-height:1.7;}
+.goal li:last-child{border:none;}
+.goal .n{flex:none;width:24px;height:24px;border-radius:8px;background:var(--p1-bg);border:1px solid var(--p1-bd);
+  color:var(--p1);font-size:12px;font-weight:700;display:grid;place-items:center;margin-top:2px;}
+.chapters{display:grid;grid-template-rows:repeat(4,1fr);gap:14px;}
+.chcard{display:flex;align-items:center;gap:18px;text-align:left;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-1);padding:14px 20px;transition:.22s;}
+.chcard:hover{transform:translateX(6px);border-color:var(--p1-bd);box-shadow:var(--sh-2);}
+.chcard .no{font-size:26px;font-weight:800;color:var(--p1);opacity:.9;width:52px;flex:none;
+  font-variant-numeric:tabular-nums;}
+.chcard h3{font-size:17px;font-weight:700;}
+.chcard p{font-size:12.5px;color:var(--muted);margin-top:3px;}
+.chcard .arr{margin-left:auto;color:var(--p1);opacity:0;transform:translateX(-6px);transition:.22s;font-size:18px;}
+.chcard:hover .arr{opacity:1;transform:none;}
+
+/* ============================================================
+   模块 S6：热点标注（公式 / 表格）
+   ============================================================ */
+.hs-wrap{display:grid;grid-template-columns:1fr 380px;gap:30px;flex:1;min-height:0;}
+.formula{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);
+  padding:34px 34px;font-size:23px;line-height:2.3;font-family:var(--math);position:relative;}
+.fz{border-radius:8px;padding:2px 8px;transition:.3s;border:1px dashed transparent;}
+.fz.on{background:var(--p1-bg);border-color:var(--p1-bd);color:#123a9c;}
+.hotspots{display:flex;gap:14px;margin-top:24px;flex-wrap:wrap;}
+.hs{display:flex;align-items:center;gap:9px;padding:9px 16px;border-radius:11px;background:var(--surface);
+  border:1px solid var(--border-2);font-size:14px;font-weight:600;color:var(--text-2);transition:.2s;}
+.hs i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--p1);color:#fff;
+  font-size:12px;display:grid;place-items:center;}
+.hs:hover{transform:translateY(-2px);border-color:var(--p1-bd);}
+.hs.on{background:var(--p1-bg);border-color:var(--p1-bd);color:var(--p1);}
+.hspanel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:20px 22px;display:flex;flex-direction:column;}
+.hspanel h4{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px;}
+.hspanel h4 i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--p1);color:#fff;
+  font-size:12px;display:grid;place-items:center;}
+.hspanel p{font-size:14px;color:var(--text-2);line-height:1.85;}
+.hspanel .fm{font-family:var(--math);font-size:17px;background:var(--surface-2);border-radius:8px;
+  padding:8px 12px;margin-top:12px;border:1px solid var(--border);}
+
+/* —— 单纯形表（第 7 页与第 10 页共用） —— */
+table.sx{border-collapse:separate;border-spacing:0;width:100%;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:16px;}
+table.sx th,table.sx td{padding:9px 10px;text-align:center;border-bottom:1px solid var(--border);
+  font-family:var(--math);transition:background .3s,color .3s;}
+table.sx thead th{background:var(--surface-3);font-size:14.5px;color:var(--text-2);font-weight:600;}
+table.sx td.c-basis{font-family:var(--font);font-size:13.5px;color:var(--text-2);width:96px;}
+table.sx td.c-rhs{font-weight:700;}
+table.sx td.c-slack{background:#fbfcfd;color:#5a6779;}
+table.sx .zrow td{background:#eef3fa;color:var(--text-2);}
+table.sx td.sig-pos{color:var(--p1);font-weight:700;}
+/* 热点高亮 */
+table.sx[data-hl="basis"] td.c-basis{background:var(--p3-bg);color:var(--p3);font-weight:700;}
+table.sx[data-hl="sigma"] .zrow td{background:var(--p1-bg);color:#123a9c;}
+table.sx[data-hl="rhs"] td.c-rhs{background:var(--p2-bg);color:#8a5206;font-weight:700;}
+table.sx[data-hl="slack"] td.c-slack{background:#e8eef5;color:#3f4c60;}
+table.sx[data-hl="init"] tr:first-child td,table.sx[data-hl="init"] tr:nth-child(2) td{background:var(--ok-bg);}
+
+/* —— 迭代动画表（第 10 页） —— */
+table.sx td.h-enter{background:var(--p1-bg);color:#123a9c;}
+table.sx thead th.h-enter{background:var(--p1-bg);color:#123a9c;box-shadow:inset 0 -3px 0 var(--p1);}
+table.sx tr.h-leave td{background:var(--p2-bg);}
+table.sx td.h-pivot{background:var(--no-bg)!important;color:var(--no)!important;font-weight:800;
+  box-shadow:inset 0 0 0 2px var(--no);border-radius:4px;}
+table.sx tr.h-new td{background:var(--p3-bg);}
+table.sx thead th.h-newcol{background:var(--p3-bg);color:var(--p3);box-shadow:inset 0 -3px 0 var(--p3);}
+table.sx td{position:relative;}
+table.sx td.chg::after{content:"";position:absolute;inset:0;background:#ffdd8a;
+  box-shadow:inset 0 0 0 2px #f0a92b;pointer-events:none;animation:chgFade 1.6s ease forwards;}
+@keyframes chgFade{0%{opacity:0;}12%{opacity:.78;}100%{opacity:0;}}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;line-height:1.05;text-align:center;
+  font-size:.82em;margin:0 2px;}
+.frac .num{border-bottom:1.5px solid currentColor;padding:0 3px;}
+.frac .den{padding:0 3px;}
+
+/* ============================================================
+   模块 S7：判分式选择题（入基 / 顶点 / 测验）
+   ============================================================ */
+.opts{display:grid;gap:10px;}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 16px;border-radius:11px;
+  background:var(--surface);border:1.5px solid var(--border-2);font-size:15px;color:var(--text);
+  transition:.18s;font-family:var(--math);}
+.opt.sm{padding:8px 13px;font-size:13.5px;border-radius:10px;gap:9px;}
+.opt.sm .tag{width:23px;height:23px;font-size:11.5px;}
+.opt .tag{font-family:var(--font);flex:none;width:26px;height:26px;border-radius:8px;background:var(--surface-3);
+  color:var(--text-2);font-size:12.5px;font-weight:700;display:grid;place-items:center;transition:.18s;}
+.opt:hover:not(:disabled){border-color:var(--p1-bd);background:var(--p1-bg);transform:translateX(4px);}
+.opt:disabled{cursor:default;}
+.opt.correct{border-color:var(--ok);background:var(--ok-bg);color:#0d5c2c;}
+.opt.correct .tag{background:var(--ok);color:#fff;}
+.opt.wrong{border-color:var(--no);background:var(--no-bg);color:#8f1d14;}
+.opt.wrong .tag{background:var(--no);color:#fff;}
+.explain{margin-top:12px;font-size:13.5px;line-height:1.8;border-radius:10px;padding:12px 15px;display:none;}
+.explain.show{display:block;animation:rise .4s ease forwards;}
+.explain.good{background:var(--ok-bg);color:#0d5c2c;border:1px solid #b7e2c5;}
+.explain.bad{background:var(--no-bg);color:#8f1d14;border:1px solid #f3c1bc;}
+
+/* ============================================================
+   模块 S8：图解法探究台（SVG + 滑块）
+   ============================================================ */
+.graph-wrap{display:grid;grid-template-columns:1fr 350px;gap:28px;flex:1;min-height:0;}
+.plotbox{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:10px;display:grid;place-items:center;overflow:hidden;}
+.plotbox svg{height:408px;width:auto;max-width:100%;display:block;}
+.gctl{display:flex;flex-direction:column;gap:13px;}
+.gctl .row{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--text-2);}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:4px;
+  background:linear-gradient(90deg,var(--p1) var(--fill,0%),rgba(20,29,43,.12) var(--fill,0%));outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:#fff;border:3px solid var(--p1);box-shadow:0 2px 8px rgba(37,99,235,.4);cursor:grab;transition:transform .15s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+.tgl{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--text-2);cursor:pointer;user-select:none;}
+.tgl input{accent-color:var(--p1);width:15px;height:15px;cursor:pointer;}
+.zread{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;
+  font-size:14px;display:flex;align-items:center;justify-content:space-between;}
+.zread b{font-family:var(--math);font-size:19px;color:var(--p1);}
+.status{border-radius:10px;padding:11px 14px;font-size:13.5px;line-height:1.7;transition:.3s;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);}
+.status.in{background:var(--ok-bg);border-color:#b7e2c5;color:#0d5c2c;}
+.status.out{background:var(--no-bg);border-color:#f3c1bc;color:#8f1d14;}
+.status.best{background:var(--p1-bg);border-color:var(--p1-bd);color:#123a9c;}
+
+/* ============================================================
+   模块 S9：松弛变量点选转换（第 4 页）
+   ============================================================ */
+.cvn{display:flex;flex-direction:column;gap:13px;}
+.cvnrow{position:relative;background:var(--surface);border:1.5px solid var(--border-2);border-radius:12px;
+  padding:14px 20px;font-family:var(--math);font-size:20px;display:flex;align-items:center;justify-content:space-between;
+  transition:.3s;cursor:pointer;overflow:hidden;}
+.cvnrow:hover:not(.done){border-color:var(--p1-bd);background:var(--p1-bg);transform:translateX(4px);}
+.cvnrow.done{cursor:default;border-color:var(--ok);background:var(--ok-bg);}
+.cvnrow .add{font-size:13px;color:var(--p1);font-family:var(--font);display:flex;align-items:center;gap:6px;}
+.cvnrow.done .add{color:var(--ok);}
+.cvnrow .slack{display:inline-block;color:var(--ok);font-weight:700;}
+.cvnrow .slack.pop{animation:pop .5s cubic-bezier(.34,1.56,.64,1) forwards;}
+.stdform{margin-top:6px;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:12px;
+  padding:16px 20px;font-family:var(--math);font-size:19px;line-height:2;opacity:.35;filter:grayscale(.5);transition:.5s;}
+.stdform.ready{opacity:1;filter:none;border-color:var(--ok);background:var(--ok-bg);}
+.mini-q{margin-top:14px;display:none;}
+.mini-q.show{display:block;animation:rise .45s ease forwards;}
+
+/* ============================================================
+   模块 S10：比值检验点选（第 9 页）
+   ============================================================ */
+.ratio-t{border-collapse:separate;border-spacing:0;width:100%;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:16.5px;}
+.ratio-t th,.ratio-t td{padding:11px 12px;text-align:center;border-bottom:1px solid var(--border);font-family:var(--math);}
+.ratio-t thead th{background:var(--surface-3);font-size:14px;color:var(--text-2);}
+.ratio-t td.min{background:var(--p2-bg);color:#8a5206;font-weight:800;}
+.ratio-t tr.minrow td{background:var(--p2-bg);}
+.ratio-t .thval{color:var(--muted);}
+.ratio-t .thval.calc{color:var(--text);font-weight:700;animation:pop .45s cubic-bezier(.34,1.56,.64,1) forwards;}
+.rbtn{font-size:12.5px;padding:6px 12px;border-radius:8px;background:var(--p1-bg);border:1px solid var(--p1-bd);
+  color:var(--p1);font-weight:600;font-family:var(--font);transition:.2s;}
+.rbtn:hover:not(:disabled){background:var(--p1);color:#fff;}
+.rbtn:disabled{opacity:.45;cursor:default;}
+
+/* ============================================================
+   模块 S11：步骤排序挑战（第 11 页）
+   ============================================================ */
+.sort-wrap{display:grid;grid-template-columns:1fr 300px;gap:28px;flex:1;min-height:0;}
+.sortbox{position:relative;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.scard{position:absolute;left:14px;right:14px;top:14px;height:74px;border-radius:12px;background:var(--surface);
+  border:1.5px solid var(--border-2);box-shadow:var(--sh-1);display:flex;align-items:center;gap:14px;
+  padding:0 18px;cursor:pointer;transition:transform .42s cubic-bezier(.22,.61,.36,1),border-color .2s,background .2s,box-shadow .2s;}
+.scard:hover{border-color:var(--p1-bd);}
+.scard.sel{border-color:var(--p1);background:var(--p1-bg);box-shadow:0 0 0 3px rgba(37,99,235,.18);transform:scale(1.015)!important;}
+.scard .idx{flex:none;width:32px;height:32px;border-radius:10px;background:var(--surface-3);color:var(--text-2);
+  font-weight:800;font-size:14px;display:grid;place-items:center;transition:.2s;}
+.scard p{font-size:14.5px;color:var(--text);line-height:1.5;}
+.scard .sw{margin-left:auto;font-size:11.5px;color:var(--muted);flex:none;}
+.scard.ok{border-color:var(--ok);background:var(--ok-bg);}
+.scard.ok .idx{background:var(--ok);color:#fff;}
+.scard.bad{border-color:var(--no);background:var(--no-bg);}
+.scard.bad .idx{background:var(--no);color:#fff;}
+
+/* ============================================================
+   模块 S12：总结页（知识路线）
+   ============================================================ */
+.sumwrap{display:grid;grid-template-columns:1fr 1fr;gap:22px;flex:1;min-height:0;}
+.sumcol{display:flex;flex-direction:column;gap:14px;}
+.sumcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-1);
+  padding:15px 18px;display:flex;gap:14px;align-items:flex-start;}
+.sumcard .ic{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  font-size:15px;font-weight:800;color:#fff;}
+.sumcard h4{font-size:15px;font-weight:700;margin-bottom:4px;}
+.sumcard p{font-size:13px;color:var(--text-2);line-height:1.7;}
+.formulabar{grid-column:1 / -1;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:12px;
+  padding:12px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-family:var(--math);font-size:16px;}
+.formulabar .lbl{font-family:var(--font);font-size:12.5px;color:var(--muted);font-weight:600;}
+
+/* 讲解面板（迭代动画页） */
+.whybox{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-1);
+  padding:15px 17px;overflow:hidden;}
+.whybox .act{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;margin-bottom:9px;}
+.act.enter{background:var(--p1-bg);color:var(--p1);border:1px solid var(--p1-bd);}
+.act.leave{background:var(--p2-bg);color:var(--p2);border:1px solid var(--p2-bd);}
+.act.pivot{background:var(--no-bg);color:var(--no);border:1px solid #f3c1bc;}
+.act.opt{background:var(--ok-bg);color:var(--ok);border:1px solid #b7e2c5;}
+.act.init{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border);}
+.whybox h4{font-size:15.5px;font-weight:700;margin-bottom:8px;}
+.whybox p{font-size:13px;color:var(--text-2);line-height:1.8;}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;}
+.facts span{font-size:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;
+  padding:4px 10px;color:var(--text-2);font-family:var(--math);}
+.facts span b{color:var(--p1);}
+#topbar .brand a.home{margin-left:8px;font-size:11.5px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:1px 8px;transition:.2s;}
+#topbar .brand a.home:hover{color:var(--p1);border-color:var(--p1-bd);background:var(--p1-bg);}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ===================== 顶栏 ===================== -->
+  <header id="topbar">
+    <div class="brand"><span class="logo">Σ</span><span>运筹学 · 线性规划单元 · 交互课件</span><a class="home" href="index.html">← 课件中心</a></div>
+    <div class="meta"><span id="chapLabel">封面</span><span>|</span><span>第 <b id="pgCur">1</b> / <span id="pgAll">14</span> 页</span></div>
+  </header>
+  <div id="progress"><i></i></div>
+
+  <!-- ===================== 幻灯片区 ===================== -->
+  <main id="deck">
+
+    <!-- ========== 1 封面 ========== -->
+    <section class="slide" id="s1">
+      <div class="cover">
+        <span class="badge a" style="--d:.05s">运筹学 · 线性规划 · 第 4 讲</span>
+        <h1 class="a" style="--d:.15s">单纯形法<br><em>从图解直觉到代数最优</em></h1>
+        <div class="en a" style="--d:.28s">The Simplex Method</div>
+        <p class="lead a" style="--d:.38s">当决策变量超过两个，图解法便无能为力。单纯形法用「顶点跳跃」的思想，
+          在代数世界里沿可行域的边走向最优。本课件带你看懂它的每一步。</p>
+        <div class="chips a" style="--d:.48s">
+          <span class="chip">适合：运筹学 / 管理科学基础</span>
+          <span class="chip">时长约 40 分钟</span>
+          <span class="chip">互动练习 × 6</span>
+        </div>
+        <div class="go a" style="--d:.58s">
+          <button class="btn btn-p" data-go="1">开始学习 →</button>
+          <span class="keyhint">键盘 ← → 翻页 · 空格下一页 · Home / End 首末页</span>
+        </div>
+        <svg class="deco a pop" style="--d:.5s" width="430" height="380" viewBox="0 0 430 380" fill="none">
+          <defs>
+            <linearGradient id="cg1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#2563eb" stop-opacity=".16"/><stop offset="1" stop-color="#0e7490" stop-opacity=".10"/>
+            </linearGradient>
+          </defs>
+          <polygon points="60,330 300,330 300,180 180,90 60,90" fill="url(#cg1)" stroke="#2563eb" stroke-width="2" stroke-dasharray="900" stroke-dashoffset="900">
+            <animate attributeName="stroke-dashoffset" from="900" to="0" dur="2.4s" fill="freeze" begin="0.6s"/>
+          </polygon>
+          <line x1="60" y1="330" x2="410" y2="330" stroke="#7a879d" stroke-width="1.5"/>
+          <line x1="60" y1="330" x2="60" y2="40" stroke="#7a879d" stroke-width="1.5"/>
+          <line x1="60" y1="330" x2="400" y2="60" stroke="#c2740b" stroke-width="2.5" stroke-dasharray="8 7" opacity=".75"/>
+          <circle cx="180" cy="90" r="8" fill="#2563eb"/>
+          <circle cx="180" cy="90" r="15" fill="none" stroke="#2563eb" stroke-width="2" opacity=".5">
+            <animate attributeName="r" values="10;22" dur="1.8s" repeatCount="indefinite" begin="2.8s"/>
+            <animate attributeName="opacity" values=".6;0" dur="1.8s" repeatCount="indefinite" begin="2.8s"/>
+          </circle>
+          <text x="196" y="84" font-size="15" fill="#141d2b" font-family="Georgia,serif" font-style="italic">z*</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ========== 2 目录与学习目标 ========== -->
+    <section class="slide" id="s2">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">课程导览</span><h2>学习目标与目录</h2></div>
+        <div class="hint">点击右侧章节卡片<br>可直接跳转</div>
+      </div>
+      <div class="toc">
+        <div class="card a slidex" style="--d:.15s">
+          <h3 style="font-size:16px;margin-bottom:6px">学完本课你将能够</h3>
+          <ul class="goal">
+            <li><span class="n">1</span><span>写出线性规划的<b>标准形</b>，说清决策变量、目标函数与约束三要素</span></li>
+            <li><span class="n">2</span><span>用<b>图解法</b>直观理解可行域与顶点定理</span></li>
+            <li><span class="n">3</span><span>读懂<b>单纯形表</b>，掌握入基、出基与枢轴三步规则</span></li>
+            <li><span class="n">4</span><span>独立完成一次完整的<b>单纯形迭代</b>并通过随堂测验</span></li>
+          </ul>
+        </div>
+        <div class="chapters">
+          <button class="chcard a slidex" style="--d:.22s" data-go="2">
+            <span class="no">01</span><span><h3>认识线性规划</h3><p>三要素 · 标准形与松弛变量</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.32s" data-go="4">
+            <span class="no">02</span><span><h3>图解法与几何直觉</h3><p>可行域探究台 · 顶点定理</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.42s" data-go="6">
+            <span class="no">03</span><span><h3>单纯形法原理</h3><p>表结构 · 入基规则 · 比值检验</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.52s" data-go="9">
+            <span class="no">04</span><span><h3>完整迭代与测验</h3><p>动画演示 · 排序挑战 · 随堂测</p></span><span class="arr">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 3 1.1 什么是线性规划 ========== -->
+    <section class="slide" id="s3">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第一章 · 认识线性规划</span><h2>1.1 什么是线性规划</h2><div class="sub">点击下方热点，逐个认识标准式的三个组成部分</div></div>
+        <div class="hint">互动：热点标注 × 3</div>
+      </div>
+      <div class="hs-wrap">
+        <div>
+          <div class="card a slidex" style="--d:.15s;margin-bottom:16px">
+            <p style="font-size:14.5px;color:var(--text-2);line-height:1.9">
+              <b style="color:var(--text)">线性规划（Linear Programming）</b>：在一组<b>线性约束</b>条件下，
+              求一个<b>线性目标函数</b>的最大值或最小值。它是资源分配、生产计划、运输调度等问题最基础的数学模型。</p>
+          </div>
+          <div class="formula a" style="--d:.28s">
+            max&nbsp;&nbsp;<span class="fz" data-k="obj">z = 3x₁ + 5x₂ + 2x₃</span><br>
+            s.t.&nbsp;&nbsp;<span class="fz" data-k="con">x₁ + 2x₂ + 3x₃ ≤ 14</span>&nbsp;&nbsp;（车间工时）<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fz" data-k="con">2x₁ + 3x₂ + x₃ ≤ 11</span>&nbsp;&nbsp;（原料配额）<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fz" data-k="var">x₁, x₂, x₃ ≥ 0</span>
+            <div class="hotspots">
+              <button class="hs" data-hs="var"><i>1</i>决策变量</button>
+              <button class="hs" data-hs="obj"><i>2</i>目标函数</button>
+              <button class="hs" data-hs="con"><i>3</i>约束条件</button>
+            </div>
+          </div>
+        </div>
+        <div class="hspanel a" style="--d:.4s" id="hsPanel">
+          <h4><i>?</i><span id="hspTitle">三个热点，等你点开</span></h4>
+          <p id="hspBody">标准式的每一部分都对应决策问题的一个侧面。依次点击左下方的三个热点，
+            看看「决策变量」「目标函数」「约束条件」分别回答了什么问题。</p>
+          <div class="fm" id="hspFm" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 4 1.2 标准形与松弛变量 ========== -->
+    <section class="slide" id="s4">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第一章 · 认识线性规划</span><h2>1.2 化为标准形：松弛变量</h2><div class="sub">点击每条约束，把「≤」补成「=」，再回答小问题</div></div>
+        <div class="hint">互动：点选转换 × 2 + 小问答题 × 1</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 330px;gap:30px;flex:1;min-height:0">
+        <div>
+          <p class="a" style="--d:.15s;font-size:14px;color:var(--text-2);margin-bottom:12px">
+            单纯形法只处理<b>等式</b>。把每条「≤」约束的左端加上一个<b style="color:var(--ok)">松弛变量</b>，
+            表示「剩余量」，即可化为等式。点击试试：</p>
+          <div class="cvn">
+            <div class="cvnrow a" style="--d:.25s" data-cvn="0">
+              <span>x₁ + 2x₂ + 3x₃ <span class="op">≤</span> 14</span>
+              <span class="add">点击添加松弛变量 s₁ →</span>
+            </div>
+            <div class="cvnrow a" style="--d:.35s" data-cvn="1">
+              <span>2x₁ + 3x₂ + x₃ <span class="op">≤</span> 11</span>
+              <span class="add">点击添加松弛变量 s₂ →</span>
+            </div>
+          </div>
+          <div class="stdform a" style="--d:.45s" id="stdForm">
+            max&nbsp;z − 3x₁ − 5x₂ − 2x₃ = 0<br>
+            s.t.&nbsp;&nbsp;x₁ + 2x₂ + 3x₃ <span class="s1op">≤</span> 14&nbsp;&nbsp;&nbsp;2x₁ + 3x₂ + x₃ <span class="s2op">≤</span> 11&nbsp;&nbsp;&nbsp;x₁, x₂, x₃, s₁, s₂ ≥ 0
+          </div>
+          <div class="mini-q" id="miniQ">
+            <p style="font-size:14px;color:var(--text-2);margin:12px 0 9px">
+              <b>小问答：</b>当约束「恰好用完全部资源」时，松弛变量 s₁ 的取值是？</p>
+            <div class="opts" style="grid-template-columns:repeat(3,1fr)" data-quiz="slack">
+              <button class="opt" data-ok="0"><span class="tag">A</span>s₁ = 14</button>
+              <button class="opt" data-ok="1"><span class="tag">B</span>s₁ = 0</button>
+              <button class="opt" data-ok="0"><span class="tag">C</span>s₁ = 1</button>
+            </div>
+            <div class="explain" id="miniQEx"></div>
+          </div>
+        </div>
+        <div class="card a" style="--d:.55s;align-self:start">
+          <h4 style="font-size:15px;margin-bottom:10px">为什么需要松弛变量</h4>
+          <p style="font-size:13.5px;color:var(--text-2);line-height:1.9">
+            松弛变量把「资源还剩多少」变成一个<b>显式的变量</b>：<br>
+            <span class="m" style="display:block;margin:8px 0;padding:8px 12px;background:var(--surface-2);border-radius:8px">s₁ = 14 − (x₁ + 2x₂ + 3x₃)</span>
+            令所有决策变量为 0，得 <span class="m">s₁ = 14, s₂ = 11</span> ——
+            这就是<b>初始基本可行解</b>（什么都不生产，资源全剩余）。单纯形法正是从这个「原点」出发开始寻优的。</p>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);font-size:13px;color:var(--muted);line-height:1.8">
+            完成上面两条约束的转换，小问答题会自动出现。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 5 2.1 图解法探究台 ========== -->
+    <section class="slide" id="s5">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第二章 · 图解法与几何直觉</span><h2>2.1 图解法：在图上找最优</h2><div class="sub">拖动滑块移动目标线，观察它与可行域的关系</div></div>
+        <div class="hint">互动：拖动滑块 · 找最优按钮</div>
+      </div>
+      <div class="graph-wrap">
+        <div class="plotbox a" style="--d:.15s">
+          <svg id="graph" viewBox="0 0 560 430">
+            <defs>
+              <clipPath id="clipPlot"><rect x="46" y="8" width="500" height="382"/></clipPath>
+              <linearGradient id="gFeas" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#2563eb" stop-opacity=".20"/><stop offset="1" stop-color="#0e7490" stop-opacity=".10"/>
+              </linearGradient>
+            </defs>
+            <g id="gGrid"></g>
+            <g clip-path="url(#clipPlot)">
+              <polygon id="feasPoly" points="" fill="url(#gFeas)" stroke="#2563eb" stroke-width="2" opacity="0"/>
+              <line id="c1" stroke="#0e7490" stroke-width="2.2" opacity="0"/>
+              <line id="c2" stroke="#0e7490" stroke-width="2.2" opacity="0"/>
+              <line id="c3" stroke="#0e7490" stroke-width="2.2" opacity="0"/>
+              <line id="objLine" stroke="#c2740b" stroke-width="3" stroke-dasharray="10 7"/>
+            </g>
+            <g id="gAxis"></g>
+            <g id="gVerts"></g>
+          </svg>
+        </div>
+        <div class="gctl">
+          <div class="card a" style="--d:.25s;padding:15px 17px">
+            <div style="font-family:var(--math);font-size:18px;margin-bottom:10px">max z = 3x₁ + 5x₂</div>
+            <div style="font-family:var(--math);font-size:14.5px;color:var(--text-2);line-height:1.9">
+              s.t.&nbsp; x₁ ≤ 4<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2x₂ ≤ 12<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3x₁ + 2x₂ ≤ 18<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x₁, x₂ ≥ 0</div>
+          </div>
+          <div class="card a" style="--d:.35s;padding:15px 17px">
+            <div class="row" style="margin-bottom:9px"><span>目标函数值 z</span><b class="m" id="zRead" style="font-size:19px;color:var(--p1)">z = 0</b></div>
+            <input type="range" id="zSlider" min="0" max="45" step="0.5" value="0">
+            <div style="display:flex;gap:16px;margin-top:12px">
+              <label class="tgl"><input type="checkbox" id="tgCon" checked>约束线</label>
+              <label class="tgl"><input type="checkbox" id="tgFeas" checked>可行域</label>
+            </div>
+          </div>
+          <div class="status a" style="--d:.45s" id="gStatus">拖动滑块，把目标线往右上方推，目标值 z 会不断变大——但它能一直变大下去吗？</div>
+          <button class="btn btn-p a" style="--d:.55s" id="btnBest">移动到最优 →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 6 2.2 顶点定理 ========== -->
+    <section class="slide" id="s6">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第二章 · 图解法与几何直觉</span><h2>2.2 顶点定理：最优解藏在角上</h2><div class="sub">先点击顶点卡片算出各自的 z，再回答哪个是最大</div></div>
+        <div class="hint">互动：点选计算 × 5 + 判分题 × 1</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 330px;gap:30px;flex:1;min-height:0">
+        <div>
+          <div class="card a slidex" style="--d:.15s;margin-bottom:16px;padding:14px 18px">
+            <p style="font-size:14px;color:var(--text-2);line-height:1.85">
+              <b style="color:var(--text)">顶点定理</b>：若线性规划存在有限最优解，则<b>至少有一个最优解出现在可行域的顶点（极点）上</b>。
+              可行域有无穷多个点，但顶点只有有限个 —— 这正是单纯形法「只查顶点」的理论依据。</p>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="vertCards"></div>
+          <div class="mini-q show" style="margin-top:18px">
+            <p style="font-size:14px;color:var(--text-2);margin-bottom:9px"><b>判一判：</b>哪个顶点使目标函数 z = 3x₁ + 5x₂ 取得最大值？</p>
+            <div class="opts" style="grid-template-columns:repeat(5,1fr)" data-quiz="vertex">
+              <button class="opt" data-ok="0"><span class="tag">A</span>(4, 0)</button>
+              <button class="opt" data-ok="0"><span class="tag">B</span>(4, 3)</button>
+              <button class="opt" data-ok="1"><span class="tag">C</span>(2, 6)</button>
+              <button class="opt" data-ok="0"><span class="tag">D</span>(0, 6)</button>
+              <button class="opt" data-ok="0"><span class="tag">E</span>(0, 0)</button>
+            </div>
+            <div class="explain" id="vertexEx"></div>
+          </div>
+        </div>
+        <div class="card a" style="--d:.5s;align-self:start">
+          <h4 style="font-size:15px;margin-bottom:10px">从几何走向代数</h4>
+          <p style="font-size:13.5px;color:var(--text-2);line-height:1.9">
+            图解法只能处理<b>两个</b>决策变量（画平面图），而真实问题往往有几十、几百个变量。<br><br>
+            单纯形法的思路是把几何语言翻译成代数语言：</p>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:9px;font-size:13.5px">
+            <span class="chip">顶点（角点）↔ 基本可行解</span>
+            <span class="chip">沿边移动 ↔ 换一个基变量（枢轴）</span>
+            <span class="chip">「这条路还能更高吗」↔ 检验数 σ &gt; 0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 7 3.1 单纯形表解剖 ========== -->
+    <section class="slide" id="s7">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 单纯形法原理</span><h2>3.1 单纯形表解剖</h2><div class="sub">点击热点，看表格的每个部位分别是什么</div></div>
+        <div class="hint">互动：热点标注 × 4</div>
+      </div>
+      <div class="hs-wrap" style="grid-template-columns:1fr 360px">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px" class="a" >
+            <span style="font-size:13.5px;color:var(--muted)">运行例题：max z = 3x₁+5x₂+2x₃（1.2 节的标准形）</span>
+            <span class="chip">初始单纯形表</span>
+          </div>
+          <div class="a" style="--d:.2s">
+            <table class="sx" id="t7" data-hl="">
+              <thead><tr><th style="font-family:var(--font)">基变量</th><th>x₁</th><th>x₂</th><th>x₃</th><th>s₁</th><th>s₂</th><th>常数 b</th></tr></thead>
+              <tbody>
+                <tr><td class="c-basis">s₁</td><td>1</td><td>2</td><td>3</td><td class="c-slack">1</td><td class="c-slack">0</td><td class="c-rhs">14</td></tr>
+                <tr><td class="c-basis">s₂</td><td>2</td><td>3</td><td>1</td><td class="c-slack">0</td><td class="c-slack">1</td><td class="c-rhs">11</td></tr>
+                <tr class="zrow"><td class="c-basis">z · 检验数</td><td class="sig-pos">3</td><td class="sig-pos">5</td><td class="sig-pos">2</td><td>0</td><td>0</td><td class="c-rhs">0</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="hotspots a" style="--d:.35s">
+            <button class="hs" data-t7="basis"><i>1</i>基变量列</button>
+            <button class="hs" data-t7="slack"><i>2</i>松弛变量列</button>
+            <button class="hs" data-t7="sigma"><i>3</i>检验数行 σ</button>
+            <button class="hs" data-t7="rhs"><i>4</i>常数列 b</button>
+          </div>
+        </div>
+        <div class="hspanel a" style="--d:.45s">
+          <h4><i>?</i><span id="t7Title">四个热点，等你点开</span></h4>
+          <p id="t7Body">这张表把「当前的顶点」和「往每个方向走一步能赚多少」压缩在了一起。
+            逐个点击下方热点，认识表的两个核心部件。</p>
+          <div class="fm" id="t7Fm" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 8 3.2 入基规则 ========== -->
+    <section class="slide" id="s8">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 单纯形法原理</span><h2>3.2 规则一：谁入基</h2><div class="sub">先看规则，再做题（答错也会给出解析）</div></div>
+        <div class="hint">互动：判分题 × 2</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;flex:1;min-height:0">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="card a slidex" style="--d:.15s">
+            <h4 style="font-size:15px;margin-bottom:8px">检验数：往哪个方向走最划算</h4>
+            <p style="font-size:13.5px;color:var(--text-2);line-height:1.9">
+              <span class="m">σ<sub>j</sub> = c<sub>j</sub> − z<sub>j</sub></span>，表示「让非基变量 x<sub>j</sub> 从 0 增加 1 个单位，
+              目标值 z 能提升多少」。它就是单纯形表<b>目标行</b>里的数字。</p>
+          </div>
+          <div class="card a slidex" style="--d:.28s">
+            <h4 style="font-size:15px;margin-bottom:8px">入基规则与终止条件</h4>
+            <p style="font-size:13.5px;color:var(--text-2);line-height:1.9">
+              在所有 <span class="m">σ<sub>j</sub> &gt; 0</span> 的非基变量中，选 <b>σ 最大的那个入基</b>（最陡的改进方向）。<br>
+              若<b>所有 σ<sub>j</sub> ≤ 0</b> —— 没有任何方向能再改进，当前解即<b style="color:var(--ok)">最优解</b>，迭代停止。</p>
+          </div>
+        </div>
+        <div class="card a" style="--d:.4s">
+          <p style="font-size:13.5px;color:var(--text-2);margin-bottom:9px">
+            <b>题 1</b>：某张单纯形表的目标行检验数为 <span class="m" style="font-size:15.5px">σ = (3, 5, 2, 0, 0)</span>，
+            对应列 <span class="m">(x₁, x₂, x₃, s₁, s₂)</span>。应选哪个变量入基？</p>
+          <div class="opts" style="grid-template-columns:repeat(4,1fr)" data-quiz="enter">
+            <button class="opt sm" data-ok="0"><span class="tag">A</span>x₁（σ = 3）</button>
+            <button class="opt sm" data-ok="1"><span class="tag">B</span>x₂（σ = 5）</button>
+            <button class="opt sm" data-ok="0"><span class="tag">C</span>x₃（σ = 2）</button>
+            <button class="opt sm" data-ok="0"><span class="tag">D</span>s₁（σ = 0）</button>
+          </div>
+          <div class="explain" id="enterEx"></div>
+        </div>
+        <div class="card a" style="--d:.5s">
+          <p style="font-size:13.5px;color:var(--text-2);margin-bottom:9px">
+            <b>题 2</b>：若某张表的全部检验数都 ≤ 0，说明：</p>
+          <div class="opts" style="grid-template-columns:repeat(3,1fr)" data-quiz="optimal">
+            <button class="opt sm" data-ok="0" style="font-family:var(--font)"><span class="tag">A</span>问题无界，目标值可无限增大</button>
+            <button class="opt sm" data-ok="1" style="font-family:var(--font)"><span class="tag">B</span>当前解已是最优解，迭代停止</button>
+            <button class="opt sm" data-ok="0" style="font-family:var(--font)"><span class="tag">C</span>需要重新添加松弛变量</button>
+          </div>
+          <div class="explain" id="optimalEx"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 9 3.3 比值检验 ========== -->
+    <section class="slide" id="s9">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 单纯形法原理</span><h2>3.3 规则二：谁出基（比值检验）</h2><div class="sub">点击「算 θ」，算完再选出基变量</div></div>
+        <div class="hint">互动：点选计算 × 2 + 判分题 × 1</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:30px;flex:1;min-height:0">
+        <div>
+          <p class="a" style="--d:.15s;font-size:14px;color:var(--text-2);margin-bottom:12px">
+            x₂ 已确定入基，它的值将从 0 开始增大。增大会<b>消耗</b>对应行的资源：
+            只有该行 <span class="m">a<sub>ij</sub> &gt; 0</span> 才构成限制。对每个受限行计算
+            <span class="m">θ<sub>i</sub> = b<sub>i</sub> / a<sub>ij</sub></span>（最多能增到多少而不违反非负性）：</p>
+          <div class="a" style="--d:.25s">
+            <table class="ratio-t" id="rt">
+              <thead><tr><th style="font-family:var(--font)">基变量</th><th>x₂ 列系数 a<sub>ij</sub></th><th>常数 b<sub>i</sub></th><th>θ = b<sub>i</sub>/a<sub>ij</sub></th><th style="font-family:var(--font)">操作</th></tr></thead>
+              <tbody>
+                <tr><td>s₁</td><td>2</td><td>14</td><td class="thval" data-th="7">—</td><td><button class="rbtn" data-calc="0">算 θ</button></td></tr>
+                <tr><td>s₂</td><td>3</td><td>11</td><td class="thval" data-th="113">—</td><td><button class="rbtn" data-calc="1">算 θ</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mini-q show" style="margin-top:18px">
+            <p style="font-size:14px;color:var(--text-2);margin-bottom:9px"><b>判一判：</b>应选哪个变量出基（退出基变量集合）？</p>
+            <div class="opts" style="grid-template-columns:repeat(3,1fr)" data-quiz="leave">
+              <button class="opt" data-ok="0"><span class="tag">A</span>s₁（θ = 7）</button>
+              <button class="opt" data-ok="1"><span class="tag">B</span>s₂（θ = 11/3）</button>
+              <button class="opt" data-ok="0"><span class="tag">C</span>任意一个都可以</button>
+            </div>
+            <div class="explain" id="leaveEx"></div>
+          </div>
+        </div>
+        <div class="card a" style="--d:.4s;align-self:start">
+          <h4 style="font-size:15px;margin-bottom:10px">为什么取最小比值</h4>
+          <p style="font-size:13.5px;color:var(--text-2);line-height:1.9">
+            x₂ 每增加 1，s₁ 就减少 2、s₂ 就减少 3。要让<b>所有</b>基变量保持 ≥ 0，x₂ 的增量不能超过任何一个上限：
+            <span class="m" style="display:block;margin:8px 0;padding:8px 12px;background:var(--surface-2);border-radius:8px">
+            x₂ ≤ min(14/2, 11/3) = 11/3</span>
+            超过它，s₂ 就会变成负数，解不可行。<b>最小比值所在行</b>的基变量被「顶」出去，这就是出基变量；
+            该行与入基列的交点称为<b style="color:var(--no)">枢轴元素</b>（此处是 3）。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 10 4.1 完整迭代演示 ========== -->
+    <section class="slide" id="s10">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第四章 · 完整迭代与测验</span><h2>4.1 完整迭代演示</h2><div class="sub">把三条规则串起来，看单纯形表如何一步步走向最优</div></div>
+        <div class="hint">互动：动画控制（单步 / 播放 / 速度）</div>
+      </div>
+      <div style="display:grid;grid-template-columns:460px 1fr;gap:26px;flex:1;min-height:0">
+        <div>
+          <div class="a" style="--d:.15s">
+            <table class="sx" id="t10"><thead></thead><tbody></tbody></table>
+          </div>
+          <div class="a" style="--d:.25s;display:flex;align-items:center;gap:9px;margin-top:13px;flex-wrap:wrap">
+            <button class="btn btn-p" id="b10play" style="height:36px;padding:0 16px;font-size:13.5px">播放</button>
+            <button class="btn btn-g" id="b10step" style="height:36px;padding:0 14px;font-size:13.5px">单步 →</button>
+            <button class="btn btn-g" id="b10reset" style="height:36px;padding:0 14px;font-size:13.5px">重置</button>
+            <span style="display:flex;gap:5px;margin-left:4px" id="b10speed">
+              <button class="rbtn" data-sp="1" style="background:var(--p1);color:#fff">1×</button>
+              <button class="rbtn" data-sp="2">2×</button>
+              <button class="rbtn" data-sp="3">3×</button>
+            </span>
+            <span style="font-size:12.5px;color:var(--muted);margin-left:auto" id="b10prog">节拍 0 / 8</span>
+          </div>
+          <div class="card a" style="--d:.35s;margin-top:13px;padding:12px 16px">
+            <div style="font-size:12.5px;color:var(--muted);margin-bottom:7px">图例</div>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-2)">
+              <span><i style="display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--p1-bg);border:1px solid var(--p1-bd);margin-right:5px"></i>入基列</span>
+              <span><i style="display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--p2-bg);border:1px solid var(--p2-bd);margin-right:5px"></i>出基行</span>
+              <span><i style="display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--no-bg);border:1.5px solid var(--no);margin-right:5px"></i>枢轴元素</span>
+              <span><i style="display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--p3-bg);border:1px solid #9fd0dc;margin-right:5px"></i>新基</span>
+            </div>
+          </div>
+        </div>
+        <div class="a slidex" style="--d:.3s;display:flex;flex-direction:column;gap:12px;min-height:0">
+          <div class="whybox" style="min-height:0">
+            <span class="act init" id="b10act">初始表</span>
+            <h4 id="b10title">建立标准形，确定初始基</h4>
+            <p id="b10why">两条约束加入松弛变量 s₁、s₂ 化为等式。令决策变量全为 0，得初始基 {s₁, s₂}，初始解 s₁ = 14, s₂ = 11, z = 0 —— 这是原点处的可行解，迭代从这里出发。</p>
+            <div class="facts" id="b10facts"></div>
+          </div>
+          <div class="whybox" id="b10result" style="display:none;border-color:#b7e2c5;background:var(--ok-bg)">
+            <h4 style="color:#0d5c2c">达到最优</h4>
+            <p style="color:#166534">最优解 <span class="m">x₁ = 0, x₂ = 19/7, x₃ = 20/7</span>，
+              最优目标值 <b class="m" style="font-size:16px">z* = 135/7 ≈ 19.29</b>。两条约束恰好用尽（s₁ = s₂ = 0）。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 11 4.2 步骤排序挑战 ========== -->
+    <section class="slide" id="s11">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第四章 · 完整迭代与测验</span><h2>4.2 排序挑战：单纯形法五步走</h2><div class="sub">先点一张卡片选中，再点另一张与之交换位置；排好后点「检查」</div></div>
+        <div class="hint">互动：点击交换排序 + 判定</div>
+      </div>
+      <div class="sort-wrap">
+        <div class="sortbox a" style="--d:.15s" id="sortbox"></div>
+        <div style="display:flex;flex-direction:column;gap:13px">
+          <div class="card a slidex" style="--d:.28s">
+            <h4 style="font-size:15px;margin-bottom:8px">玩法</h4>
+            <p style="font-size:13.5px;color:var(--text-2);line-height:1.9">
+              五张卡片被打乱了顺序。点击一张<b>选中</b>（蓝色高亮），再点击另一张，两张<b>交换位置</b>。
+              认为排好后点「检查答案」，错误的步骤会标红。</p>
+          </div>
+          <div class="a" style="--d:.4s;display:flex;gap:10px">
+            <button class="btn btn-p" id="sortCheck" style="flex:1">检查答案</button>
+            <button class="btn btn-g" id="sortReset">重新打乱</button>
+          </div>
+          <div class="status a" style="--d:.5s" id="sortStatus">加油，把单纯形法的完整流程排出来。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 12 4.3 随堂测验 ========== -->
+    <section class="slide" id="s12">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第四章 · 完整迭代与测验</span><h2>4.3 随堂测验</h2><div class="sub">三道题综合检验本课内容，答完立即判分并给出解析</div></div>
+        <div class="hint">互动：判分题 × 3 · 实时计分</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.15fr 1fr;grid-template-rows:1fr 1fr;gap:14px;flex:1;min-height:0">
+        <div class="card a" style="--d:.15s;padding:12px 16px;min-height:0">
+          <p style="font-size:13px;color:var(--text-2);margin-bottom:8px"><b>第 1 题</b>：标准形中松弛变量 s<sub>i</sub> 的取值范围是？</p>
+          <div class="opts" style="grid-template-columns:repeat(4,1fr)" data-quiz="q1">
+            <button class="opt sm" data-ok="0" style="font-family:var(--font)"><span class="tag">A</span>任意实数</button>
+            <button class="opt sm" data-ok="1" style="font-family:var(--font)"><span class="tag">B</span>≥ 0</button>
+            <button class="opt sm" data-ok="0" style="font-family:var(--font)"><span class="tag">C</span>= 0</button>
+            <button class="opt sm" data-ok="0" style="font-family:var(--font)"><span class="tag">D</span>≤ 0</button>
+          </div>
+          <div class="explain" data-ex="q1" style="font-size:12.5px;padding:7px 11px;margin-top:8px"></div>
+        </div>
+        <div class="card a slidex" style="--d:.3s;padding:12px 16px;min-height:0">
+          <h4 style="font-size:15px;margin-bottom:12px">实时成绩</h4>
+          <div style="display:flex;align-items:baseline;gap:10px">
+            <span style="font-size:42px;font-weight:800;color:var(--p1)" id="quizScore">0</span>
+            <span style="font-size:15px;color:var(--muted)">/ 3</span>
+          </div>
+          <div style="height:8px;border-radius:5px;background:rgba(20,29,43,.08);margin:10px 0 12px;overflow:hidden">
+            <i id="quizBar" style="display:block;height:100%;width:0;background:linear-gradient(90deg,var(--p1),var(--p3));transition:width .5s ease"></i>
+          </div>
+          <p style="font-size:12.5px;color:var(--text-2);line-height:1.8" id="quizMsg">完成三道题后，结束页会给出本课学习报告。</p>
+        </div>
+        <div class="card a" style="--d:.25s;padding:12px 16px;min-height:0">
+          <p style="font-size:13px;color:var(--text-2);margin-bottom:8px"><b>第 2 题（判断）</b>：「若某非基变量的检验数 σ<sub>j</sub> &gt; 0，则当前基本可行解一定不是最优解。」</p>
+          <div class="opts" style="grid-template-columns:repeat(2,1fr)" data-quiz="q2">
+            <button class="opt sm" data-ok="1" style="font-family:var(--font)"><span class="tag">对</span>正确</button>
+            <button class="opt sm" data-ok="0" style="font-family:var(--font)"><span class="tag">错</span>错误</button>
+          </div>
+          <div class="explain" data-ex="q2" style="font-size:12.5px;padding:7px 11px;margin-top:8px"></div>
+        </div>
+        <div class="card a" style="--d:.35s;padding:12px 16px;min-height:0">
+          <p style="font-size:13px;color:var(--text-2);margin-bottom:8px">
+            <b>第 3 题</b>：当前基为 (s₁, x₂)，入基变量为 x₃，比值检验算得第 1 行 θ = 20/7、第 2 行 θ = 11。出基变量是？</p>
+          <div class="opts" style="grid-template-columns:repeat(4,1fr)" data-quiz="q3">
+            <button class="opt sm" data-ok="1"><span class="tag">A</span>s₁</button>
+            <button class="opt sm" data-ok="0"><span class="tag">B</span>x₂</button>
+            <button class="opt sm" data-ok="0"><span class="tag">C</span>x₃</button>
+            <button class="opt sm" data-ok="0"><span class="tag">D</span>无法确定</button>
+          </div>
+          <div class="explain" data-ex="q3" style="font-size:12.5px;padding:7px 11px;margin-top:8px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 13 总结 ========== -->
+    <section class="slide" id="s13">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">课程小结</span><h2>总结：一条从几何到代数的路线</h2></div>
+        <div class="hint">要点回顾</div>
+      </div>
+      <div class="sumwrap">
+        <div class="sumcol">
+          <div class="sumcard a slidex" style="--d:.12s"><span class="ic" style="background:#2563eb">01</span>
+            <span><h4>线性规划与标准形</h4><p>三要素（决策变量 / 目标函数 / 约束）；「≤」加松弛变量化为等式，令决策变量为 0 即得初始基本可行解。</p></span></div>
+          <div class="sumcard a slidex" style="--d:.22s"><span class="ic" style="background:#0e7490">02</span>
+            <span><h4>图解法与顶点定理</h4><p>目标线沿改进方向平移，最后卡在可行域的顶点上；顶点有限个 —— 这让「逐点检查」成为可能。</p></span></div>
+          <div class="sumcard a slidex" style="--d:.32s"><span class="ic" style="background:#c2740b">03</span>
+            <span><h4>单纯形表与两条规则</h4><p>检验数 σ 指出「往哪走」（最大正者入基）；比值检验指出「能走多远」（最小 θ 者出基）。</p></span></div>
+          <div class="sumcard a slidex" style="--d:.42s"><span class="ic" style="background:#15803d">04</span>
+            <span><h4>迭代与终止</h4><p>枢轴运算（归一 + 消元）完成换基；所有 σ ≤ 0 时达到最优。本课例题的最优值 z* = 135/7 ≈ 19.29。</p></span></div>
+        </div>
+        <div class="sumcol">
+          <div class="sumcard a" style="--d:.3s;flex:1;flex-direction:column;align-items:stretch">
+            <h4 style="font-size:15px;margin-bottom:10px">关键公式速查</h4>
+            <div style="display:flex;flex-direction:column;gap:10px;font-family:var(--math);font-size:15.5px">
+              <span style="background:var(--surface-2);border-radius:8px;padding:8px 12px;border:1px solid var(--border)">标准形：max z = cᵀx,&nbsp; Ax + Is = b,&nbsp; x, s ≥ 0</span>
+              <span style="background:var(--surface-2);border-radius:8px;padding:8px 12px;border:1px solid var(--border)">检验数：σ<sub>j</sub> = c<sub>j</sub> − z<sub>j</sub>，&nbsp; z<sub>j</sub> = c<sub>B</sub>ᵀ A<sub>j</sub></span>
+              <span style="background:var(--surface-2);border-radius:8px;padding:8px 12px;border:1px solid var(--border)">比值检验：θ<sub>i</sub> = b<sub>i</sub> / a<sub>ij</sub>（仅 a<sub>ij</sub> &gt; 0），取最小</span>
+              <span style="background:var(--surface-2);border-radius:8px;padding:8px 12px;border:1px solid var(--border)">枢轴：枢轴行 ÷ p，其余行 − (a<sub>ij</sub>/p) × 枢轴行</span>
+            </div>
+          </div>
+          <div class="sumcard a pop" style="--d:.5s;border-color:var(--p1-bd);background:var(--p1-bg)">
+            <span class="ic" style="background:var(--p1)">→</span>
+            <span><h4 style="color:#123a9c">下一步学什么</h4><p style="color:#1c4390">两阶段单纯形法与大 M 法（人工初始基）、对偶理论、退化与循环、以及计算机实现中的数值稳定性。</p></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 14 结束页 ========== -->
+    <section class="slide" id="s14">
+      <div class="fin">
+        <span class="chip a pop" style="--d:.05s">课程完成</span>
+        <h1 class="a" style="--d:.15s;margin-top:18px">恭喜，你已走完单纯形法的全程</h1>
+        <p class="sub a" style="--d:.3s">从图解直觉出发，经过标准形、单纯形表与两条规则，最终亲手完成了一次完整迭代。<br>数学的最优解，往往就藏在「下一步往哪走、能走多远」这两个朴素的问题里。</p>
+        <div class="rep">
+          <div class="repcard a pop" style="--d:.42s"><h4>随堂测验</h4><div class="v" id="repQuiz">—</div></div>
+          <div class="repcard a pop" style="--d:.5s"><h4>排序挑战</h4><div class="v dim" id="repSort">未完成</div></div>
+          <div class="repcard a pop" style="--d:.58s"><h4>例题最优值</h4><div class="v" style="font-family:var(--math)">135/7</div></div>
+        </div>
+        <div class="acts a" style="--d:.68s">
+          <button class="btn btn-p" id="btnRestart">重新学习</button>
+          <button class="btn btn-g" data-go="11">回看目录</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== 底栏 ===================== -->
+  <footer id="chrome">
+    <div id="dots"></div>
+    <div id="pageNum"><b id="pn1">1</b> / <span id="pn2">14</span></div>
+    <div id="navbtns">
+      <button class="navbtn" id="btnPrev"><span class="k">←</span>上一页</button>
+      <button class="navbtn" id="btnNext">下一页<span class="k">→</span></button>
+    </div>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   模块 J1：画布缩放 —— 1280×720 设计稿等比适配任意分辨率
+   ============================================================ */
+const stage = document.getElementById("stage");
+function fit(){
+  const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+  stage.style.transform = "translate(-50%,-50%) scale(" + s + ")";
+}
+window.addEventListener("resize", fit); fit();
+
+/* ============================================================
+   模块 J2：幻灯片导航引擎 —— 方向感知切换 + 顶部/底部导航
+   ============================================================ */
+const CHAPS = ["封面","课程导览","认识线性规划","认识线性规划","图解法与几何直觉","图解法与几何直觉",
+               "单纯形法原理","单纯形法原理","单纯形法原理","完整迭代与测验","完整迭代与测验",
+               "完整迭代与测验","课程小结","结束"];
+const slides = Array.from(document.querySelectorAll(".slide"));
+const N = slides.length;
+const nav = { idx: 0, busy: false };
+const dotsBox = document.getElementById("dots");
+slides.forEach((_, i) => {
+  const b = document.createElement("button");
+  b.title = "第 " + (i + 1) + " 页 · " + CHAPS[i];
+  b.addEventListener("click", () => goTo(i, i > nav.idx ? 1 : -1));
+  dotsBox.appendChild(b);
+});
+const dots = Array.from(dotsBox.children);
+document.getElementById("pgAll").textContent = N;
+document.getElementById("pn2").textContent = N;
+
+function renderPlace(i, dir){
+  const el = slides[i];
+  if (dir < 0){                       // 从左侧进入：先瞬移到左侧位
+    el.classList.add("pos-left");
+    el.style.transition = "none"; void el.offsetWidth; el.style.transition = "";
+  } else {
+    el.classList.remove("pos-left");
+  }
+}
+function goTo(n, dir){
+  n = Math.max(0, Math.min(N - 1, n));
+  if (n === nav.idx && slides[n].classList.contains("active")) return;
+  if (nav.busy) return;
+  nav.busy = true; setTimeout(() => nav.busy = false, 260);
+  dir = dir === undefined ? (n > nav.idx ? 1 : -1) : dir;
+  const cur = slides[nav.idx], nxt = slides[n];
+  const leaving = cur !== nxt ? SLIDES[nav.idx] : null;
+  if (cur !== nxt){
+    if (dir > 0) cur.classList.add("pos-left");      // 前进：旧页退向左侧
+    cur.classList.remove("active");
+    renderPlace(n, dir);
+    void nxt.offsetWidth;
+    if (leaving && leaving.onLeave) leaving.onLeave();
+  }
+  nxt.classList.add("active");                        // 首次调用 cur === nxt 也要激活
+  nav.idx = n;
+  /* 顶栏与底栏 */
+  document.getElementById("progress").firstElementChild.style.width = ((n + 1) / N * 100) + "%";
+  document.getElementById("pgCur").textContent = n + 1;
+  document.getElementById("pn1").textContent = n + 1;
+  document.getElementById("chapLabel").textContent = CHAPS[n];
+  dots.forEach((d, i) => {
+    d.classList.toggle("on", i === n);
+    d.classList.toggle("done", i < n);
+  });
+  document.getElementById("btnPrev").disabled = n === 0;
+  document.getElementById("btnNext").disabled = n === N - 1;
+  if (SLIDES[n].onEnter) SLIDES[n].onEnter();
+}
+document.getElementById("btnPrev").addEventListener("click", () => goTo(nav.idx - 1, -1));
+document.getElementById("btnNext").addEventListener("click", () => goTo(nav.idx + 1, 1));
+document.querySelectorAll("[data-go]").forEach(b =>
+  b.addEventListener("click", () => goTo(+b.dataset.go, +b.dataset.go > nav.idx ? 1 : -1)));
+window.addEventListener("keydown", e => {
+  const t = e.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "BUTTON") &&
+      (e.key === " " || e.key === "Enter")) return;    // 控件自身响应，避免双重触发
+  if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " "){ e.preventDefault(); goTo(nav.idx + 1, 1); }
+  else if (e.key === "ArrowLeft" || e.key === "PageUp"){ e.preventDefault(); goTo(nav.idx - 1, -1); }
+  else if (e.key === "Home"){ e.preventDefault(); goTo(0, -1); }
+  else if (e.key === "End"){ e.preventDefault(); goTo(N - 1, 1); }
+});
+
+/* ============================================================
+   模块 J3：通用判分选择题（第 4/6/8/9/12 页共用）
+   即时判分 + 正误配色 + 错误细节 + 答后解析
+   ============================================================ */
+const quizState = { answered: 0, correct: 0 };   // 仅统计第 12 页的随堂测验
+function bindQuiz(sel, explainEl, goodText, badText, counted){
+  const box = document.querySelector(sel);
+  if (!box) return;
+  box.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (box.dataset.done) return;
+      box.dataset.done = "1";
+      const ok = btn.dataset.ok === "1";
+      box.querySelectorAll(".opt").forEach(b => { b.disabled = true;
+        if (b.dataset.ok === "1") b.classList.add("correct"); });
+      if (!ok) btn.classList.add("wrong");
+      if (counted){ quizState.answered++; if (ok) quizState.correct++; updateQuizHud(); }
+      if (explainEl){
+        explainEl.className = "explain show " + (ok ? "good" : "bad");
+        explainEl.textContent = (ok ? "正确。" : "再想想。") + (ok ? goodText : badText);
+      }
+    });
+  });
+}
+function updateQuizHud(){
+  const s = document.getElementById("quizScore");
+  if (!s) return;
+  s.textContent = quizState.correct;
+  document.getElementById("quizBar").style.width = (quizState.correct / 3 * 100) + "%";
+  const done = quizState.answered;
+  document.getElementById("quizMsg").textContent =
+    "已作答 " + done + " / 3 题" + (done === 3
+      ? (quizState.correct === 3 ? "，全对！可以进入总结页了。"
+        : "。错题的解析再看一遍，然后到结束页查看报告。")
+      : "，继续。");
+}
+const EXPLAINS = {
+  slack:  ["当约束取等号时资源恰好用尽，剩余量 s₁ = 14 − 14 = 0。",
+           "松弛变量表示「剩余量」：s₁ = 14 − (x₁+2x₂+3x₃)。资源恰好用完时剩余量为 0，所以 s₁ = 0（选 B）。"],
+  vertex: ["z = 3×2 + 5×6 = 36，是五个顶点中最大的。",
+           "逐点比较：z(4,0)=12，z(4,3)=27，z(2,6)=36，z(0,6)=30，z(0,0)=0。最大的是 (2,6)，z = 36（选 C）。"],
+  enter:  ["σ = 5 是最大的正检验数，对应 x₂，它是最陡的改进方向。",
+           "入基规则取最大的正检验数：σ = (3, 5, 2, 0, 0) 中最大的是 5，对应 x₂（选 B）。σ = 0 的方向暂不能改进目标。"],
+  optimal:["全部 σ ≤ 0 意味着没有任何改进方向，当前解即最优。",
+           "检验数的含义是「该方向每走一步能提升多少」。全部 ≤ 0 说明所有方向都不能再改进，当前解已最优（选 B）。注意与「无界」区分：无界是某列系数全 ≤ 0 且 σ > 0。"],
+  leave:  ["最小比值 min(7, 11/3) = 11/3 落在 s₂ 行，s₂ 被顶出基。",
+           "出基规则取最小比值：min(7, 11/3) = 11/3，对应 s₂ 行（选 B）。若选 s₁ 出基，x₂ 最多增到 11/3 就会把 s₂ 压成负数，解不可行。"],
+  q1: ["松弛变量是剩余资源量，资源量非负，故 s ≥ 0。",
+       "标准形要求所有变量非负，松弛变量 s = b − Ax 表示剩余资源，显然非负（选 B）。"],
+  q2: ["σ > 0 说明沿该方向走一步目标值还会增大，当前解不是最优。",
+       "检验数 σ 的含义是「该方向每走一步能提升多少」。σ > 0 即存在改进方向，当前解必非最优，故该命题正确（选「对」）。"],
+  q3: ["最小比值 20/7 落在第 1 行，出基的应是 s₁。",
+       "取最小比值 min(20/7, 11) = 20/7，在第 1 行，出基的是第 1 行的基变量 s₁（选 A）。x₂ 在第 2 行，θ = 11 不是最小。"]
+};
+const COUNTED = { q1: 1, q2: 1, q3: 1 };   // 只有随堂测验三题计入成绩
+Object.entries({
+  slack:  ["#miniQEx", 0], vertex: ["#vertexEx", 1], enter: ["#enterEx", 2],
+  optimal:["#optimalEx", 3], leave: ["#leaveEx", 4], q1: ['[data-ex="q1"]', 5],
+  q2: ['[data-ex="q2"]', 6], q3: ['[data-ex="q3"]', 7]
+}).forEach(([k, [sel, ei]]) => bindQuiz('[data-quiz="' + k + '"]', document.querySelector(sel),
+  EXPLAINS[k][0], EXPLAINS[k][1], !!COUNTED[k]));
+
+/* ============================================================
+   模块 J4：热点标注（第 3、7 页）
+   ============================================================ */
+const HS3 = {
+  var: { t: "决策变量 x₁, x₂, x₃", b: "问题中可以自主决定的量，例如三种产品的产量。它们是「未知的、待求的」，一切约束与目标都围绕它们展开。标准形要求其非负。",
+         f: "x₁, x₂, x₃ ≥ 0（非负性）" },
+  obj: { t: "目标函数 z", b: "衡量方案好坏的线性函数，这里是总利润。单纯形法的任务就是让 z 在可行范围内尽可能大。目标行里的检验数，正是「往各方向走一步 z 能变多少」的度量。",
+         f: "max z = 3x₁ + 5x₂ + 2x₃" },
+  con: { t: "约束条件", b: "决策必须遵守的限制，这里是不超过车间的可用工时与原料配额。线性规划的「线性」二字：目标与约束都只含变量的一次项，没有平方、没有相乘。",
+         f: "x₁ + 2x₂ + 3x₃ ≤ 14；2x₁ + 3x₂ + x₃ ≤ 11" }
+};
+document.querySelectorAll("#s3 .hs").forEach(h => h.addEventListener("click", () => {
+  document.querySelectorAll("#s3 .hs").forEach(x => x.classList.remove("on"));
+  document.querySelectorAll("#s3 .fz").forEach(z => z.classList.remove("on"));
+  h.classList.add("on");
+  const k = h.dataset.hs;
+  document.querySelectorAll('#s3 .fz[data-k="' + k + '"]').forEach(z => z.classList.add("on"));
+  document.getElementById("hspTitle").textContent = HS3[k].t;
+  document.getElementById("hspBody").textContent = HS3[k].b;
+  const fm = document.getElementById("hspFm");
+  fm.style.display = "block"; fm.textContent = HS3[k].f;
+}));
+const T7 = {
+  basis:{ t: "基变量列", b: "当前「非零」的变量。初始时只有松弛变量在基中，对应解 x₁=x₂=x₃=0。每次迭代用换基操作把一个变量换进、一个换出，就像在顶点之间跳跃。",
+          f: "初始基 = { s₁, s₂ }，对应原点" },
+  slack:{ t: "松弛变量列", b: "初始时它们构成单位矩阵（便于直接读出初始解），这也是「≤ 约束」不用额外加工就能开工的原因。迭代中它们会逐渐被决策变量替换出基。",
+          f: "s₁ = 14, s₂ = 11（初始值）" },
+  sigma:{ t: "检验数行 σ", b: "目标行最关键的一行。正的 σ 表示「把该列变量请入基，目标值还能涨」。迭代是否停止，全看这一行是否还有正数。",
+          f: "σ = (3, 5, 2, 0, 0) → x₂ 入基" },
+  rhs:  { t: "常数列 b", b: "当前基变量的取值，也就是当前顶点的坐标分量。最优性判定通过后，最优解直接从这一列读出。",
+          f: "当前解：s₁ = 14, s₂ = 11, z = 0" }
+};
+document.querySelectorAll("#s7 .hs").forEach(h => h.addEventListener("click", () => {
+  document.querySelectorAll("#s7 .hs").forEach(x => x.classList.remove("on"));
+  h.classList.add("on");
+  const k = h.dataset.t7, tb = document.getElementById("t7");
+  tb.dataset.hl = (tb.dataset.hl === k) ? "" : k;
+  const d = T7[k];
+  document.getElementById("t7Title").textContent = d.t;
+  document.getElementById("t7Body").textContent = d.b;
+  const fm = document.getElementById("t7Fm"); fm.style.display = "block"; fm.textContent = d.f;
+}));
+
+/* ============================================================
+   模块 J5：松弛变量点选转换（第 4 页）
+   ============================================================ */
+document.querySelectorAll("#s4 .cvnrow").forEach(row => {
+  row.addEventListener("click", () => {
+    if (row.classList.contains("done")) return;
+    row.classList.add("done");
+    const i = +row.dataset.cvn, sn = "s" + (i + 1);
+    const disp = i === 0 ? "s₁" : "s₂";
+    const op = row.querySelector(".op");
+    const add = row.querySelector(".add");
+    const span = document.createElement("span");
+    span.className = "slack pop"; span.textContent = " + " + disp + " ";
+    row.firstElementChild.insertBefore(span, op);
+    op.textContent = "=";
+    add.textContent = "已添加 " + disp + "，约束化为等式";
+    document.querySelector("." + sn.toLowerCase() + "op").textContent = "=";
+    if (document.querySelectorAll("#s4 .cvnrow.done").length === 2){
+      document.getElementById("stdForm").classList.add("ready");
+      document.getElementById("miniQ").classList.add("show");
+    }
+  });
+});
+
+/* ============================================================
+   模块 J6：图解法探究台（第 5 页）
+   ============================================================ */
+const G = { X: v => 46 + v / 9 * 500, Y: v => 390 - v / 8 * 380, best: false };
+(function initGraph(){
+  const svg = document.getElementById("graph");
+  const NS = "http://www.w3.org/2000/svg";
+  const mk = (tag, at, parent) => {
+    const el = document.createElementNS(NS, tag);
+    for (const k in at) el.setAttribute(k, at[k]);
+    (parent || svg).appendChild(el); return el;
+  };
+  /* 网格与坐标轴 */
+  const grid = document.getElementById("gGrid"), axis = document.getElementById("gAxis");
+  for (let i = 0; i <= 9; i++) mk("line", { x1: G.X(i), y1: G.Y(0), x2: G.X(i), y2: G.Y(8),
+    stroke: "rgba(20,29,43,.07)", "stroke-width": 1 }, grid);
+  for (let j = 0; j <= 8; j++) mk("line", { x1: G.X(0), y1: G.Y(j), x2: G.X(9), y2: G.Y(j),
+    stroke: "rgba(20,29,43,.07)", "stroke-width": 1 }, grid);
+  mk("line", { x1: G.X(0), y1: G.Y(0), x2: G.X(9), y2: G.Y(0), stroke: "#7a879d", "stroke-width": 1.5 }, axis);
+  mk("line", { x1: G.X(0), y1: G.Y(0), x2: G.X(0), y2: G.Y(8), stroke: "#7a879d", "stroke-width": 1.5 }, axis);
+  for (let i = 1; i <= 9; i += 1){
+    mk("text", { x: G.X(i), y: G.Y(0) + 17, "font-size": 11, fill: "#7a879d",
+      "text-anchor": "middle" }, axis).textContent = i;
+  }
+  for (let j = 2; j <= 8; j += 2){
+    mk("text", { x: G.X(0) - 9, y: G.Y(j) + 4, "font-size": 11, fill: "#7a879d",
+      "text-anchor": "end" }, axis).textContent = j;
+  }
+  mk("text", { x: G.X(9) + 2, y: G.Y(0) + 17, "font-size": 12, fill: "#44516a",
+    "font-style": "italic" }, axis).textContent = "x₁";
+  mk("text", { x: G.X(0) - 24, y: G.Y(8) - 2, "font-size": 12, fill: "#44516a",
+    "font-style": "italic" }, axis).textContent = "x₂";
+  /* 三条约束线 */
+  const seg = (id, x1, y1, x2, y2) => {
+    const l = document.getElementById(id);
+    l.setAttribute("x1", G.X(x1)); l.setAttribute("y1", G.Y(y1));
+    l.setAttribute("x2", G.X(x2)); l.setAttribute("y2", G.Y(y2));
+    l.style.strokeDasharray = "900"; l.style.strokeDashoffset = "900";
+    l.style.transition = "stroke-dashoffset 1.2s ease .15s";
+    requestAnimationFrame(() => { l.style.strokeDashoffset = "0"; });
+  };
+  seg("c1", 4, 0, 4, 8); seg("c2", 0, 6, 9, 6); seg("c3", 0, 9, 6, 0);
+  ["c1","c2","c3"].forEach((id, i) => {
+    const l = document.getElementById(id);
+    l.style.opacity = "0"; l.style.transition += ", opacity .5s ease " + (0.2 + i * 0.18) + "s";
+    setTimeout(() => { l.style.opacity = "1"; }, 60);
+  });
+  /* 可行域多边形 */
+  const poly = document.getElementById("feasPoly");
+  const V = [[0,0],[4,0],[4,3],[2,6],[0,6]];
+  poly.setAttribute("points", V.map(p => G.X(p[0]) + "," + G.Y(p[1])).join(" "));
+  /* 顶点（可点击） */
+  const vinfo = { "0,0":0, "4,0":12, "4,3":27, "2,6":36, "0,6":30 };
+  const gv = document.getElementById("gVerts");
+  const vertEls = {};
+  V.forEach(p => {
+    const key = p[0] + "," + p[1];
+    const c = mk("circle", { cx: G.X(p[0]), cy: G.Y(p[1]), r: 6, fill: "#fff",
+      stroke: "#2563eb", "stroke-width": 2.5, style: "cursor:pointer" }, gv);
+    const t = mk("text", { x: G.X(p[0]) + 11, y: G.Y(p[1]) - 9, "font-size": 12,
+      fill: "#44516a", "font-family": "Cambria Math,Georgia,serif", "font-style": "italic" }, gv);
+    t.textContent = "(" + p[0] + "," + p[1] + ")";
+    c.addEventListener("click", () => {
+      document.getElementById("zSlider").value = vinfo[key];
+      drawObj(vinfo[key]);
+      if (!G.best) setStatus("in", "顶点 (" + p[0] + ", " + p[1] + ")：z = " + vinfo[key] +
+        (vinfo[key] === 36 ? " —— 这是可行域里最大的 z。" : "，还不是最大，再往上推推看。"));
+    });
+    vertEls[key] = c;
+  });
+  /* 目标线 */
+  const obj = document.getElementById("objLine");
+  function drawObj(z){
+    obj.setAttribute("x1", G.X(0)); obj.setAttribute("y1", G.Y(z / 5));
+    obj.setAttribute("x2", G.X(z / 3)); obj.setAttribute("y2", G.Y(0));
+    document.getElementById("zRead").textContent = "z = " + (+z).toFixed(1).replace(/\.0$/, "");
+    const r = document.getElementById("zSlider");
+    r.style.setProperty("--fill", (z / 45 * 100) + "%");
+  }
+  window.__drawObj = drawObj;
+  /* 状态提示 */
+  const st = document.getElementById("gStatus");
+  window.__setStatus = (cls, txt) => { st.className = "status " + cls; st.textContent = txt; };
+  function setStatus(cls, txt){ window.__setStatus(cls, txt); }
+  window.__graphVerts = vertEls;
+  document.getElementById("zSlider").addEventListener("input", e => {
+    G.best = false;
+    Object.values(vertEls).forEach(c => c.setAttribute("stroke", "#2563eb"));
+    const z = +e.target.value; drawObj(z);
+    if (z === 0) setStatus("", "拖动滑块，把目标线往右上方推，目标值 z 会不断变大——但它能一直变大下去吗？");
+    else if (z <= 36) setStatus("in", "z = " + (+z).toFixed(1).replace(/\.0$/, "") + "：目标线仍与可行域相交，还存在更大的 z。继续推。");
+    else setStatus("out", "z = " + (+z).toFixed(1).replace(/\.0$/, "") + "：目标线已完全离开可行域，这个 z 取不到。最大值一定在 36 以内。");
+  });
+  document.getElementById("btnBest").addEventListener("click", () => {
+    G.best = true;
+    const s = document.getElementById("zSlider");
+    const from = +s.value, to = 36, t0 = performance.now(), D = 900;
+    (function step(now){
+      const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      const z = from + (to - from) * e; s.value = z; drawObj(z);
+      if (k < 1) requestAnimationFrame(step);
+      else {
+        const c = vertEls["2,6"];
+        c.setAttribute("stroke", "#c2740b"); c.setAttribute("r", 9);
+        setStatus("best", "最优解：(x₁, x₂) = (2, 6)，z* = 3×2 + 5×6 = 36。目标线推到头，正好卡在可行域的顶点上 —— 这就是顶点定理。");
+      }
+    })(performance.now());
+  });
+  drawObj(0);
+})();
+
+/* ============================================================
+   模块 J7：顶点卡片（第 6 页）
+   ============================================================ */
+(function initVerts(){
+  const box = document.getElementById("vertCards");
+  [[0,0,0],[4,0,12],[4,3,27],[2,6,36],[0,6,30]].forEach((v, i) => {
+    const d = document.createElement("div");
+    d.className = "card a";
+    d.style.setProperty("--d", (0.25 + i * 0.07) + "s");
+    d.style.padding = "12px 10px";
+    d.style.textAlign = "center";
+    d.style.cursor = "pointer";
+    d.innerHTML = '<div style="font-family:var(--math);font-size:16px">(' + v[0] + ", " + v[1] + ')</div>' +
+      '<div style="font-size:11.5px;color:var(--muted);margin:5px 0 7px">点击算 z</div>' +
+      '<div class="vz" style="font-family:var(--math);font-size:20px;font-weight:800;color:var(--muted)">?</div>';
+    d.addEventListener("click", () => {
+      if (d.dataset.done) return;
+      d.dataset.done = "1";
+      const vz = d.querySelector(".vz");
+      vz.textContent = v[2]; vz.style.color = "var(--p1)";
+      vz.style.animation = "pop .45s cubic-bezier(.34,1.56,.64,1) forwards";
+      d.style.borderColor = v[2] === 36 ? "var(--ok)" : "var(--border-2)";
+    });
+    box.appendChild(d);
+  });
+})();
+
+/* ============================================================
+   模块 J8：比值检验点选（第 9 页）
+   ============================================================ */
+document.querySelectorAll("#rt .rbtn").forEach(b => {
+  b.addEventListener("click", () => {
+    const tr = b.closest("tr"), cell = tr.querySelector(".thval");
+    b.disabled = true; b.textContent = "已算";
+    cell.textContent = b.dataset.calc === "0" ? "14 / 2 = 7" : "11 / 3 = 11/3";
+    cell.classList.add("calc");
+    if (document.querySelectorAll("#rt .rbtn:disabled").length === 2){
+      document.querySelector("#rt tbody tr:nth-child(2)").classList.add("minrow");
+      document.querySelectorAll("#rt .thval")[1].classList.add("min");
+    }
+  });
+});
+
+/* ============================================================
+   模块 J9：精确有理数 + 单纯形求解（第 10 页动画的数据引擎）
+   ============================================================ */
+function gcd(a, b){ a = Math.abs(a); b = Math.abs(b); while (b){ const t = a % b; a = b; b = t; } return a || 1; }
+class F {
+  constructor(n, d){ d = d === undefined ? 1 : d;
+    if (d < 0){ n = -n; d = -d; } const g = gcd(n, d); this.n = n / g; this.d = d / g; }
+  add(o){ return new F(this.n * o.d + o.n * this.d, this.d * o.d); }
+  sub(o){ return new F(this.n * o.d - o.n * this.d, this.d * o.d); }
+  mul(o){ return new F(this.n * o.n, this.d * o.d); }
+  div(o){ return new F(this.n * o.d, this.d * o.n); }
+  neg(){ return new F(-this.n, this.d); }
+  cmp(o){ return this.n * o.d - o.n * this.d; }
+  gt0(){ return this.n > 0; }
+  s(){ return this.d === 1 ? String(this.n) : this.n + "/" + this.d; }
+}
+const NAME10 = ["x1","x2","x3","s1","s2"], NC10 = 5, MR10 = 2;
+function buildBeats10(){
+  const c = [3,5,2].map(v => new F(v));
+  const A = [[1,2,3],[2,3,1]].map(r => r.map(v => new F(v)));
+  const B = [new F(14), new F(11)];
+  let basis = ["s1","s2"];
+  let rows = A.map((r, i) => { const a = r.slice();
+    for (let k = 0; k < MR10; k++) a.push(new F(k === i ? 1 : 0)); a.push(B[i]); return a; });
+  let zrow = [...c.map(v => v.neg()), new F(0), new F(0), new F(0)];
+  const snap = () => ({ basis: basis.slice(), rows: rows.map(r => r.slice()), zrow: zrow.slice() });
+  const beats = [{ group: 0, kind: "init", act: "初始表", actCls: "init",
+    title: "建立标准形，确定初始基", tab: snap(), hl: {}, dur: 3600,
+    why: "两条约束加入松弛变量 s₁、s₂ 化为等式。令决策变量全为 0，得初始基 {s₁, s₂}，初始解 s₁ = 14, s₂ = 11, z = 0。",
+    facts: [["初始基","{s₁, s₂}"],["初始解","s₁=14, s₂=11"],["目标值","z = 0"]] }];
+  for (let iter = 1; ; iter++){
+    const T = snap();
+    const sigma = zrow.slice(0, NC10).map(v => v.neg());
+    let enter = -1, es = null;
+    for (let j = 0; j < NC10; j++){
+      if (basis.includes(NAME10[j])) continue;
+      if (sigma[j].gt0() && (enter < 0 || sigma[j].cmp(es) > 0)){ enter = j; es = sigma[j]; }
+    }
+    if (enter < 0){
+      beats.push({ group: iter, kind: "opt", act: "最优性检验", actCls: "opt",
+        title: "所有检验数 ≤ 0，达到最优", tab: T, hl: {}, dur: 4200,
+        why: "目标行再无正检验数，任何方向都不能继续改进目标值，当前基本可行解即最优解，迭代终止。",
+        facts: [["检验数", sigma.map((v,i) => NAME10[i] + "=" + v.s()).join(", ")],
+                ["最优解","x₂=19/7, x₃=20/7, x₁=0"],["最优值","z* = 135/7 ≈ 19.29"]] });
+      break;
+    }
+    beats.push({ group: iter, kind: "enter", act: "入基判定", actCls: "enter",
+      title: "选最大的正检验数入基", tab: T, hl: { enterCol: enter }, dur: 4200,
+      why: "检验数表示「该变量每增加 1 单位，目标值提升多少」。正数中最大的是 σ = " + es.s() +
+           "，对应 " + NAME10[enter].replace("1","₁").replace("2","₂").replace("3","₃") + "，它是最陡的改进方向。",
+      facts: [["检验数", sigma.map((v,i) => NAME10[i] + "=" + v.s()).join(", ")],
+              ["入基变量", NAME10[enter].replace("1","₁").replace("2","₂").replace("3","₃") + "（σ = " + es.s() + "）"]] });
+    const ratios = [];
+    for (let i = 0; i < MR10; i++){
+      const a = rows[i][enter];
+      ratios.push({ row: i, basis: basis[i], a, b: rows[i][NC10],
+        ok: a.gt0(), th: a.gt0() ? rows[i][NC10].div(a) : null });
+    }
+    let leave = -1;
+    ratios.forEach(r => { if (r.th && (leave < 0 || r.th.cmp(ratios[leave].th) < 0)) leave = r.row; });
+    beats.push({ group: iter, kind: "ratio", act: "比值检验", actCls: "leave",
+      title: "最小比值确定出基行", tab: T, hl: { enterCol: enter, leaveRow: leave, pivot: { r: leave, c: enter } },
+      ratios, leaveRow: leave, dur: 4600,
+      why: "入基变量的增长会消耗对应行的资源，只有系数为正的行构成限制。θ = b/a 最小的行最先被「顶到 0」，其基变量出基。",
+      facts: ratios.filter(r => r.ok).map(r =>
+        [r.basis + " 行", "θ = " + r.b.s() + "/" + r.a.s() + " = " + r.th.s()]) });
+    const pivot = rows[leave][enter], prow = rows[leave];
+    rows = rows.map((r, ri) => {
+      if (ri === leave) return r.map(v => v.div(pivot));
+      const fac = r[enter].div(pivot);
+      return r.map((v, ci) => v.sub(fac.mul(prow[ci])));
+    });
+    const fz = zrow[enter].div(pivot);
+    zrow = zrow.map((v, ci) => v.sub(fz.mul(prow[ci])));
+    const T2 = snap(), pv = pivot.s(), nb = NAME10[enter]
+      .replace("1","₁").replace("2","₂").replace("3","₃");
+    basis[leave] = NAME10[enter];
+    beats.push({ group: iter, kind: "pivot", act: "枢轴换基", actCls: "pivot",
+      title: "枢轴运算完成换基", tab: T2, hl: { newBasis: NAME10[enter], newBasisRow: leave, newCol: enter },
+      tabPrev: T, pivotInfo: { r: leave, c: enter, v: pivot }, ratios, leaveRow: leave, dur: 4800,
+      why: "枢轴元素 = " + pv + "（出基行 × 入基列）。操作：枢轴行整行除以它使入基列变成单位列，其余行减去相应倍数消去该列 —— 几何上就是跳到了相邻的下一个顶点。",
+      facts: [["枢轴元素", pv],["换基结果", "新基加入 " + nb],["目标值", "z = " + zrow[NC10].s()]] });
+  }
+  return beats;
+}
+const BEATS10 = buildBeats10();
+
+/* ============================================================
+   模块 J10：迭代动画播放器（第 10 页）
+   async/await + rAF 计时；支持单步 / 自动播放 / 暂停 / 调速 / 重置
+   ============================================================ */
+const P10 = { beat: 0, playing: false, paused: false, speed: 1, token: 0 };
+const $10 = id => document.getElementById(id);
+function frac10(f){
+  return f.d === 1 ? String(f.n)
+    : '<span class="frac"><span class="num">' + f.n + '</span><span class="den">' + f.d + '</span></span>';
+}
+function render10(tab, hl){
+  hl = hl || {};
+  const t = $10("t10");
+  let h = "<thead><tr><th style='font-family:var(--font)'>基变量</th>";
+  ["x₁","x₂","x₃","s₁","s₂"].forEach((n, j) => {
+    const cls = (j >= 3 ? "c-slack" : "") + (hl.enterCol === j ? " h-enter" : "") + (hl.newCol === j ? " h-newcol" : "");
+    h += '<th class="' + cls.trim() + '">' + n + "</th>";
+  });
+  h += "<th>常数 b</th></tr></thead><tbody>";
+  tab.basis.forEach((b, i) => {
+    const isLeave = hl.leaveRow === i, isNew = hl.newBasisRow === i;
+    h += '<tr class="' + (isLeave ? "h-leave" : "") + (isNew ? " h-new" : "") + '">';
+    const tag = hl.newBasis && b === hl.newBasis
+      ? b.replace("1","₁").replace("2","₂").replace("3","₃") + ' <span style="color:var(--p3);font-size:11px">新</span>'
+      : b.replace("1","₁").replace("2","₂").replace("3","₃");
+    h += '<td class="c-basis">' + tag + "</td>";
+    tab.rows[i].slice(0, NC10).forEach((v, j) => {
+      const cls = (j >= 3 ? "c-slack " : "") + (hl.enterCol === j ? "h-enter " : "") +
+        (hl.newCol === j ? "h-newcol " : "") +
+        (hl.pivot && hl.pivot.r === i && hl.pivot.c === j ? "h-pivot" : "");
+      h += '<td class="' + cls.trim() + '">' + frac10(v) + "</td>";
+    });
+    h += '<td class="c-rhs">' + frac10(tab.rows[i][NC10]) + "</td></tr>";
+  });
+  h += '<tr class="zrow"><td class="c-basis">z · 检验数</td>';
+  tab.zrow.slice(0, NC10).forEach((v, j) => {
+    const sig = v.neg();
+    const cls = (sig.gt0() ? "sig-pos " : "") + (hl.enterCol === j ? "h-enter" : "");
+    h += '<td class="' + cls.trim() + '">' + frac10(sig) + "</td>";
+  });
+  h += '<td class="c-rhs">' + frac10(tab.zrow[NC10]) + "</td></tr></tbody>";
+  t.innerHTML = h;
+}
+function showBeat10(b, prev){
+  render10(prev ? b.tabPrev : b.tab, prev
+    ? { enterCol: b.pivotInfo.c, leaveRow: b.pivotInfo.r, pivot: b.pivotInfo }
+    : Object.assign({}, b.hl));
+  $10("b10act").textContent = b.act; $10("b10act").className = "act " + b.actCls;
+  $10("b10title").textContent = (b.group > 0 ? "第 " + b.group + " 次迭代 · " : "") + b.title;
+  $10("b10why").textContent = b.why;
+  $10("b10facts").innerHTML = b.facts.map(f => "<span>" + f[0] + "：<b>" + f[1] + "</b></span>").join("");
+  $10("b10prog").textContent = "节拍 " + (prev ? P10.beat : P10.beat + 1) + " / " + BEATS10.length;
+  $10("b10result").style.display = b.kind === "opt" && !prev ? "block" : "none";
+}
+function wait10(ms, token){
+  ms /= P10.speed;
+  return new Promise(res => {
+    const t0 = performance.now();
+    (function tick(now){
+      if (token !== undefined && token !== P10.token){ res(false); return; }
+      if (P10.paused){ requestAnimationFrame(tick); return; }
+      if (now - t0 >= ms){ res(true); return; }
+      requestAnimationFrame(tick);
+    })(performance.now());
+  });
+}
+let run10 = null;   // 正在播放的节拍下标；被打断时保留，由下一次单步定格
+async function showBeatFull10(b, token){
+  if (b.kind === "pivot" && b.tabPrev){
+    showBeat10(b, true);                              // 阶段一：旧表 + 枢轴高亮
+    if (!await wait10(b.dur * 0.42, token)) return false;
+    showBeat10(b, false);                             // 阶段二：新表
+    return await wait10(b.dur * 0.58, token);
+  }
+  showBeat10(b, false);
+  return await wait10(b.dur, token);
+}
+async function step10(){
+  if (run10 !== null){                                // 定格被打断的上一拍并推进
+    showBeat10(BEATS10[run10], false);
+    P10.beat = run10 + 1;
+    run10 = null; P10.token++;
+    sync10();
+    if (P10.beat >= BEATS10.length){ stop10(true); return; }
+  }
+  if (P10.beat >= BEATS10.length) return;
+  run10 = P10.beat;
+  const token = ++P10.token;
+  const ok = await showBeatFull10(BEATS10[run10], token);
+  if (!ok) return;                                    // 被打断：留给下一次单步定格
+  run10 = null; P10.beat++;
+  sync10();
+  if (P10.beat >= BEATS10.length) stop10(true);
+}
+function sync10(){
+  $10("b10prog").textContent = "节拍 " + P10.beat + " / " + BEATS10.length;
+  $10("b10play").textContent = P10.playing ? (P10.paused ? "继续" : "暂停") : "播放";
+  $10("b10step").disabled = P10.beat >= BEATS10.length;
+  $10("b10play").disabled = P10.beat >= BEATS10.length;
+}
+function stop10(done){
+  P10.token++; P10.playing = false; P10.paused = false; run10 = null; sync10();
+  if (done) $10("b10prog").textContent = "已完成 " + BEATS10.length + " / " + BEATS10.length;
+}
+async function loop10(){
+  while (P10.playing && P10.beat < BEATS10.length){
+    run10 = P10.beat;
+    const token = ++P10.token;
+    const ok = await showBeatFull10(BEATS10[run10], token);
+    if (!ok) return;
+    run10 = null; P10.beat++; sync10();
+    if (P10.beat >= BEATS10.length){ stop10(true); return; }
+    if (!await wait10(360, P10.token)) return;
+  }
+}
+$10("b10play").addEventListener("click", () => {
+  if (P10.beat >= BEATS10.length) return;
+  if (!P10.playing){ P10.playing = true; P10.paused = false; sync10(); loop10(); }
+  else { P10.paused = !P10.paused; sync10(); }
+});
+$10("b10step").addEventListener("click", () => {
+  if (P10.playing){ P10.playing = false; P10.paused = false; }
+  step10();
+});
+$10("b10reset").addEventListener("click", () => {
+  stop10(false); P10.beat = 0;
+  showBeat10(BEATS10[0], false);
+  $10("b10result").style.display = "none";
+  sync10();
+});
+document.querySelectorAll("#b10speed .rbtn").forEach(b => b.addEventListener("click", () => {
+  P10.speed = +b.dataset.sp;
+  document.querySelectorAll("#b10speed .rbtn").forEach(x => {
+    x.style.background = ""; x.style.color = "";
+  });
+  b.style.background = "var(--p1)"; b.style.color = "#fff";
+}));
+function reset10(){ P10.token++; P10.playing = false; P10.paused = false; P10.beat = 0;
+  showBeat10(BEATS10[0], false); $10("b10result").style.display = "none"; sync10(); }
+
+/* ============================================================
+   模块 J11：步骤排序挑战（第 11 页）
+   ============================================================ */
+const SORT_STEPS = [
+  "把约束化为标准形，令决策变量为 0，确定初始基与初始基本可行解",
+  "计算目标行检验数 σ，选最大的正检验数对应变量入基",
+  "比值检验 θ = b/a（仅 a > 0 的行），取最小比值确定出基变量",
+  "枢轴运算：枢轴行归一化，其余行消去入基列，得到新单纯形表",
+  "检查所有检验数：若全部 ≤ 0 则达到最优，否则回到第 2 步"
+];
+const SORT = { order: [], sel: -1, checked: false };
+const CARD_H = 74, CARD_G = 15;          // 卡片高度与间距（布局与排序交换共用）
+const sortbox = document.getElementById("sortbox");
+function shuffleSort(){
+  SORT.order = [0,1,2,3,4];
+  do {
+    for (let i = SORT.order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [SORT.order[i], SORT.order[j]] = [SORT.order[j], SORT.order[i]];
+    }
+  } while (SORT.order.every((v, i) => v === i));
+}
+(function initSort(){
+  shuffleSort();
+  SORT.order.forEach((stepIdx, pos) => {
+    const c = document.createElement("div");
+    c.className = "scard";
+    c.dataset.step = stepIdx;
+    c.innerHTML = '<span class="idx">' + (pos + 1) + '</span><p>' + SORT_STEPS[stepIdx] +
+      '</p><span class="sw">点击交换</span>';
+    c.addEventListener("click", () => clickSort(c));
+    sortbox.appendChild(c);
+  });
+  layoutSort();
+})();
+function layoutSort(){
+  Array.from(sortbox.children).forEach((c, i) => {
+    c.style.transform = "translateY(" + i * (CARD_H + CARD_G) + "px)";
+    c.querySelector(".idx").textContent = i + 1;
+  });
+  sortbox.style.height = (SORT.order.length * (CARD_H + CARD_G) + 28 - CARD_G) + "px";
+}
+function clickSort(c){
+  if (SORT.checked) return;
+  const i = Array.from(sortbox.children).indexOf(c);
+  if (SORT.sel < 0){ SORT.sel = i; c.classList.add("sel"); return; }
+  if (SORT.sel === i){ c.classList.remove("sel"); SORT.sel = -1; return; }
+  const a = Array.from(sortbox.children)[SORT.sel];
+  a.classList.remove("sel");
+  [SORT.order[i], SORT.order[SORT.sel]] = [SORT.order[SORT.sel], SORT.order[i]];
+  /* 交换两卡的 step 数据并重新布局（transform 过渡自动产生滑动动画） */
+  const t = a.dataset.step; a.dataset.step = c.dataset.step; c.dataset.step = t;
+  SORT.sel = -1; layoutSort();
+}
+document.getElementById("sortCheck").addEventListener("click", () => {
+  SORT.checked = true;
+  let ok = 0;
+  Array.from(sortbox.children).forEach((c, i) => {
+    const good = +c.dataset.step === i;
+    c.classList.toggle("ok", good); c.classList.toggle("bad", !good);
+    if (good) ok++;
+  });
+  SORT.result = ok;
+  const st = document.getElementById("sortStatus");
+  if (ok === 5){ st.className = "status best"; st.textContent = "全部正确！五步流程：标准形与初始基 → 选入基 → 比值选出基 → 枢轴换基 → 检验 σ ≤ 0。"; }
+  else { st.className = "status out"; st.textContent = "有 " + (5 - ok) + " 步位置不对（红色标记）。点「重新打乱」再试一次。"; }
+});
+document.getElementById("sortReset").addEventListener("click", () => {
+  SORT.checked = false; SORT.sel = -1; SORT.result = undefined;
+  shuffleSort();
+  Array.from(sortbox.children).forEach((c, i) => {
+    c.dataset.step = SORT.order[i];
+    c.classList.remove("ok", "bad", "sel");
+  });
+  layoutSort();
+  const st = document.getElementById("sortStatus");
+  st.className = "status"; st.textContent = "已重新打乱，再来一次。";
+});
+
+/* ============================================================
+   模块 J12：页面注册（进入/离开钩子）与收尾
+   ============================================================ */
+const SLIDES = slides.map((el, i) => ({
+  el,
+  onEnter: i === 9 ? () => { if (P10.beat === 0 && !P10.playing) showBeat10(BEATS10[0], false); }
+        : i === 13 ? () => {
+            const q = document.getElementById("repQuiz");
+            q.textContent = quizState.answered === 3 ? (quizState.correct + " / " + 3) : "未完成";
+            const s = document.getElementById("repSort");
+            if (SORT.result === 5){ s.textContent = "通过"; s.classList.remove("dim"); }
+            else if (SORT.result !== undefined){ s.textContent = SORT.result + " / 5"; }
+          }
+        : null,
+  onLeave: i === 9 ? () => stop10(false) : null
+}));
+document.getElementById("btnRestart").addEventListener("click", () => location.reload());
+reset10();
+goTo(0, 0);
+
+window.addEventListener("keydown", e => { if (e.key === "Escape") location.href = "index.html"; });
+</script>
+
+<style id="portal-back-style">
+#portal-back{position:fixed;right:14px;bottom:14px;z-index:9999;
+  right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));
+  display:inline-flex;align-items:center;gap:6px;
+  font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:#fff;background:rgba(17,24,39,.82);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:9px 15px;text-decoration:none;
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:.72;transition:opacity .18s,transform .18s}
+#portal-back:hover{opacity:1;transform:translateY(-1px)}
+#portal-back:active{transform:none}
+@media print{#portal-back{display:none}}
+</style>
+<a id="portal-back" href="../../" title="返回资源中心">← 资源中心</a>
+</body>
+</html>
