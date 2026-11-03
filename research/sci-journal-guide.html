@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大数据管理与应用专业 · SCI期刊投稿指南</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230F3B42'/%3E%3Ctext x='16' y='22' font-size='17' text-anchor='middle' fill='%23D9A441' font-family='serif' font-weight='700'%3E投%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<style>
+:root{
+  --teal:#0F3B42; --teal2:#123A42; --teal-soft:#E3ECEC; --amber:#D9A441; --amber-soft:#F3E6C8;
+  --paper:#F7F4EE; --card:#FFFFFF; --ink:#1B2326; --muted:#566166; --line:#DAD3C4;
+  --good:#2F6B4F; --good-soft:#E4F0E9; --warn:#9A5B28; --warn-soft:#F8EADB; --danger:#8C3B32; --danger-soft:#F6E5E3;
+  --sans:'Noto Sans SC','Microsoft YaHei','PingFang SC','Hiragino Sans GB',system-ui,sans-serif;
+  --serif:'Noto Serif SC','Songti SC','SimSun',Georgia,serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7;}
+a{color:var(--teal);}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px;}
+/* ===== nav ===== */
+.topnav{position:sticky;top:0;z-index:50;background:var(--teal);box-shadow:0 2px 8px rgba(15,59,66,.25);}
+.topnav .wrap{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 20px;}
+.brand{font-family:var(--serif);font-weight:700;color:#F3E9D2;font-size:15px;margin-right:14px;white-space:nowrap;}
+.topnav a.nlink{color:#D8E4E4;text-decoration:none;font-size:13.5px;padding:5px 11px;border-radius:14px;white-space:nowrap;}
+.topnav a.nlink:hover{background:rgba(217,164,65,.22);color:#fff;}
+/* ===== hero ===== */
+.hero{background:linear-gradient(180deg,#0F3B42 0%,#16505A 100%);color:#F4EFE6;padding:46px 0 34px;border-bottom:4px solid var(--amber);}
+.hero .kicker{font-size:13px;letter-spacing:.18em;color:var(--amber);margin:0 0 10px;text-transform:uppercase;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:31px;line-height:1.35;margin:0 0 12px;color:#FBF7EE;}
+.hero .sub{font-size:15px;color:#CFE0E0;margin:0 0 22px;max-width:760px;}
+.badges{display:flex;flex-wrap:wrap;gap:10px;}
+.hbadge{background:rgba(255,255,255,.10);border:1px solid rgba(217,164,65,.55);color:#F6E8C9;border-radius:8px;padding:7px 14px;font-size:13.5px;}
+.hbadge b{color:#fff;font-size:15px;}
+/* ===== section frame ===== */
+section{padding:34px 0 10px;}
+.sec-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--teal);padding-bottom:8px;margin-bottom:18px;}
+.sec-h h2{font-family:var(--serif);font-size:23px;font-weight:700;color:var(--teal);margin:0;}
+.sec-h .en{font-size:12.5px;color:var(--muted);letter-spacing:.05em;}
+.sec-h .cnt{margin-left:auto;font-size:12.5px;color:var(--muted);}
+/* ===== callout ===== */
+.calbox{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:8px;padding:16px 20px;margin-bottom:14px;}
+.calbox h3{font-size:15.5px;color:var(--teal);margin:2px 0 8px;font-family:var(--serif);}
+.calbox ul{margin:6px 0;padding-left:20px;}
+.calbox li{margin:5px 0;font-size:14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid2 .calbox{margin-bottom:0;}
+.uflag{display:inline-block;background:var(--warn-soft);color:var(--warn);border:1px solid #E3C3A4;border-radius:4px;padding:0 6px;font-size:12.5px;white-space:nowrap;font-weight:500;}
+/* ===== toolbar ===== */
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin-bottom:14px;}
+.toolbar label{font-size:13px;color:var(--muted);}
+.toolbar select,.toolbar input{font-family:var(--sans);font-size:13.5px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);}
+.toolbar input{min-width:230px;}
+.toolbar .reset{background:var(--teal);color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:13.5px;font-family:var(--sans);cursor:pointer;}
+.toolbar .reset:hover{background:var(--teal2);}
+.toolbar .hint{margin-left:auto;font-size:12.5px;color:var(--muted);}
+/* ===== table ===== */
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--card);}
+table.ov{border-collapse:collapse;width:100%;min-width:980px;table-layout:fixed;font-size:13px;}
+table.ov thead th{background:var(--teal);color:#F3E9D2;font-weight:500;font-size:12.5px;padding:9px 8px;text-align:left;border-right:1px solid #28575F;position:sticky;top:54px;}
+table.ov tbody td{padding:8px 8px;border-top:1px solid var(--line);border-right:1px solid #EDE7D9;vertical-align:top;word-break:break-word;}
+table.ov tbody tr:nth-child(even){background:#FBF8F2;}
+table.ov tbody tr:hover{background:var(--amber-soft);}
+.cell-name a{font-weight:500;text-decoration:none;}
+.cell-name a:hover{text-decoration:underline;}
+.small{font-size:12px;color:var(--muted);display:block;}
+.pill{display:inline-block;font-size:11.5px;border-radius:10px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;}
+.pill.scie{background:var(--good-soft);color:var(--good);}
+.pill.ssci{background:var(--amber-soft);color:var(--warn);}
+.pill.dual{background:#E7E4F0;color:#4A4470;}
+.btnlink{display:inline-block;font-size:12px;text-decoration:none;border:1px solid var(--teal);color:var(--teal);border-radius:5px;padding:2px 8px;white-space:nowrap;}
+.btnlink:hover{background:var(--teal);color:#fff;}
+.norow{display:none;text-align:center;padding:18px;color:var(--muted);}
+/* ===== cards ===== */
+.jcard{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:22px;overflow:hidden;}
+.jcard>header{background:var(--teal-soft);padding:14px 20px;border-bottom:1px solid var(--line);}
+.jnum{display:inline-block;background:var(--teal);color:#F6E8C9;font-family:var(--serif);font-weight:700;border-radius:6px;padding:2px 10px;font-size:14px;margin-right:10px;}
+.jtitle{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--teal);}
+.jtitle small{display:block;font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400;margin-top:3px;}
+.jchips{margin-top:9px;display:flex;flex-wrap:wrap;gap:7px;}
+.tpos{font-weight:700;font-size:12.5px;border-radius:11px;padding:2px 11px;}
+.tpos.strong{background:var(--good);color:#fff;}
+.tpos.core{background:var(--teal);color:#fff;}
+.tpos.recommend{background:#3D7E78;color:#fff;}
+.tpos.apply{background:#B07E22;color:#fff;}
+.tpos.push{background:var(--warn);color:#fff;}
+.tpos.mid{background:#6E8793;color:#fff;}
+.tpos.backup{background:#7A6E58;color:#fff;}
+.tpos.narrow{background:#8C3B32;color:#fff;}
+.tcost{background:var(--good-soft);color:var(--good);font-size:12.5px;border-radius:11px;padding:2px 11px;font-weight:500;}
+.tidx{font-size:12.5px;border-radius:11px;padding:2px 11px;}
+.jbody{padding:16px 20px;}
+.dlgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 26px;}
+.dlgrid.full{grid-template-columns:1fr;}
+.ditem{border-bottom:1px dotted var(--line);padding-bottom:8px;}
+.ditem dt{font-size:12.5px;color:var(--muted);margin-bottom:2px;}
+.ditem dd{margin:0;font-size:13.8px;overflow-wrap:anywhere;}
+.jcard .friendly,.jcard .stepinner,.jcard ol.dr{overflow-wrap:anywhere;}
+.ditem dd ul{margin:4px 0;padding-left:18px;}
+.ditem dd li{margin:3px 0;}
+.sub-h{font-size:14px;font-weight:700;color:var(--teal);margin:14px 0 7px;padding-left:9px;border-left:3px solid var(--amber);}
+.matchline{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;}
+.rating{font-weight:700;border-radius:6px;padding:2px 10px;font-size:13px;}
+.rating.high{background:var(--good-soft);color:var(--good);}
+.rating.midhigh{background:var(--amber-soft);color:var(--warn);}
+.rating.mid{background:#ECECEC;color:#444;}
+.rating.low{background:var(--danger-soft);color:var(--danger);}
+.friendly{background:#FBF6EC;border:1px dashed #D9C59A;border-radius:8px;padding:9px 13px;font-size:13.6px;margin:8px 0;}
+ol.dr{margin:6px 0;padding-left:20px;font-size:13.6px;}
+ol.dr li{margin:5px 0;}
+.cbts{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+details.stepbox,details.srcbox{margin-top:12px;border:1px solid var(--line);border-radius:8px;background:#FBF8F2;}
+details.stepbox summary,details.srcbox summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:14px;color:var(--teal);list-style:none;}
+details.stepbox summary::-webkit-details-marker,details.srcbox summary::-webkit-details-marker{display:none;}
+details.stepbox summary::before,details.srcbox summary::before{content:"展开 ▾";color:var(--amber);font-size:12px;margin-right:8px;}
+details[open].stepbox summary::before,details[open].srcbox summary::before{content:"收起 ▴";}
+.stepinner{padding:4px 16px 14px;font-size:13.6px;}
+.stepinner h4{font-size:13.5px;color:var(--teal);margin:10px 0 4px;}
+.srcbox ul{margin:6px 0;padding-left:20px;word-break:break-all;}
+.srcbox li{font-size:12.5px;margin:3px 0;color:var(--muted);}
+.srcbox a{color:var(--teal);}
+/* ===== timeline ===== */
+.tl{display:grid;grid-template-columns:150px 34px 1fr;gap:0 0;}
+.tl .t-time{font-size:13px;color:var(--teal);font-weight:600;text-align:right;padding:12px 14px 12px 0;}
+.tl .t-axis{position:relative;justify-self:center;width:34px;}
+.tl .t-axis::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--amber);transform:translateX(-50%);}
+.tl .t-dot{display:block;position:relative;z-index:1;justify-self:center;align-self:start;margin:16px auto 0;width:13px;height:13px;border-radius:50%;background:var(--teal);border:3px solid var(--amber);}
+.tl .t-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 15px;margin:6px 0;}
+.tl .t-card b{color:var(--teal);}
+.tl .t-card p{margin:4px 0 0;font-size:13.4px;color:var(--ink);}
+.lead-note{font-size:13.8px;color:var(--muted);line-height:1.7;margin:0 0 14px;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;}
+.tips{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:8px;padding:14px 20px;margin-top:16px;}
+.tips h3{margin:0 0 8px;font-size:15.5px;color:var(--teal);font-family:var(--serif);}
+.tips ul{margin:6px 0;padding-left:20px;}
+.tips li{margin:5px 0;font-size:13.8px;}
+/* ===== glossary ===== */
+.gloss{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.gitem{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 15px;}
+.gitem dt{font-weight:700;color:var(--teal);font-size:14px;}
+.gitem dd{margin:4px 0 0;font-size:13.4px;color:var(--ink);}
+/* ===== notes ===== */
+.notebox{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 20px;margin-bottom:13px;font-size:14px;}
+.notebox h3{font-size:15.5px;color:var(--teal);margin:2px 0 8px;font-family:var(--serif);}
+.notebox ul{margin:6px 0;padding-left:20px;}
+.notebox li{margin:5px 0;}
+.soft-alt{background:var(--danger-soft);border:1px solid #E5BCB6;border-radius:8px;padding:14px 18px;margin-bottom:13px;font-size:14px;}
+.soft-alt h3{color:var(--danger);margin:0 0 8px;font-size:15.5px;}
+footer{margin-top:34px;background:var(--teal);color:#CFE0E4;padding:22px 0;font-size:13px;}
+footer .wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;}
+/* responsive */
+@media (max-width:900px){
+  .grid2,.dlgrid,.gloss{grid-template-columns:1fr;}
+  .hero h1{font-size:24px;}
+  .tl{grid-template-columns:96px 28px 1fr;}
+  .tl .t-time{font-size:12px;padding-right:8px;}
+  table.ov thead th{position:static;}
+  .toolbar .hint{margin-left:0;width:100%;}
+}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="wrap">
+    <span class="brand">SCI选刊手册</span>
+    <a class="nlink" href="#caliber">口径说明</a>
+    <a class="nlink" href="#overview">20刊总览</a>
+    <a class="nlink" href="#cards">期刊详情</a>
+    <a class="nlink" href="#process">通用流程</a>
+    <a class="nlink" href="#glossary">术语表</a>
+    <a class="nlink" href="#notes">数据说明</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Dalian University of Finance and Economics · Big Data Management &amp; Application</p>
+    <h1>大数据管理与应用专业 · SCI期刊投稿指南</h1>
+    <p class="sub">面向民办高校教师的免费用、友好型选刊与投稿实操手册；20本候选刊按投稿定位排序，硬数据逐条附来源，无法核实处一律显式标注。</p>
+    <div class="badges">
+      <span class="hbadge"><b>20</b> 本期刊</span>
+      <span class="hbadge"><b>20</b> 本订阅路线0发表费</span>
+      <span class="hbadge"><b>SCIE / SSCI</b> 双口径</span>
+      <span class="hbadge">数据核实于 <b>2026-11-02</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ B. 口径与使用说明 ============ -->
+<section id="caliber">
+  <div class="sec-h"><h2>一、口径与使用说明</h2><span class="en">Scope · Fee · Friendliness · Data Caveat</span></div>
+  <div class="grid2">
+    <div class="calbox">
+      <h3>1. 「SCI级别」口径</h3>
+      <ul>
+        <li>按 Web of Science 收录理解：<b>SCIE（Science Citation Index Expanded）</b>与 <b>SSCI（Social Science Citation Index）</b>均算「WOS 收录级别」。</li>
+        <li>管理学院期刊多属 SSCI，本手册不排除 SSCI；但 SSCI 是否等同于本校考核口径中的「SCI/SCIE」，<b>投稿前须向学校科研/人事部门书面确认折算规则</b>。</li>
+        <li>另有 ESCI（Emerging Sources Citation Index）口径，本手册20本均不以 ESCI 作为入选依据。</li>
+      </ul>
+    </div>
+    <div class="calbox">
+      <h3>2. 费用口径</h3>
+      <ul>
+        <li>20本均为 <b>Hybrid 混合期刊</b>：默认走<b>订阅路线（Subscription / Traditional）发表费 = 0</b>，不影响评审标准。</li>
+        <li>混合期刊可选 Open Access / Open Choice（Gold OA）时<b>另付 APC</b>；已核实金额直接列出，<b>未核实处标注「未核实」</b>，不套用网传数字。</li>
+        <li>绝大多数期刊未发现投稿费（submission fee）；个别刊的投稿费、纸本彩印、超页费等附属收费未核实，以投稿系统与录用邮件为准。</li>
+      </ul>
+    </div>
+    <div class="calbox">
+      <h3>3. 「民办高校友好」口径</h3>
+      <ul>
+        <li>接受率处于可接受区间、审稿周期可规划、主题范围宽、对行业实证/应用建模类稿件包容。</li>
+        <li>各刊公开规则中均<b>未见按院校出身歧视的条款</b>；「不看出身」是基于公开规则与发文样本的评估性结论，非官方承诺。</li>
+        <li>民办/普通本科作者的具名发表案例多数未逐篇核实，友好度结论为定性判断，不代表录用保证。</li>
+      </ul>
+    </div>
+    <div class="calbox">
+      <h3>4. 数据核实声明</h3>
+      <ul>
+        <li>每个硬数字在详情卡「数据来源」折叠区附来源 URL；第三方站点（LetPub、科研通 AbleSci、Scopus、高校图书馆证明等）均注明站点与口径。</li>
+        <li>「未核实」为刻意保留的诚信标注，<b>不是疏漏、不得填数或删除</b>；网友主观接受率/周期不等同官方统计，页面中分开呈现。</li>
+        <li>JCR 影响因子与中科院分区随年度更新；投稿前请用机构 Web of Science JCR、Master Journal List 与官方分区表复核当期值。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ C. 20刊总览 ============ -->
+<section id="overview">
+  <div class="sec-h"><h2>二、20刊总览对比表</h2><span class="en">Comparison Table · 可筛选可搜索</span><span class="cnt">共20行 · 横向可滚动</span></div>
+  <div class="toolbar">
+    <label>出版社
+      <select id="fPub">
+        <option value="">全部出版社</option>
+        <option value="Elsevier">Elsevier</option>
+        <option value="Springer">Springer</option>
+        <option value="Taylor &amp; Francis">Taylor &amp; Francis</option>
+        <option value="Emerald">Emerald</option>
+        <option value="World Scientific">World Scientific</option>
+      </select>
+    </label>
+    <label>WOS收录
+      <select id="fType">
+        <option value="">全部收录类型</option>
+        <option value="SCIE">SCIE</option>
+        <option value="SSCI">SSCI</option>
+        <option value="DUAL">SCIE + SSCI 双收录</option>
+      </select>
+    </label>
+    <label>关键词 <input id="fKw" type="text" placeholder="刊名 / 主题关键词，如 decision、supply chain"></label>
+    <button class="reset" id="fReset" type="button">重置筛选</button>
+    <span class="hint">点刊名可跳转至该刊详情卡</span>
+  </div>
+  <div class="tbl-scroll">
+  <table class="ov" id="ovTable">
+    <colgroup>
+      <col style="width:3%"><col style="width:13%"><col style="width:7%"><col style="width:7%">
+      <col style="width:10%"><col style="width:10%"><col style="width:9%"><col style="width:7%">
+      <col style="width:10%"><col style="width:9%"><col style="width:6%"><col style="width:9%">
+    </colgroup>
+    <thead><tr>
+      <th>序</th><th>期刊名</th><th>出版社</th><th>WOS收录</th><th>最新JCR IF（年份口径）</th><th>JCR分区（学科）</th><th>中科院分区（升级版）</th><th>订阅路线发表费</th><th>可选OA APC</th><th>经验审稿周期</th><th>接受率</th><th>投稿入口</th>
+    </tr></thead>
+    <tbody id="ovBody">
+<tr data-pub="Emerald" data-type="SCIE" data-key="industrial management data systems imds big data analytics supply chain operations management 运营管理 供应链 数据分析">
+<td>1</td><td class="cell-name"><a href="#j01">Industrial Management &amp; Data Systems</a></td><td>Emerald</td><td><span class="pill scie">SCIE</span></td>
+<td>IF 6.1<span class="small">2025，Emerald官网；5yr 6.7</span></td>
+<td>第三方快照：CS跨学科应用 Q1 45/185；工业工程 Q1 17/70<span class="small">官方当期Q档：<span class="uflag">未核实</span></span></td>
+<td>大类工程技术；小类CS跨学科应用（2025-03升级版，逐档<span class="uflag">未核实</span>）</td>
+<td>0 APC · 无投稿费</td><td>通用£3,222/US$4,351/€3,710+税<span class="small">单刊额<span class="uflag">未核实</span></span></td>
+<td>官网首决47天；网友6–12周</td><td>11.4%<span class="small">官网官方</span></td>
+<td><a class="btnlink" href="https://mc.manuscriptcentral.com/imds" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Elsevier" data-type="SCIE" data-key="decision support systems dss business intelligence 决策支持 商业智能 群体决策">
+<td>2</td><td class="cell-name"><a href="#j02">Decision Support Systems</a></td><td>Elsevier</td><td><span class="pill scie">SCIE</span></td>
+<td>JCR2025：IF 7.5<span class="small">JCR2024：6.8/6.7996口径不一，官方证书<span class="uflag">未核实</span></span></td>
+<td>Q1：CS-AI 39/210；CS-IS 24/266；OR&amp;MS 10/109</td>
+<td>管理学2区 Top；小类CS-AI 1区、CS-IS 1区、OR&amp;MS 1区（2025-03升级版）</td>
+<td>订阅0 APC（官网明示）</td><td>Gold OA USD 3,280 不含税（官网明示）</td>
+<td>官网平均8.7周（转引）；网友约18.0个月</td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/decsup/" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Springer" data-type="SCIE" data-key="annals of operations research anor optimization scheduling supply chain reliability 运筹 优化 调度 供应链">
+<td>3</td><td class="cell-name"><a href="#j03">Annals of Operations Research</a></td><td>Springer</td><td><span class="pill scie">SCIE</span></td>
+<td>Springer：4.5(2024)；最新一轮(2026-06)：4.1</td>
+<td>Q2：OR&amp;MS 30/109（JCI Q2 32/109）</td>
+<td>管理学4区；小类OR&amp;MS 3区（2025-03升级版）；非Top</td>
+<td>订阅路线费用<span class="uflag">未核实</span>（hybrid，以录用邮件为准）</td><td>Open Choice APC <span class="uflag">未核实</span></td>
+<td>官网首决中位26天；网友约6.0个月</td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/anor" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Elsevier" data-type="SCIE" data-key="expert systems with applications eswa intelligent systems data mining finance risk 专家系统 智能系统 数据挖掘 风控">
+<td>4</td><td class="cell-name"><a href="#j04">Expert Systems with Applications</a></td><td>Elsevier</td><td><span class="pill scie">SCIE</span></td>
+<td>JCR2025：IF 9.4<span class="small">JCR2024官方证明：7.5</span></td>
+<td>Q1：CS-AI 28/210；EE&amp;E 22/369；OR&amp;MS 6/109</td>
+<td>计算机科学1区 Top；小类CS-AI 2区、EE&amp;E 2区、OR&amp;MS 2区（2025-03升级版）</td>
+<td>订阅0 APC</td><td>Gold OA USD 3,490 不含税（LetPub转引；另有第三方3,630说法，以系统报价为准）</td>
+<td>官网首决5天/送审后62天/在线7天；网友约13.8个月</td><td><span class="uflag">未核实</span>（网友约16%非官方）</td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/eswa/Default.aspx" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Springer" data-type="SCIE" data-key="information systems frontiers isf digital transformation credit scoring machine learning 信息系统 数字化转型 机器学习 信用评分">
+<td>5</td><td class="cell-name"><a href="#j05">Information Systems Frontiers</a></td><td>Springer</td><td><span class="pill scie">SCIE</span></td>
+<td>Springer：8.3(2024)；最新一轮(2026-06)：6.2</td>
+<td>Q1：CS-IS 43/266；CS-Theory&amp;Methods 16/146</td>
+<td>管理学3区；小类CS-IS 2区、CS-Theory 2区（2025-03升级版）；非Top</td>
+<td>订阅路线费用<span class="uflag">未核实</span></td><td>Open Choice APC <span class="uflag">未核实</span></td>
+<td>官网首决中位34天；网友约9.0个月</td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/isfi" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Springer" data-type="SSCI" data-key="electronic commerce research ecr e-commerce platform online review recommendation fintech 电商 平台 用户行为 个性化推荐">
+<td>6</td><td class="cell-name"><a href="#j06">Electronic Commerce Research</a></td><td>Springer</td><td><span class="pill ssci">SSCI</span></td>
+<td>官网4.7(2024)；主编季报2025 IF 4.9</td>
+<td>官方逐类目Q档原文<span class="uflag">未核实</span>（第三方Q1/Q2口径不一）</td>
+<td>管理学大类；Business/Management小类；单一区档<span class="uflag">未核实</span></td>
+<td>传统路线 no APC（官网原文）</td><td>实时抓取 $2,890/£1,990/€2,290 +税（按接受日报价）</td>
+<td>官网首决中位24天；季报录用平均367天；反馈偏慢</td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/elec" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Springer" data-type="SSCI" data-key="information technology and management itm data mining decision support machine learning 信息技术管理 数据挖掘 群决策">
+<td>7</td><td class="cell-name"><a href="#j07">Information Technology and Management</a></td><td>Springer</td><td><span class="pill ssci">SSCI</span><span class="small">另有SCIE第三方冲突说法，待Master Journal List核</span></td>
+<td>官网2.9(2024)；LetPub汇总3.6（口径不同勿混用）</td>
+<td>官方逐类目Q档<span class="uflag">未核实</span></td>
+<td>管理学大类；IS&amp;LS/Management小类；单一区档<span class="uflag">未核实</span></td>
+<td>通行0 APC（逐字原文<span class="uflag">未核实</span>）</td><td>OA APC <span class="uflag">未核实</span>（缓存$3390/3790/3990矛盾，不采用）</td>
+<td>官网首决中位38天；作者反馈偏慢；年发文约33篇</td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/item" target="_blank" rel="noopener">投稿旧址</a></td>
+</tr>
+<tr data-pub="Taylor &amp; Francis" data-type="SCIE" data-key="enterprise information systems eis digital transformation industry 4.0 edge computing workflow 企业信息系统 数字化转型 工业4.0 工作流">
+<td>8</td><td class="cell-name"><a href="#j08">Enterprise Information Systems</a></td><td>Taylor &amp; Francis</td><td><span class="pill scie">SCIE</span></td>
+<td>IF 3.6（2025，T&amp;F官网）；5yr 3.4</td>
+<td>Best Quartile Q2（官方最高类目；逐类目Q档<span class="uflag">未核实</span>）</td>
+<td>计算机科学3区；CS-IS 3区（2025，第三方一致口径）</td>
+<td>非OA不产生APC（官方模板口径）</td><td>OA APC <span class="uflag">未核实</span></td>
+<td>首决104天；外审首决102天；上线14天（官网）</td><td>5%（官网）</td>
+<td><a class="btnlink" href="https://mc.manuscriptcentral.com/teis" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Emerald" data-type="SSCI" data-key="journal of enterprise information management jeim digital transformation ai supply chain e-business 企业信息管理 数字化 AI 供应链 SSCI">
+<td>9</td><td class="cell-name"><a href="#j09">Journal of Enterprise Information Management</a></td><td>Emerald</td><td><span class="pill ssci">SSCI</span></td>
+<td>官网2024 IF 6.4<span class="small">2025 IF：<span class="uflag">未核实</span>；LetPub 9.1为更早值勿混用</span></td>
+<td>第三方快照：SSCI Q1 IS&amp;LS 5/172；Management 26/427<span class="small">官方当期：<span class="uflag">未核实</span></span></td>
+<td>管理学大类；IS&amp;LS 2档、Management 2档（2025-03，逐档未锁定）；非Top</td>
+<td>0 APC · 无投稿费</td><td>通用$4,351量级；单刊额<span class="uflag">未核实</span></td>
+<td>官网首决59天；录用到在线54天</td><td>7.6%（官网）</td>
+<td><a class="btnlink" href="https://mc.manuscriptcentral.com/jeim" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Taylor &amp; Francis" data-type="SCIE" data-key="international journal of production research ijpr scheduling manufacturing supply chain optimization 生产研究 调度 制造 供应链优化">
+<td>10</td><td class="cell-name"><a href="#j10">International Journal of Production Research</a></td><td>Taylor &amp; Francis</td><td><span class="pill scie">SCIE</span></td>
+<td>8.7（2025官网）；7.3（2024武大库口径）</td>
+<td>Best Q1（官方最高类目；逐类目原文<span class="uflag">未核实</span>）</td>
+<td>工程技术2区（第三方一致；2025单值待核）</td>
+<td>非OA = 0 APC（官网原文）</td><td>OA官方美元值<span class="uflag">未核实</span>（第三方2833 EUR仅供量级参考）</td>
+<td>首决3天(含desk reject)；外审首决60天；上线17天</td><td>12%（官网）</td>
+<td><a class="btnlink" href="https://mc.manuscriptcentral.com/tprs" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Taylor &amp; Francis" data-type="DUAL" data-key="journal of operational research society jors forecasting inventory logistics simulation multicriteria 运筹学会 预测 库存 物流 仿真 双收录">
+<td>11</td><td class="cell-name"><a href="#j11">Journal of the Operational Research Society</a></td><td>Taylor &amp; Francis</td><td><span class="pill dual">SCIE + SSCI</span></td>
+<td>2.6（2025官网）；5yr 3.1</td>
+<td>Best Q2（双收录下两类目逐档<span class="uflag">未核实</span>）</td>
+<td>管理学3区（第三方；2025单值待核）</td>
+<td>非OA = 0 APC（官网原文）</td><td>OA官方值<span class="uflag">未核实</span>（第三方USD3650待核）</td>
+<td>首决17天；外审首决96天；上线20天（官网）</td><td>12%（官网）</td>
+<td><a class="btnlink" href="https://www.tandfonline.com/journals/tjor20/about-this-journal" target="_blank" rel="noopener">官网入口</a></td>
+</tr>
+<tr data-pub="Springer" data-type="SCIE" data-key="operational research international journal orij mcdm fuzzy decision path planning simulation 运筹 多准则决策 模糊决策 双盲 MSC">
+<td>12</td><td class="cell-name"><a href="#j12">Operational Research: An International Journal</a></td><td>Springer</td><td><span class="pill scie">SCIE</span></td>
+<td>Springer：2.7(2024)；最新一轮(2026-06)：3.0</td>
+<td>Q2：OR&amp;MS 40/109（JCI Q2 53/109）</td>
+<td>管理学4区；小类OR&amp;MS 4区（2025-03升级版）；非Top</td>
+<td>订阅路线费用<span class="uflag">未核实</span></td><td>Open Choice APC <span class="uflag">未核实</span></td>
+<td>官网首决中位57天；网友周期<span class="uflag">未核实</span></td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/orij" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Springer" data-type="SCIE" data-key="journal of intelligent information systems jiis text-to-sql retrieval recommendation knowledge discovery LaTeX 智能信息系统 检索 推荐 知识发现 数据库">
+<td>13</td><td class="cell-name"><a href="#j13">Journal of Intelligent Information Systems</a></td><td>Springer</td><td><span class="pill scie">SCIE</span></td>
+<td>Springer：3.4(2024)；最新一轮(2026-06)：3.5</td>
+<td>Q2：CS-AI 102/210；CS-IS 120/266</td>
+<td>计算机科学3区；小类CS-AI 4区、CS-IS 4区（2025-03）；非Top</td>
+<td>订阅路线费用<span class="uflag">未核实</span></td><td>Open Choice APC <span class="uflag">未核实</span></td>
+<td>官网首决中位5天(多为初筛)；网友外审6–12周</td><td><span class="uflag">未核实</span>（满意度91%≠录取率）</td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/jiis" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="World Scientific" data-type="SCIE" data-key="asia pacific journal operational research apjor scheduling supply chain logistics heuristic decision 亚太运筹 调度 物流 启发式 保底">
+<td>14</td><td class="cell-name"><a href="#j14">Asia-Pacific Journal of Operational Research</a></td><td>World Scientific</td><td><span class="pill scie">SCIE</span></td>
+<td>IF 1.3（2025官网）；CiteScore 2.6</td>
+<td>第三方Q4；官方JCR Q档<span class="uflag">未核实</span></td>
+<td>大类管理学4区（多源一致）；小类OR&amp;MS精确档<span class="uflag">未核实</span></td>
+<td>0 APC · 无投稿费（官网明示）</td><td>Gold OA US$2,500 + 税（官网已核实）</td>
+<td>录用到在线30天；网友投稿→录用约8.5个月</td><td>38%（官网）</td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/APJOR" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Emerald" data-type="SCIE" data-key="kybernetes systems theory cybernetics decision science organizational information systems control 控制论 系统理论 决策科学">
+<td>15</td><td class="cell-name"><a href="#j15">Kybernetes</a></td><td>Emerald</td><td><span class="pill scie">SCIE</span></td>
+<td>IF 2.9（2025官网）；LetPub 3.2为较早值勿混用</td>
+<td>第三方快照：CS-Cybernetics Q2 16/34<span class="small">官方当期：<span class="uflag">未核实</span></span></td>
+<td>计算机科学大类/CS控制论（列表3档；逐档<span class="uflag">未核实</span>）</td>
+<td>0 APC · 无投稿费</td><td>通用$4,351量级；单刊额<span class="uflag">未核实</span></td>
+<td>官网首决14天；网友4–8周至数月，离散大</td><td>9.5%（官网）</td>
+<td><a class="btnlink" href="http://mc.manuscriptcentral.com/kyb" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Taylor &amp; Francis" data-type="SCIE" data-key="information systems management ism it governance sourcing ecommerce knowledge management 信息系统管理 IT治理 外包 知识管理 接受率3">
+<td>16</td><td class="cell-name"><a href="#j16">Information Systems Management</a></td><td>Taylor &amp; Francis</td><td><span class="pill scie">SCIE</span></td>
+<td>IF 3.0（2025官网）；5yr 4.1</td>
+<td>第三方快照：CS-IS Q2 81/258<span class="small">官方当期：<span class="uflag">未核实</span></span></td>
+<td>管理学大类/CS-IS（3档口径；逐档<span class="uflag">未核实</span>）</td>
+<td>订阅无APC、无投稿费（官网原文no APC）</td><td>OA APC <span class="uflag">未核实</span>（APC Finder实时）</td>
+<td>官网首决平均4天(含desk reject)；网友&gt;12周或约稿</td><td>3%（官网）</td>
+<td><a class="btnlink" href="https://mc.manuscriptcentral.com/uism" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Elsevier" data-type="SCIE" data-key="european journal operational research ejor theory methodology optimization decision support rigorous 欧洲运筹 理论 方法论 决策支持 冲刺">
+<td>17</td><td class="cell-name"><a href="#j17">European Journal of Operational Research</a></td><td>Elsevier</td><td><span class="pill scie">SCIE</span></td>
+<td>JCR2025：IF 7.0<span class="small">JCR2024精确值：<span class="uflag">未核实</span>（仅有14/106 Q1排名）</span></td>
+<td>Q1：OR&amp;MS 2025 11/109（90.4百分位）</td>
+<td>管理学2区；小类OR&amp;MS 2区（2025-03升级版）；Top：否</td>
+<td>订阅作者无需发表费（官方明示）</td><td>Gold APC官方金额<span class="uflag">未核实</span></td>
+<td>官网平均20.5周；网友约7.1个月；98%录用稿≥1次大修</td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/EJOR" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Elsevier" data-type="SCIE" data-key="computers industrial engineering caie cie scheduling production logistics heuristic algorithm 计算机与工业工程 调度 生产 物流 算法">
+<td>18</td><td class="cell-name"><a href="#j18">Computers &amp; Industrial Engineering</a></td><td>Elsevier</td><td><span class="pill scie">SCIE</span></td>
+<td>最新(2026-06科研通)IF 7.3；2025发布6.5/6.55（精度差异）</td>
+<td>Q1：CS-Interdisciplinary 30/185；Engineering Industrial 13/69</td>
+<td>工程技术2区 Top；小类CS跨学科2区、工业工程2区（2025-03）</td>
+<td>订阅APC=0（Elsevier通用政策；本刊官网页未抓到）</td><td>Gold APC <span class="uflag">未核实</span></td>
+<td>官网中位<span class="uflag">未核实</span>；网友约11.1个月</td><td><span class="uflag">未核实</span>（网友约50%不采信）</td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/CAIE" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Elsevier" data-type="SCIE" data-key="data knowledge engineering dke ontology knowledge graph database modeling semantic 数据知识工程 本体 知识图谱 数据库建模">
+<td>19</td><td class="cell-name"><a href="#j19">Data &amp; Knowledge Engineering</a></td><td>Elsevier</td><td><span class="pill scie">SCIE</span></td>
+<td>科研通2026-06-17：IF 3.9（第三方发布口径；官方证书<span class="uflag">未核实</span>）</td>
+<td>Q2：CS-AI 94/210；CS-IS 107/266</td>
+<td>计算机科学3区；小类CS-AI 3区、CS-IS 3区（2025-03）；非Top</td>
+<td>订阅APC=0（Elsevier通用政策）</td><td>Gold APC <span class="uflag">未核实</span></td>
+<td>官网中位<span class="uflag">未核实</span>；网友约12.0个月；年发文约百篇</td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/datak/Default.aspx" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+<tr data-pub="Springer" data-type="SSCI" data-key="information systems e-business management iseb business analytics digital adoption process mining PLSSSEM SNAPP 电子商务管理 商业智能采纳 流程挖掘 双盲 SSCI">
+<td>20</td><td class="cell-name"><a href="#j20">Information Systems and e-Business Management</a></td><td>Springer</td><td><span class="pill ssci">SSCI</span></td>
+<td>Springer：3.6(2024)；最新一轮(2026-06-17)：4.1</td>
+<td>SSCI Q2：Business 128/323；Management 154/426</td>
+<td>管理学4区；小类Business 4区、Management 4区（2025-03）；非Top</td>
+<td>订阅路线费用<span class="uflag">未核实</span>；投稿费<span class="uflag">未核实</span></td><td>Open Choice APC <span class="uflag">未核实</span></td>
+<td>官网首决中位16天；网友全流程周期<span class="uflag">未核实</span></td><td><span class="uflag">未核实</span></td>
+<td><a class="btnlink" href="https://www.editorialmanager.com/iseb" target="_blank" rel="noopener">投稿系统</a></td>
+</tr>
+    <tr class="norow" id="noRow"><td colspan="12">当前筛选条件下无匹配期刊，请调整筛选或关键词。</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ D. 期刊详情 ============ -->
+<section id="cards">
+  <div class="sec-h"><h2>三、期刊详情卡（按投稿定位排序）</h2><span class="en">20 Journal Detail Cards · 一刊一卡</span></div>
+<!-- ===== 01 IMDS ===== -->
+<article class="jcard" id="j01">
+<header>
+<span class="jnum">01</span><span class="jtitle">Industrial Management &amp; Data Systems<small>缩写 IMDS ｜ 出版社 Emerald Group Publishing Ltd.（英国 Bingley）｜月刊，年发文约180篇</small></span>
+<div class="jchips"><span class="tpos strong">稳健首选</span><span class="tcost">订阅路线0费 · 无投稿费</span><span class="tidx pill scie">SCIE</span><span class="rating high">匹配度：高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0263-5577；eISSN 1758-5783；月刊（Monthly）；前身Industrial Management（2018更名）。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（非SSCI）</span> SSCI未见收录记录。学科：Computer Science, Interdisciplinary Applications；Engineering, Industrial。Scopus多类Q1为CiteScore口径，勿与JCR混用。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>Emerald官网：2025 IF 6.1；5yr IF 6.7（2025）；CiteScore 10.1（2025）。</li><li>第三方快照(2023–2024)：CS跨学科应用 Q1 45/185；工业工程 Q1 17/70。</li><li>Clarivate官方当期Q档：<span class="uflag">未核实</span>，投稿前以机构JCR库复核。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>列表干净值：大类工程技术、小类计算机：跨学科应用（2档口径）；Top=否；不在2023–2026各版预警名单。2025升级版逐档精确值：<span class="uflag">未核实</span>（详情页多版本并列渲染）。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd><ul><li>订阅/Green路线：<b>0 APC、无投稿费</b>；Emerald官方FAQ：仅选Gold OA才在录用后收APC，投稿环节不收费。</li><li>Gold OA：混合刊通用 £3,222 / US$4,351 / €3,710 + VAT；IMDS单刊专属APC：<span class="uflag">未核实</span>；Gold采用CC BY 4.0。</li></ul></dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网(2024-04–2025-03)：首决47天；录用到在线44天；通用目标60天内首决。</li><li>网友众包(非官方)：较慢6–12周，样本主观。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官网官方 <b>11.4%</b>（数据期2024-04-01至2025-03-31）；网友主观「较易」，无量化值。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>ScholarOne：https://mc.manuscriptcentral.com/imds ；Author Guidelines见期刊页Author guidelines标签。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>宗旨连接运营管理(OM)与信息系统(IS)，明确主题含 Big Data research、Data analytics、E-business、Production planning and scheduling、Logistics and supply chain management、Green IS、IS strategies、Knowledge management、Performance measurement、Sustainable supply chain；短板是不主打纯理论运筹模型，须落到管理/运营场景。</p>
+<div class="friendly"><b>民办高校友好度：中（看质量与场景契合度、不唯出身）。</b>依据：接受率11.4%、首决47天相对可控；月刊容量大；近期中国机构发文未限定名校；编委国际化含亚太学者。属「跳一跳可及」对口刊，仍需规范实证/数据建模与管理贡献。</div>
+<ol class="dr">
+<li>缺Emerald结构化摘要（Purpose / Design-methodology-approach / Findings / Originality四段、摘要≤250词含关键词）→严格四段式。</li>
+<li>Research Paper ≤10000词（图表按约250–280词/个折算）、体裁须选对。</li>
+<li>跑题：纯运筹算法/纯供应链工程模型而无IS/数据分析落点→引言与结论写明data/IS/analytics与决策连接。</li>
+<li>仅PDF不可（需Word，LaTeX须附PDF）；表格单独文件；参考文献用Emerald Harvard；投稿前先润色。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://mc.manuscriptcentral.com/imds" target="_blank" rel="noopener">投稿系统（ScholarOne）</a>
+<a class="btnlink" href="https://www.emeraldgrouppublishing.com/journal/imds" target="_blank" rel="noopener">期刊页 / Author Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（IMDS落地版）</summary><div class="stepinner">
+<p><b>账号准备：</b>注册ScholarOne；通讯作者机构邮箱+ORCID；作者姓名将原样出版、单位为研究开展时所属机构，系统内逐人填全。</p>
+<p><b>新建投稿：</b>Author Center → New Submission → Article Type选Research Paper → 上传Word正文、单独表格文件、单独高清图、传记/致谢单独Word → 填标题、四段结构化摘要、≤12关键词 → Add Authors排序 → 选学科Category → 推荐3–5名无冲突审稿人 → Comments/Cover letter → 核对声明提交并记录稿号。</p>
+<p><b>必备文件：</b>Word正文（结构化摘要、内嵌引用）；Cover letter（落点Big Data/Data analytics/供应链/排程、创新点、无重复发表声明、推荐审稿人）；可选作者简介与致谢单独Word；补充材料须正文引用；第三方版权材料须书面许可。</p>
+<p><b>格式：</b>Word主格式；参考文献Emerald Harvard（文内(Author, Year)，三作者及以上et al.，文末字母序、期刊全名、尽量DOI）；一级标题加粗、次级中斜。评审为<b>双盲</b>；官网首决47天、录用至在线44天；未选中可自愿走Emerald Manuscript Transfer Service转兄弟刊。</p>
+<p><b>录用后：</b>订阅/非Gold路线发表费0；选Gold OA才开票（通用$4,351量级+税，单刊额以系统为准）；签版权许可表→校样仅改错→EarlyCite先发DOI后卷入期。</p>
+<p><b>民办教师建议：</b>优先官网明确列出的Big Data/Data analytics/排程/绩效测量落点；实证带真实或公开面板数据、方法可复现；审稿人优先近2–3年该刊作者、避免近亲圈层；超60天无消息礼貌催一次；desk reject可Transfer至JEIM/JMTM，外审拒稿逐条response letter大修。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>期刊主页/指南：https://www.emeraldgrouppublishing.com/journal/imds</li>
+<li>OA政策：https://www.emerald.com/publish-with-us/pages/publish-in-an-open-access-journal</li>
+<li>LetPub：http://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=3543</li>
+<li>LetPub繁中JIF快照：https://www.letpub.tw/index.php?page=journalapp&view=detail&journalid=3543</li>
+<li>投稿入口（第三方收录）：https://m.wanweixueshu.com/sci/detail/61297 ；Scopus：https://www.scopus.com/sources/19170</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 02 DSS ===== -->
+<article class="jcard" id="j02">
+<header>
+<span class="jnum">02</span><span class="jtitle">Decision Support Systems<small>缩写 DSS ｜ 出版社 Elsevier（荷兰阿姆斯特丹）｜1985创刊，月刊</small></span>
+<div class="jchips"><span class="tpos core">核心匹配</span><span class="tcost">订阅0 APC</span><span class="tidx pill scie">SCIE</span><span class="rating high">匹配度：高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0167-9236；在线eISSN <span class="uflag">未核实</span>（官方在线ISSN未取得，勿臆测）；月刊。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（非SSCI）</span> 另被Scopus收录。三学科均Q1：CS-AI 39/210；CS-IS 24/266；OR&amp;MS 10/109（科研通2026-06-17更新版）。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li><b>JCR2025（2026年发布最新值）：IF 7.5</b>（EURO 2026简报；科研通2026-06-17「最新IF 7.5」）。</li><li>JCR2024口径：科研通「2025发布」6.8、JustScience 6.7996；两站表头年度口径不一，<b>精确3位小数官方证书<span class="uflag">未核实</span></b>，投稿前以机构WoS JCR复核。</li><li>最新版三学科均Q1。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03-20升级版：大类管理学<b>2区 Top</b>；小类CS-AI 1区、CS-IS 1区、OR&amp;MS 1区；不在预警名单。历史2023-12版大类计算机科学1区Top。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd><ul><li>Hybrid混合刊；<b>订阅路线不收发表费</b>，且出版选择不影响评审（官网原文：publication choice will have no effect on peer review or acceptance）。</li><li>Gold OA APC <b>USD 3,280，不含税</b>；系统OACS可能按机构/协议减免。投稿费：<span class="uflag">未核实</span>；订阅稿绿色自存档embargo 24个月。</li></ul></dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网口径(科研通转引)：平均8.7周。</li><li>网友众包(非官方)：平均约18.0个月（偏慢稿/全周期样本）；公开个案含「初评快、约2个月给意见」个人经验，非统计值。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方接受率：<span class="uflag">未核实</span>（官网未公开固定值）；网友转述「约5%」为二手转述、不作官方数字；众包定性Moderate仅供参考。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/decsup/ ；Guide：https://www.elsevier.com/journals/decision-support-systems/0167-9236/guide-for-authors</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>共同主线为「面向增强决策的理论与技术问题」；高吻合方向：数据驱动商业决策与BI/Analytics、IS与管理、DSS设计实施、多准则/群体决策与偏好建模、数据挖掘管理决策、运筹/仿真支撑决策、区块链/大模型等新技术决策应用。纯算法论文不如方法类刊受青睐。</p>
+<div class="friendly"><b>民办高校友好度：中等（严格但不看出身，强调决策贡献）。</b>门槛：三学科Q1、管理学2区Top；评审以贡献为准、无公开出身门槛，可见普通院校合作发表个案（个案不等于普遍规律）；范围宽、方法来源多元，对「真实管理决策问题+数据分析/建模闭环」较包容；对「只有算法模型、无决策价值验证」容易拒。</div>
+<ol class="dr">
+<li>范围不符（最主要）：纯ML/纯数据库/纯计量方法而无决策问题与洞见；公开个案2024-06-17投稿、06-19因主题不匹配被拒→标题/摘要/引言点明「决策问题—数据/模型—决策价值」链。</li>
+<li>贡献不足、重复成熟方法换数据集→讲清新决策问题/机制/系统能力，补主流方法对比与管理含义。</li>
+<li>写作格式硬伤：英文不流畅、图表混乱、缺近年文献；EM强制利益冲突声明（无冲突也要声明）。</li>
+<li>实验/数据支撑弱、缺可复现细节→说明数据来源、基准对比、稳健性检验。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/decsup/" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://www.elsevier.com/journals/decision-support-systems/0167-9236/guide-for-authors" target="_blank" rel="noopener">Guide for Authors</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（DSS落地版）</summary><div class="stepinner">
+<p><b>账号：</b>Elsevier账号登录新EM体验；投稿后90天内完成EM注册否则账号匿名化；通讯作者用稳定机构邮箱；提前注册ORCID。</p>
+<p><b>新建投稿：</b>Start a submission → Research Article（特刊选Special Issue）→ 伦理声明（经管数据类通常Not applicable仍须勾选）→ 上传稿件与<b>强制利益冲突声明</b>（manuscript与Declaration of Competing Interest为强制项）→ 核对系统抽取的标题/摘要/关键词 → 补全作者单位（官方英文全称）→ 基金信息 → 出版路线选择（订阅0 APC / Gold OA USD 3,280不含税）→ 推荐3–6名审稿人 → Review and Submit；修回仍在旧版EM处理。</p>
+<p><b>必备文件：</b>稿件（Word/LaTeX，初投非终稿格式可内嵌图表）；利益冲突声明强制；Cover Letter建议（突出决策支持创新点与范围契合、无一稿多投、全体作者同意）；推荐审稿人；建议附数据可用性说明。参考文献按Elsevier体例，初投不强制套模板。</p>
+<p><b>评审：</b>未核实到强制双盲声明，按常规盲审；常见Major/Minor Revision多轮；官网平均8.7周。</p>
+<p><b>录用后：</b>订阅路线0 APC；Gold OA USD 3,280不含税；签署版权/许可协议。</p>
+<p><b>民办教师建议：</b>①单位按学校官方英文译名填写、勿自行音译；②审稿人选近3年DSS/IS发文、机构不冲突学者；③首轮超官网8.7周仍无进展再礼貌催询；④因范围不符被拒优先改投ESWA或CIE，避免原文重投。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>科研通：https://www.ablesci.com/journal/detail?id=rvRv9r</li>
+<li>LetPub：https://www.letpub.com/index.php?journalid=2230&page=journalapp&view=detail</li>
+<li>EURO 2026简报(JCR2025 IF 7.5)：https://www.euro-online.org/media_site/reports/EJOR_2026.pdf</li>
+<li>Elsevier OA政策：https://www.elsevier.com/journals/decision-support-systems/0167-9236/open-access-options</li>
+<li>JustScience：https://sci.justscience.cn/details.html?sci=1&id=2606</li>
+<li>指南：https://www.elsevier.com/journals/decision-support-systems/0167-9236/guide-for-authors</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 03 ANOR ===== -->
+<article class="jcard" id="j03">
+<header>
+<span class="jnum">03</span><span class="jtitle">Annals of Operations Research<small>缩写 ANOR ｜ 出版社 Springer ｜1984创刊，双月刊</small></span>
+<div class="jchips"><span class="tpos recommend">稳健推荐</span><span class="tcost">Hybrid · 订阅路线费用以录用邮件为准</span><span class="tidx pill scie">SCIE</span><span class="rating high">匹配度：高（建模内核）</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0254-5330；在线ISSN 1572-9338；双月刊。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（未见SSCI）</span> 另收INSPEC、Scopus、zbMATH、RePEc。学科：OPERATIONS RESEARCH &amp; MANAGEMENT SCIENCE。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>Springer官网：IF 4.5(2024)、5yr 4.6(2024)。</li><li>科研通最新一轮(2026-06-17发布)：IF 4.1（同比降0.4）。</li><li>Q2：OR&amp;MS 30/109；JCI Q2 32/109。Scopus Q1为另一口径，勿混作JCR分区。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03升级版：大类管理学<b>4区</b>；小类OR&amp;MS <b>3区</b>；Top否、综述否。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid混合刊；Open Choice可选、APC按刊不同给出版社清单链接但<b>本刊美元金额：<span class="uflag">未核实</span></b>；投稿费：<span class="uflag">未核实</span>；Gold OA占比28.98%（结构指标非费用）。订阅路线是否零费用以出版社正式邮件为准，本报告不写死金额。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网首决中位：<b>26天</b>。</li><li>网友经验(非官方)：全流程平均约6.0个月；与首决中位口径不同，勿混用。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方：<span class="uflag">未核实</span>；第三方定性「容易」为主观印象，不可当录取率使用。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/anor ；指南：https://link.springer.com/journal/10479/submission-guidelines ；<b>强制要求通讯作者投稿前提供ORCID</b>。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>运筹学全领域（理论、实践、计算）；近年专刊与本专业高度相关：数据驱动可靠性建模与工业系统决策支持、供应链与金融运营风险建模、面向可靠性管理的高级机器学习；契合点：优化（规划/调度/库存/排队/鲁棒优化）、供应链与物流数据分析、数据驱动决策支持、可靠性与风险建模。偏弱：纯描述性实证、无模型或算法贡献的管理案例。</p>
+<div class="friendly"><b>民办高校友好度：中等偏友好。</b>中国作者近期应用类论文第一/通讯单位多样、含普通院校；强调模型贡献、可复现计算与应用价值，无院校出身公开限制；自引率约10–11%，写作避免不当自引。纯理论数学推导要求高，应用型OR稿件相对友好。</div>
+<ol class="dr">
+<li>缺Statements and Declarations（须含Competing Interests，视情况含Funding、Data Availability、Author Contributions）将作为incomplete退回。</li>
+<li>通讯作者未绑定ORCID（强制项）→先注册并在EM账号绑定。</li>
+<li>摘要须150–250词、关键词4–6个；须提交完整可编辑源文件，缺则不送审。</li>
+<li>缺方法学贡献或纯经验叙述→明确给出模型、求解/验证过程与管理含义。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/anor" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://link.springer.com/journal/10479/submission-guidelines" target="_blank" rel="noopener">Submission Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（ANOR落地版）</summary><div class="stepinner">
+<p><b>账号：</b>EM注册，通讯作者必须先有ORCID；全体作者姓名顺序单位定稿后再提交，录用后通常不接受增删调换。</p>
+<p><b>新建投稿：</b>New Submission → Original Research（专刊稿须选对应Special Collection并先确认仍开放）→ 标题、摘要150–250词、4–6关键词 → 上传LaTeX（推荐Springer Nature模板，含源文件与编译PDF）或.docx、图、表、SI → 逐栏填作者单位，通讯作者填邮箱与ORCID → 推荐跨机构独立审稿人（附机构邮箱），可填排除名单 → Comments to Editor说明模型贡献与应用场景 → 预览PDF并Approve提交。</p>
+<p><b>文件清单：</b>可编辑manuscript源文件；Title Page（标题/全作者/单位/通讯邮箱/ORCID 16位）；参考文献APA7作者-年份括注、字母序、期刊名斜体、尽量全DOI；Competing Interests必需、原始研究建议Data Availability Statement；图矢量EPS、半色调≥300dpi（组合图600dpi）、线稿≥1200dpi；模型参数符号表建议齐全。</p>
+<p><b>评审：</b>单/双盲公开指南未载明（<span class="uflag">未核实</span>）；首决中位26天；外审通常≥2名、可多轮修订；网友全流程约6个月。</p>
+<p><b>录用后：</b>邮件确认单位、选择传统订阅或Open Choice OA、办理版权/费用；再收proof；在线先发DOI后分配卷期（OA金额<span class="uflag">未核实</span>，勿按网传值预算）。</p>
+<p><b>民办建议：</b>优先对接开放专刊（数据驱动可靠性、ML for reliability、供应链风险），专刊竞争池明确；单位全称规范、高级职称教师挂通讯、模型可复现；审稿人避开专刊guest editors；满约2个月无更新礼貌询问一次；desk reject后快速改投ISF/JIIIS/ORJ。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>期刊主页：https://www.springer.com/journal/10479</li>
+<li>科研通：https://www.ablesci.com/journal/detail?id=W5OKE5</li>
+<li>LetPub：https://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=627</li>
+<li>指南：https://link.springer.com/journal/10479/submission-guidelines</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 04 ESWA ===== -->
+<article class="jcard" id="j04">
+<header>
+<span class="jnum">04</span><span class="jtitle">Expert Systems with Applications<small>缩写 ESWA ｜ 出版社 Elsevier Ltd（Pergamon-Elsevier, Oxford）｜1990创刊，年发文量大</small></span>
+<div class="jchips"><span class="tpos apply">应用首选 · 竞争强</span><span class="tcost">订阅0 APC</span><span class="tidx pill scie">SCIE</span><span class="rating high">匹配度：高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0957-4174；在线eISSN 1873-6793；Bimonthly（隔月刊行、实际年发文量大，科研通列2025年约4,299篇）。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（非SSCI）</span> Scopus CiteScore 17.00（2026-06版）。三学科均Q1：CS-AI 28/210；EE&amp;E 22/369；OR&amp;MS 6/109。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li><b>JCR2025（2026年发布）：IF 9.4</b>（EURO简报第6位；科研通「2026-06-17发布最新IF 9.4↑1.9」；LetPub标题IF 9.400）。</li><li>JCR2024官方库证明：IF 7.5（浙大宁波理工图书馆证明NBT-SCIE-2024-10204-IF2024），三学科Q1。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03-20升级版：大类计算机科学<b>1区 Top</b>；小类CS-AI 2区、EE&amp;E 2区、OR&amp;MS 2区；综述=否；不在预警名单。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd><ul><li>Hybrid；<b>订阅路线不向作者收取发表费</b>。</li><li>Gold OA APC <b>USD 3,490，不含税</b>（LetPub转引出版社定价；Manusights另称3,630美元、数值不一不作主依据；以投稿系统OACS实时报价为准）；投稿费：<span class="uflag">未核实</span>。</li></ul></dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>出版商数据(LetPub转引官网)：投稿→首决5天；送审后→决定62天；投稿→录用147天；录用→在线7天。</li><li>网友众包(非官方)：全周期平均约13.8个月（含多轮修回）；个案3–12个月不等。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方：<span class="uflag">未核实</span>（未公开官方百分比）；网友分享「录用比例约16%」为主观自报样本，非官方统计，不采信为定量结论。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/eswa/Default.aspx ；Guide：https://www.sciencedirect.com/journal/expert-systems-with-applications/publish/guide-for-authors</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>面向专家/智能系统的设计、开发、测试、实现与管理；明确收录finance、accounting、marketing、auditing、project management、risk assessment、information management、strategic management、business、production management、HR management等应用域；方法含multi-agent、knowledge management、neural networks、data and text mining、multimedia mining、genetic algorithms。偏好范式：「智能方法 + 明确行业管理场景 + 充分实证对比」；纯理论OR建模不如EJOR对口。</p>
+<div class="friendly"><b>民办高校友好度：中等偏上（范围宽、发文量大、中国作者案例多，但竞争强、重实验）。</b>对「行业数据+方法应用」型论文较宽容，可见普通本科/地方院校团队发表；门槛在实验完整性、对比基线与创新叙事而非单位名头；前提是方法可复现、实验充分、应用价值清晰。</div>
+<ol class="dr">
+<li>只报算法精度、无真实管理应用场景与业务价值→引言给行业痛点、结论写管理/决策含义、附真实或规范公开数据集。</li>
+<li>贡献增量小（换数据集跑成熟模型、缺对比与消融）→设计SOTA基线、消融、统计检验。</li>
+<li>与范围擦边（纯硬件信号处理、纯医学影像等无管理/智能系统语境）→Cover Letter映射其列明应用领域。</li>
+<li>缺强制文件/利益冲突声明不全、格式混乱→按通用清单备齐并核对metadata。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/eswa/Default.aspx" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://www.sciencedirect.com/journal/expert-systems-with-applications/publish/guide-for-authors" target="_blank" rel="noopener">Guide for Authors</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（ESWA落地版）</summary><div class="stepinner">
+<p><b>类型：</b>常规Research Article为主，特刊选Special Issue。<b>必备：</b>稿件（Word/LaTeX均可，初投不强制排版终稿）、强制利益冲突声明、Cover Letter（列明应用领域、创新点、与指南范围对应、全体作者同意）、3–6名推荐审稿人；图建议单独高分辨率备用。</p>
+<p><b>格式：</b>以ScienceDirect Guide为准；语言英式/美式统一不混用。首轮官方口径快（首决5天多为技术/范围初筛；送审后约62天）；未核实到强制双盲声明；多数录用稿经历修回。</p>
+<p><b>录用后：</b>订阅路线0 APC；选Gold OA USD 3,490不含税（以系统报价为准）；版权协议与校样按系统处理（接收到在线官方口径约7天）。</p>
+<p><b>民办建议：</b>优先「管理场景明确+数据可公开或可描述」选题（企业数据不便公开时给模拟/公开替代数据与可复现伪代码）；审稿人从近年ESWA应用论文作者中选、避开本校与亲密合作圈；desk reject重点读范围/贡献提示勿纠缠；可结合本地金融、物流、外贸、旅游服务数据分析形成差异化故事。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>科研通：https://www.ablesci.com/journal/detail?id=pB2jEp</li>
+<li>LetPub：https://letpub.com.cn/index.php?page=journalapp&view=detail&journalid=2799</li>
+<li>JCR2024官方证明：https://lib.nbt.edu.cn/subject/indexed/paper_print.php?sid=10204&son=if&whatdb=scie</li>
+<li>EURO 2026简报：https://www.euro-online.org/media_site/reports/EJOR_2026.pdf</li>
+<li>指南：https://www.elsevier.com/journals/expert-systems-with-applications/0957-4174/guide-for-authors</li>
+<li>第三方指南(非官方)：https://manusights.com/blog/expert-systems-with-applications-submission-guide</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 05 ISF ===== -->
+<article class="jcard" id="j05">
+<header>
+<span class="jnum">05</span><span class="jtitle">Information Systems Frontiers<small>全称 Information Systems Frontiers — A Journal of Research and Innovation ｜ Springer</small></span>
+<div class="jchips"><span class="tpos push">冲刺刊 · 成熟稿</span><span class="tcost">Hybrid · APC以录用邮件为准</span><span class="tidx pill scie">SCIE</span><span class="rating high">匹配度：高（IS交叉实证）</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 1387-3326；在线ISSN 1572-9419；Springer（Dordrecht, Netherlands）。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（未列入SSCI）</span> 另收Current Contents/ECT、EI Compendex、Scopus、ACM DL、DBLP、INSPEC。学科：CS-Information Systems；CS-Theory &amp; Methods。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>Springer官网：Journal IF 8.3(2024)、5yr 7.8(2024)；about页另显示最新版IF 6.2(2025)、5yr 8.9(2025)。</li><li>科研通最新一轮(2026-06-17发布)：IF <b>6.2</b>（较上一年降2.1）。</li><li>Q1：CS-IS 43/266；CS-Theory&amp;Methods 16/146（第三方转引，投稿前建议WoS账号复核原始分区）。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03升级版：大类管理学<b>3区</b>；小类CS-IS <b>2区</b>、CS-Theory <b>2区</b>；Top否、综述否。2026新锐版管理学2区（新锐口径另列，以官方分区表为准）。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid；默认订阅路线不缴Open Choice APC；指南仅说明APC vary by journal。<b>Open Choice APC美元金额：<span class="uflag">未核实</span></b>；投稿费：<span class="uflag">未核实</span>；在线彩色图免费、纸本彩印可能另收成本；Gold占比43.05%（结构指标）。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网Submission to first decision (median)：<b>34天</b>。</li><li>LetPub网友：全流程体感平均约9.0个月（口径不同勿混用）；外审后按半年到9个月规划。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方：<span class="uflag">未核实</span>（Springer不公开录取率）；网友评价「容易」为定性主观，不引用为百分比。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/isfi ；指南：https://www.springer.com/journal/10796/submission-guidelines ；摘要100–150词、关键词4–6个；参考文献APA第7版。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>从分析(analytical)、行为(behavioral)、技术(technological)三视角研究IS与IT交叉界面；契合点：数据驱动决策/企业数字化绩效实证、BI与分析、IS采纳与价值实现、信用/风控/金融场景数据挖掘、IS+管理交叉（信息经济学、平台、供应链数字化）。偏弱：纯底层算法/纯硬件、无管理组织问题锚点的模型改进。</p>
+<div class="friendly"><b>民办高校友好度：中等（门槛偏中高，看论文质量不看出身；适合扎实实证/建模成熟稿）。</b>可见多篇中国作者近年发文（信用评分代价敏感提升模型、绿色政策+ML实证等）；未见院校门槛条款；但Q1对选题新颖性、理论贡献与实证严谨度要求高。</div>
+<ol class="dr">
+<li>摘要超/短、关键词不足（要求100–150词、4–6个）→卡词数、覆盖digital transformation/business analytics/machine learning/decision support等标准检索词。</li>
+<li>未提交完整可编辑源文件将不进入送审（正文须.docx或LaTeX，不能只交PDF）。</li>
+<li>主题偏离：纯理论算法/纯技术缺组织管理接口→引言锚定采纳、价值、治理、决策，Cover Letter说明与Aims &amp; Scope对应。</li>
+<li>缺Declarations（Funding/Competing Interests）、Data Availability Statement，或一稿多投/salami拆分/重复发表→投稿前补齐声明、杜绝拆分。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/isfi" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://www.springer.com/journal/10796/submission-guidelines" target="_blank" rel="noopener">Submission Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（ISF落地版）</summary><div class="stepinner">
+<p><b>账号：</b>EM注册并推荐绑定ORCID；作者姓名顺序、单位投稿时定稿，录用后一般不允许增删/调换。<b>步骤：</b>Author Center → New Submission → 选Original Research/Original Paper → 标题、摘要100–150词、关键词4–6个 → 上传.docx（有数学内容可用LaTeX+Springer Nature模板）、单独图/表/SI → 逐位填作者单位（官方英文全称+院系+城市+国家）、标注通讯邮箱与ORCID → 推荐3–5名跨机构无合作关系国际学者（附机构邮箱），可填排除名单 → Comments to Editor说明创新点/scope匹配/无重复发表 → 生成PDF预览 → Approve → Submit。</p>
+<p><b>文件：</b>可编辑manuscript；Title Page（全作者、单位地址、通讯邮箱/电话，致谢基金单列）；图矢量EPS优先、半色调TIFF，图注写在正文；参考文献APA7、作者+年份括注、按第一作者字母序、期刊名斜体、尽量全DOI；Declarations与Data Availability Statement；SI命名规范（非强制）；作者简介录用后才需提交。</p>
+<p><b>评审：</b>盲态公开指南未明确载明（<span class="uflag">未核实</span>）；首决中位34天；外审通常≥2名、可多轮major/minor revision；网友全流程约9个月。录用后两封邮件：先选出版模式（传统订阅/Open Choice OA）与费用权利，再收proof；在线彩图免费。</p>
+<p><b>民办建议：</b>单位用「学校官方英文全称 + School of Management / Department of Big Data Management and Application」规范全称；选题「公开数据集/企业案例 + ML或优化方法 + 管理/决策含义」三段式；审稿人从近2–3年参考文献找不同国家无师承合作作者；投稿满6–8周状态长期不变可礼貌询问一次、不宜频繁催；格式/范围类desk reject转投ANOR/JIIIS，外审意见稿优先同刊revised resubmit。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>期刊主页：https://www.springer.com/journal/10796</li>
+<li>科研通：https://www.ablesci.com/journal/detail?id=5yNEvD</li>
+<li>LetPub：https://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=3569</li>
+<li>指南：https://www.springer.com/journal/10796/submission-guidelines</li>
+<li>万维书刊佐证入口：https://www.eshukan.com/sci/scidisplayj.aspx?jid=19000&jtype=1</li>
+</ul></details>
+</div></article>
+<!-- ===== 06 ECR ===== -->
+<article class="jcard" id="j06">
+<header>
+<span class="jnum">06</span><span class="jtitle">Electronic Commerce Research<small>缩写 ELECTRON COMMER RES ｜ Springer Nature ｜ 每年4期，年发文约131篇</small></span>
+<div class="jchips"><span class="tpos mid">主题匹配 · 周期注意</span><span class="tcost">传统路线 no APC（官网原文）</span><span class="tidx pill ssci">SSCI</span><span class="rating midhigh">匹配度：较高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 1389-5753；在线ISSN 1572-9362；Hybrid/转型期刊；Gold OA占比约18.86%。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill ssci">SSCI（未见SCIE收录说明，按SSCI处理）</span> 另收Current Contents/SBS、DBLP、Scopus；学科含Business、Management。官方逐类目Q档原文：<span class="uflag">未核实</span>（第三方Q1/Q2口径不一）。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>Springer官网当前展示：2024 JIF 4.7、5yr 4.6。</li><li>主编J. Christopher Westland Q2 2026季报：2025 IF 4.9；LetPub标题列4.900；引用须标注年份来源。</li><li>Scopus CiteScore 2025 11.7（非JCR）。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>大类管理学；小类Business、Management；<b>单一区档：<span class="uflag">未核实</span></b>（LetPub多档并列无法锁定）；2020/2021/2023/2024/2025/2026各版预警名单均不在列。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd><ul><li>官网原文：传统订阅模式 no APC charges apply，两条路线录用后选择、不影响评审。</li><li>可选OA实时抓取：<b>£1,990 / US$2,890 / €2,290</b>（另加VAT/地方税），CC BY 4.0；历史快照曾为£2,590/$3,490/€2,890，说明APC按接受日期调整，以接受日报价为准。</li><li>投稿费独立表述：<span class="uflag">未核实</span>；机构有Springer协议可减免。</li></ul></dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网首决中位24天；主编季报Q1–Q2 2026首决平均约20天，但 submission→acceptance 平均367天。</li><li>网友(非官方)：大修后录用总耗时约10个月–2年半，多条反馈返修后催稿响应慢；初决策偏快、多轮返修周期长。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd><span class="uflag">未核实</span>（官网与LetPub均无可核验百分比）。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/elec ；指南：https://www.springer.com/journal/10660/submission-guidelines ；评审为<b>单盲</b>；特色组件Executive Summary；通讯作者须提供ORCID。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>Scope覆盖电商使能技术与社会经济影响、智能代理、电子市场与拍卖、电子支付、互联网供应链管理、网络营销与CRM、用户活动度量预测、个性化与大规模定制、网安隐私、EDI、决策支持类商业问题。匹配点：电商用户行为分析、平台数据驱动运营、在线评论/营销分析、个性化推荐、电商风控信任、平台供应链数据决策；不匹配纯运筹优化模型与纯底层算法。</p>
+<div class="friendly"><b>民办高校友好度：中。</b>主题面宽、不强制机构出身，可见多个中国单位作者发文；扣分项：公开反馈流程慢、返修周期长、SSCI竞争客观存在；优势是中国电商情境实证切口灵活。时间紧迫（职称/毕业截止）者不宜首选。</div>
+<ol class="dr">
+<li>选题偏离电商主线、缺真实e-commerce场景或理论/实证贡献→Cover Letter对接平台/消费者/支付/物流/风控方向，Executive Summary回答「为何重要、方法、管理实施含义」。</li>
+<li>无可编辑源文件（指南原文：缺完整可编辑源文件将不被考虑送审）→交.docx或LaTeX，勿只交PDF。</li>
+<li>前期会议/预印本成果增量不足→引用旧作并说明实质性新增贡献。</li>
+<li>形式硬伤：通讯作者未提供ORCID、缺Data Availability Statement、一稿多投/salami/过量自引；典型篇幅约35页双倍行距、摘要100–150词、关键词4–6个。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/elec" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://www.springer.com/journal/10660/submission-guidelines" target="_blank" rel="noopener">Submission Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（ECR落地版）</summary><div class="stepinner">
+<p><b>账号：</b>EM注册；通讯作者提前注册并绑定ORCID；Cover Letter须列出全部作者姓名/单位/邮箱。<b>步骤：</b>Author Dashboard → Submit New Manuscript → 选Original Research → 标题/摘要/关键词 → 上传稿件图表 → 添加全部作者单位 → 通讯信息 → 推荐跨国跨机构审稿人（附机构邮箱或可核验身份链接）→ 作者评论/Cover Letter → PDF校验稿核对后提交。</p>
+<p><b>必备：</b>Cover Letter；manuscript（.docx/LaTeX、双倍行距、约35页含文献表格、标题≤3级）；<b>Executive Summary（该刊专门要求的独立说服性摘要）</b>；Title Page（全作者单位、通讯电话/邮箱/ORCID，致谢基金单列）；图EPS/TIFF（半色调≥300dpi、线条≥1200dpi，图注在正文）；Data Availability Statement（必须）；可选SI统一命名ESM_x并正文引用。</p>
+<p><b>格式：</b>正文方括号数字编号[n]；参考文献按APA7著录风格（作者-年份、斜体期刊名、尽量全DOI）。<b>评审：</b>单盲；每稿至少2名外审、无两份完整外审意见不得录用；大修常由原审稿人复审。<b>录用后：</b>传统路线0 APC（版权转让）；Open Choice按接受日报$2,890等三币种、CC BY保留版权；再收校样。</p>
+<p><b>民办建议：</b>单位按院/系→学校→城市→国家规范填写；审稿人选近年发文、跨地区、无师生合作关系者；首决超24天较多且停滞可礼貌询问一次，返修稿逐条point-by-point回复；被拒补强新颖性与数据可得性后可转向EIS/ITM类刊。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>主页：https://www.springer.com/journal/10660 ；出版模式/APC：https://www.springer.com/journal/10660/how-to-publish-with-us</li>
+<li>主编季报(2025 IF 4.9、录用367天)：https://westland.github.io/ECR_Q2_2026_Journal_Report.pdf</li>
+<li>LetPub：https://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=13086</li>
+<li>Scopus：https://www.scopus.com/sources/145669?zone=refpointrank ；指南：https://www.springer.com/journal/10660/submission-guidelines</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 07 ITM ===== -->
+<article class="jcard" id="j07">
+<header>
+<span class="jnum">07</span><span class="jtitle">Information Technology and Management<small>缩写 INFORM TECHNOL MANAG ｜ Springer Nature ｜ 每年4期，年发文约33篇（低体量）</small></span>
+<div class="jchips"><span class="tpos recommend">稳健匹配</span><span class="tcost">Hybrid · 传统路线费用逐字原文待核</span><span class="tidx pill ssci">SSCI（另有SCIE冲突说法待核）</span><span class="rating high">匹配度：高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 1385-951X；在线ISSN 1573-7667；Hybrid；Gold占比约13.04%。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill ssci">SSCI（主口径）</span> LetPub/高丽大学库为SSCI；聚合站mebis另标SCIE，<b>权威口径未取得WOS原文，Master Journal List复核前不认定</b>。JCR官方逐类目Q档：<span class="uflag">未核实</span>。Scopus：Information Systems Q2 147/519（非JCR）。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网：JIF 2.9(2024)、5yr 2.8(2024)、首决中位38天、2025下载198.7k。</li><li>LetPub标题列3.600、五年3.605（网友/汇总更新年度口径，非官网主页值，引用须注明年份来源）。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>大类管理学；小类Information Science &amp; Library Science、Management；<b>单一区档：<span class="uflag">未核实</span></b>（旧mebis口径管理科学/管理学3区，版本不一致）；各版预警名单均不在列。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid；传统路线通行口径0 APC，但该刊How-to-publish动态页被cookie墙拦截、<b>逐字「no APC」原文<span class="uflag">未核实</span></b>；OA APC缓存快照$3,390/$3,790/$3,990互相矛盾、<b>不采用任一快照（<span class="uflag">未核实</span>）</b>，以接受日APC-finder为准；投稿费：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网首决中位38天；指南特邀流程外审通常8周内出意见、二轮6周。</li><li>网友样本极少（1条）：投了一年、修改三次仍无结果、偏慢；低发文量刊客观等待可能偏长。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd><span class="uflag">未核实</span>（无官方百分比，LetPub录用比例栏为空）。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>历史EM旧址 https://www.editorialmanager.com/item ；指南明示近期切换SNAPP Double Anonymous双盲系统，<b>是否已整体迁移<span class="uflag">未核实</span>，以官网「Submit manuscript」实际跳转为准</b>；指南：https://www.springer.com/journal/10799/submission-guidelines</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>Scope直列Data Mining、Decision Support Systems、Machine Learning、Neural Network Applications、Expert Systems、Meta-Heuristics and Business Problem Solving、Data Modeling、Knowledge Acquisition/Representation、AI Applications to Organizational/Business Problems、Group Decision Support、IS for logistics/marketing/accounting/finance/operations；官网2024高下载论文含「big data analytics management capability」。不匹配纯硬件/电信底层技术与无人际管理问题的算法论文。</p>
+<div class="friendly"><b>民办高校友好度：中（偏谨慎）。</b>主题匹配度高、可见中国学者管理实证发文、浙大等机构学者任副编；但发文量小、公开反馈偏慢、双盲评审，且未取得民办院校具名案例；选题必须落到「IT/数据 → 管理/业务价值」证据链，不适合赶时间计划。</div>
+<ol class="dr">
+<li>纯技术实现、缺管理问题与管理价值→把算法/模型挂钩组织绩效、决策过程或战略价值。</li>
+<li>声明缺失将被returned as incomplete（系统内提交Competing Interest、Funding等）。</li>
+<li>双盲身份泄露：作者信息与声明在系统界面填写、不写进送审稿→匿名主稿+not-for-review完整稿。</li>
+<li>篇幅格式：正文（含摘要参考文献）≤32页（8.5×11英寸、1.5倍行距、11号字、四边1英寸边距）；摘要150–250词、关键词4–6个；原创研究必须Data Availability Statement；LLM不得作为作者、须在Methods说明使用。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/item" target="_blank" rel="noopener">投稿旧址（EM）</a>
+<a class="btnlink" href="https://www.springer.com/journal/10799/submission-guidelines" target="_blank" rel="noopener">Submission Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（ITM落地版 · 双盲要点）</summary><div class="stepinner">
+<p><b>账号：</b>以官网Submit实际系统注册（历史EM地址备用核对）；ORCID预先准备；双盲另备匿名稿。<b>步骤：</b>新建投稿 → 文章类型（Original/Review/Communication等）→ 上传匿名主稿（标题摘要关键词正文参考文献附录，不得出现单位/致谢身份）→ 上传含全部作者与致谢完整稿并标记"not for review" → 系统逐位添加共同作者邮箱并排序 → 填FundRef基金与Competing Interests → 上传匿名化图表 → PDF校验稿确认匿名性 → 提交。</p>
+<p><b>文件：</b>匿名主稿.docx（或LaTeX，可用sn-basic.bst）；not-for-review完整稿；Title Page + Declarations（Funding/Competing/Ethics/Data availability/Contributions）；图表；可选SI。<b>格式：</b>正文数字方括号[n]引用；Springer基础参考文献格式（作者姓+名缩写、年份、LTWA期刊缩写、卷页、DOI）。</p>
+<p><b>评审：</b>双盲（依SNAPP Double Anonymous段落）；特邀稿至少2份正面外审方可录用；首决中位38天；返修以Create Revision提交并附逐点回复。<b>录用后：</b>传统订阅通行0 APC（逐字原文待核）；OA金额以接受日报价为准（<span class="uflag">未核实</span>）；校样只允许排印错误级修改。</p>
+<p><b>民办建议：</b>双盲稿删除单位痕迹（可识别机构的致谢/项目号放not-for-review文件）；审稿人选近2–3年发文者、覆盖不同国家；首决超38天较多且停滞可礼貌催问；被拒后强化「管理问题—方法—证据—实践建议」闭环，避免在低发文量刊长期占用审稿周期。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>主页(IF/首决38天)：https://www.springer.com/journal/10799/ ；指南：https://www.springer.com/journal/10799/submission-guidelines</li>
+<li>LetPub：https://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=13687</li>
+<li>高丽大学收录库：https://scholar.korea.ac.kr/journal/49b287b7-28d8-426f-8b27-4aff5bc90026</li>
+<li>高下载论文(big data analytics capability)：https://www.springer.com/journal/10799/updates/18567750</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 08 EIS ===== -->
+<article class="jcard" id="j08">
+<header>
+<span class="jnum">08</span><span class="jtitle">Enterprise Information Systems<small>缩写 EIS ｜ Taylor &amp; Francis ｜ 每年10期</small></span>
+<div class="jchips"><span class="tpos mid">匹配刊 · 门槛中高</span><span class="tcost">非OA不产生APC（官方模板口径）</span><span class="tidx pill scie">SCIE</span><span class="rating high">匹配度：高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 1751-7575；在线ISSN 1751-7583；接受original articles、short papers、review papers、technical notes。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（未列SSCI）</span> 另收Scopus、Ei Compendex、DBLP、INSPEC、ACM DL、ABDC(A)、CABS(Rating 2)；第三方方向CS-Information Systems；官方逐类目Q档：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网(标注2025)：IF 3.6、5yr 3.4、CiteScore 11.3(Q1)、SNIP 1.273、SJR 0.790、年下载约130K。</li><li>Impact Factor Best Quartile = Q2（最高类目口径，非全部类目）。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03-20发布：大类<b>计算机科学3区</b>；小类<b>计算机：信息系统3区</b>（科研通与LetPub两源一致，可作参考；官方分区原文不可得）。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid Open Select；非OA选择不产生APC（同组T&amp;F官方模板表述，EIS静态页逐字"no APC"未单独出现）；<b>OA APC确切金额：<span class="uflag">未核实</span></b>（动态APC-finder无静态数字）；投稿费未见官方收取表述；机构/基金协议可减免。</dd></div>
+<div class="ditem"><dt>审稿周期（官方）</dt><dd>官网：投稿→首决平均<b>104天</b>；投稿→首次外审后决定<b>102天</b>；录用→在线14天；第三方体感「较难、周期不定」。</dd></div>
+<div class="ditem"><dt>接受率</dt><dd><b>5%</b>（官网官方，上一完整自然年口径；本组最低之一）。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>ScholarOne：https://mc.manuscriptcentral.com/teis ；About：https://www.tandfonline.com/journals/teis20/about-this-journal ；评审为<b>双盲 double anonymized</b>。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>主题：AI-Driven Enterprise Systems、Advanced Data Science and Analytics in EIS、Digital Transformation and Industry 4.0、Edge Computing、Integration of Emerging Technologies、Trust/Security/Privacy、Enterprise Systems for Digital Ecosystems、Resilience and Risk、Hyperautomation and Intelligent Workflow Systems。匹配点：企业级数据分析与BI、数字化转型与产业互联网、智能工作流与决策支持、企业系统集成中的数据治理与隐私；不匹配纯底层网络/硬件与无企业管理情境的算法竞赛型工作。</p>
+<div class="friendly"><b>民办高校友好度：中—偏低。</b>主题契合度高、编委含多位华语学者、国内普通院校有发表记录可参考；但接受率仅5%、首决均值104天（本组最慢）；选题须具备「企业/组织情境 + 分析方法创新或系统设计贡献 + 管理价值」，避免泛泛AI综述，预留6个月以上周期。</div>
+<ol class="dr">
+<li>脱离enterprise systems/集成/数字化转型情境的泛IT、泛AI话题→摘要引言尽早点明企业场景与系统/集成对象。</li>
+<li>双盲稿件身份泄露（官方明确double anonymized）→匿名主稿不得出现可识别信息，完整稿另存"not for review"。</li>
+<li>贡献不清、技术堆砌而无管理/系统价值闭环→明确problem、method、design/analysis、企业效用与局限。</li>
+<li>稿件类型错配（original/short/review/technical note篇幅证据要求不同）；格式、文献与数据声明须按Instructions备齐（细则<span class="uflag">未核实</span>，以官网行动页为准）。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://mc.manuscriptcentral.com/teis" target="_blank" rel="noopener">投稿系统（ScholarOne）</a>
+<a class="btnlink" href="https://www.tandfonline.com/journals/teis20/about-this-journal" target="_blank" rel="noopener">About / 投稿入口</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（EIS落地版 · 双盲专用）</summary><div class="stepinner">
+<p><b>账号：</b>ScholarOne注册；双盲分别准备匿名送审稿与完整作者稿(not for review)；收集全部合著者邮箱、ORCID、基金信息。<b>步骤：</b>Begin Submission → 文章类型 → 上传匿名主稿（删除姓名单位致谢、自引可识别表述）→ 上传完整稿并标记"file not for review" → 系统添加全部合著者 → 关键词、FundRef → 匿名化图表与SI → PDF校验稿无身份痕迹 → Review and Submit。</p>
+<p><b>文件：</b>匿名主文档；not-for-review完整稿；匿名图表；补充材料/数据说明；伦理与数据可得性声明（Instructions细则未抓取，以官网为准）。<b>评审：</b>双盲；首决104天、外审首决102天、上线14天；返修Create Revision附response letter逐条回复。</p>
+<p><b>录用后：</b>不启用OA则不付APC（金额<span class="uflag">未核实</span>）；版权许可按选择签署；投稿前确认无当前重复投稿。<b>民办建议：</b>匿名稿不写院校排名/项目帽子，聚焦方法与证据；审稿人选编委与近2年发文作者、中外搭配；作为冲刺刊，另备ITM/ECR等匹配备选；被拒先判断「情境不匹配」还是「方法贡献不足」再定向改投。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>About（指标/双盲声明/SCIE/scope/编委）：https://www.tandfonline.com/journals/teis20/about-this-journal</li>
+<li>中科院2025第三方：https://www.ablesci.com/journal/detail?id=5O9Aar</li>
+<li>投稿系统证据(稿件页眉)：https://eprints.sztaki.hu/9540/1/Preuveneers_279_3303588_ny.pdf</li>
+<li>Scopus：https://www.scopus.com/sources/10900153330 ；T&amp;F ScholarOne指南：https://authorservices.taylorandfrancis.com/publishing-your-research/making-your-submission/using-scholarone-manuscripts/</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 09 JEIM ===== -->
+<article class="jcard" id="j09">
+<header>
+<span class="jnum">09</span><span class="jtitle">Journal of Enterprise Information Management<small>缩写 JEIM ｜ Emerald Publishing ｜ 年发文约117篇</small></span>
+<div class="jchips"><span class="tpos push">SSCI冲刺</span><span class="tcost">订阅0 APC · 无投稿费</span><span class="tidx pill ssci">SSCI（非SCIE、非双收录）</span><span class="rating midhigh">匹配度：中高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 1741-0398；eISSN 1758-7409；SSCI收录（官网与LetPub均未列SCIE）。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill ssci">SSCI</span> 另收INSPEC、Scopus、ABI/INFORM、ProQuest、ERIC、dblp。第三方快照(2023–2024, SSCI版)：Information Science &amp; Library Science Q1 5/172；Management Q1 26/427；官方当期Q档：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网：2024 IF 6.4、5yr 7.6(2024)、CiteScore 16.7(2024)；<b>2025 JIF：<span class="uflag">未核实</span></b>（官网未显示）。</li><li>LetPub标题9.100为较早JCR年份值、非官网当前6.4，勿混用；网友实时估算4.606非正式JIF。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03升级版（详情页中部列）：大类管理学；小类IS&amp;LS 2档、Management 2档；Top=否、综述=否；<b>逐档精确数字建议官方分区表复核（未完全锁定）</b>；新锐版Top标注待核；不在预警名单。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>订阅（非Gold）路线<b>0 APC、无投稿费</b>，Green OA可免费自存档接受稿（无禁运期）；Gold OA通用£3,222/US$4,351/€3,710+VAT、CC BY 4.0；<b>JEIM单刊专属APC：<span class="uflag">未核实</span></b>。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网(2024-04–2025-03)：首决59天；录用到在线54天；通用目标60天内首决。</li><li>网友量化审稿周期/录用比例：<span class="uflag">未核实</span>；个案「10天被拒、拒稿邮件说明不充分」。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd><b>7.6%</b>（官网官方，2024-04-01至2025-03-31数据期）。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>ScholarOne：https://mc.manuscriptcentral.com/jeim ；指南：https://www.emeraldgrouppublishing.com/journal/jeim ；评审<b>双盲</b>；Research Paper 5,000–10,000词。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>面向信息密集型、业务驱动型企业的概念性与实证信息管理研究；在组SI直接对口：Agentic AI在组织职能中的应用、生成式AI与数字化转型、AI与数据分析驱动的以人为本供应链；热门主题含AI与供应链韧性、数字银行AI持续使用、企业架构价值、中小企业数字化韧性。偏SSCI管理/理论对话，需IS/管理理论贡献，纯算法实现不宜直投。</p>
+<div class="friendly"><b>民办高校友好度：中偏低。</b>接受率7.6%、首决59天；SSCI Q1、CiteScore高、学术声望高、编委多为研究型院校；但未见机构出身限制、近期发文含国内/新兴经济体机构；适合有理论框架与规范实证（问卷/案例/二手数据）的成熟稿冲刺，不宜作保底。</div>
+<ol class="dr">
+<li>字数不在5,000–10,000词区间或缺四段结构化摘要（≤250词：Purpose/Design/Findings/Originality）→先定摘要四段再核字数（图表折约250词/个）。</li>
+<li>缺企业信息系统/管理理论对话、纯技术堆叠→引入IS/TOE/动态能力/数字化韧性透镜，写清理论与实践双重implication。</li>
+<li>体裁选错（Research Article/Viewpoint；Category: Research/Conceptual/Case/Literature review）→实证选Research paper、思辨选Conceptual。</li>
+<li>双盲泄露身份、参考文献非Emerald Harvard、表格未单独文件、图片格式不合规→匿名化、统一Harvard、表格单独Word、图用.ai/.eps/.jpeg/.bmp/.tif。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://mc.manuscriptcentral.com/jeim" target="_blank" rel="noopener">投稿系统（ScholarOne）</a>
+<a class="btnlink" href="https://www.emeraldgrouppublishing.com/journal/jeim" target="_blank" rel="noopener">Author Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（JEIM落地版）</summary><div class="stepinner">
+<p><b>账号：</b>ScholarOne注册；通讯作者机构邮箱+ORCID；Emerald「first-time right policy」：提交后作者列表原则上不可改，务必核对姓名/单位/邮箱顺序。<b>步骤：</b>New Submission → Article Type → 上传双盲Word manuscript+单独表格文件+图片文件 → 标题、结构化摘要、≤12关键词 → Add Authors排序 → Category（Research/Conceptual/Case/Literature review）→ 推荐3–5名无冲突审稿人 → Cover Letter/Comments（理论贡献、企业信息管理/数字化/AI数据落点、原创性声明）→ 提交保存稿号。</p>
+<p><b>文件：</b>Word正文（5,000–10,000词、四段摘要、Emerald Harvard）；Cover Letter；可选单独作者简介（每人≤约100词）与致谢；单独表格与高清图；补充材料须正文引用；第三方版权许可；SI稿在系统选对应栏目。<b>评审：</b>双盲；编辑初筛→≥2外审；首决59天、上线54天；支持Manuscript Transfer。</p>
+<p><b>录用后：</b>订阅路线0元发表；Gold才开票（通用量级，单刊额<span class="uflag">未核实</span>）；签版权表→仅校正性质校样→EarlyCite先发DOI。<b>民办建议：</b>优先蹭高相关在组SI（命中率常高于自由来稿）；理论框架先行、三类实证任一即可；审稿人选近2年JEIM作者跨地域搭配；首决超60天可礼貌去信；初筛退稿可Transfer至IMDS，外审大修逐条点对点回复。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>官网指标/指南：https://www.emeraldgrouppublishing.com/journal/jeim</li>
+<li>LetPub：http://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=12210</li>
+<li>繁中JIF快照：https://www.letpub.tw/index.php?page=journalapp&view=detail&journalid=12210</li>
+<li>dblp：https://dblp.org/db/journals/jeim/index.html ；OA政策：https://www.emerald.com/publish-with-us/pages/publish-in-an-open-access-journal</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 10 IJPR ===== -->
+<article class="jcard" id="j10">
+<header>
+<span class="jnum">10</span><span class="jtitle">International Journal of Production Research<small>缩写 IJPR ｜ Taylor &amp; Francis Ltd. ｜ 24 issues/year，1961创刊</small></span>
+<div class="jchips"><span class="tpos push">高门槛应用刊</span><span class="tcost">非OA = 0 APC（官网原文）</span><span class="tidx pill scie">SCIE</span><span class="rating midhigh">匹配度：中高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0020-7543；在线ISSN 1366-588X；主编Alexandre Dolgui（IMT Atlantique, France）。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE</span> 另收Science Citation Index、CC-ECT、Scopus、Ei Compendex、INSPEC、DBLP、Zentralblatt MATH；类目Engineering Industrial、Engineering Manufacturing、OR&amp;MS；官方逐类目Q档原文：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网(标注2025)：IF 8.7、5yr 9.5、CiteScore 18.1(Q1)、Best Quartile Q1、年下载约2M。</li><li>2024口径：武大图书馆库 IF 7.3、5yr 8.8；两值年份不同不矛盾，引用须标年份。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（第三方汇编）</dt><dd>第三方一致口径：大类<b>工程技术2区</b>；小类工程工业、工程制造、OR&amp;MS 2区；<b>2025升级版单一区档未取得官方/单源一致值（<span class="uflag">未核实</span>，可作参考）</b>。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid Open Select；<b>官网原文："If you choose not to publish open access in this journal, there is no APC."</b>；OA官方美元值未取得（动态APC-finder）；第三方countryofpapers称约2,833 EUR（非官方、非美元，仅供量级参考，<span class="uflag">未核实</span>）；官方未列投稿收费；机构/基金T&amp;F协议可减免。</dd></div>
+<div class="ditem"><dt>审稿周期（官网官方）</dt><dd>投稿→首决平均<b>3天</b>（<b>含编辑desk reject，不等于外审速度</b>）；送外审后首决<b>60天</b>；录用→在线<b>17天</b>；第三方体感约6.3个月。</dd></div>
+<div class="ditem"><dt>接受率</dt><dd><b>12%</b>（官网官方，上一日历年接受/终决比）。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>ScholarOne：https://mc.manuscriptcentral.com/tprs （权威入口以官网绿色Submit按钮为准）；About：https://www.tandfonline.com/journals/tprs20/about-this-journal ；评审<b>单盲 single-anonymized</b>。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>Scope：产品与制造过程设计、生产系统与供应网络工程、生产计划与调度、新技术对生产物流的贡献、生产研究服务业应用；定位manufacturing/IE/OR/MS，目标是decision aid in manufacturing, operations management and logistics。官方要求六要素：穷尽文献分析、新颖决策辅助模型、与state-of-art对比、真实应用讨论、面向产业决策者的管理洞见、研究展望。匹配运筹优化调度、供应链预测库存、AI/ML驱动制造供应链决策、prescriptive analytics、数字智能工厂数据；不匹配无生产运营情境的纯IS设计与纯商业实证。</p>
+<div class="friendly"><b>民办高校友好度：偏低—中（高标准、方法门槛高，但华人作者基数大、不看出身）。</b>接受率12%、3天首决说明筛稿快、大量不匹配稿送审前被拒；编委含多位大陆/华人学者、第三方称国人占比约43%；欢迎真实应用与管理洞见而非纯理论；建议「可复现优化/预测模型 + 公开或企业数据集 + 对比基准 + 管理建议」组队投稿，单人纯思辨不适合。</div>
+<ol class="dr">
+<li>无新颖决策模型、缺SOTA对比→明确基准方法、数据集/算例、评价指标与对比表。</li>
+<li>脱离真实生产/物流应用、缺managerial insights→增加案例/敏感性分析与「对决策者意味着什么」小节。</li>
+<li>文献综述不充分、问题定位不清→系统梳理生产研究脉络、指出gap。</li>
+<li>稿件类型/篇幅不符（第三方称长文≤12,000词含摘要图表文献，待对回Instructions原文）；作者变更原则上不接受（仅大修后经EiC同意minor变更），投稿前锁定顺序单位。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://mc.manuscriptcentral.com/tprs" target="_blank" rel="noopener">投稿系统（ScholarOne）</a>
+<a class="btnlink" href="https://www.tandfonline.com/journals/tprs20/about-this-journal" target="_blank" rel="noopener">About / 投稿入口</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（IJPR落地版）</summary><div class="stepinner">
+<p><b>账号：</b>ScholarOne免费Author账号；准备通讯与全部合著者邮箱（系统必须添加全部合著者）。<b>步骤：</b>Author Centre → Begin Submission → 文章类型（Research Article/Technical Note/Review）→ 标题摘要关键词（可匹配官方关键词表）→ Add Funder(FundRef) → Add Co-authors（可拖拽排序）→ Upload Files并指定类型（manuscript/figure/table/supplement）→ 编辑顺序、检查合并PDF → Review and Submit（红叉必填项补全）→ 收到confirmation。单盲无需匿名处理。</p>
+<p><b>文件：</b>含全部作者信息主文档（标题页、摘要、关键词、正文、图表位置、参考文献、附录）；单独图/表/SI；T&amp;F Word模板（使用前查该刊Instructions，细则<span class="uflag">未核实</span>）。参考文献以该刊指南为准。<b>评审：</b>单盲；编辑先筛（均值3天含desk reject）；送审约60天首决；返修Create Revision（原稿ID加.R1），先view decision letter再逐条回复。</p>
+<p><b>录用后：</b>订阅路线0 APC（官网原文）；选Open Select才产生APC（金额<span class="uflag">未核实</span>、按接受日报价、可查机构协议）；签版权/许可；校样约17天内上线。<b>民办建议：</b>单位写全（School of Management/Department + University + City + China）；审稿人选编委与近作作者、避开合作者同单位；利用活跃专刊（AI-Driven Decision Making under Uncertainty、Agentic Supply Chain）匹配选题；被拒多为模型/应用不足，补对比实验与管理洞见后改投JORS/EJOR，不无修改重投。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>About（指标/索引/APC政策/scope/编委）：https://www.tandfonline.com/journals/tprs20/about-this-journal</li>
+<li>武大图书馆(2024 IF 7.3、SCIE)：https://topj.lib.whu.edu.cn/show.asp?cat=sci&id=6468</li>
+<li>第三方分区：https://www.peipusci.com/news/10824.html ；https://www.peipusci.com/sci/2753.html</li>
+<li>T&amp;F ScholarOne官方指南：https://authorservices.taylorandfrancis.com/publishing-your-research/making-your-submission/using-scholarone-manuscripts/</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 11 JORS ===== -->
+<article class="jcard" id="j11">
+<header>
+<span class="jnum">11</span><span class="jtitle">Journal of the Operational Research Society<small>缩写 JORS ｜ Taylor &amp; Francis ｜ 英国运筹学会(The OR Society)旗舰刊，22 issues/year</small></span>
+<div class="jchips"><span class="tpos recommend">稳健OR刊</span><span class="tcost">非OA = 0 APC（官网原文）</span><span class="tidx pill dual">SCIE + SSCI 双收录</span><span class="rating midhigh">匹配度：中高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0160-5682；在线ISSN 1476-9360；编委含多位中国学者（中央财大、川大、东北大学、上海大学等）。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill dual">SCIE + SSCI 同时收录（本组唯一双收录刊）</span> 另列Web of Science、双CC、ESI、Scopus、ABDC、CABS、dblp、Ei；官方逐类目Q档：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网(标注2025)：IF <b>2.6</b>、5yr 3.1、CiteScore 6.7(Q1)、Best Quartile Q2、年下载约353K。</li><li>双收录下SCIE/SSCI两类目Q档未分别核实。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（第三方汇编）</dt><dd>LetPub运筹领域表：大类管理学<b>3区</b>、小类管理学；SCIE；<b>2025升级版单一区档未独立复核（<span class="uflag">未核实</span>）</b>。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid Open Select；<b>官网原文："If you choose not to publish open access in this journal, there is no APC."</b>；OA官方确切值未取得；第三方列USD 3,650/EUR 3,505/GBP 2,920（未经官网确认，<span class="uflag">未核实</span>）；投稿费未见官方收取表述。</dd></div>
+<div class="ditem"><dt>审稿周期（官网官方）</dt><dd>投稿→首决平均<b>17天</b>（含未送审首决）；送外审后首决<b>96天</b>；录用→在线<b>20天</b>；第三方体感总周期约7.0个月。</dd></div>
+<div class="ditem"><dt>接受率</dt><dd><b>12%</b>（官网官方）；盲态（单/双盲）官网About未写明：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>ScholarOne Manuscripts（官网仅文字提示、<b>二级URL<span class="uflag">未核实</span>，从官网Submit按钮进入、勿用猜测链接</b>）；About：https://www.tandfonline.com/journals/tjor20/about-this-journal ；不接受未邀特刊投稿。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>Scope：OR理论、实践、历史、方法论，尤其欢迎真实问题应用案例；应用域含forecasting、inventory、investment、location、logistics、maintenance、scheduling等；方法含decision support systems、expert systems、heuristics、networks、mathematical programming、MCDM、problem structuring methods、queues、simulation。官方鼓励代码/数据存入可注册DOI仓库供可复现性验证。与运筹优化、数据驱动决策、管理科学方法匹配中高；与IS技术实现、纯商业分析中等。</p>
+<div class="friendly"><b>民办高校友好度：中。</b>应用导向、欢迎真实案例、不唯理论复杂度；双收录SCIE/SSCI、接受率12%中等偏严；选题面宽、应用数据驱动型OR模型可切入；劣势是外审后约96天、总周期约半年量级，要求方法严谨可复现；适合有真实管理/运营数据、方法为规划/调度/评价/预测/仿真的团队。</div>
+<ol class="dr">
+<li>无真实决策问题的纯数学演算/习题式建模→给问题背景、数据或可说明情境、结果可操作性。</li>
+<li>方法不规范或缺基准对比→完整问题定义、假设、求解算法、对比与灵敏度分析。</li>
+<li>可复现性不足→准备仓库链接或可索取补充材料（Data/Code availability说明）。</li>
+<li>缺实践建议（须回答对管理者/组织意味着什么）；格式稿件类型与伦理基金声明须按Instructions备齐（细则<span class="uflag">未核实</span>）。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.tandfonline.com/journals/tjor20/about-this-journal" target="_blank" rel="noopener">官网入口 / About</a>
+<a class="btnlink" href="https://authorservices.taylorandfrancis.com/publishing-your-research/making-your-submission/using-scholarone-manuscripts/" target="_blank" rel="noopener">ScholarOne官方操作指南</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（JORS落地版）</summary><div class="stepinner">
+<p><b>账号：</b>经官网入口进入ScholarOne注册（二级URL<span class="uflag">未核实</span>，勿用非官方镜像）；准备合著者邮箱、建议ORCID、基金与伦理声明。<b>步骤（T&amp;F ScholarOne标准）：</b>Begin Submission → 类型 → 标题摘要关键词 → Add Funder → Add Co-authors（邮箱检索添加、排序勾选）→ Upload files指定类型 → 顺序排列、合并PDF预览 → Review and Submit补全必填 → 提交确认。</p>
+<p><b>文件：</b>主文档（标题页作者信息、摘要、关键词、正文、参考文献、附录）；图表；代码/数据仓库说明或SI；建议随稿提供方法可复现说明。模板与参考文献以该刊Instructions为准（未抓取<span class="uflag">未核实</span>）。<b>评审：</b>首决17天、外审首决96天、上线20天；返修Create Revision逐条回复。<b>录用后：</b>订阅路线0 APC（官网原文）；Open Select才付APC（第三方USD3650待核<span class="uflag">未核实</span>）；注意不接受未邀特刊。</p>
+<p><b>民办建议：</b>优先forecasting/scheduling/inventory/location/simulation等有公开数据或可教学案例化题目；审稿人选编委与近作作者、保持地理机构多样性；外审阶段（约3个月量级）耐心等待、避免过早催稿；被拒按「问题—方法—数据—可操作性」补强后可转投IJPR或同社Health Systems/Journal of Simulation。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>About（指标/双收录/APC政策/scope/编委/速度）：https://www.tandfonline.com/journals/tjor20/about-this-journal</li>
+<li>镜像：https://orsociety.tandfonline.com/journals/tjor20/about-this-journal</li>
+<li>第三方APC(待核)：https://m.wanweixueshu.com/sci/detail/55985</li>
+<li>LetPub领域表(体感7.0个月)：http://letpub.com.cn/index.php?page=journalapp&view=researchfield&fieldtag=109&firstletter=&currentpage=2</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 12 ORJ ===== -->
+<article class="jcard" id="j12">
+<header>
+<span class="jnum">12</span><span class="jtitle">Operational Research: An International Journal<small>缩写 ORIJ ｜ Springer Berlin Heidelberg ｜ 与希腊运筹学会合作，5 issues/year</small></span>
+<div class="jchips"><span class="tpos backup">稳健备选 · 双盲</span><span class="tcost">Hybrid · APC<span class="uflag">未核实</span></span><span class="tidx pill scie">SCIE</span><span class="rating mid">匹配度：中</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 1109-2858；在线ISSN 1866-1505；2001创刊；年发文约117–160篇（小体量）。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（未见SSCI）</span> 另收CC-ECT、Scopus、DBLP、RePEc；学科OR&amp;MS；<b>官方双盲 Double-blind（指南Editorial procedure明示）</b>。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>Springer官网：IF 2.7(2024)、5yr 2.6(2024)。</li><li>科研通最新一轮(2026-06-17)：IF 3.0（同比升0.3）。</li><li>Q2：OR&amp;MS 40/109；JCI Q2 53/109。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03升级版：大类管理学<b>4区</b>；小类OR&amp;MS <b>4区</b>；Top否、综述否。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid；Open Choice APC <b><span class="uflag">未核实</span></b>（无本刊美元金额）；投稿费<span class="uflag">未核实</span>；Gold占比22.61%；自引率4.30%（较低、友好）。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网首决中位<b>57天</b>。</li><li>网友审稿周期、录用比例：<b><span class="uflag">未核实</span></b>；预期初筛约2个月、全流程预留3–6个月。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd><b><span class="uflag">未核实</span></b>（无官方公开值，第三方亦无数值，不臆造）。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/orij ；指南：https://link.springer.com/journal/12351/submission-guidelines ；须提供MSC分类号；Word优先、数学内容可用LaTeX。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>定位OR/MS与Analytics的理论洞见、方法发展与真实世界案例；覆盖优化方法、决策理论、随机模型、仿真、博弈论、排队、库存与可靠性，特别欢迎OR/MS与IT、计算机、AI、软计算、电子服务交叉。契合点：MCDM/模糊决策、优化调度与路径规划、排队库存可靠性建模、数据驱动运营案例、OR×AI；偏弱方向是无模型的纯管理经验总结。</p>
+<div class="friendly"><b>民办高校友好度：中等偏低–中等。</b>体量较小、鼓励跨学科与真实案例、无出身限制条款；门槛在双盲匿名准备成本、MSC标注要求、小刊审稿人池有限与周期偏长、第三方经验缺失风险不可量化；能完成匿名化与MSC标注者可尝试，追求确定性产出者建议先投ANOR。</div>
+<ol class="dr">
+<li>双盲匿名不到位（作者须自行匿名化正文及附属文件，姓名/单位/自引致谢不得暴露，须单独提交Title Page）→匿名稿与独立title page分两个文件，自引第三人称，致谢基金放title page。</li>
+<li>缺MSC分类号（www.ams.org/msc，建议2–4个如90B06/90C29/91B06/68T37，以实际方法为准）。</li>
+<li>纯案例/纯算法缺OR理论贡献→给出模型、求解方法（精确/启发式/仿真）、对比验证与管理结论。</li>
+<li>格式：摘要150–250词、关键词4–6个；参考文献Springer作者-年份制；缺Statements and Declarations将退回。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/orij" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://link.springer.com/journal/12351/submission-guidelines" target="_blank" rel="noopener">Submission Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（ORJ落地版 · 双盲重点操作）</summary><div class="stepinner">
+<p><b>账号：</b>EM注册绑定ORCID；注册身份信息由系统掌握、不进入送审稿。<b>步骤：</b>New Submission → Original Paper/Review Article → 上传两个稿件：①匿名manuscript（删姓名、单位、致谢、基金、"our previous work"）；②单独Title Page → 标题、摘要150–250词、关键词4–6个、<b>MSC codes</b> → 作者单位在系统表单填写（不写入匿名稿）→ 推荐独立跨机构审稿人 → Comments to Editor（对编辑可见、不送审，可正常写身份与选题价值）→ 预览PDF确认无身份泄露后提交。</p>
+<p><b>文件：</b>匿名.docx（数学内容可用LaTeX模板）；独立Title Page；图矢量EPS/半色调TIFF、连续编号、图注在正文；MSC号；Springer作者-年份参考文献（LTWA期刊缩写、附DOI）；Statements and Declarations（Competing Interests必需）。<b>评审：</b>双盲；首决中位57天；外审一般1–2轮大小修。<b>录用后：</b>选订阅传统模式或Open Choice OA、权利与费用；先发DOI；APC金额<span class="uflag">未核实</span>。</p>
+<p><b>民办建议：</b>选题走「教学/真实业务案例 + 优化或决策模型 + 数值验证」路线契合real-world case导向；双盲做专项检查清单（身份字段、PDF元数据作者、自引语句、致谢基金四处）；MSC由方法负责人按ams.org核对；审稿人避开同单位师承、可从开放专刊客座编委之外选；周期长、经验少，作为补充目标，主目标优先ANOR。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>主页：https://www.springer.com/journal/12351</li>
+<li>科研通：https://www.ablesci.com/journal/detail?id=5daZAD</li>
+<li>指南（双盲/MSC/格式）：https://link.springer.com/journal/12351/submission-guidelines</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 13 JIIIS ===== -->
+<article class="jcard" id="j13">
+<header>
+<span class="jnum">13</span><span class="jtitle">Journal of Intelligent Information Systems<small>Integrating AI and Database Technologies ｜ Springer ｜ 双月刊，1992创刊</small></span>
+<div class="jchips"><span class="tpos backup">方法类备选 · 需LaTeX</span><span class="tcost">Hybrid · APC<span class="uflag">未核实</span></span><span class="tidx pill scie">SCIE</span><span class="rating midhigh">匹配度：中–高</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0925-9902；在线ISSN 1573-7675；年发文约54–102篇、体量不大。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（未见SSCI）</span> 另收EI Compendex、Scopus、DBLP、INSPEC、ACM DL；学科CS-AI、CS-IS。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>Springer官网：IF 3.4(2024)、5yr 3.0(2024)。</li><li>科研通最新一轮(2026-06-17)：IF 3.5（同比升0.1）。</li><li>Q2：CS-AI 102/210；CS-IS 120/266。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03升级版：大类<b>计算机科学3区</b>；小类CS-AI <b>4区</b>、CS-IS <b>4区</b>；Top否、综述否。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid；Open Choice APC <b><span class="uflag">未核实</span></b>；投稿费<span class="uflag">未核实</span>；Gold占比24.17%；<b>自引率26.10%偏高，写作须控制自引、避免异常自引判定</b>。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网首决中位<b>5天</b>（大量对应编辑快速初筛/格式性决定，≠外审周期）。</li><li>第三方：网友「较慢6–12周」；booksci载初审约4天、审稿6–12周；进入外审按月规划。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方：<b><span class="uflag">未核实</span></b>；官网「曾发表作者满意度91%」是satisfaction不是录取率，不得混用；网友定性「容易」不采信为百分比。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/jiis （<b>拼写为jiis，非jiiis</b>）；指南：https://link.springer.com/journal/10844/submission-guidelines ；硬性要求LaTeX、≤25页、编号参考文献。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>AI与数据库技术融合构建先进信息系统；覆盖理论、系统架构、分析设计工具、智能信息检索、不确定性推理、多源异构数据管理、知识发现、数据库+机器学习；近年方向含数据清洗与对抗学习、检索增强/Text-to-SQL、推荐系统可持续性；开放CfP含Data-Centric AI、Recommender Systems for Sustainability。契合数据挖掘知识发现、智能检索推荐、数据库+AI、决策支持中的不确定性推理、BI系统实现；不适合纯管理理论实证、无数据/算法成分的IS行为研究。</p>
+<div class="friendly"><b>民办高校友好度：中等（对会LaTeX、选题贴「智能+数据管理」者友好；仅Word写作、纯管理实证稿件不友好；建议作ANOR/ISF之外方法类备选）。</b>体量不大、官网自述满意度91%、无出身公开条款；硬性LaTeX+25页上限构成形式门槛，选题须扣AI×数据库/信息系统融合点，且须避免密集引用本刊压低自引嫌疑。</div>
+<ol class="dr">
+<li>超25页上限（含参考文献、表格、图）易被格式退回→按官方模板排版控页，SI另交补充材料压缩正文。</li>
+<li>非LaTeX提交风险高（指南硬条款：LaTeX files are the only acceptable file format for submissions，优先LaTeX）；须用宏包smallcondensed、参考文献sn-basic.bst；勿用子文件夹组织LaTeX文件。</li>
+<li>投稿界面缺Author Contribution与Competing Interest（仅写进正文无效，须在EM表单逐项填写）。</li>
+<li>选题偏离「AI×数据库/智能信息系统」、摘要超250词、参考文献非编号制（正文方括号[1]而非作者-年份）→摘要150–250词、编号引用、条目含DOI。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/jiis" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://link.springer.com/journal/10844/submission-guidelines" target="_blank" rel="noopener">Submission Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（JIIIS落地版）</summary><div class="stepinner">
+<p><b>账号：</b>EM（/jiis）注册，建议绑定ORCID；通讯作者负责全部作者知情与信息准确。<b>步骤：</b>New Submission → Research/Research Paper → 标题、摘要150–250词、关键词4–6 → 上传<b>LaTeX源文件</b>（宏包smallcondensed）、图片源、编译PDF → 作者单位填写；界面表单单独提交Author Contributions与Competing Interests → 推荐独立跨机构带邮箱审稿人 → Comments说明「AI×数据库/智能系统」贡献、数据/代码来源、无重复发表 → 系统编译合并PDF检查后Approve提交。</p>
+<p><b>文件：</b>LaTeX工程（.tex、sn-basic.bst、样式、图文件）+编译PDF；Title Page；编号参考文献（正文[1,2]，条目作者(年份)题名.期刊缩写 卷:页.DOI）；系统内作者贡献与利益冲突；原始研究配Data Availability Statement；LLM/ChatGPT使用须在Methods说明、<b>LLM不可列为作者</b>；图矢量EPS优先、半色调TIFF、图注在正文。</p>
+<p><b>评审：</b>盲态公开指南未载明（<span class="uflag">未核实</span>）；初筛快（中位5天/初审约4天），外审6–12周。<b>录用后：</b>选传统订阅或Open Choice OA（APC<span class="uflag">未核实</span>）；作者顺序录用后不可更改。<b>民办建议：</b>用课程/科研积累的真实业务数据（脱敏）+智能算法构建系统型论文；团队培养1人维护LaTeX模板降低形式拒稿；审稿人选近三年该刊作者与数据库/信息检索会议活跃学者；超页/格式问题压缩补SI再投，范围不符则管理实证转ISF、纯优化转ANOR/ORJ。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>主页：https://www.springer.com/journal/10844</li>
+<li>科研通：https://www.ablesci.com/journal/detail?id=DbNo7D</li>
+<li>指南（25页/LaTeX/编号文献硬条款）：https://link.springer.com/journal/10844/submission-guidelines</li>
+<li>booksci节奏参考：https://m.booksci.cn/journal/56119.htm</li>
+</ul></details>
+</div></article>
+<!-- ===== 14 APJOR ===== -->
+<article class="jcard" id="j14">
+<header>
+<span class="jnum">14</span><span class="jtitle">Asia-Pacific Journal of Operational Research<small>缩写 APJOR ｜ World Scientific（新加坡）｜ APORS官方刊之一，6 issues/year</small></span>
+<div class="jchips"><span class="tpos backup">保底刊 · 周期长</span><span class="tcost">订阅0 APC · 无投稿费（官网明示）</span><span class="tidx pill scie">SCIE</span><span class="rating midhigh">匹配度：中高（建模方向）</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0217-5959；在线ISSN 1793-7019；官网6期/年（LetPub记Quarterly、口径差异以官网为准）；年发文约77篇。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（官网索引子页抓取失败，由LetPub/第三方佐证；官网原文清单<span class="uflag">未直接核实</span>）</span> 学科对应OR&amp;MS；第三方佩普学术标JCR Q4；<b>官方JCR Q档：<span class="uflag">未核实</span></b>。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网Journal Metrics：<b>2025 IF 1.3</b>；CiteScore 2.6；SNIP 0.446；SJR 0.272。</li><li>LetPub：IF 1.3、5yr 1.003；网友实时估算0.911非正式JIF。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>大类<b>管理学4区</b>（LetPub/佩普/搞科研导航多源一致）；小类OR&amp;MS精确档：<span class="uflag">未核实</span>；不在预警名单。</dd></div>
+<div class="ditem"><dt>OA政策与费用（官方金额已核实）</dt><dd><ul><li>混合期刊；<b>订阅路线无APC、无投稿费</b>；仅录用后选Gold OA才开票，投稿与审稿阶段不收费，勿轻信投稿阶段付费邮件。</li><li>Gold OA标准APC <b>US$2,500，另加VAT/当地税费</b>（官网明文）；CC BY、保留版权；部分Read-and-Publish机构/EIFL/KCUE可减免，中国普通高校一般不在已列豁免名单（国内协议<span class="uflag">未核实</span>）。</li></ul></dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网：Acceptance to online publication <b>30天</b>（仅录用到在线，非投稿到录用）。</li><li>网友/第三方：投稿→录用平均<b>约8.5个月</b>；个案离散极大（3个月录用、1个月退稿、旧帖With Editor近一年/全流程两年多，时效需谨慎）。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官网官方 <b>38%</b>；LetPub网友估算约50%（无严格抽样、非正式统计，以官网38%为准）。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd><b>Editorial Manager（非ScholarOne）</b>：https://www.editorialmanager.com/APJOR ；指南：https://www.worldscientific.com/page/apjor/submission-guidelines ；盲审方式：<span class="uflag">未核实</span>（WSPC运筹类多为单盲，勿写死）。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>体裁含General、Theoretical、OR Practice、Reviewer Survey、OR Education、Communications；理论稿须有显著方法学发展，<b>OR Practice（运筹实践应用）稿尤其受欢迎、强调实践意义</b>。近期主题：仿真优化（云计算大数据时代）、调度（流水线/恶化工件/交货窗）、供应链物流（双向闭环、无人机-卡车协同路径、集装箱翻箱）、收益管理、多准则决策、运筹在电商平台应用、AI×供应链OR模型。核心要求是OR模型/方法贡献，纯描述性统计或通用ML分类难以命中。</p>
+<div class="friendly"><b>民办高校友好度：中高（本组门槛相对最低，但周期长）。</b>官网接受率38%（五本D组最高）、管理学4区、IF 1.3、竞争烈度较低；近期发文含大量国内普通院校/地方机构运筹团队、未见出身限制；编委覆盖亚太各国运筹学会、亚太作者友好。代价：总周期长（网友均值约8.5个月）、方法要求扎实（数学模型/算法/决策分析），非OR背景教师上手成本高；适合运筹优化/调度/供应链建模方向的现实保底—主攻刊，务必预留充足时间。</div>
+<ol class="dr">
+<li>缺OR方法贡献、偏纯应用描述（被退个案理由即「建议投应用型期刊」）→明确写出模型（规划/调度/DEA/多准则/仿真）、创新点与求解方法。</li>
+<li>超长或格式不符：限定15–25手稿页（约2,500–6,000词）、双倍行距宽边距连续页码、公式右缘顺序编号、引理命题顺序标号、表题在上图题在下。</li>
+<li>摘要超长/不符：≤200词、自含、目的方法结果结论；另需≤50字符短标题(running head)；参考文献作者-年份、字母序、期刊全称不缩写。</li>
+<li>原创性/一稿多投声明缺失、作者简介缺失（每人≤150词）；投稿前建议先跑PaperPal preflight技术检查。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/APJOR" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://www.worldscientific.com/page/apjor/submission-guidelines" target="_blank" rel="noopener">Submission Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（APJOR落地版）</summary><div class="stepinner">
+<p><b>账号：</b>EM注册（机构邮箱、ORCID更佳）；准备通讯邮箱与全部作者姓名/单位/邮箱；提前写好≤150词作者简历。<b>步骤：</b>Author → Submit New Manuscript → 选体裁（General/Theoretical/OR Practice/Review/Communications）→ 上传主文件（Word或LaTeX，建议先过PaperPal preflight）→ 标题、短标题(≤50字符)、≤200词摘要、关键词 → 作者单位（标注通讯邮箱）→ 建议/推荐OR领域无利益冲突审稿人（强制人数以EM界面为准<span class="uflag">未核实</span>）→ 上传cover letter/作者简历 → 核对原创性声明 → 提交记录稿号。</p>
+<p><b>文件：</b>正文（Title/Authors/Affiliations/Abstract/Keywords/Main Text/Acknowledgements/References/Appendices，图表随文位置标注）；表格插图（题注位置按指南、方程命题标号规范）；合并作者简历文件；running head；Cover Letter（体裁类别、方法创新与实践意义、推荐审稿人、原创性声明）；可复现数据集/算法建议附SI（上传位以EM为准<span class="uflag">未核实</span>）。</p>
+<p><b>格式：</b>2,500–6,000词（15–25页）；双倍行距；参考文献作者-年份、字母排序、不编号、期刊全名；提供LaTeX2e与MS-Word两套官方模板下载。<b>评审：</b>编辑初筛→独立外审（一般≥2名，本刊具体人数<span class="uflag">未核实</span>）；投稿到录用网友均值约8.5个月、录用到在线官网30天。<b>录用后：</b>默认订阅0元；选Gold缴US$2,500+税（CC BY）；只在确认Accepted后理会缴费请求，疑似诈骗邮件先向apjor@wspc.com核实。</p>
+<p><b>民办建议：</b>选题优先调度、供应链/物流优化、多准则决策、仿真优化等OR Practice体裁；给出可复现模型与算例（数值实验/敏感性分析）弥补院校声望；审稿人选亚太运筹学会成员、近三年发文作者；投稿3–4个月仍With Editor/审稿中可礼貌致信一次，心理预期按8个月以上规划、勿赶毕业节点；desk reject后转同类方法刊（如CIE），大修保证求解器/算法/数据集可复核、逐条回复。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>主页/指标：https://www.worldscientific.com/worldscinet/apjor</li>
+<li>OA政策(US$2,500)：https://www.worldscientific.com/apjor/openaccess</li>
+<li>投稿指南：https://www.worldscientific.com/page/apjor/submission-guidelines ；Scope：https://www.worldscientific.com/page/apjor/aims-scope</li>
+<li>LetPub：http://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=905 ；第三方Q4：https://www.peipusci.com/sci/724.html</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 15 Kybernetes ===== -->
+<article class="jcard" id="j15">
+<header>
+<span class="jnum">15</span><span class="jtitle">Kybernetes<small>Emerald ｜ WOSC(UNESCO认可)与The Cybernetics Society官方刊之一 ｜ 月刊，年发文约130篇</small></span>
+<div class="jchips"><span class="tpos backup">稳健备选</span><span class="tcost">订阅0 APC · 无投稿费</span><span class="tidx pill scie">SCIE</span><span class="rating low">匹配度：中偏低</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0368-492X；eISSN 1758-7883；月刊。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（非SSCI）</span> 另收SciSearch、CC-ECT、EI Compendex、INSPEC、Zentralblatt MATH、Scopus；第三方快照：CS-Cybernetics Q2 16/34；<b>官网当期官方Q档：<span class="uflag">未核实</span></b>；Scopus CiteScore分区≠JCR Q档。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网Emerald：2025 IF 2.9、5yr 2.7(2025)、CiteScore 7.7(2025)。</li><li>LetPub标题3.200为较早JCR年份、非官网当前2.9，勿混用；网友实时估算2.05非正式JIF。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>大类计算机科学、小类CS控制论（列表3档口径）；<b>2025升级版逐档精确值：<span class="uflag">未核实</span></b>；Top否、综述否；不在2023–2026各版预警名单。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>订阅（非Gold）路线<b>0 APC、无投稿费</b>，可选Green OA自存档（无禁运期）；Gold通用£3,222/US$4,351/€3,710+VAT；<b>Kybernetes单刊专属APC：<span class="uflag">未核实</span></b>。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网(2024-04–2025-03)：首决14天；录用到在线35天；通用目标60天内首决。</li><li>网友：偏慢4–8周；换届期曾出现Awaiting EO Checklist/Reviewer Scores数月停滞、个别5–6个月无更新，也有1个多月修改后录用，离散度大。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官网官方 <b>9.5%</b>（2024-04-01至2025-03-31）；网友主观「容易/Easy」无量化值。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>ScholarOne：http://mc.manuscriptcentral.com/kyb ；指南：https://www.emeraldgrouppublishing.com/journal/k ；评审<b>双盲</b>；本刊专属字数上限/模板细节：<span class="uflag">未核实</span>。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>2025调整后新宗旨扎根二阶控制论(second-order cybernetics)、系统理论、反思性方法；欢迎Management Science、Organisation Science、Information Systems、Information Management、Decision Science、Management Information Systems；<b>明确不偏好对气候变化、数字化、全球治理等主流话题的平铺直叙式处理，要有反直觉/系统性理论视角</b>，偏好理论性、概念性、方法论创新稿件。单纯商业数据分析/预测建模、供应链优化实证若缺系统/控制论/反馈/整体性理论框架，命中度低；可对接IS的系统论解释、决策系统反馈控制建模、组织数字化的系统韧性/复杂性视角。</p>
+<div class="friendly"><b>民办高校友好度：中偏低。</b>接受率9.5%、网友经验两极且换届期偏慢；收稿偏理论概念、对工程化实证不友好；可见国内学者管理/运筹方向修改后录用个案、未见机构门槛声明；不唯出身但理论门槛高、节奏不稳，与本专业技术应用定位契合度一般，仅建议有系统科学/理论框架储备时尝试。</div>
+<ol class="dr">
+<li>纯实证/纯技术、无控制论-系统理论贡献（新宗旨拒绝主流话题常规描述）→把数据/管理现象放进反馈回路、系统涌现、二阶观察框架，给出理论命题。</li>
+<li>缺结构化摘要（Purpose/Design/Findings/Originality四段，同Emerald体系）→按模板补齐。</li>
+<li>主题跑偏（纯供应链优化、纯营销实证而无系统视角）→Cover Letter明确引用Information Systems/Decision Science/Systems Theory收稿领域。</li>
+<li>语言与编辑就绪度不足、文件不齐导致长期停在EO Checklist→投稿前确保文件齐全、作者信息完整；时间敏感任务不建议押宝本刊。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="http://mc.manuscriptcentral.com/kyb" target="_blank" rel="noopener">投稿系统（ScholarOne）</a>
+<a class="btnlink" href="https://www.emeraldgrouppublishing.com/journal/k" target="_blank" rel="noopener">Author Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（Kybernetes落地版）</summary><div class="stepinner">
+<p><b>账号：</b>ScholarOne注册；机构邮箱+ORCID；作者信息按Emerald要求填全。<b>新建投稿：</b>New Submission → 选类型（Research/Conceptual/Viewpoint等，理论稿可选Conceptual paper）→ Word稿上传 → 结构化摘要+关键词 → 作者单位 → 推荐系统科学/控制论/IS方向审稿人 → Cover Letter说明理论视角与契合范围 → 提交记稿号。</p>
+<p><b>文件：</b>Word正文（结构化摘要、Emerald Harvard文献、图表规范同IMDS体系）；Cover Letter；可选作者简介/致谢单独Word；图.ai/.eps/.jpeg/.bmp/.tif；第三方版权许可。<b>格式：</b>Emerald Harvard、一级标题加粗次级中斜、表格单独文件；专属字数上限<span class="uflag">未核实</span>，以系统模板为准。<b>评审：</b>双盲；首决中位14天多为初筛，送审实际4–8周至数月不等。</p>
+<p><b>录用后：</b>非Gold路线0 APC；Gold才开票（通用$4,351量级、单刊额<span class="uflag">未核实</span>）；签版权表→校样→EarlyCite。<b>民办建议：</b>把论文上升到系统/决策理论层面、避免「工具应用报告」；毕业时间≤1年者不优先；可跟踪组织管理系统议题SI提高命中率；被退改投IMDS/JEIM等应用取向Emerald刊Transfer通道。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>官网指标/指南：https://www.emeraldgrouppublishing.com/journal/k</li>
+<li>2025新宗旨社论：https://emeraldinsight.com/k/article-pdf/54/8/4071/9866422/k-07-2025-330.pdf</li>
+<li>LetPub：http://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=5517 ；繁中快照：https://www.letpub.tw/index.php?page=journalapp&view=detail&journalid=5517</li>
+<li>OA政策：https://www.emerald.com/publish-with-us/pages/publish-in-an-open-access-journal</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 16 ISM ===== -->
+<article class="jcard" id="j16">
+<header>
+<span class="jnum">16</span><span class="jtitle">Information Systems Management<small>缩写 ISM ｜ Taylor &amp; Francis（Auerbach/CRC印记）｜ 季刊，年发文约23篇</small></span>
+<div class="jchips"><span class="tpos push">冲刺刊 · 接受率3%</span><span class="tcost">订阅无APC、无投稿费（官网原文）</span><span class="tidx pill scie">SCIE</span><span class="rating mid">匹配度：中等</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 1058-0530；在线ISSN 1934-8703；Quarterly（4期/年）；英文。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE</span> 另收Scopus、Compendex、INSPEC、EBSCOhost、ProQuest；<b>SSCI：未见证据（倾向不收录，<span class="uflag">未核实</span>/倾向）</b>；学科CS-Information Systems；第三方快照Q2 81/258；官方当期Q档：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网(标注2025)：IF <b>3.0</b>、5yr 4.1、CiteScore 12.3(2025,Q1)、SNIP 1.726、SJR 1.211。</li><li>LetPub：IF 3.000、5yr 4.102、h-index 53、自引率3.3%；网友实时估算1.714非正式JIF。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>大类管理学、小类CS-IS（列表3档口径）；<b>2025升级版逐档精确值：<span class="uflag">未核实</span></b>；Top否；不在2023–2026各版预警名单。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid Open Select；官网原文「If you choose not to publish open access in this journal, there is no APC」，<b>订阅路线无APC、无投稿费</b>；Gold OA APC确切美元金额：<span class="uflag">未核实</span>（官网仅引导APC Finder实时计算）；机构/基金协议可减免。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网：投稿→首决平均<b>4天</b>（含desk reject、不代表送审周期）。</li><li>网友：&gt;12周，或约稿；主观「容易」与官网3%接受率差异大，以官网数据为准。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官网官方 <b>3%</b>（上一完整自然年接受/终决占比，每年2月更新）；网友主观无量化值。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>ScholarOne：https://mc.manuscriptcentral.com/uism ；About：https://www.tandfonline.com/journals/uism20/about-this-journal ；评审<b>双盲 double anonymized</b>；逐字字数/文献体例：<span class="uflag">未核实</span>。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>收录方向：战略性IT对齐与能力、IT治理、CIO/IT领导、IT外包(Sourcing)、企业基础设施规划、IT安全、应用方案选型交付、组合管理、复杂IT项目管理、电子商务技术、支持知识工作；鼓励研究+实践结合、同时给出学术与管理启示。契合点偏IS治理、电商/数字化管理、知识管理、企业IT决策支持；不直接主打数据挖掘算法、商业分析建模、运筹优化；纯技术ML/算法论文命中概率低，宜写成「数据/IT驱动的管理决策与实践启示」视角。</p>
+<div class="friendly"><b>民办高校友好度：中偏低。</b>接受率仅3%门槛高、年发文约23篇、约稿/专题比重高、自由投稿命中率受限；编委含多个非顶尖/应用型院校、说明评审不唯机构出身；普通中国院校具名案例<span class="uflag">未核实</span>。结论：不看出身但命中率低、偏管理实践，宜作冲刺刊、不宜保底。</div>
+<ol class="dr">
+<li>跑题/缺管理启示：纯技术实现、纯算法对比而缺IS管理含义与实践建议→摘要结论显式写「对IT治理/电商/知识工作/企业数据管理的管理启示」。</li>
+<li>违反双盲：正文出现姓名、单位、致谢、自引「我等(2024)」→正文匿名化，作者信息只在系统与单独cover file填写。</li>
+<li>选题过窄/技术化或与11条主题词不符→Cover Letter显式映射1–2条官网主题。</li>
+<li>语言结构与格式不过关→按T&amp;F模板排版、规范参考文献与图表（字数上限<span class="uflag">未核实</span>），避免初筛以语言/质量退回。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://mc.manuscriptcentral.com/uism" target="_blank" rel="noopener">投稿系统（ScholarOne）</a>
+<a class="btnlink" href="https://www.tandfonline.com/journals/uism20/about-this-journal" target="_blank" rel="noopener">About / 投稿入口</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（ISM落地版）</summary><div class="stepinner">
+<p><b>账号：</b>ScholarOne注册；通讯作者机构邮箱+ORCID；所有合作者需在系统添加（每位作者是否强制自有账号以系统提示为准<span class="uflag">未核实</span>）。<b>步骤：</b>登录 → Author Center → New Manuscript → 选Article Type → 上传双盲manuscript → 填title/abstract/keywords → Add/Edit Authors排序、单位邮箱 → 推荐3–5名避开同机构/近期合作/师承的审稿人 → Comments to Editor(Cover Letter要点) → 核对版权与利益冲突声明 → 提交记录manuscript ID。</p>
+<p><b>文件：</b>匿名manuscript（标题、摘要、关键词、正文、参考文献；图表可内嵌或单独上传）；Cover Letter（选题契合点、创新点、推荐/回避审稿人、原创无一稿多投声明）；单独Author/Title Page（全作者、单位、邮箱、ORCID，满足双盲）；高质量图片；涉及问卷/人体需伦理知情说明（强制清单以系统上传页为准<span class="uflag">未核实</span>）。</p>
+<p><b>格式：</b>以T&amp;F Word/LaTeX模板与指定文献体例为准（多为哈佛作者-年份或期刊指定体例，确切体例<span class="uflag">未核实</span>）。<b>评审：</b>双盲；编辑初筛（首决中位4天含desk reject）→送审后独立匿名外审；决定accept/minor/major/reject；送审后网友经验&gt;12周。<b>录用后：</b>订阅路线无APC；选Open Select才产生APC（金额<span class="uflag">未核实</span>、APC Finder实时）；签版权/许可→校样→Version of Record。</p>
+<p><b>民办建议：</b>单位按「大连财经学院+二级学院/系+标准英文名」如实填写、无需包装；选题挂靠IT治理/数字化/电商/知识管理主题词、弱化纯算法表述；审稿人选近年本刊/同类刊发文、主题相近国外学者；投稿满6–8周仍停滞可礼貌询问一次、忌频繁催促；desk reject后据意见补「管理启示+双盲格式」改投EMDS/JEIM等更宽口径刊，外审拒稿按comments大修后转投。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>官网(指标/双盲/3%接受率/no APC)：https://www.tandfonline.com/journals/uism20/about-this-journal</li>
+<li>LetPub：http://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=3570</li>
+<li>第三方Q2快照：https://www.hindawi.letpub.com/journal-selector/journal/3570</li>
+<li>作者指南行动页(人工浏览器可开)：https://www.tandfonline.com/action/authorSubmission?show=instructions&journalCode=uism20</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 17 EJOR ===== -->
+<article class="jcard" id="j17">
+<header>
+<span class="jnum">17</span><span class="jtitle">European Journal of Operational Research<small>缩写 EJOR ｜ Elsevier ｜ 欧洲运筹学会联合会(EURO)会刊，1977创刊，半月刊</small></span>
+<div class="jchips"><span class="tpos push">理论冲刺</span><span class="tcost">订阅无需发表费（官方明示）</span><span class="tidx pill scie">SCIE</span><span class="rating mid">匹配度：中等</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0377-2217；在线eISSN 1872-6860；Semimonthly（年24期）；2025年新投稿4,679篇。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（非SSCI主类）</span> 主学科OR&amp;MS：JCR2025 11/109 Q1（90.4百分位）；JCR2024 14/106 Q1（87.3百分位）。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li><b>JCR2025（官方简报明示）：WoS 2-year IF = 7.0</b>；Scopus CiteScore 2025 = 14.0；2025总被引67,071。</li><li>JCR2024精确IF数值：<span class="uflag">未核实</span>（简报仅给14/106 Q1排名，不臆测）；Resurchify等8.17为非标准口径、本手册不采用。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03升级版：大类管理学<b>2区</b>；小类OR&amp;MS <b>2区</b>；<b>Top：否</b>（个别高校宣传稿称Top与第三方分区表不一致，以非Top为准）；综述否；不在预警名单。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid（官方明示runs in a hybrid format）；<b>订阅路线Authors do not need to pay publication fees</b>，两种路线评审标准与录用门槛相同；Gold OA APC官方美元单价：<span class="uflag">未核实</span>（官方页未列金额；第三方OpenAlex估算3,290美元为非官方、不采用）；投稿费：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>Elsevier官网口径(LetPub转引)：平均20.5周（约4.7个月）。</li><li>网友众包(非官方)：平均约7.1个月；公开个案3–7个月修改后接受。</li><li>官方过程统计(2025)：录用稿平均邀6.43位审稿人、2.83位完成；<b>98%录用稿至少经历1次Major Revision</b>。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方：<span class="uflag">未核实</span>（官方报告仅给拒稿率图表、未提取到具体百分比）；网友「Easy/容易」主观印象与98%大修事实反差大、不采信为宽松证据。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/EJOR ；指南：https://www.elsevier.com/journals/european-journal-of-operational-research/0377-2217/guide-for-authors ；学会政策页：https://www.euro-online.org/web/pages/518/european-journal-of-operational-research-ejor</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>论文类型：Invited Reviews（多为约稿）、Innovative Applications of OR、Theory and Methodology Papers（含Continuous Optimization、Discrete Optimization、Production/Manufacturing/Logistics、Stochastics and Statistics、<b>Decision Support</b>、<b>Computational Intelligence and Information Management</b>、Interfaces with Other Disciplines七栏目）、Short Communications。最契合「运筹优化+管理决策问题」的严谨建模论文；纯数据描述/纯BI可视化不适合，需有OR模型或方法论新意。</p>
+<div class="friendly"><b>民办高校友好度：中等偏低（传统强刊、方法论门槛高、选择性强）。</b>官方政策原文「much more selective than in the past」，无重大新发现/新颖OR方法者不送外审直接拒；英文差、科学贡献不足者即使有审稿人支持也可被拒；ABS 4星、FMS A类、JCR Q1；不看出身、可见中国学者近期论文但要求方法扎实；98%录用稿≥1次大修。适合作为冲刺目标，保底不宜。</div>
+<ol class="dr">
+<li>未含重大新研究发现或OR应用新颖方法→不送审直接拒（官方原文）；引言贡献清单明确「新模型/新算法/新理论性质/新应用洞见」之一。</li>
+<li>英文写作质量差→拒（官方原文papers written in poor English）；正式润色、术语规范、逻辑连贯。</li>
+<li>科学贡献不足（理论/算法/实证三选一做到硬贡献，补分界性质、最优性、复杂度或严格对比实验）。</li>
+<li>应用稿缺新颖角度/落地洞见、未恰当引用近期OR文献→综述覆盖近3年OR主流刊、说明案例管理含义与可迁移性。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/EJOR" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://www.elsevier.com/journals/european-journal-of-operational-research/0377-2217/guide-for-authors" target="_blank" rel="noopener">Guide for Authors</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（EJOR落地版）</summary><div class="stepinner">
+<p><b>类型/栏目：</b>Theory稿宜在Cover Letter或系统字段标明七子栏目之一（Decision Support、Computational Intelligence and Information Management最贴近本专业）；Invited Review一般不接受自由投稿（开放投稿资格<span class="uflag">未核实</span>，以系统列表为准）。<b>必备：</b>稿件、强制利益冲突声明、Cover Letter（突出OR新颖贡献与子栏目归属）、完整算法/模型推导、数据与算例说明、OR理论/应用方向推荐审稿人；应用稿附问题背景与实施洞见。</p>
+<p><b>格式：</b>数学公式编号规范、参考文献须含近期OR文献；LaTeX友好；以Guide为最终依据。<b>评审：</b>未核实到强制双盲；录用稿多轮大修（98%≥1次）；官网约20.5周中位口径，规划周期按半年以上。<b>录用后：</b>订阅路线0发表费（官方明示）；Gold APC金额官方页未列、以系统报价为准（<span class="uflag">未核实</span>）。</p>
+<p><b>民办建议：</b>先以成熟方法在CIE/ESWA积累发表经验后再冲刺EJOR；与运筹方向合作者共著补强理论严谨性（最优性证明/复杂度/性质分析）；单位如实填写不影响评审，审稿人选ISI/ORMS活跃学者；应用稿(Innovative Applications of OR)相对理论稿更易切入真实管理场景但仍需方法论新意；Desk Reject后对照官方四点补短板再改投，不要原样转投。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>EURO官方政策页：https://www.euro-online.org/web/pages/518/european-journal-of-operational-research-ejor</li>
+<li>EURO 2026简报(IF7.0/Q1 11/109/98%大修)：https://www.euro-online.org/media_site/reports/EJOR_2026.pdf</li>
+<li>LetPub：https://letpub.com.cn/index.php?page=journalapp&view=detail&journalid=2684</li>
+<li>指南：https://www.elsevier.com/journals/european-journal-of-operational-research/0377-2217/guide-for-authors</li>
+<li>第三方分区(非Top佐证)：https://www.booksci.cn/journal/55161.htm</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 18 CIE ===== -->
+<article class="jcard" id="j18">
+<header>
+<span class="jnum">18</span><span class="jtitle">Computers &amp; Industrial Engineering<small>缩写 CAIE / CIE ｜ Elsevier Ltd（Pergamon-Elsevier, Oxford）｜1976创刊，Bimonthly</small></span>
+<div class="jchips"><span class="tpos mid">应用匹配</span><span class="tcost">订阅APC=0（Elsevier通用政策）</span><span class="tidx pill scie">SCIE</span><span class="rating midhigh">匹配度：中等偏上</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0360-8352；在线eISSN 1879-0550；Bimonthly；2025年约848篇。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE</span>（impactfactor.cn片段另列SSCI字样与LetPub/科研通冲突，<b>SSCI收录结论<span class="uflag">未核实、不作为依据</span></b>，以Master Journal List为准）；Q1：CS-Interdisciplinary Applications 30/185；Engineering Industrial 13/69。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>最新(科研通2026-06-17发布)：IF <b>7.3</b>↑0.8；LetPub列表/佩普学术同载7.30。</li><li>2025发布口径：科研通6.5、impactfactor.cn 6.55（2025-06-26更新，小数精度不同）；<b>7.3对应的官方JCR年度证书<span class="uflag">未核实</span>，以机构JCR账号复核</b>。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03-20升级版：大类工程技术<b>2区 Top</b>；小类CS跨学科应用2区、工业工程2区；综述否；不在预警名单（2023-12旧版曾为工程技术1区）。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid（Gold占比15.73%–15.94%）；Elsevier混合刊通用政策为订阅文章不收发表费（同集团DSS/EJOR官方明示）；<b>CIE官网OA定价页被robots限制未抓到，Gold OA确切APC金额：<span class="uflag">未核实</span>，投稿系统内查看、勿引用本手册外数字</b>；投稿费：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网官方中位审稿时间：<span class="uflag">未核实</span>（未取得Journal Insights数值）。</li><li>网友众包(非官方)：平均约11.1个月；个案2025-02-14投→04-14大修→05-29录用，亦有3–8个月修改后接受（个案不代表均值）。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方：<span class="uflag">未核实</span>；网友分享「约50%」主观自报、与Q1/Top定位不符，仅记录不采信为定量结论。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/CAIE ；指南：https://www.elsevier.com/journals/computers-and-industrial-engineering/0360-8352/guide-for-authors</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>发表「用计算机化新方法解决工业工程问题」的原创贡献；适配本专业：生产/物流/调度优化与智能算法、供应链与运营数据分析、设备/质量/维护数据驱动决策、工业大数据方法、仿真与启发式算法在管理运营中的应用、评价/选址/可靠性建模。要求「方法（算法/模型/优化）+ 工业或运营问题」双要素；纯管理信息系统或纯商务智能不如DSS/ESWA对口。</p>
+<div class="friendly"><b>民办高校友好度：中等（偏方法实现、工程应用导向，门槛适中）。</b>中科院工程技术2区Top、JCR Q1，但方法类应用论文渠道多；年发文约848篇、选题落在调度/优化/生产分析成熟赛道可参考大量同类结构；审稿个案显示方法扎实、实验完整即可推进，未见单位门槛证据；短板是纯描述性系统开发、无算法/模型新意的论文不受欢迎。适合有运筹/算法建模能力的教师。</div>
+<ol class="dr">
+<li>无新方法贡献（纯系统描述、业务流程介绍、缺模型/算法创新）→突出新模型/改进算法/新应用机制并给对比验证。</li>
+<li>问题场景脱离工业工程/运营管理语境→用排产、物流、库存、质量、选址、维护等标准IE问题框定。</li>
+<li>实验/算例规模小、缺benchmark与统计比较→标准算例/公开数据集、多组对比、显著性与灵敏度分析。</li>
+<li>写作英文与公式图表规范不足→按指南编号公式与附录（Eq.(A.1)、Table A.1体例），投稿前润色。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/CAIE" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://www.elsevier.com/journals/computers-and-industrial-engineering/0360-8352/guide-for-authors" target="_blank" rel="noopener">Guide for Authors</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（CIE落地版）</summary><div class="stepinner">
+<p><b>类型：</b>常规Research Article；特刊/专刊按系统选项选择。<b>必备：</b>稿件（含公式、算法伪代码、算例结果）、强制利益冲突声明、Cover Letter（点明IE方法贡献与问题类型）、运筹/工业工程/调度方向推荐审稿人；图件源文件录用后提交。<b>格式：</b>公式、表格、图按Guide规范；参考文献Elsevier体例；LaTeX/Word均可。</p>
+<p><b>评审：</b>未核实到强制双盲；以修回多轮为主；众包全周期约11.1个月（个案可短至3–4个月），规划投稿时间预留6–12个月。<b>录用后：</b>优先订阅路线0 APC；Gold OA金额系统内显示（<span class="uflag">未核实、勿引用报告外数字</span>）；版权协议按系统指引。</p>
+<p><b>民办建议：</b>与计算机/运筹方向教师组队互补（方法实现+管理问题定义）；选题结合大连本地制造、港口物流、供应链场景做数据驱动优化；审稿人从近期CAIE同主题论文作者匹配；若被拒且原因为「方法创新不足」，保留数据与代码资产、降级改投更偏应用实现的刊物。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>科研通：https://www.ablesci.com/journal/detail?id=DGLL7r</li>
+<li>LetPub繁中：https://www.letpub.tw/index.php?page=journalapp&view=detail&journalid=2008</li>
+<li>IF 6.55第三方：http://impactfactor.cn/4437.html</li>
+<li>指南(公式附录规范)：https://www.elsevier.com/journals/computers-and-industrial-engineering/0360-8352/guide-for-authors</li>
+<li>中科院佐证：https://www.peipusci.com/news/10645.html ；录用个案：https://www.letpub.com.cn/profile/0753f3</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 19 DKE ===== -->
+<article class="jcard" id="j19">
+<header>
+<span class="jnum">19</span><span class="jtitle">Data &amp; Knowledge Engineering<small>缩写 DKE ｜ Elsevier（Amsterdam）｜1985创刊，月刊，年发文约108篇</small></span>
+<div class="jchips"><span class="tpos narrow">窄赛道备选</span><span class="tcost">订阅APC=0（Elsevier通用政策）</span><span class="tidx pill scie">SCIE</span><span class="rating low">匹配度：中等偏低</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 0169-023X；在线eISSN 1872-6933（第三方目录口径，<b>Elsevier官网eISSN未直接核实、投稿前官网核对</b>）；月刊。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill scie">SCIE（非SSCI；Scopus收录）</span>；均Q2：CS-AI 94/210；CS-IS 107/266（科研通2026-06-17；JustScience标Q2/Q3口径差异记录在案，以最新Q2/Q2为主）。</dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>科研通2026-06-17发布最新IF <b>3.9</b>（↑1.3）；JustScience最新行3.9003。</li><li>历年（发布年口径）：2025发布2.6、2024发布2.7、2023发布2.5、2022发布1.5；<b>各值官方JCR年度对应关系未取得证书，官方精确IF以机构JCR账号为准（<span class="uflag">未核实</span>）</b>。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03升级版：大类计算机科学<b>3区</b>；小类CS-AI 3区、CS-IS 3区；Top否、综述否；不在预警名单（2023-12旧版小类曾为4区）。</dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid（Gold占比约35.08%）；订阅APC=0为Elsevier混合刊通用政策；<b>本刊Gold OA确切APC金额：<span class="uflag">未核实</span>（官网定价页未抓到数字）</b>；投稿费：<span class="uflag">未核实</span>。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网官方中位审稿速度：<span class="uflag">未核实</span>（未取得Journal Insights数值）。</li><li>网友众包(非官方)：平均约12.0个月；评论区个案1–7个月、信息有限不足为据。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方：<span class="uflag">未核实</span>；众包定性「Moderate/较易」主观非官方；年发文量较小（约百篇级）。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/datak/Default.aspx ；指南：https://www.elsevier.com/journals/data-and-knowledge-engineering/0169-023X/guide-for-authors</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>连接Data与Knowledge两领域，研究信息/知识系统设计与有效使用的底层原理；适配方向：数据建模与本体/概念建模、数据库与知识库系统、知识表示与管理、语义/元数据与信息集成、数据工程方法、规则/约束/数据质量、知识图谱与数据驱动知识获取的系统原理。偏「数据/知识模型与系统原理」，不是纯统计分析或纯管理决策；纯商业数据分析论文更宜投DSS/ESWA/CIE。</p>
+<div class="friendly"><b>民办高校友好度：中等（门槛相对低但赛道窄、发文量小、竞争集中于技术圈）。</b>JCR Q2、计算机科学3区，绝对门槛低于前四刊；不看出身、无公开单位歧视；但年发文约百篇、主题偏数据库/概念建模，与本专业偏经管课程结合点有限；官方Guide提示作者身份与研究地点等信息不全的论文可不送审退回。可作为技术类选题可行选项，不宜作为管理应用论文首选。</div>
+<ol class="dr">
+<li>偏离「数据/知识工程原理」、沦为纯应用系统描述或纯业务数据分析→突出数据模型/知识表示/系统机制层面新原理或新框架。</li>
+<li>作者身份、单位、研究地点等元数据不全→可能不送审退回；系统逐位填全、首页作者信息完整。</li>
+<li>概念/形式化贡献弱、与经典数据模型/知识库文献脱节→补ER、本体、规则库、语义集成等理论基础并对比既有方法。</li>
+<li>实验仅玩具数据集、缺可复现细节→公开/标准基准数据、复杂度与质量指标、可复现描述。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/datak/Default.aspx" target="_blank" rel="noopener">投稿系统（EM）</a>
+<a class="btnlink" href="https://www.elsevier.com/journals/data-and-knowledge-engineering/0169-023X/guide-for-authors" target="_blank" rel="noopener">Guide for Authors</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（DKE落地版）</summary><div class="stepinner">
+<p><b>类型：</b>常规研究论文，以系统内Article Type列表为准。<b>必备：</b>稿件（概念框架/模型定义/算法/实验）、强制利益冲突声明、Cover Letter（说明数据或知识工程层面原理贡献）、完整作者与单位信息、数据库/知识工程/语义建模方向推荐审稿人。<b>格式：</b>遵循Guide、模型与符号定义清晰；参考文献规范；图件录用阶段按Elsevier规范提交。</p>
+<p><b>评审：</b>未核实到强制双盲；众包全周期约12个月、个案差异大；官方周期<span class="uflag">未核实</span>。<b>录用后：</b>订阅路线0 APC（通用政策；本刊APC金额<span class="uflag">未核实、勿引用具体数字</span>）；Gold OA以系统报价为准。</p>
+<p><b>民办建议：</b>仅当选题落在数据建模/知识图谱/本体/数据库智能方法时选择；管理决策类选题优先前四刊；注重形式化定义与理论对比、避免「系统演示型」写作；审稿人选近3年DKE及数据工程相关会刊发文者；因发文量小、周期偏长，建议与主投刊并行规划、不要作为唯一投稿目标。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>科研通：https://www.ablesci.com/journal/detail?id=5j2k45</li>
+<li>LetPub：https://www.letpub.com/index.php?journalid=2228&page=journalapp&view=detail ；繁中：https://www.letpub.tw/index.php?journalid=2228&page=journalapp&view=detail</li>
+<li>JustScience(IF历年)：https://sci.justscience.cn/details.html?sci=1&id=3426</li>
+<li>指南（含退稿提示原文）：https://www.elsevier.com/journals/data-and-knowledge-engineering/0169-023X/guide-for-authors</li>
+</ul></details>
+</div></article>
+
+<!-- ===== 20 ISeB ===== -->
+<article class="jcard" id="j20">
+<header>
+<span class="jnum">20</span><span class="jtitle">Information Systems and e-Business Management<small>缩写 ISeB ｜ Springer-Verlag GmbH Germany ｜ 季刊，年发文约22–49篇（小体量）</small></span>
+<div class="jchips"><span class="tpos recommend">稳健SSCI · 口径注意</span><span class="tcost">Hybrid · 费用以录用邮件为准</span><span class="tidx pill ssci">SSCI（非SCIE）</span><span class="rating high">匹配度：高（管理实证）</span></div>
+</header>
+<div class="jbody">
+<div class="dlgrid">
+<div class="ditem"><dt>基本信息</dt><dd>印刷ISSN 1617-9846；在线ISSN 1617-9854；季刊(4 issues/year)；官方引用名Inf Syst E-Bus Manage。</dd></div>
+<div class="ditem"><dt>WOS收录与JCR学科</dt><dd><span class="pill ssci">SSCI（不是SCIE，官网列表无SCIE字样）</span> 另收Scopus、ACM DL、EconLit、RePEc、DBLP、INSPEC、ABDC、BFI等；学科Business、Management。<b>考核前须确认本校SSCI认定与折算规则。</b></dd></div>
+<div class="ditem"><dt>JCR影响因子与分区（并列口径）</dt><dd><ul><li>官网缓存：IF 3.6(2024)、5yr 3.3(2024)；当前官网：IF <b>4.1(2025)</b>、5yr 3.1(2025)；科研通2026-06-17发布IF 4.1（同比+0.5）。</li><li>SSCI Q2：Business 128/323；Management 154/426（科研通转引；JCI：Business Q2 153/324、Management Q3 215/426）；原始JCR表未直接登录核验。</li></ul></dd></div>
+<div class="ditem"><dt>中科院分区（升级版）</dt><dd>2025-03-20：大类管理学<b>4区</b>；小类Business 4区、Management 4区；Top否、综述否；2020/2021/2023/2024版预警名单均不在列。<b>SSCI身份用于考核前先确认单位认定口径。</b></dd></div>
+<div class="ditem"><dt>OA政策与费用</dt><dd>Hybrid；录用后邮件确认单位、选择传统订阅/Open Choice OA并结算费用；<b>Open Choice APC美元金额、投稿费、纸本彩印/超页费：均<span class="uflag">未核实</span></b>（费用页访问受限、指南无金额，不得按网传值预算）；Gold占比两口径66.67%/59.78%并列仅供参考。</dd></div>
+<div class="ditem"><dt>审稿周期（官方 / 网友分列）</dt><dd><ul><li>官网首决中位(Submission to first decision median)：<b>16天</b>（含编辑快速退稿/格式退回）。</li><li>网友全流程周期：<span class="uflag">未核实</span>；进入外审后完整周期无公开数据，建议按SSCI常规3–6个月预留，以系统状态为准。</li></ul></dd></div>
+<div class="ditem"><dt>接受率</dt><dd>官方：<span class="uflag">未核实</span>；第三方录取比例字段空白；结合年发文约20–49篇、SSCI Q2，整体筛选强度偏高。</dd></div>
+<div class="ditem"><dt>投稿系统 / 指南</dt><dd>EM：https://www.editorialmanager.com/iseb （页面标题已确认为本刊；<b>近期切换SNAPP Double Anonymous双盲系统，最终入口以主页Submit按钮落地URL为准，深度子链接<span class="uflag">未核实</span></b>）；指南：https://link.springer.com/journal/10257/submission-guidelines ；评审双盲(SNAPP)。</dd></div>
+</div>
+<div class="sub-h">主题匹配 · 友好度 · 规避要点</div>
+<p>官方定位：IS管理的概念分析、设计与部署及全部e-business主题；兼顾分析/行为/技术三视角，要求清晰business focus与适当IS方法论；欢迎可推广案例研究与规范实证。主题域：Information Modeling、Domain-Specific IS（制造/零售/金融）、E-Business Management（电商、供应链管理IS、电子市场）、IS Development（ERP等大型IS开发）、IT Management、Latest IT Developments（BI系统、Agent技术、工作流管理）。契合：BI/分析采纳与价值、e-business/数字化/平台与供应链IS、业务流程建模与流程挖掘、IS能力/数字化转型实证（问卷+PLS-SEM）、行业IS案例；偏弱：纯算法/底层技术且无管理业务锚点、不可一般化的玩具模型。</p>
+<div class="friendly"><b>民办高校友好度：中等（不看出身、案例与实证友好；但写作准备成本高于SCIE工程刊）。</b>官网无出身限制、可见普通公立高校作者发表记录；不利门槛：SSCI写作与理论对话要求高、年发文小（2025约22篇）、Research稿10,000–15,000词、双盲匿名；适合有真实业务数据/问卷样本的MIS类选题冲SSCI Q2。</div>
+<ol class="dr">
+<li>缺清晰业务锚点、结论不可一般化（要求clear business focus与general applicability，案例须可推广、实证须有明确研究问题）→引言讨论写清管理问题、研究问题与外部效度。</li>
+<li>双盲(SNAPP)匿名不到位：正文删姓名/单位/致谢/基金/"our prior work"，自引第三人称，数据仓库/补充材料身份信息建议匿名，作者单位在系统表单提交。</li>
+<li>声明缺失被returned as incomplete：Competing Interests必需、原始研究必须Data Availability Statement、Author Contribution与Competing Interest须在投稿界面提交。</li>
+<li>体量/格式/文献不符：Research/Systematic Review/Discovery 10,000–15,000词、Research Notes 5,000–8,000词、Viewpoint仅邀稿；摘要150–250词；须交可编辑.docx/LaTeX源文件；参考文献作者-年份括注、第一作者字母序、LTWA缩写期刊名、尽量全DOI（非编号制、非APA7）；SI须为PDF。</li>
+</ol>
+<div class="cbts">
+<a class="btnlink" href="https://www.editorialmanager.com/iseb" target="_blank" rel="noopener">投稿系统（EM/SNAPP）</a>
+<a class="btnlink" href="https://link.springer.com/journal/10257/submission-guidelines" target="_blank" rel="noopener">Submission Guidelines</a>
+</div>
+<details class="stepbox"><summary>分步投稿指南（ISeB落地版 · SNAPP双盲）</summary><div class="stepinner">
+<p><b>账号：</b>系统注册、建议绑定ORCID；定稿作者名单顺序单位（录用后不接受增删作者、调换通讯作者或顺序）。<b>步骤：</b>New Submission → 先选文章类型与词数区间（最常用Research 10,000–15,000词；短篇Research Notes 5,000–8,000词；Viewpoint勿擅自投）→ 匿名标题、摘要150–250词、关键词4–6 → 上传匿名manuscript（.docx优先；数学内容可用LaTeX+Springer模板）→ 系统字段单独填写作者、单位、通讯邮箱、ORCID与各项声明 → 推荐跨国别跨机构混合审稿人（附机构邮箱或可核验身份链接）→ Cover Letter说明business contribution、方法严谨性、scope对应、原创无重复发表、全体作者同意 → 系统合并PDF重点检查无身份泄露 → Approve提交。</p>
+<p><b>文件：</b>匿名manuscript（10pt Times类普通字体、自动页码、表格用Word功能、公式用编辑器）；独立Title Page（作者、单位=机构/系/城市/国家、通讯邮箱、可选ORCID、致谢基金）；Declarations按系统界面与title page两处保持一致；参考文献作者-年份（Becker and Seligman 1996体例）、字母序、全DOI；Data Availability Statement（原始研究必须，鼓励公共仓库DataCite引用、隐私说明获取条件）；图遵循Springer Artwork指南；SI仅PDF；已发表图表/段落须版权许可证据。</p>
+<p><b>评审：</b>双盲(SNAPP Double-Anonymous)；官网仅披露首决中位16天，外审轮次与全流程时长<span class="uflag">未核实</span>；通常经major/minor revision。<b>录用后：</b>两封邮件——先确认单位、选择传统订阅/Open Choice OA与权利费用，再收proof；Proof不允许实质性修改；在线后更正只能走Erratum；APC金额<span class="uflag">未核实</span>。</p>
+<p><b>民办建议：</b>选题公式＝真实业务情境（电商、供应链、SME数字化、BI采纳、流程挖掘）+规范方法（问卷+PLS-SEM/回归、案例、Delphi、系统综述或原型验证）+明确管理启示与一般适用性；单位写官方英文全称+School of Management+Department of Big Data Management and Application，通讯宜高级职称；审稿人选近3年References作者、ABDC B类以上IS活跃学者、跨国别搭配；投稿6–8周无变化可礼貌去信一次；范围/匿名/声明类desk reject整改后可转投ISF等管理实证备选；投稿前务必确认单位SSCI认定口径与折算分值。</p>
+</div></details>
+<details class="srcbox"><summary>数据来源（本卡引用URL）</summary><ul>
+<li>期刊主页/指标：https://link.springer.com/journal/10257 ；https://www.springer.com/journal/10257</li>
+<li>指南(SNAPP双盲/词数/声明)：https://link.springer.com/journal/10257/submission-guidelines</li>
+<li>科研通：https://www.ablesci.com/journal/detail?id=pqqvEp</li>
+<li>辑思编译(SSCI佐证)：https://wdcsci.com/sci/detail/13567</li>
+<li>Scopus：https://www.scopus.com/sources/144936?zone=refpointrank ；院校发表佐证：https://sxy.suda.edu.cn/_s109/0b/74/c13349a330612/page.psp</li>
+</ul></details>
+</div></article>
+</section>
+
+<!-- ============ E. 通用流程 ============ -->
+<section id="process">
+  <div class="sec-h"><h2>四、跨刊通用投稿流程</h2><span class="en">Timeline · Common Workflow</span></div>
+<p class="lead-note">下列七步为20本调研刊共同遵循的投稿链路；各刊官方首决中位差异较大（最短约3天、最长104天，含编辑初筛），外审轮次与全周期以卡片「审稿周期」小节官方值/网友值分列口径为准，勿用单一平均值做时间承诺。</p>
+<div class="tl">
+  <div class="t-time">① 投稿前准备<br><span class="tmeta">约1–2周</span></div>
+  <div class="t-axis"><span class="t-dot"></span></div>
+  <div class="t-card"><b>读指南、备材料、定路线</b>
+    <p>注册并绑定ORCID（ANOR强制要求，其余刊建议提供）；准备单位官方英文全称（School/Department → University → City → China，勿自行音译）；精读目标刊Guide for Authors与投稿范围；准备Cover Letter、原创性/一稿多投声明、通讯作者稳定机构邮箱；按双盲要求另备匿名稿（ISF、EIS、JEIM、ORJ、ISM、ISeB等）。</p>
+  </div>
+
+  <div class="t-time">② 系统注册<br><span class="tmeta">三套系统择一</span></div>
+  <div class="t-axis"><span class="t-dot"></span></div>
+  <div class="t-card"><b>Editorial Manager / ScholarOne Manuscripts / SNAPP</b>
+    <p>按官网Submit按钮实际落地系统注册，勿直接猜测二级URL（JORS、ISeB等刊官网未直给二级地址）；通讯作者机构邮箱保持可收信；作者名单、顺序、单位、通讯位置定稿后再提交（录用后多数刊不接受增删作者或调序）；Springer部分刊已由EM迁移至SNAPP双盲前端，以当前系统为准。</p>
+  </div>
+
+  <div class="t-time">③ 新建投稿<br><span class="tmeta">系统内逐段填写</span></div>
+  <div class="t-axis"><span class="t-dot"></span></div>
+  <div class="t-card"><b>选类型 → 传稿 → 元数据 → 审稿人 → 预览提交</b>
+    <p>选择正确Article Type（Research Article/Review/Technical Note/OR Practice等，类型错配易被初筛退稿）；上传主文档、图表、补充材料与强制声明（Competing Interest、Data Availability、Author Contributions等部分刊须在系统界面单独填写，仅写入正文无效）；逐位添加合著者；推荐2–4名无利益冲突审稿人；选择出版路线（订阅/Open Choice）；核对系统生成的合并PDF后提交，保存稿号。</p>
+  </div>
+
+  <div class="t-time">④ 编辑初筛<br><span class="tmeta">desk-reject高发段</span></div>
+  <div class="t-axis"><span class="t-dot"></span></div>
+  <div class="t-card"><b>编辑不送审即可直接退回</b>
+    <p>高发原因：主题偏离收稿范围；缺强制声明或可编辑源文件；前期会议/预印本成果增量不足；双盲稿件泄露身份；语言质量差、贡献不清；超篇幅/超页数上限（如JIIIS≤25页且要求LaTeX）；作者身份与单位信息不全（DKE指南明示可不送审退回）。初筛不等于外审结果，未送审拒稿应对照意见补强后转投相近刊。</p>
+  </div>
+
+  <div class="t-time">⑤ 同行评审<br><span class="tmeta">外审轮次不等</span></div>
+  <div class="t-axis"><span class="t-dot"></span></div>
+  <div class="t-card"><b>单盲 / 双盲因刊而异，常见Major / Minor Revision</b>
+    <p>多数刊至少2名独立外审；EJOR官方统计2025录用稿98%至少1次Major Revision、平均邀6.43位审稿人；返修在系统以Revision版本提交，须附Response Letter逐条point-by-point回复审稿人，改动处编号标注；不要频繁催稿，官方首决中位之后停滞一段再礼貌询问一次即可（详见下方建议）。</p>
+  </div>
+
+  <div class="t-time">⑥ 录用与OA选择<br><span class="tmeta">收费发生点</span></div>
+  <div class="t-axis"><span class="t-dot"></span></div>
+  <div class="t-card"><b>订阅路线0 APC；选Gold/OA才产生APC</b>
+    <p>订阅（非OA）路线：本手册20本均按订阅路线0发表费口径整理，其中DSS/EJOR/IJPR/JORS/ISM/APJOR等有官网原文；混合期刊可选Open Choice/Gold OA，APC按接受日系统实时报价（已核实金额见各卡，未核实处标注、不填网传数）；双盲刊注意匿名稿与not-for-review完整稿分离提交；版权许可按所选路线签署（订阅多为转让，CC BY保留版权）。</p>
+  </div>
+
+  <div class="t-time">⑦ 校样与见刊<br><span class="tmeta">Proof → DOI → 卷期</span></div>
+  <div class="t-axis"><span class="t-dot"></span></div>
+  <div class="t-card"><b>仅允许校正性修改，先在线先发DOI</b>
+    <p>Proof阶段只改排印/事实性错误，不得新增实质内容；多数刊先以EarlyCite/Advance Online发布并分配DOI，后编入正式卷期；录用到在线天数各刊不同（如EIS 14天、JORS 20天、IMDS相关刊约54天、APJOR官网30天）；提交后续勘误须走Erratum通道，不在校样里大改。</p>
+  </div>
+</div>
+
+<div class="tips">
+<h3>民办高校教师通用建议（来自四组调研文件的横向结论）</h3>
+<ul>
+<li><b>单位如实规范填写：</b>按院系—学校—城市—国家书写标准英文名称，不包装头衔、不虚构合作单位；评审不因出身歧视是本手册选题前提，但不完整或不规范的单位/作者信息会在初筛被退回（DKE等刊指南明示）。</li>
+<li><b>推荐审稿人策略：</b>优先选近2–3年在目标刊/相近刊发文、跨国别与跨机构、无师承与近期合著关系的学者；避开同单位教师、编委本人作为推荐人；系统须填可核验身份（机构邮箱或主页）；回避审稿人仅写明确利益冲突者。</li>
+<li><b>催稿节奏：</b>以官网首决中位为基准，尚未到中位不催；超过官方中位较多、状态长期停滞（如长期With Editor/Awaiting Decision）再礼貌发一次询问邮件，说明稿号、投稿日期、当前状态与询问进度，不反复去信；外审阶段尊重审稿周期。</li>
+<li><b>拒稿后改投策略：</b>先区分「desk reject（范围/格式/增量不足）」还是「外审拒（方法/证据/贡献不足）」；按意见定位短板后定向改投同主题相近刊（如EIS被拒转ITM/ECR、Kybernetes被拒可走Transfer至IMDS/JEIM、纯建模稿在应用刊被拒转运筹刊），不要原文不改重复投稿；投稿前预留多轮外审时间，时间敏感任务优先首决快、接受率相对高的备选刊。</li>
+<li><b>SSCI刊特别提示：</b>JEIM、ECR、ITM、ISeB为SSCI（JORS为SCIE+SSCI双收录），投稿前先确认本校/本单位对SSCI的认定与科研折算口径，避免录用后不被认定；ITM是否另具SCIE身份存在来源冲突，以WoS Master Journal List为准。</li>
+<li><b>选题与组队：</b>技术算法类选题（ESWA/CIE/JIIIS/DKE）宜与运筹/计算机方向合作；管理实证类（ECR/ITM/ISM/JEIM/ISeB）需理论框架+规范方法+管理启示；应用建模类（IJPR/JORS/EJOR/APJOR）要求模型新意与可复现实验；课题组可按「冲刺—主攻—保底」三层各选1–2刊并行规划。</li>
+</ul>
+</div>
+</section>
+
+<!-- ============ F. 术语表 ============ -->
+<section id="glossary">
+  <div class="sec-h"><h2>五、术语表</h2><span class="en">Glossary</span></div>
+<dl class="gloss">
+<div class="gitem"><dt>IF（Impact Factor，影响因子）</dt><dd>Clarivate期刊引证报告（JCR）计算的两年论文被引均值；<b>必须连同发布年份引用</b>，如「JCR2025：IF 9.4」「IF 2.7(2024)」。不同站点表头年度口径常不一致（如官网当前值、科研通最新一轮、LetPub历史标题值、网友实时估算），并列呈现时均标注来源与年份；网友实时估算非正式JIF，不作结论依据。</dd></div>
+<div class="gitem"><dt>JCR（Journal Citation Reports）</dt><dd>Clarivate官方期刊引证报告数据库，发布SCIE/SSCI期刊的IF、五分位区、排名与学科类目；JCR2025数据一般在2026年6月前后发布。第三方站点（LetPub、科研通AbleSci、高校图书馆库、Scopus/CiteScore）为转引或替代指标，分区与IF须以机构订阅的官方WoS/JCR账号当期证书为准；CiteScore、SNIP、SJR不是JCR指标，不得混作IF。</dd></div>
+<div class="gitem"><dt>中科院分区（升级版）</dt><dd>中国科学院文献情报中心期刊分区表（升级版），按大类、小类划分1–4区并标注是否Top；2022年起官方只更新升级版；本手册引用版本为<b>2025年3月（2025-03-20发布）升级版</b>。第三方（LetPub、科研通等）为汇编快照，逐档与Top标注须官方表复核；不在官方预警名单不等于当期分区无变化。</dd></div>
+<div class="gitem"><dt>APC（Article Processing Charge，文章处理费）</dt><dd>仅在作者选择Gold Open Access（付费开放获取）路线时产生的发表费，通常另加VAT/地方税；订阅（非OA）路线原则上不付APC。已核实金额见各卡（如DSS USD 3,280、APJOR US$2,500、ECR $2,890/£1,990/€2,290）；未取得官方金额处统一标「未核实」，不引用第三方缓存或网传报价。</dd></div>
+<div class="gitem"><dt>Hybrid 混合期刊</dt><dd>默认订阅模式（读者机构订阅、作者不付发表费），同时可选Open Choice/Gold OA付费开放的期刊；本手册20本均为Hybrid或订阅型。转型期刊（如ECR）另有Transformative Journal身份与机构Read&amp;Publish协议减免可能；APC随接受日系统报价调整，历史快照价不可直接预算。</dd></div>
+<div class="gitem"><dt>SCIE / SSCI / ESCI</dt><dd>SCIE（Web of Science Science Citation Index Expanded，自然科学工程技术方向）、SSCI（Social Sciences Citation Index，社会科学方向，管理学院多属此类）、ESCI（Emerging Sources Citation Index，原始收录层级、通常不计入正式IF分区口径）。本手册口径：SCIE与SSCI均视为目标收录，双收录刊（JORS：SCIE+SSCI）单独标注；SSCI投稿前确认单位认定；ESCI不在本手册目标内。</dd></div>
+<div class="gitem"><dt>desk-reject（编辑初筛直接拒）</dt><dd>编辑（或助理编辑）在送外审前，因范围不符、格式/声明不全、贡献不足、语言差等直接退回，不经审稿人；官网首决天数（如EIS 104天、ISM 4天、IJPR 3天）包含这类快速决定，不能等同于外审周期。规避要点见各卡「常见desk-reject原因」与流程时间轴第④步。</dd></div>
+<div class="gitem"><dt>三套投稿系统：Editorial Manager / ScholarOne Manuscripts / SNAPP</dt><dd>Editorial Manager（EM，Elsevier/Springer/World Scientific常用，如EJOR、ANOR、APJOR、CAIE）；ScholarOne Manuscripts（T&amp;F、Emerald常用，如EIS、JEIM、ISM、IMDS）；SNAPP（Springer新双盲前端，部分Springer刊由EM迁移，如ITM、ISeB）。入口以期刊官网「Submit」按钮实际跳转为准，勿凭旧链接猜测；注册信息在同一系统内跨刊通用。</dd></div>
+<div class="gitem"><dt>盲审：单盲 single-blind / 双盲 double-anonymous（double-blind）</dt><dd>单盲：审稿人知道作者身份、作者不知道审稿人（如ECR、IJPR、APJOR未核实前勿写死）；双盲：送审稿隐去作者与单位身份，作者信息只在系统表单/独立Title Page提交（如ISF、EIS、JEIM、ORJ、ISM、ISeB、ITM按指南为双盲）；双盲稿须清理正文、PDF元数据、致谢基金与自引语句中的身份痕迹，并另备not-for-review完整稿。JORS等盲态未核实的刊以投稿时系统/指南提示为准。</dd></div>
+<div class="gitem"><dt>On Hold / Under Review（收录资格预警状态）</dt><dd>期刊在WoS/收录库中被暂缓或处于复核预警的状态（如候选Soft Computing被LetPub记录「最新JCR未收录、SCIE On Hold/Under Review」，2026-09-24查询）；此状态下收录资格与IF有效性不确定，不适合作为正式投稿目标，须等官方库恢复正常并复核后再考虑。</dd></div>
+</dl>
+</section>
+
+<!-- ============ G. 数据说明 ============ -->
+<section id="notes">
+  <div class="sec-h"><h2>六、数据说明与免责声明</h2><span class="en">Data Notes · Disclaimer</span></div>
+<div class="notebox">
+<h3>1. 调研日期与数据来源</h3>
+<ul>
+<li>本手册调研与核实日期：<b>2026-11-02</b>；页面数字与结论全部来自四组期刊调研文件（A组 Elsevier 5刊、B组 Springer 6节、C组 Springer+Taylor &amp; Francis 5刊、D组 Emerald+World Scientific 5刊），未以模型记忆补充任何数字。</li>
+<li>官方一手来源：各刊官网主页与 About 页、Guide for Authors / Submission Guidelines、Elsevier Journal Insights、Springer 期刊页与 How-to-publish、Taylor &amp; Francis About/Author Action 页、Emerald 期刊页与作者政策页、World Scientific 主页/OA页/指南；B组另含EURO学会简报类一手材料。</li>
+<li>交叉印证来源（仅作旁证、不单独构成结论）：LetPub、科研通（AbleSci）、Scopus Sources、高校图书馆收录库、dblp、第三方分区汇编（佩普学术等）、网友众包周期与评论；第三方值与官方值冲突时以官方/机构库为准并并列标注。</li>
+<li>每本详情卡末尾「数据来源」折叠区列出该刊调研文件中出现的主要来源URL，供投稿前逐一点开复核。</li>
+</ul>
+</div>
+
+<div class="notebox">
+<h3>2. 「未核实」标注处理规则（诚信口径）</h3>
+<ul>
+<li><b>不填数：</b>凡官方页面未取得确切数值（如多数Springer刊的OA APC、部分刊接受率、官方逐类目Q档、投稿费、外审周期均值），页面统一以「未核实」徽章呈现，不以网传金额、第三方快照价、网友主观比例顶替。</li>
+<li><b>不删除：</b>「未核实」是刻意保留的风险标注，提示投稿前必须复核；并列口径冲突值（如同一年份不同来源IF、旧版分区）均同时列出并写明口径，不择优掩盖。</li>
+<li><b>官方与网友分列：</b>审稿周期分「官网官方口径」与「网友/第三方经验口径」两栏；接受率只采用官网官方百分比（如ISM 3%、EIS 5%、JEIM 7.6%、IMDS 11.4%、IJPR/JORS 12%、Kybernetes 9.5%、APJOR 38%），网友「容易/较易」主观表述不计入接受率；JIIIS官网「作者满意度91%」不是录取率。</li>
+<li><b>投稿前三处必查：</b>①机构Web of Science JCR与Master Journal List复核当期收录状态、IF年份、Q档与SSCI/SCIE身份；②目标刊官网最新Guide for Authors与OA政策页核对APC、篇幅、盲态、声明清单；③投稿系统内实时报价、Article Type列表与合并PDF预览；官网政策与系统状态优先于本手册。</li>
+</ul>
+</div>
+
+<div class="soft-alt">
+<h3>3. Soft Computing 未入选说明（备查、不设详情卡）</h3>
+<p>原候选刊 <b>Soft Computing</b>（Springer；印刷ISSN 1432-7643、在线ISSN 1433-7479；投稿系统 <a href="https://www.editorialmanager.com/soco" target="_blank" rel="noopener">editorialmanager.com/soco</a>；主页 <a href="https://www.springer.com/journal/00500" target="_blank" rel="noopener">springer.com/journal/00500</a>）经调研评估<b>未纳入本手册20本推荐序列</b>，理由如实记录如下：</p>
+<ul>
+<li>收录状态冲突：LetPub（2026-09-24查询记录）显示该刊<b>最新JCR未收录、SCIE处于 On Hold / Under Review 预警状态</b>（<a href="https://www.letpub.com.cn/index.php?page=journalapp&view=detail&journalid=7538" target="_blank" rel="noopener">来源：LetPub journalid=7538</a>）；而Springer官网仍标注SCIE与IF 2.5(2024)，两来源不一致，收录资格不能确认为稳定有效。</li>
+<li>时效风险：官网首决中位约275天，周期极慢，不适合有时间节点要求的民办高校教师投稿规划。</li>
+<li>处理方式：B组调研文件第3节保留该刊备查；正式序列中<b>以 Information Systems and e-Business Management（#j20，SSCI）替换</b>。若日后WoS官方库确认该刊收录恢复，再依据当时官方数据重新评估；当前不应据其历史IF或官网标签安排投稿。指南页备查：<a href="https://link.springer.com/journal/00500/submission-guidelines" target="_blank" rel="noopener">link.springer.com/journal/00500/submission-guidelines</a>。</li>
+</ul>
+</div>
+
+<div class="notebox">
+<h3>4. 免责声明</h3>
+<ul>
+<li>本指南为大连财经学院管理学院「大数据管理与应用」专业教师内部教学科研参考资料，<b>仅供选刊准备与投稿流程参考，不构成任何录用、分区认定或费用结果的保证</b>；不替代各刊官方政策与机构科研管理部门的认定规则。</li>
+<li>期刊收录身份、IF与分区、APC金额、审稿周期、接受率、盲态、篇幅与格式要求均会随官方更新而变化；<b>一切以投稿时点期刊官方页面、投稿系统与机构官方数据库（WoS/JCR、Master Journal List、本校科研认定文件）为准</b>。</li>
+<li>第三方来源（含本手册列出的交叉印证站点）可能滞后或口径不一；引用第三方数字申报职称、项目或考核前，须回溯官方出处并留存当期截图/证书。</li>
+<li>本手册不收取任何第三方代办、代投或润色费用；投稿全程由作者本人通过官方投稿系统完成，警惕以「内部通道、保发表、包录用」名义收费的非官方渠道。</li>
+</ul>
+</div>
+</section>
+
+</main>
+<footer><div class="wrap">
+  <span>大连财经学院管理学院 · 大数据管理与应用专业 · 内部教学科研参考</span>
+  <span>调研与核实日期：2026-11-02 ｜ 以投稿时官方页面为准</span>
+</div></footer>
+
+<script>
+(function () {
+  var pub = document.getElementById('fPub');
+  var typ = document.getElementById('fType');
+  var kw  = document.getElementById('fKw');
+  var reset = document.getElementById('fReset');
+  var body = document.getElementById('ovBody');
+  if (!body) { return; }
+  var rows = Array.prototype.slice.call(body.querySelectorAll('tr[data-pub]'));
+  var noRow = null;
+
+  function ensureNoRow() {
+    if (!noRow) {
+      noRow = document.createElement('tr');
+      noRow.className = 'norow';
+      var td = document.createElement('td');
+      td.colSpan = 12;
+      td.style.padding = '18px';
+      td.style.textAlign = 'center';
+      td.textContent = '当前筛选条件下没有匹配期刊，请调整出版社、收录类型或关键词，或点击「重置筛选」。';
+      noRow.appendChild(td);
+      noRow.style.display = 'none';
+      body.appendChild(noRow);
+    }
+    return noRow;
+  }
+
+  function apply() {
+    var pv = pub ? pub.value : '';
+    var tv = typ ? typ.value : '';
+    var q = kw ? kw.value.trim().toLowerCase() : '';
+    var visible = 0;
+    rows.forEach(function (r) {
+      var ok = true;
+      if (pv && r.getAttribute('data-pub') !== pv) { ok = false; }
+      if (ok && tv && r.getAttribute('data-type') !== tv) { ok = false; }
+      if (ok && q) {
+        var hay = (r.getAttribute('data-key') || '').toLowerCase();
+        var nameCell = r.cells[1] ? r.cells[1].textContent.toLowerCase() : '';
+        if (hay.indexOf(q) === -1 && nameCell.indexOf(q) === -1) { ok = false; }
+      }
+      r.style.display = ok ? '' : 'none';
+      if (ok) { visible += 1; }
+    });
+    var nr = ensureNoRow();
+    nr.style.display = visible === 0 ? '' : 'none';
+  }
+
+  if (pub) { pub.addEventListener('change', apply); }
+  if (typ) { typ.addEventListener('change', apply); }
+  if (kw)  { kw.addEventListener('input', apply); }
+  if (reset) { reset.addEventListener('click', function () {
+    if (pub) { pub.value = ''; }
+    if (typ) { typ.value = ''; }
+    if (kw)  { kw.value = '';  }
+    apply();
+  }); }
+  apply();
+})();
+</script>
+
+<style id="portal-back-style">
+#portal-back{position:fixed;right:14px;bottom:14px;z-index:9999;
+  right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));
+  display:inline-flex;align-items:center;gap:6px;
+  font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:#fff;background:rgba(17,24,39,.82);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:9px 15px;text-decoration:none;
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:.72;transition:opacity .18s,transform .18s}
+#portal-back:hover{opacity:1;transform:translateY(-1px)}
+#portal-back:active{transform:none}
+@media print{#portal-back{display:none}}
+</style>
+<a id="portal-back" href="../../" title="返回资源中心">← 资源中心</a>
+</body>
+</html>
