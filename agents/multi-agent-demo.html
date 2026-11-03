@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多智能体协作原理演示 · 技术报告流水线</title>
+<style>
+/* ============================================================
+   设计令牌（浅色主题）
+   ============================================================ */
+:root{
+  --bg:#eef2f8;
+  --bg-grad-1:#f7f9fd;
+  --bg-grad-2:#e8eef7;
+  --surface:#ffffff;
+  --surface-2:#f7f9fc;
+  --border:#dfe6f0;
+  --border-strong:#c9d5e6;
+  --text:#16202e;
+  --text-2:#41506a;
+  --muted:#7b8aa1;
+  --accent:#3568ef;
+  --accent-soft:#eaf0ff;
+
+  /* 状态色：空闲 / 思考中 / 执行中 / 完成 / 出错 */
+  --s-idle:#8a97ad;
+  --s-idle-bg:#eef1f6;
+  --s-think:#e0910a;
+  --s-think-bg:#fdf3dd;
+  --s-work:#2f6bff;
+  --s-work-bg:#e6eeff;
+  --s-done:#12a074;
+  --s-done-bg:#e2f6ee;
+  --s-error:#e0483f;
+  --s-error-bg:#fde9e7;
+
+  /* 消息类型色 */
+  --m-dispatch:#3b6ef6;
+  --m-data:#0d9488;
+  --m-feedback:#f08c1e;
+  --m-approve:#12a074;
+  --m-final:#d99614;
+  --m-error:#e0483f;
+
+  --radius:14px;
+  --radius-sm:9px;
+  --shadow-sm:0 1px 2px rgba(20,35,60,.06), 0 2px 8px rgba(20,35,60,.05);
+  --shadow-md:0 6px 22px rgba(20,35,60,.10);
+  --shadow-lg:0 16px 44px rgba(20,35,60,.16);
+  --font:"Inter","PingFang SC","Microsoft YaHei","Hiragino Sans GB","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono","SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font);
+  background:
+    radial-gradient(1200px 600px at 12% -10%, #ffffff 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+}
+
+/* ============================================================
+   顶栏
+   ============================================================ */
+.topbar{
+  position:sticky; top:0; z-index:60;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:14px 22px 12px;
+}
+.topbar-inner{max-width:1560px;margin:0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;}
+.brand-logo{
+  width:42px;height:42px;border-radius:12px;flex:none;
+  background:linear-gradient(135deg,#3568ef,#6f4bf0);
+  color:#fff;display:grid;place-items:center;font-size:20px;
+  box-shadow:0 4px 14px rgba(53,104,239,.32);
+}
+.brand h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.2px;line-height:1.25;}
+.brand p{margin:2px 0 0;font-size:12.5px;color:var(--muted);}
+.task-chip{
+  margin-left:auto;display:flex;align-items:center;gap:9px;
+  background:linear-gradient(180deg,#f2f6ff,#e9effe);
+  border:1px solid #cfdcff;border-radius:999px;
+  padding:7px 15px;font-size:12.5px;color:#2a4c9e;max-width:52ch;
+}
+.task-chip b{font-weight:700;color:#1c3a86;}
+.task-chip .tag{
+  font-size:10.5px;font-weight:700;letter-spacing:.6px;
+  background:#3568ef;color:#fff;border-radius:999px;padding:2px 8px;flex:none;
+}
+
+/* ============================================================
+   控制条
+   ============================================================ */
+.controls{
+  max-width:1560px;margin:14px auto 0;padding:0 22px;
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+}
+.ctrl-panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);
+  padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.btn{
+  font-family:inherit;font-size:13.5px;font-weight:600;
+  border:1px solid var(--border-strong);background:#fff;color:var(--text);
+  border-radius:9px;padding:8px 15px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:transform .12s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+.btn:hover:not(:disabled){background:#f2f6fd;border-color:#a9bfe8;box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+.btn:active:not(:disabled){transform:translateY(0);}
+.btn:disabled{opacity:.42;cursor:not-allowed;}
+.btn.primary{
+  background:linear-gradient(180deg,#4173f5,#2f5fe0);border-color:#2a55cf;color:#fff;
+  box-shadow:0 3px 10px rgba(47,95,224,.28);
+}
+.btn.primary:hover:not(:disabled){background:linear-gradient(180deg,#4c7cf8,#3565e6);}
+.btn.ghost{background:transparent;border-style:dashed;color:var(--text-2);}
+.btn .ico{font-size:14px;line-height:1;}
+
+.speed-box{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--text-2);font-weight:600;}
+.speed-box input[type=range]{
+  -webkit-appearance:none;appearance:none;width:126px;height:4px;border-radius:99px;
+  background:linear-gradient(90deg,#3568ef var(--sp,50%), #dde4ef var(--sp,50%));outline:none;
+}
+.speed-box input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+  background:#fff;border:3px solid #3568ef;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.speed-box input[type=range]::-moz-range-thumb{
+  width:15px;height:15px;border-radius:50%;background:#fff;border:3px solid #3568ef;cursor:pointer;
+}
+.speed-val{min-width:38px;color:var(--accent);font-variant-numeric:tabular-nums;}
+
+/* 进度 */
+.progress-wrap{display:flex;align-items:center;gap:11px;flex:1;min-width:220px;}
+.progress-track{flex:1;height:7px;border-radius:99px;background:#e5eaf3;overflow:hidden;min-width:110px;}
+.progress-fill{
+  height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,#3b6ef6,#7a5cf0);
+  transition:width .35s cubic-bezier(.4,0,.2,1);
+}
+.progress-text{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600;}
+
+/* 状态图例 */
+.legend{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+.legend-item{
+  display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;
+  padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--text-2);
+}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex:none;}
+.lg-idle .legend-dot{background:var(--s-idle);}
+.lg-think .legend-dot{background:var(--s-think);}
+.lg-work  .legend-dot{background:var(--s-work);}
+.lg-done  .legend-dot{background:var(--s-done);}
+.lg-error .legend-dot{background:var(--s-error);}
+
+/* ============================================================
+   主布局
+   ============================================================ */
+.shell{max-width:1560px;margin:18px auto 40px;padding:0 22px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px;align-items:start;}
+.col-left{display:flex;flex-direction:column;gap:16px;min-width:0;}
+.panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.panel-head{
+  display:flex;align-items:center;gap:10px;padding:11px 16px;
+  border-bottom:1px solid var(--border);background:linear-gradient(180deg,#fbfcfe,#f5f8fc);
+}
+.panel-head h2{margin:0;font-size:13.5px;font-weight:700;letter-spacing:.2px;}
+.panel-head .sub{font-size:11.5px;color:var(--muted);font-weight:500;}
+.panel-head .spacer{margin-left:auto;}
+
+/* ============================================================
+   舞台（智能体 + 连线）
+   ============================================================ */
+.stage{position:relative;min-height:760px;height:760px;padding:14px;isolation:isolate;}
+#wires{position:absolute;left:0;top:0;z-index:1;overflow:visible;pointer-events:none;}
+.wire{
+  fill:none;stroke:#c8d4e6;stroke-width:1.7;stroke-dasharray:5 6;
+  transition:stroke .3s ease, stroke-width .3s ease, opacity .3s ease;
+}
+.wire.idle{opacity:.55;}
+.wire.used{stroke-dasharray:none;opacity:.85;}
+.wire.live{stroke-width:2.8;stroke-dasharray:9 7;animation:dashflow .55s linear infinite;}
+@keyframes dashflow{to{stroke-dashoffset:-32;}}
+
+.agent-card{
+  position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);
+  width:196px;z-index:3;
+  background:var(--surface);border:1.5px solid var(--border);border-radius:13px;
+  padding:11px 12px 10px;cursor:pointer;
+  box-shadow:var(--shadow-sm);
+  transition:border-color .25s ease, box-shadow .25s ease, transform .2s ease;
+}
+.agent-card:hover{transform:translate(-50%,-50%) translateY(-2px);box-shadow:var(--shadow-md);}
+.agent-card.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(53,104,239,.14), var(--shadow-md);}
+.agent-card.hub-card{
+  background:linear-gradient(180deg,#1f2a3d,#151d2c);color:#eaf0fa;border-color:#2b3a54;
+}
+.agent-card.hub-card .card-role{color:#9db0cc;}
+.agent-card.hub-card .card-duty{color:#c2d0e4;}
+.agent-card.hub-card .tool-pill{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.16);color:#d6e2f2;}
+.agent-card.hub-card .io-row{border-top-color:rgba(255,255,255,.12);}
+.agent-card.hub-card .io-k{color:#8ea3c2;}
+.agent-card.hub-card .io-v{color:#cfdaea;}
+
+.card-top{display:flex;align-items:center;gap:9px;}
+.avatar{
+  width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;
+  font-size:17px;background:var(--surface-2);border:1px solid var(--border);
+}
+.hub-card .avatar{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);}
+.card-title{min-width:0;flex:1;}
+.card-name{font-size:13.5px;font-weight:700;line-height:1.2;white-space:nowrap;}
+.card-role{
+  font-size:10.5px;color:var(--muted);font-weight:600;margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.state-badge{
+  font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap;flex:none;
+  background:var(--s-idle-bg);color:var(--s-idle);border:1px solid transparent;
+  transition:background .25s, color .25s;
+}
+.card-duty{font-size:11.5px;color:var(--text-2);margin:8px 0 7px;line-height:1.5;min-height:34px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-io{margin-bottom:8px;}
+.io-row{
+  display:flex;gap:6px;align-items:baseline;font-size:10px;
+  border-top:1px dashed var(--border);padding-top:4px;margin-top:4px;color:var(--muted);
+}
+.io-k{
+  font-weight:800;color:var(--muted);background:#eef2f8;border-radius:4px;
+  padding:1px 5px;flex:none;font-size:9.5px;
+}
+.io-v{color:var(--text-2);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.card-meta{display:flex;flex-wrap:wrap;gap:4px;}
+.tool-pill{
+  font-size:10px;font-weight:600;padding:2.5px 7px;border-radius:6px;
+  background:#f1f5fb;border:1px solid var(--border);color:var(--text-2);
+}
+
+/* 状态皮肤 */
+.agent-card[data-state="idle"]{border-color:var(--border);}
+.agent-card[data-state="thinking"]{border-color:var(--s-think);box-shadow:0 0 0 3px rgba(224,145,10,.13), var(--shadow-sm);}
+.agent-card[data-state="thinking"] .state-badge{background:var(--s-think-bg);color:var(--s-think);}
+.agent-card[data-state="thinking"] .avatar{animation:breathe 1.4s ease-in-out infinite;}
+.agent-card[data-state="working"]{border-color:var(--s-work);box-shadow:0 0 0 3px rgba(47,107,255,.14), var(--shadow-md);}
+.agent-card[data-state="working"] .state-badge{background:var(--s-work-bg);color:var(--s-work);}
+.agent-card[data-state="working"] .avatar{animation:spinPulse 1.05s linear infinite;}
+.agent-card[data-state="done"]{border-color:var(--s-done);}
+.agent-card[data-state="done"] .state-badge{background:var(--s-done-bg);color:var(--s-done);}
+.agent-card[data-state="error"]{border-color:var(--s-error);box-shadow:0 0 0 3px rgba(224,72,63,.15), var(--shadow-md);animation:shake .5s ease;}
+.agent-card[data-state="error"] .state-badge{background:var(--s-error-bg);color:var(--s-error);}
+.agent-card[data-state="error"] .avatar{animation:jitter .55s ease-in-out infinite;}
+
+@keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+@keyframes spinPulse{0%{transform:rotate(0) scale(1);}50%{transform:rotate(180deg) scale(1.08);}100%{transform:rotate(360deg) scale(1);}}
+@keyframes jitter{0%,100%{transform:translateX(0);}25%{transform:translateX(-2px);}75%{transform:translateX(2px);}}
+@keyframes shake{0%,100%{transform:translate(-50%,-50%);}20%{transform:translate(calc(-50% - 5px),-50%);}40%{transform:translate(calc(-50% + 5px),-50%);}60%{transform:translate(calc(-50% - 3px),-50%);}80%{transform:translate(calc(-50% + 3px),-50%);}}
+
+/* 卡片内工作浮层 */
+.work-strip{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:-13px;
+  background:#1f2a3d;color:#e8eef8;font-size:10.5px;font-weight:600;
+  padding:3px 9px;border-radius:999px;white-space:nowrap;z-index:5;
+  box-shadow:0 3px 10px rgba(20,30,50,.25);pointer-events:none;
+}
+.work-strip::before{
+  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:#7fd0ff;margin-right:6px;vertical-align:middle;animation:breathe 1s infinite;
+}
+.card-toast{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:-30px;z-index:8;
+  background:#223049;color:#eaf1fb;font-size:10px;font-weight:600;
+  padding:4px 8px;border-radius:7px;width:184px;max-width:184px;text-align:center;
+  line-height:1.45;
+  box-shadow:0 5px 14px rgba(20,30,50,.28);pointer-events:none;
+  animation:toastUp 2.4s ease forwards;
+}
+@keyframes toastUp{
+  0%{opacity:0;transform:translate(-50%,6px);}
+  14%{opacity:1;transform:translate(-50%,0);}
+  76%{opacity:1;transform:translate(-50%,0);}
+  100%{opacity:0;transform:translate(-50%,-8px);}
+}
+
+/* 飞行消息气泡 */
+.packet{
+  position:absolute;left:0;top:0;z-index:20;pointer-events:none;
+  max-width:236px;padding:8px 11px;border-radius:11px;
+  background:#fff;border:1.5px solid var(--pk,#3568ef);
+  box-shadow:0 10px 26px rgba(20,35,60,.20);
+  font-size:11.5px;color:var(--text);line-height:1.45;
+  will-change:transform,opacity;
+}
+.packet::after{
+  content:"";position:absolute;left:50%;bottom:-7px;margin-left:-6px;
+  width:11px;height:11px;background:#fff;border-right:1.5px solid var(--pk,#3568ef);
+  border-bottom:1.5px solid var(--pk,#3568ef);transform:rotate(45deg);
+}
+.packet .pk-from{
+  display:inline-block;font-size:10px;font-weight:700;color:var(--pk,#3568ef);
+  margin-bottom:3px;letter-spacing:.3px;
+}
+.packet .pk-text{display:block;max-width:212px;}
+
+/* ============================================================
+   教学说明面板
+   ============================================================ */
+.teach{padding:16px 18px 18px;}
+.teach-top{display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap;}
+.step-chip{
+  font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff;
+  background:linear-gradient(135deg,#3568ef,#6f4bf0);border-radius:6px;padding:3px 9px;
+}
+.teach h3{margin:0;font-size:15.5px;font-weight:700;}
+.teach .problem{
+  font-size:13.5px;color:var(--text-2);margin:0 0 12px;line-height:1.75;
+  background:var(--surface-2);border-left:3px solid var(--accent);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:11px 14px;
+}
+.why{
+  display:flex;gap:11px;align-items:flex-start;
+  background:linear-gradient(180deg,#fff9ec,#fff5e2);border:1px solid #f3dfb8;
+  border-radius:var(--radius-sm);padding:11px 14px;
+}
+.why .why-ico{font-size:16px;line-height:1.5;flex:none;}
+.why .why-body{font-size:13px;color:#6b4d16;line-height:1.7;}
+.why b{color:#5a3d0d;}
+.teach.done .problem{background:#eaf7f1;border-left-color:var(--s-done);}
+.teach.done .why{background:linear-gradient(180deg,#eefaf4,#e2f5ec);border-color:#bde6d4;}
+.teach.done .why .why-body{color:#14604a;}
+
+/* ============================================================
+   详情面板
+   ============================================================ */
+.side{position:sticky;top:132px;}
+.detail-body{padding:14px 16px 18px;max-height:calc(100vh - 190px);overflow:auto;}
+.detail-hero{display:flex;gap:12px;align-items:center;margin-bottom:14px;}
+.detail-hero .avatar{width:46px;height:46px;font-size:22px;border-radius:13px;}
+.dh-text{min-width:0;flex:1;}
+.dh-name{font-size:16px;font-weight:700;line-height:1.25;}
+.dh-role{font-size:11.5px;color:var(--muted);font-weight:600;}
+.dsec{margin-bottom:15px;}
+.dsec-title{
+  font-size:11px;font-weight:800;letter-spacing:.7px;color:var(--muted);
+  margin:0 0 7px;display:flex;align-items:center;gap:6px;
+}
+.dsec-title::after{content:"";flex:1;height:1px;background:var(--border);}
+.fact-grid{display:grid;gap:6px;}
+.fact-row{
+  display:grid;grid-template-columns:52px 1fr;gap:9px;align-items:start;
+  font-size:12px;line-height:1.6;
+}
+.fact-key{font-weight:700;color:var(--muted);font-size:11px;padding-top:1px;}
+.fact-val{color:var(--text-2);}
+.fact-val .mini{
+  display:inline-block;background:#f1f5fb;border:1px solid var(--border);
+  border-radius:6px;padding:1.5px 6px;margin:0 4px 4px 0;font-size:10.5px;font-weight:600;color:var(--text-2);
+}
+pre.code{
+  margin:0;background:#111a29;color:#d6e2f4;border-radius:var(--radius-sm);
+  padding:12px 13px;font-family:var(--mono);font-size:11px;line-height:1.72;
+  white-space:pre-wrap;word-break:break-word;overflow-x:auto;
+}
+pre.code .k{color:#7fc4ff;font-weight:700;}
+pre.code .c{color:#6f829e;font-style:italic;}
+.ctx-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
+.ctx-item{
+  background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--m-data);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:7px 10px;font-size:11.5px;line-height:1.55;color:var(--text-2);
+}
+.ctx-item .ctx-from{display:block;font-weight:700;font-size:10.5px;color:var(--m-data);margin-bottom:2px;}
+.ctx-item.err{border-left-color:var(--m-error);}
+.ctx-item.err .ctx-from{color:var(--m-error);}
+.empty-note{
+  font-size:12px;color:var(--muted);background:var(--surface-2);border:1px dashed var(--border-strong);
+  border-radius:var(--radius-sm);padding:12px;text-align:center;
+}
+.follow-toggle{
+  font-size:11px;font-weight:700;border:1px solid var(--border-strong);background:#fff;
+  color:var(--text-2);border-radius:999px;padding:3px 10px;cursor:pointer;font-family:inherit;
+}
+.follow-toggle.on{background:var(--accent-soft);border-color:#b9cdfb;color:var(--accent);}
+
+/* ============================================================
+   时间线
+   ============================================================ */
+.timeline{max-height:290px;overflow:auto;padding:8px 16px 16px;}
+.tl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;}
+.tl-item{
+  display:grid;grid-template-columns:64px 14px 1fr;gap:10px;align-items:start;
+  padding:7px 0;border-bottom:1px dashed var(--border);animation:rowIn .35s ease;
+}
+.tl-item:last-child{border-bottom:none;}
+@keyframes rowIn{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:none;}}
+.tl-time{font-family:var(--mono);font-size:10.5px;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums;}
+.tl-rail{position:relative;display:flex;justify-content:center;padding-top:5px;}
+.tl-rail::before{content:"";position:absolute;top:14px;bottom:-14px;width:1.5px;background:var(--border);}
+.tl-item:last-child .tl-rail::before{display:none;}
+.tl-dot{width:9px;height:9px;border-radius:50%;background:var(--tlc,#8a97ad);position:relative;z-index:1;box-shadow:0 0 0 3px #fff;}
+.tl-main{min-width:0;}
+.tl-title{font-size:12.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.tl-kind{font-size:9.5px;font-weight:800;letter-spacing:.4px;padding:1.5px 6px;border-radius:5px;background:var(--surface-2);border:1px solid var(--border);color:var(--tlc);}
+.tl-detail{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.55;}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width:1180px){
+  .shell{grid-template-columns:1fr;}
+  .side{position:static;}
+  .detail-body{max-height:none;}
+}
+@media (max-width:880px){
+  .stage{
+    display:flex;flex-direction:column;align-items:center;gap:16px;
+    height:auto;min-height:0;padding:16px 12px 24px;
+  }
+  .agent-card{position:static;transform:none;width:min(340px,100%);}
+  .agent-card:hover{transform:translateY(-2px);}
+  .agent-card.selected{transform:translateY(-2px);}
+  .card-duty{min-height:0;}
+  .work-strip{position:static;transform:none;margin-top:8px;display:inline-block;}
+  .card-toast{position:static;transform:none;margin-top:6px;animation:none;}
+  .topbar{padding:12px 14px 10px;}
+  .controls{padding:0 14px;}
+  .shell{padding:0 14px;}
+  .task-chip{margin-left:0;max-width:100%;}
+}
+@media (max-width:560px){
+  .brand h1{font-size:15px;}
+  .btn{padding:7px 12px;font-size:12.5px;}
+  .tl-item{grid-template-columns:52px 12px 1fr;gap:8px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-logo">◈</div>
+      <div>
+        <h1>多智能体协作原理演示</h1>
+        <p>一次完整的「任务下发 → 分工执行 → 评审反馈 → 迭代收敛 → 汇总交付」全链路消息流</p>
+      </div>
+    </div>
+    <div class="task-chip">
+      <span class="tag">TASK</span>
+      <span>调研并撰写 <b>《多智能体协作在企业内的落地》</b> 技术报告，8,000 字以内，需给出可执行方案</span>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="ctrl-panel">
+    <button class="btn primary" id="btnPlay"><span class="ico">▶</span><span id="playLabel">自动播放</span></button>
+    <button class="btn" id="btnStep"><span class="ico">⏭</span>单步执行</button>
+    <button class="btn ghost" id="btnReset"><span class="ico">↺</span>重置</button>
+    <div class="speed-box">
+      <span>速度</span>
+      <input type="range" id="speed" min="0.5" max="3" step="0.25" value="1">
+      <span class="speed-val" id="speedVal">1.00×</span>
+    </div>
+  </div>
+
+  <div class="ctrl-panel" style="flex:1;min-width:260px">
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">步骤 0 / 16</div>
+    </div>
+  </div>
+
+  <div class="ctrl-panel">
+    <div class="legend">
+      <span class="legend-item lg-idle"><span class="legend-dot"></span>空闲</span>
+      <span class="legend-item lg-think"><span class="legend-dot"></span>思考中</span>
+      <span class="legend-item lg-work"><span class="legend-dot"></span>执行中</span>
+      <span class="legend-item lg-done"><span class="legend-dot"></span>完成</span>
+      <span class="legend-item lg-error"><span class="legend-dot"></span>出错</span>
+    </div>
+  </div>
+</div>
+
+<main class="shell">
+  <div class="col-left">
+
+    <!-- ============ 舞台 ============ -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>协作拓扑图</h2>
+        <span class="sub">点击任一智能体查看它的提示词 / 上下文 / 产出</span>
+        <span class="spacer"></span>
+        <span class="sub" id="wireHint">实线 = 已发生通信　虚线 = 拓扑关系</span>
+      </div>
+      <div class="stage" id="stage">
+        <svg id="wires" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </section>
+
+    <!-- ============ 教学说明 ============ -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>这一步在解决什么问题</h2>
+        <span class="spacer"></span>
+        <span class="sub" id="teachStep">尚未开始</span>
+      </div>
+      <div class="teach" id="teach">
+        <div class="teach-top">
+          <span class="step-chip" id="teachChip">READY</span>
+          <h3 id="teachTitle">点击「自动播放」或「单步执行」开始演示</h3>
+        </div>
+        <p class="problem" id="teachProblem">
+          下面这张图展示了 1 个编排器 + 5 个专业智能体的协作拓扑。请注意观察三件事：
+          <b>①</b> 谁在给谁派单（上下级不等于有通信），<b>②</b> 消息以什么形态传递（结构化产物，不是聊天记录），
+          <b>③</b> 评审意见如何回到链路上形成闭环。
+        </p>
+        <div class="why">
+          <div class="why-ico">💡</div>
+          <div class="why-body" id="teachWhy">
+            <b>整体教学目标：</b>理解多智能体协作的三条主线 —— <b>分工</b>（为什么必须有规划者）、
+            <b>交接</b>（消息该长什么样）、<b>闭环</b>（评审如何真正改变产出）。
+            全程共 16 步，其中第 4 步是<b>刻意保留的真实故障</b>，用来演示错误处理与重试。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 时间线 ============ -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>执行时间线</h2>
+        <span class="sub">逐步记录每一次消息收发、状态变化与产出</span>
+        <span class="spacer"></span>
+        <span class="sub" id="tlCount">0 条记录</span>
+      </div>
+      <div class="timeline">
+        <ol class="tl-list" id="tlList">
+          <li class="tl-item" style="border-bottom:none">
+            <div class="tl-time">T+00:00</div>
+            <div class="tl-rail"><span class="tl-dot" style="background:#8a97ad"></span></div>
+            <div class="tl-main">
+              <div class="tl-title">等待开始</div>
+              <div class="tl-detail">点击「自动播放」进入自动演示，或「单步执行」逐帧观察每一步的因果关系。</div>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============ 详情面板 ============ -->
+  <aside class="panel side">
+    <div class="panel-head">
+      <h2>智能体详情</h2>
+      <span class="spacer"></span>
+      <button class="follow-toggle on" id="followBtn" title="自动跟随当前正在工作的智能体">● 自动跟随</button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </aside>
+</main>
+
+<script>
+"use strict";
+
+/* ============================================================
+   1. 角色定义
+   ============================================================ */
+const AGENTS = {
+  hub: {
+    key:"hub", name:"编排器", icon:"🎛️", role:"Orchestrator · 调度中枢", isHub:true,
+    duty:"接收任务、路由消息、维护共享上下文、判定流程收敛",
+    tools:["消息总线","状态与预算控制"],
+    input:"用户原始需求与约束条件",
+    output:"最终交付物 + 可追溯执行轨迹",
+    prompt:`你是「编排器」，多智能体协作的调度中枢。
+
+职责：分发任务、路由消息、维护共享上下文、判定流程是否收敛。
+工作准则：
+1. 只向满足前置条件的角色分发任务，不做无谓的广播；
+2. 消息必须结构化——包含「任务项 / 交付物 / 验收标准」三要素；
+3. 失败时先重试一次，仍失败则上报缺口而非静默跳过；
+4. 跟踪全局预算（轮次 / 时长 / token），避免无限迭代。
+
+约束：你只做调度与裁决，不亲自产出业务内容。`,
+    instr:"等待任务接入。"
+  },
+  planner: {
+    key:"planner", name:"规划者", icon:"🗺️", role:"Planner · 任务拆解",
+    duty:"把模糊目标转成可执行、可验收的子任务序列",
+    tools:["任务分解器","依赖图引擎"],
+    input:"原始需求 + 约束条件",
+    output:"结构化执行计划（子任务 / 依赖 / 验收标准）",
+    prompt:`你是「规划者」，多智能体协作中的任务拆解角色。
+
+职责：把模糊目标转化为可执行、可验证的子任务序列。
+工作准则：
+1. 先确认目标边界与约束，再动手拆解；
+2. 每个子任务必须写清「输入 / 输出 / 验收标准」；
+3. 显式标注子任务之间的依赖关系，并指出哪些可并行；
+4. 判断需要哪几个专业角色参与，并给出分工建议。
+
+约束：只输出计划，不执行任何子任务；不臆造事实性结论。`,
+    instr:"等待任务接入。"
+  },
+  retriever: {
+    key:"retriever", name:"检索者", icon:"🔍", role:"Retriever · 证据获取",
+    duty:"执行检索子任务，产出带来源与可信度评级的结构化证据",
+    tools:["搜索工具","文档解析"],
+    input:"检索子任务 + 关键词 + 时间范围",
+    output:"证据卡片集合（标题 / 摘要 / 来源 / 可信度 / 缺口声明）",
+    prompt:`你是「检索者」，负责为报告收集可核查的外部证据。
+
+职责：把检索子任务转化为具体检索动作，产出结构化证据卡片。
+工作准则：
+1. 明确检索关键词、来源类型与时间范围；
+2. 每条证据必须附来源 URL 与可信度评级（A/B/C）；
+3. 只保留与子任务直接相关的证据，去重、合并同类项；
+4. 找不到证据时如实声明缺口，绝不编造或外推。
+
+工具：搜索工具、网页抓取、文档解析。`,
+    instr:"等待子任务分发。"
+  },
+  executor: {
+    key:"executor", name:"执行者", icon:"✍️", role:"Executor · 内容生产",
+    duty:"依据计划与证据产出正文，并按评审意见做定点修订",
+    tools:["文档生成器","引用格式化"],
+    input:"执行计划 + 证据卡片 + 大纲",
+    output:"报告初稿 V1 / 修订稿 V2",
+    prompt:`你是「执行者」，负责依据计划与证据撰写报告正文。
+
+职责：把结构化输入转化为高质量初稿。
+工作准则：
+1. 严格遵循规划者给出的大纲与章节顺序，不擅自改结构；
+2. 每一处事实性陈述都必须能对应到一条证据编号；
+3. 保持术语、数字、时间口径前后一致；
+4. 收到评审意见后，只做有依据的定点修订，不随意重写其他段落。
+
+工具：文档生成器、引用格式化、术语表。`,
+    instr:"等待证据与大纲。"
+  },
+  reviewer: {
+    key:"reviewer", name:"评审者", icon:"⚖️", role:"Reviewer · 质量门禁",
+    duty:"按验收标准逐项质检，输出可执行修改意见并决定放行与否",
+    tools:["校验规则集","评分卡"],
+    input:"草稿 + 执行计划 + 验收标准",
+    output:"评审报告（问题清单 / 严重级别 / 放行结论）",
+    prompt:`你是「评审者」，独立于生成链路，负责质量把关与放行决策。
+
+职责：按验收标准逐项检查草稿，输出可执行的修改意见。
+工作准则：
+1. 逐条对照验收标准，不做主观偏好式评价；
+2. 每个问题必须定位到具体章节，并给出明确的修改方向；
+3. 标注严重级别（阻断 / 建议）；
+4. 给出明确结论：放行 或 打回。
+
+原则：你不替执行者改写正文，只指出问题。`,
+    instr:"等待送审稿。"
+  },
+  aggregator: {
+    key:"aggregator", name:"汇总者", icon:"📦", role:"Aggregator · 交付收口",
+    duty:"统一格式术语，组装为可直接使用的最终交付物",
+    tools:["合并器","目录生成器"],
+    input:"通过评审的正文 + 引用清单 + 元数据",
+    output:"终稿报告 + 执行摘要 + 引用清单",
+    prompt:`你是「汇总者」，负责把通过评审的内容收敛为可交付物。
+
+职责：统一格式、术语与元数据，生成终稿与摘要。
+工作准则：
+1. 以评审通过的版本为唯一内容来源；
+2. 统一标题层级、编号、图表编号与引用格式；
+3. 生成目录、执行摘要、术语表与引用清单；
+4. 不引入任何新的事实性内容。
+
+工具：合并器、目录生成器、导出器。`,
+    instr:"等待移交内容。"
+  }
+};
+
+/* 状态元数据 */
+const STATE_META = {
+  idle:    {label:"空闲",   color:"var(--s-idle)"},
+  thinking:{label:"思考中", color:"var(--s-think)"},
+  working: {label:"执行中", color:"var(--s-work)"},
+  done:    {label:"完成",   color:"var(--s-done)"},
+  error:   {label:"出错",   color:"var(--s-error)"}
+};
+
+/* 消息类型 */
+const KINDS = {
+  dispatch:{label:"任务分发", color:"var(--m-dispatch)", hex:"#3b6ef6"},
+  data:    {label:"数据交付", color:"var(--m-data)",     hex:"#0d9488"},
+  feedback:{label:"评审反馈", color:"var(--m-feedback)", hex:"#f08c1e"},
+  approve: {label:"质量放行", color:"var(--m-approve)",  hex:"#12a074"},
+  final:   {label:"最终交付", color:"var(--m-final)",    hex:"#d99614"},
+  error:   {label:"异常事件", color:"var(--m-error)",    hex:"#e0483f"}
+};
+
+/* ============================================================
+   2. 拓扑：位置与连线
+   ============================================================ */
+const NODES = {
+  hub:        {x:50, y:50},
+  planner:    {x:50, y:15},
+  retriever:  {x:80, y:32},
+  executor:   {x:80, y:70},
+  reviewer:   {x:22, y:70},
+  aggregator: {x:22, y:32}
+};
+
+/* 连线定义：from -> to，curve = 弧度（像素，正值向法线方向鼓起） */
+const EDGES = [
+  {id:"e-hub-planner",   from:"hub",        to:"planner",    curve:0},
+  {id:"e-planner-ret",   from:"planner",    to:"retriever",  curve:-22},
+  {id:"e-ret-exec",      from:"retriever",  to:"executor",   curve:0},
+  {id:"e-exec-rev",      from:"executor",   to:"reviewer",   curve:0},
+  {id:"e-rev-exec",      from:"reviewer",   to:"executor",   curve:58},
+  {id:"e-rev-agg",       from:"reviewer",   to:"aggregator", curve:0},
+  {id:"e-agg-hub",       from:"aggregator", to:"hub",        curve:-20}
+];
+
+/* ============================================================
+   3. 剧本：16 步协作流程
+   ============================================================ */
+const SCRIPT = [
+{
+  type:"dispatch", kind:"dispatch", from:"hub", to:"planner",
+  title:"任务下发",
+  bubble:"调研并撰写《多智能体协作在企业内的落地》技术报告，8,000 字以内，需给出可执行方案",
+  instr:{planner:"接收原始需求，请先确认目标边界与约束条件。"},
+  ctx:{planner:[{from:"编排器", text:"原始需求：调研并撰写《多智能体协作在企业内的落地》技术报告，8,000 字以内，需给出可执行方案。约束：必须含可落地步骤、需标注证据来源。"}]},
+  after:{planner:"idle"},
+  dur:1500,
+  teach:{
+    h:"步骤 1 · 把目标交到规划者手里",
+    p:"任何多智能体系统的第一步都不是「干活」，而是把目标交给一个能把模糊需求拆开的角色。如果任务一进来就让 5 个智能体各自去猜整体目标，它们会各写各的、互不对齐——最后只能靠人工缝合。",
+    why:"为什么需要「编排器」：它是全系统唯一的入口与路由中枢，负责决定「谁、在什么时候、该做什么」。没有它，智能体之间的自发互调会带来混乱、重复劳动与不可预测的调用开销。"
+  }
+},
+{
+  type:"work", kind:"dispatch", from:"planner",
+  title:"任务拆解 · 产出执行计划",
+  instr:{planner:"请把上述需求拆解为可执行的子任务序列，标注依赖关系与验收标准。"},
+  output:{planner:
+`《执行计划 v1》
+① 检索子任务 —— 收集 2024–2025 年多智能体落地案例 4 篇
+   验收：来源可核查、可信度 ≥ B、覆盖金融/制造/客服三类场景
+② 大纲子任务 —— 确定 6 章结构与每章核心论点
+   验收：章节齐备、论点与证据可对应
+③ 撰写子任务 —— 按大纲生成正文并逐条标注引用编号
+   验收：每处事实性陈述都有证据编号
+④ 质检子任务 —— 对照验收标准逐项检查
+   验收：问题可定位、可执行、可闭环
+
+依赖关系：① → ② → ③ → ④
+可并行项：① 与 ② 的前半段可同时开工`},
+  ctx:{planner:[{from:"规划者", text:"已完成拆解：输出 4 个子任务、验收标准与依赖图。"}]},
+  after:{planner:"done"},
+  dur:2400,
+  teach:{
+    h:"步骤 2 · 规划者把「一个目标」变成「四个子任务」",
+    p:"大模型最怕的不是不会写，而是不知道该写什么。拆解的价值在于把模糊目标转成可交付、可验收的子任务，并显式写出依赖关系——这直接决定了后面哪些智能体能同时开工、哪些必须排队等待，从而决定了整条链路的并行度。",
+    why:"为什么需要「规划者」：如果让执行者直接面对原始需求，它会自行脑补结构、边想边写、无法并行。而规划者提供的是全组的共享坐标系（大纲、验收标准、依赖图），相当于整个团队的「施工图」——它不写一个字，却决定了所有人的产出能拼在一起。"
+  }
+},
+{
+  type:"dispatch", kind:"dispatch", from:"planner", to:"retriever",
+  title:"分发检索子任务",
+  bubble:"子任务①：检索 2024–2025 年多智能体落地案例 4 篇，需可核查来源与可信度评级",
+  instr:{retriever:"执行子任务①：检索多智能体落地案例 4 篇，输出结构化证据卡片。"},
+  ctx:{retriever:[{from:"规划者", text:"子任务① + 验收标准：来源可核查、可信度 ≥ B、覆盖金融/制造/客服三类场景。边界：近两年，限企业级落地，排除纯论文综述。"}]},
+  after:{retriever:"idle"},
+  dur:1500,
+  teach:{
+    h:"步骤 3 · 一次只发一个子任务，并附带验收标准",
+    p:"任务分发不是「你去做检索」四个字。一张合格的派单单包含三要素：要什么（子任务）、什么算合格（验收标准）、什么不要（边界）。检索者拿到这三样，才能自己决定查什么、查到哪为止；缺了验收标准，检索质量就完全依赖对方的临场发挥。",
+    why:"为什么由「规划者」而不是编排器直接派单：规划者掌握「整体计划」这一层上下文，只有它知道检索是为了支撑哪一章、结果会被谁使用、会被怎样评价，因此派单时才能给出贴合用途的要求，而不是笼统的「去查资料」。"
+  }
+},
+{
+  type:"work", kind:"error", from:"retriever", isError:true,
+  title:"调用搜索工具 · 超时失败",
+  instr:{retriever:"调用搜索工具获取资料。"},
+  ctx:{retriever:[{from:"系统", text:"工具调用失败：search timeout after 30s（可重试）", err:true}]},
+  after:{retriever:"error"},
+  dur:2000,
+  teach:{
+    h:"步骤 4 · 真实系统一定会出错：工具超时",
+    p:"演示在这里刻意保留了一次失败。真实的多智能体系统里，检索失败、API 超时、上下文超限是日常而非意外。系统必须为「单个工具失败」预设明确策略，否则一次网络抖动就会让整条流程崩掉——这也是很多 Agent Demo 看起来很顺、上线就翻车的原因。",
+    why:"为什么需要「编排器」：错误处理与重试/降级属于全局编排职责——到底是重试、换数据源，还是跳过该子任务并向用户上报缺口，这必须由编排器统一裁决。单个智能体无权自行决定跳过，因为只有编排器知道跳过之后流程还能不能闭合。"
+  }
+},
+{
+  type:"work", kind:"data", from:"retriever",
+  title:"降级重试 · 成功并声明证据缺口",
+  instr:{retriever:"上次调用超时，请降级重试；若仍有缺口请显式声明，不要编造。"},
+  output:{retriever:
+`证据卡片 × 4
+① 《多智能体在金融风控中的落地》
+   来源：某头部券商技术博客 / 可信度 A / 含 2 组效果数据
+② 《制造业知识库 + 智能体工单实践》
+   来源：行业解决方案白皮书 / 可信度 A / 含部署周期
+③ 《客服场景智能体路由实践》
+   来源：社区案例帖 / 可信度 B / 仅有案例描述，无量化指标
+④ 《企业级 Agent 编排框架横评》
+   来源：技术媒体评测 / 可信度 A / 含选型维度对比
+
+⚠ 缺口声明：未检索到任何一手、公开可核查的效果数据，
+   所有效果数字均来自厂商披露，正文中须显式标注来源性质。`},
+  ctx:{retriever:[{from:"检索者", text:"重试成功：输出 4 张证据卡片 + 1 条缺口声明（效果数据均为厂商披露）。"}]},
+  after:{retriever:"done"},
+  dur:2400,
+  teach:{
+    h:"步骤 5 · 重试 + 降级：带着「缺口」继续往前走",
+    p:"重试成功后，检索者没有假装一切齐全，而是显式标注了「证据缺口」。这是专业检索与普通搜索最大的区别：可信度评级 + 缺口声明，让下游写作者清楚哪些话可以写得笃定、哪些必须写成「据厂商披露」。信息的不确定性被显式管理，而不是被语言流畅度掩盖。",
+    why:"为什么需要「检索者」这个独立角色：把「找事实」和「写文字」拆开，事实层才能被独立核查。如果由执行者自己检索自己写，幻觉几乎无法被检测——写作者会不自觉地为自己的措辞找证据，评审者也无从分辨哪句是查到的、哪句是编的。"
+  }
+},
+{
+  type:"dispatch", kind:"data", from:"retriever", to:"executor",
+  title:"结构化回传证据",
+  bubble:"证据卡片 × 4（可信度 A/A/B/A）＋ 缺口声明：效果数据均为厂商披露",
+  instr:{executor:"已接收证据集与大纲，请准备撰写正文。"},
+  ctx:{executor:[{from:"检索者", text:"4 张证据卡片（编号 ①–④）+ 缺口声明：所有效果数据来自厂商披露，正文须标注来源性质。"}]},
+  after:{executor:"idle"},
+  dur:1600,
+  teach:{
+    h:"步骤 6 · 用结构化产物交接，而不是转发整段对话",
+    p:"注意交接的形态：传递的不是「我和检索者的聊天记录」，而是一份被裁剪、评级、标注过的证据集。这能显著降低上下文长度与信息损耗，也避免下游把工具日志、试错记录当成事实。协作链路的带宽是稀缺资源，消息必须被压缩成对方真正需要的形态。",
+    why:"为什么需要明确的交接协议：多智能体最常见的失败模式是「上下文越滚越大、越传越模糊」。为每个角色定义清晰的输入输出契约（这是多智能体协作相对自由对话的关键工程化改造），才能让链路可规模化、可复现、可调试。"
+  }
+},
+{
+  type:"work", kind:"data", from:"executor",
+  title:"撰写报告初稿 V1",
+  instr:{executor:"按大纲与证据撰写 V1，每条事实性陈述必须可对应证据编号。"},
+  output:{executor:
+`《多智能体协作在企业内的落地》 V1
+正文 5,200 字 / 5 章
+
+1  背景与问题定义
+2  技术架构对比
+3  三大场景实践（金融 / 制造 / 客服）
+4  选型建议
+5  风险与合规
+
+⚠ 自查标记：第 4 章「选型建议」中有 2 处判断未挂证据编号。`},
+  ctx:{executor:[{from:"执行者", text:"V1 完成（5,200 字 / 5 章），已自标 2 处待核查判断，待评审。"}]},
+  after:{executor:"done"},
+  dur:2600,
+  teach:{
+    h:"步骤 7 · 执行者只负责「按图施工」，不负责判断对错",
+    p:"执行者拿到大纲和证据后进入心流：把结构化输入转成连贯正文。它不评价自己的产出够不够好——那是评审者的工作。职责单一带来的真正好处是「可归因」：出问题时能明确区分是检索没给料、还是写作跑偏、还是评审标准没写清。",
+    why:"为什么需要「执行者」这个独立环节：写作需要长时间占用推理资源，把它隔离成一个只做生成的环节，既避免它被评审逻辑干扰而自我怀疑、反复重写，也让它可以被单独替换——换一个更便宜或更强的模型来跑生成，链路结构完全不用变。"
+  }
+},
+{
+  type:"dispatch", kind:"data", from:"executor", to:"reviewer",
+  title:"提交初稿送审",
+  bubble:"V1 送审｜5,200 字｜5 章｜2 处待核查判断已标记",
+  instr:{reviewer:"请对照计划中的验收标准，逐项评审 V1 并给出放行结论。"},
+  ctx:{reviewer:[{from:"执行者", text:"V1 全文（5,200 字 / 5 章）+ 计划中的验收标准 + 执行者自标的 2 处待核查判断。"}]},
+  after:{reviewer:"idle"},
+  dur:1500,
+  teach:{
+    h:"步骤 8 · 引入独立评审，打破自我确认偏差",
+    p:"让写作者评自己的稿子，几乎必然放行——它总能解释自己为什么这么写，理由还显得很有道理。引入一个没有参与生成过程的评审者，才能得到真正的质量信号。这是「多智能体」相对「单次超长上下文生成」最本质的增益：不是写得更多，而是有了独立视角的否决权。",
+    why:"为什么需要「评审者」：评审是质量门禁（quality gate）。它必须独立于生成链路、拥有明确的否决权，且否决权要落到可执行的清单上——否则「评审」会退化成一句客套的「整体不错，建议润色」。"
+  }
+},
+{
+  type:"work", kind:"feedback", from:"reviewer",
+  title:"质量评审与打分",
+  instr:{reviewer:"评审 V1：定位具体问题、标注严重级别、给出放行或打回的明确结论。"},
+  output:{reviewer:
+`评审报告 · 评分 68 / 100
+【阻断】P1 第 4 章「选型建议」中「可降本 30%」未挂任何证据编号
+        → 改写为「据厂商披露，试点项目报告降本 20%–30%」并挂证据②
+【阻断】P2 第 5 章缺数据合规与审计留痕条款
+        → 补写一节，并区分「模型输出」与「人工决策」的责任边界
+【建议】P3 全文混用「智能体 / 代理 / Agent」
+        → 统一术语表，全文替换
+
+结论：打回修订（存在 2 项阻断问题）`},
+  ctx:{reviewer:[{from:"评审者", text:"评审完成：2 项阻断 + 1 项建议，结论为打回。"}]},
+  after:{reviewer:"done"},
+  dur:2400,
+  teach:{
+    h:"步骤 9 · 评审意见必须「可执行」",
+    p:"有效评审不是「写得不够好」，而是：定位到具体章节 → 指出具体问题 → 给出具体改法 → 标注严重级别。评审者输出的是一份可以直接派工的任务清单，而不是一段观感描述。只有这样，评审结论才能真正驱动下一轮迭代，否则它就只是免责声明。",
+    why:"为什么需要「评审者」：它把主观的「质量」翻译成可勾选的验收项，质量才第一次变得可工程化管理。反过来说，如果一个多智能体系统说不出「怎么算通过」，它就永远无法判断该不该继续迭代，也就无法收敛。"
+  }
+},
+{
+  type:"dispatch", kind:"feedback", from:"reviewer", to:"executor",
+  title:"打回并派发修改意见",
+  bubble:"打回修订｜P1 证据缺失（第 4 章）｜P2 章节缺失（数据合规）｜P3 术语统一",
+  instr:{executor:"收到 3 条修改意见，请逐条定点修订，不要重写无关段落。"},
+  ctx:{executor:[{from:"评审者", text:"3 条修改意见（2 阻断 + 1 建议），评分 68/100，结论打回：P1 第 4 章证据缺失、P2 缺数据合规章节、P3 术语混用。"}]},
+  after:{executor:"idle"},
+  dur:1500,
+  teach:{
+    h:"步骤 10 · 反馈闭环：质量问题的修复发生在协作链路上",
+    p:"评审意见不是终点，它必须回到链路上被消化。请注意这里是「打回」而不是「新建一个修订智能体」——同一对角色再次交互，构成一个可迭代的闭环。这也体现了「迭代」与「重写」的区别：只做定点修订，保留已正确的内容，成本更低、也更稳定。",
+    why:"为什么需要这条回路：如果只有「生成 → 评审」而没有「评审 → 修订」，评审就只是提了个醒，产出质量并不会变好。闭环是否存在，是判断一个系统是真协作还是用流水线冒充协作的关键标志——很多系统的评审环节只是走个形式，因为意见回不去。"
+  }
+},
+{
+  type:"work", kind:"data", from:"executor",
+  title:"定点修订生成 V2",
+  instr:{executor:"按评审意见逐条定点修订，生成 V2 并标注每条意见的闭环情况。"},
+  output:{executor:
+`《多智能体协作在企业内的落地》 V2
+正文 6,100 字 / 6 章 / 附录 1
+
+✅ P1 第 4 章改写为「据厂商披露，试点项目报告降本 20%–30%」并挂证据②
+✅ P2 第 5 章补充「数据合规与审计留痕」一节，
+        明确区分「模型输出」与「人工决策」的责任边界
+✅ P3 全文术语统一为「智能体」，新增术语表 3 条
+
+新增附录：引用清单 11 条（其中 3 条标注为厂商披露）`},
+  ctx:{executor:[{from:"执行者", text:"V2 完成（6,100 字 / 6 章），3 条意见已逐条闭环并标注。"}]},
+  after:{executor:"done"},
+  dur:2500,
+  teach:{
+    h:"步骤 11 · 增量修订：只改该改的",
+    p:"执行者拿到的是一份清单，而不是「重写一遍」的指令。它按条逐项修复、保留其余内容，同时把新增证据补进正文。质量提升因此是可追溯的——每一处修改都能对应到一条评审意见，你甚至能精确算出「这一轮反馈值多少分」。",
+    why:"为什么修订仍由「执行者」承担：这类活儿需要精确遵循指令的确定性。如果把修订交给自由生成，模型很容易顺手改写无关段落，把原本已经正确的部分改坏——这是多智能体链路里最隐蔽的质量损失来源。"
+  }
+},
+{
+  type:"dispatch", kind:"data", from:"executor", to:"reviewer",
+  title:"复审提交 V2",
+  bubble:"V2 送审｜6,100 字｜3 条意见已逐条闭环",
+  instr:{reviewer:"请复审 V2，逐条确认 P1 / P2 / P3 是否闭环。"},
+  ctx:{reviewer:[{from:"执行者", text:"V2 全文 + 执行者对 3 条意见的闭环说明。"}]},
+  after:{reviewer:"idle"},
+  dur:1400,
+  teach:{
+    h:"步骤 12 · 同一对角色再次交互，闭环闭合",
+    p:"注意消息流在这里回到了第 8 步的同一条链路——这正是「闭环」的可视化体现。协作系统的价值不在于消息发得越多，而在于能否用最少的往返次数让质量收敛到阈值以上。这里一次往返就补齐了 3 条问题，说明第 9 步的评审意见质量足够高。",
+    why:"为什么需要「编排器」：它需要判断「是否收敛」——什么时候该继续迭代、什么时候该停止放行，这是全局成本与质量的权衡，不能由正在评审的角色自己决定（它有把稿子放行的天然倾向）。"
+  }
+},
+{
+  type:"work", kind:"approve", from:"reviewer",
+  title:"复审通过 · 质量门禁放行",
+  instr:{reviewer:"复审 V2 并给出放行 / 打回的明确结论。"},
+  output:{reviewer:
+`复审报告 · 评分 91 / 100
+✅ P1 证据编号已补齐，表述已标注厂商披露   → 闭环
+✅ P2 数据合规与审计留痕章节已补充     → 闭环
+✅ P3 术语已全文统一，术语表已附        → 闭环
+
+结论：通过，放行至汇总环节`},
+  ctx:{reviewer:[{from:"评审者", text:"复审通过：91/100，3 条意见全部闭环。"}]},
+  after:{reviewer:"done"},
+  dur:2000,
+  teach:{
+    h:"步骤 13 · 门禁放行：下游只接收「已验收」的产物",
+    p:"放行是一个明确的控制点。通过之后内容才允许进入汇总环节，避免把有问题的内容向上游扩散、最后再花成倍的返工成本。门禁同时产出可统计的指标：迭代轮数、通过率、平均每轮提分——这些指标是多智能体系统唯一有效的优化依据。",
+    why:"为什么需要「评审者」：它代表质量门禁的「关闭」动作。门禁必须有明确的开关语义（放行 / 打回），链路才能被形式化地控制；否则每次都要靠人肉判断要不要往下走，规模化就无从谈起。"
+  }
+},
+{
+  type:"dispatch", kind:"approve", from:"reviewer", to:"aggregator",
+  title:"质量放行 · 移交汇总",
+  bubble:"放行｜V2 正文 + 评审记录 + 引用清单 → 请汇编终稿",
+  instr:{aggregator:"已放行的正文与评审记录已移交，请汇编终稿。"},
+  ctx:{aggregator:[{from:"评审者", text:"已放行的 V2 正文 + 评审记录（91/100）+ 引用清单 11 条。"}]},
+  after:{aggregator:"idle"},
+  dur:1400,
+  teach:{
+    h:"步骤 14 · 汇总环节只做「收口」，不做「改写」",
+    p:"汇总者的职责被严格限定：统一格式与术语、生成目录和摘要、汇总引用清单。它不引入任何新的事实性内容——一旦允许汇总者顺手补充，前面那道质量门禁就失去意义了。这是多智能体系统里最容易被破坏、也最需要写进角色约束的一条。",
+    why:"为什么需要「汇总者」：多智能体的产出天然是碎片化的——正文、图表、引用、结论散落在不同角色手里。需要有一个角色负责把它们组装成单一交付物，并保证格式、术语、编号的一致性，否则交付给用户的就是一叠互相矛盾的草稿。"
+  }
+},
+{
+  type:"work", kind:"final", from:"aggregator",
+  title:"汇编终稿",
+  instr:{aggregator:"汇编终稿：统一格式，生成目录 / 摘要 / 术语表 / 引用清单，不引入新事实。"},
+  output:{aggregator:
+`《多智能体协作在企业内的落地》终稿
+· 正文 6,100 字 / 6 章 / 附录 1
+· 自动目录、图表编号连续、术语表 3 条
+· 引用清单 11 条（3 条为厂商披露，已显式标注）
+· 执行摘要 300 字（可直接用于汇报）
+· 交付形态：Markdown + PDF 双版本`},
+  ctx:{aggregator:[{from:"汇总者", text:"终稿完成：6,100 字 / 6 章 / 附录 1，含目录、摘要、术语表、引用清单。"}]},
+  after:{aggregator:"done"},
+  dur:2400,
+  teach:{
+    h:"步骤 15 · 交付物必须「可直接使用」",
+    p:"终稿不只是「一篇文章」，它还带目录、执行摘要、术语表和可追溯的引用清单，下游读者（领导、客户）能直接拿去用。执行摘要尤其重要——多智能体的价值之一，就是把一个跨多个角色、耗时很长的长任务，压缩成一段可汇报的短结论。",
+    why:"为什么需要「汇总者」：它是交付质量的最后一道闸门，决定「系统输出」能否变成「业务可用物」。少了它，多智能体跑完一轮，只留下一个不能直接用的中间产物——那不叫交付，那叫半成品。"
+  }
+},
+{
+  type:"dispatch", kind:"final", from:"aggregator", to:"hub",
+  title:"回传编排器 · 闭环完成",
+  bubble:"终稿已交付｜执行轨迹 16 步｜1 次失败重试｜2 轮迭代",
+  instr:{hub:"所有子任务已闭环，请生成最终交付物与可追溯的执行轨迹。"},
+  ctx:{hub:[{from:"汇总者", text:"终稿已交付：6,100 字技术报告 + 执行摘要 + 引用清单 11 条。"}]},
+  after:{hub:"done"},
+  dur:1600,
+  teach:{
+    h:"步骤 16 · 闭环回到起点：交付 + 可追溯轨迹",
+    p:"最后一次消息回到编排器，一个完整闭环形成。除了终稿，系统还输出了执行轨迹——记录每一步的收发双方、耗时、失败与重试。这些数据是后续优化协作流程的唯一依据：下一轮就该知道是该换更快的模型来跑生成，还是该给检索者换个数据源，还是该砍掉某个没有产生价值的角色。",
+    why:"为什么需要「编排器」：它同时是任务的发起者与责任的收口者。没有它，整条链路只是一串孤立的对话——出了问题无法归因，也就没有任何可以量化的优化空间。"
+  }
+}
+];
+
+/* ============================================================
+   4. 运行时状态
+   ============================================================ */
+const state = {
+  idx: 0,            // 下一个待执行的剧本下标
+  playing: false,    // 自动播放循环是否运行中
+  paused: false,     // 动画暂停
+  speed: 1,
+  selected: "planner",
+  follow: true,
+  clock: 0,           // 虚拟时间（毫秒），用于时间线
+  tlCount: 0          // 时间线记录条数
+};
+
+const runtime = {};  // key -> {state, ctx:[], output:'', instr:''}
+Object.keys(AGENTS).forEach(k => {
+  runtime[k] = { state:"idle", ctx:[], output:"", instr:AGENTS[k].instr };
+});
+
+/* DOM 引用 */
+const $ = id => document.getElementById(id);
+const stageEl = $("stage");
+const svgEl = $("wires");
+const detailBody = $("detailBody");
+const tlList = $("tlList");
+const teachEl = $("teach");
+
+/* ============================================================
+   5. 构建 DOM
+   ============================================================ */
+function buildCards(){
+  const frag = document.createDocumentFragment();
+  Object.keys(AGENTS).forEach(key => {
+    const a = AGENTS[key];
+    const card = document.createElement("div");
+    card.className = "agent-card" + (a.isHub ? " hub-card" : "");
+    card.dataset.key = key;
+    card.dataset.state = "idle";
+    card.style.setProperty("--x", NODES[key].x + "%");
+    card.style.setProperty("--y", NODES[key].y + "%");
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="avatar">${a.icon}</div>
+        <div class="card-title"><div class="card-name">${a.name}</div></div>
+        <span class="state-badge">空闲</span>
+      </div>
+      <div class="card-role">${a.role}</div>
+      <div class="card-duty">${a.duty}</div>
+      <div class="card-io">
+        <div class="io-row"><span class="io-k">入</span><span class="io-v" title="${a.input}">${a.input}</span></div>
+        <div class="io-row"><span class="io-k">出</span><span class="io-v" title="${a.output}">${a.output}</span></div>
+      </div>
+      <div class="card-meta">${a.tools.map(t => `<span class="tool-pill">⚙ ${t}</span>`).join("")}</div>`;
+    card.addEventListener("click", () => {
+      state.selected = key;
+      state.follow = false;
+      $("followBtn").classList.remove("on");
+      $("followBtn").textContent = "○ 自动跟随";
+      renderDetail();
+      highlightSelection();
+    });
+    frag.appendChild(card);
+  });
+  stageEl.appendChild(frag);
+}
+
+function buildWires(){
+  const ns = "http://www.w3.org/2000/svg";
+  const defs = document.createElementNS(ns, "defs");
+  Object.keys(KINDS).forEach(k => {
+    const m = document.createElementNS(ns, "marker");
+    m.setAttribute("id", "arrow-" + k);
+    m.setAttribute("viewBox", "0 0 10 10");
+    m.setAttribute("refX", "8.5");
+    m.setAttribute("refY", "5");
+    m.setAttribute("markerWidth", "6.5");
+    m.setAttribute("markerHeight", "6.5");
+    m.setAttribute("orient", "auto-start-reverse");
+    const p = document.createElementNS(ns, "path");
+    p.setAttribute("d", "M0,0 L10,5 L0,10 z");
+    p.setAttribute("fill", KINDS[k].hex);
+    m.appendChild(p);
+    defs.appendChild(m);
+  });
+  svgEl.appendChild(defs);
+
+  EDGES.forEach(e => {
+    const path = document.createElementNS(ns, "path");
+    path.setAttribute("class", "wire idle");
+    path.setAttribute("marker-end", "url(#arrow-dispatch)");
+    svgEl.appendChild(path);
+    e.el = path;
+  });
+}
+
+/* ============================================================
+   6. 几何计算：根据卡片真实位置绘制连线
+   ============================================================ */
+/* stage 的 content box（绝对定位包含块原点），保证 SVG 与卡片坐标系一致 */
+function stageBox(){
+  const s = stageEl.getBoundingClientRect();
+  const cs = getComputedStyle(stageEl);
+  const bl = parseFloat(cs.borderLeftWidth) || 0;
+  const bt = parseFloat(cs.borderTopWidth) || 0;
+  const pl = parseFloat(cs.paddingLeft) || 0;
+  const pt = parseFloat(cs.paddingTop) || 0;
+  const pr = parseFloat(cs.paddingRight) || 0;
+  const pb = parseFloat(cs.paddingBottom) || 0;
+  return {
+    ox: s.left + bl + pl,
+    oy: s.top + bt + pt,
+    pl: pl, pt: pt,
+    w: Math.max(1, stageEl.clientWidth - pl - pr),
+    h: Math.max(1, stageEl.clientHeight - pt - pb)
+  };
+}
+
+function cardRect(box, key){
+  const el = stageEl.querySelector(`.agent-card[data-key="${key}"]`);
+  const r = el.getBoundingClientRect();
+  return {
+    cx: r.left - box.ox + r.width / 2,
+    cy: r.top - box.oy + r.height / 2,
+    hw: r.width / 2,
+    hh: r.height / 2
+  };
+}
+
+/* 求矩形边界上的出点（沿方向 d 离开中心的最短距离） */
+function rectExit(c, dx, dy){
+  const ax = Math.abs(dx) < 1e-6 ? Infinity : c.hw / Math.abs(dx);
+  const ay = Math.abs(dy) < 1e-6 ? Infinity : c.hh / Math.abs(dy);
+  return Math.min(ax, ay);
+}
+
+function layoutWires(){
+  const box = stageBox();
+  svgEl.style.left = box.pl + "px";
+  svgEl.style.top = box.pt + "px";
+  svgEl.style.width = box.w + "px";
+  svgEl.style.height = box.h + "px";
+  svgEl.setAttribute("viewBox", `0 0 ${box.w} ${box.h}`);
+
+  EDGES.forEach(e => {
+    const a = cardRect(box, e.from);
+    const b = cardRect(box, e.to);
+    let dx = b.cx - a.cx, dy = b.cy - a.cy;
+    const len = Math.hypot(dx, dy) || 1;
+    dx /= len; dy /= len;
+    const ta = rectExit(a, dx, dy) + 2;
+    const tb = rectExit(b, dx, dy) + 2;
+    const x1 = a.cx + dx * ta, y1 = a.cy + dy * ta;
+    const x2 = b.cx - dx * tb, y2 = b.cy - dy * tb;
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+    const nx = -dy, ny = dx;
+    const cx = mx + nx * e.curve, cy = my + ny * e.curve;
+    e.el.setAttribute("d", `M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`);
+    e.p1 = { x:x1, y:y1 };
+    e.p2 = { x:x2, y:y2 };
+  });
+}
+
+/* ============================================================
+   7. 动画引擎（支持暂停 / 调速）
+   ============================================================ */
+function tween(duration, onUpdate, onDone){
+  return new Promise(resolve => {
+    let last = null, elapsed = 0;
+    const step = ts => {
+      if (state.paused){ last = ts; requestAnimationFrame(step); return; }
+      if (last === null) last = ts;
+      elapsed += ts - last;
+      last = ts;
+      const t = duration <= 0 ? 1 : Math.min(1, elapsed / duration);
+      onUpdate(t);
+      if (t < 1) requestAnimationFrame(step);
+      else onDone ? onDone() : resolve();
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+function wait(ms){
+  return tween(ms, () => {});
+}
+
+/* ============================================================
+   8. 状态与面板渲染
+   ============================================================ */
+function setAgentState(key, s){
+  runtime[key].state = s;
+  const card = stageEl.querySelector(`.agent-card[data-key="${key}"]`);
+  if (!card) return;
+  card.dataset.state = s;
+  card.querySelector(".state-badge").textContent = STATE_META[s].label;
+}
+
+function highlightSelection(){
+  stageEl.querySelectorAll(".agent-card").forEach(c => {
+    c.classList.toggle("selected", c.dataset.key === state.selected);
+  });
+}
+
+function renderDetail(){
+  const key = state.selected;
+  const a = AGENTS[key];
+  const r = runtime[key];
+  const badgeColor = STATE_META[r.state].color;
+
+  const ctxHtml = r.ctx.length
+    ? `<ul class="ctx-list">${r.ctx.map(c => `
+        <li class="ctx-item${c.err ? " err" : ""}">
+          <span class="ctx-from">${c.from}</span>${escapeHtml(c.text)}
+        </li>`).join("")}</ul>`
+    : `<div class="empty-note">尚未收到任何消息</div>`;
+
+  const outHtml = r.output
+    ? `<pre class="code">${escapeHtml(r.output)}</pre>`
+    : `<div class="empty-note">尚未产出内容</div>`;
+
+  detailBody.innerHTML = `
+    <div class="detail-hero">
+      <div class="avatar">${a.icon}</div>
+      <div class="dh-text">
+        <div class="dh-name">${a.name}</div>
+        <div class="dh-role">${a.role}</div>
+      </div>
+      <span class="state-badge" style="background:${hexToRgba(hexOf(badgeColor),.14)};color:${badgeColor}">${STATE_META[r.state].label}</span>
+    </div>
+
+    <div class="dsec">
+      <div class="dsec-title">角色契约</div>
+      <div class="fact-grid">
+        <div class="fact-row"><span class="fact-key">职责</span><span class="fact-val">${a.duty}</span></div>
+        <div class="fact-row"><span class="fact-key">工具</span><span class="fact-val">${a.tools.map(t => `<span class="mini">⚙ ${t}</span>`).join("")}</span></div>
+        <div class="fact-row"><span class="fact-key">输入</span><span class="fact-val">${a.input}</span></div>
+        <div class="fact-row"><span class="fact-key">输出</span><span class="fact-val">${a.output}</span></div>
+      </div>
+    </div>
+
+    <div class="dsec">
+      <div class="dsec-title">当前指令</div>
+      <pre class="code"><span class="k">${escapeHtml(r.instr)}</span></pre>
+    </div>
+
+    <div class="dsec">
+      <div class="dsec-title">系统提示词</div>
+      <pre class="code">${escapeHtml(a.prompt)}</pre>
+    </div>
+
+    <div class="dsec">
+      <div class="dsec-title">上下文（收到的消息 · ${r.ctx.length}）</div>
+      ${ctxHtml}
+    </div>
+
+    <div class="dsec" style="margin-bottom:0">
+      <div class="dsec-title">当前产出</div>
+      ${outHtml}
+    </div>`;
+}
+
+function hexOf(cssVar){
+  const map = {
+    "var(--s-idle)":"#8a97ad","var(--s-think)":"#e0910a","var(--s-work)":"#2f6bff",
+    "var(--s-done)":"#12a074","var(--s-error)":"#e0483f"
+  };
+  return map[cssVar] || "#3568ef";
+}
+function hexToRgba(hex, a){
+  const h = hex.replace("#","");
+  const n = parseInt(h.length === 3 ? h.split("").map(c=>c+c).join("") : h, 16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* ============================================================
+   9. 教学面板
+   ============================================================ */
+function renderTeach(ev, idx){
+  const chip = $("teachChip");
+  const isLast = idx === SCRIPT.length - 1;
+  chip.textContent = isLast ? "DONE · 闭环完成" : `STEP ${idx + 1} / ${SCRIPT.length}`;
+  chip.style.background = isLast
+    ? "linear-gradient(135deg,#12a074,#0b8a63)"
+    : "linear-gradient(135deg,#3568ef,#6f4bf0)";
+  $("teachStep").textContent = ev ? `第 ${idx + 1} 步 · ${ev.title}` : "尚未开始";
+  $("teachTitle").textContent = ev ? ev.teach.h : "点击「自动播放」或「单步执行」开始演示";
+  $("teachProblem").innerHTML = ev ? ev.teach.p : $("teachProblem").innerHTML;
+  $("teachWhy").innerHTML = ev ? ev.teach.why : $("teachWhy").innerHTML;
+  teachEl.classList.toggle("done", !!ev && isLast);
+}
+
+/* ============================================================
+   10. 时间线
+   ============================================================ */
+function addTimeline(ev, idx){
+  const t = state.clock;
+  const mm = String(Math.floor(t / 60000)).padStart(2, "0");
+  const ss = String(Math.floor((t % 60000) / 1000)).padStart(2, "0");
+  const kind = KINDS[ev.kind] || KINDS.dispatch;
+  const fromName = AGENTS[ev.from].name;
+  const toName = ev.to ? AGENTS[ev.to].name : "";
+  const route = ev.to ? `${fromName} → ${toName}` : `${fromName}（内部执行）`;
+
+  // 产出可能是字符串，也可能是 { agentKey: text } 映射
+  let detail = ev.bubble || "";
+  if (!detail && ev.output){
+    const raw = typeof ev.output === "string" ? ev.output : (Object.values(ev.output)[0] || "");
+    detail = String(raw).split("\n")[0];
+  }
+  if (!detail) detail = ev.teach ? ev.teach.h : "";
+
+  const li = document.createElement("li");
+  li.className = "tl-item";
+  li.style.setProperty("--tlc", kind.hex);
+  li.innerHTML = `
+    <div class="tl-time">T+${mm}:${ss}</div>
+    <div class="tl-rail"><span class="tl-dot" style="background:${kind.hex}"></span></div>
+    <div class="tl-main">
+      <div class="tl-title">
+        <span class="tl-kind" style="color:${kind.hex};border-color:${kind.hex}40;background:${hexToRgba(kind.hex,.09)}">${kind.label}</span>
+        ${route} · ${escapeHtml(ev.title)}
+      </div>
+      <div class="tl-detail">${escapeHtml(detail)}</div>
+    </div>`;
+
+  // 移除初始占位行（仅一次），历史记录全部保留
+  if (tlList.dataset.started !== "1"){
+    tlList.dataset.started = "1";
+    tlList.innerHTML = "";
+  }
+  tlList.appendChild(li);
+  state.tlCount = (state.tlCount || 0) + 1;
+  $("tlCount").textContent = state.tlCount + " 条记录";
+  const wrap = tlList.closest(".timeline");
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+/* ============================================================
+   11. 消息飞行
+   ============================================================ */
+function findEdge(from, to){
+  return EDGES.find(e => e.from === from && e.to === to);
+}
+
+function travel(edge, ev){
+  const path = edge.el;
+  const total = path.getTotalLength();
+  const kind = KINDS[ev.kind] || KINDS.dispatch;
+
+  const pk = document.createElement("div");
+  pk.className = "packet";
+  pk.style.setProperty("--pk", kind.hex);
+  pk.innerHTML = `<span class="pk-from">${AGENTS[ev.from].name} · ${kind.label}</span><span class="pk-text">${escapeHtml(ev.bubble)}</span>`;
+  stageEl.appendChild(pk);
+
+  path.setAttribute("marker-end", `url(#arrow-${ev.kind})`);
+  path.setAttribute("class", "wire live");
+  path.style.stroke = kind.hex;
+
+  return tween(900 / state.speed, t => {
+    const pt = path.getPointAtLength(t * total);
+    const e = 1 - Math.pow(1 - t, 2);
+    const pt2 = path.getPointAtLength(e * total);
+    pk.style.transform = `translate(${pt2.x}px, ${pt2.y}px) translate(-50%,-50%) scale(${0.88 + 0.12 * Math.min(1, t * 2)})`;
+  }).then(() => tween(320 / state.speed, t => {
+    pk.style.opacity = String(1 - t);
+    pk.style.transform = pk.style.transform.replace(/scale\([^)]+\)/, `scale(${1 - t * 0.28})`);
+  })).then(() => {
+    pk.remove();
+    path.setAttribute("class", "wire used");
+    path.style.stroke = "";
+    path.setAttribute("marker-end", `url(#arrow-${ev.kind})`);
+    toastOn(ev.to, ev.bubble);
+  });
+}
+
+function toastOn(key, text){
+  if (!key) return;
+  const card = stageEl.querySelector(`.agent-card[data-key="${key}"]`);
+  if (!card) return;
+  const t = document.createElement("div");
+  t.className = "card-toast";
+  t.textContent = text.length > 46 ? text.slice(0, 46) + "…" : text;
+  card.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+function workStrip(key, label){
+  const card = stageEl.querySelector(`.agent-card[data-key="${key}"]`);
+  if (!card) return;
+  const el = document.createElement("div");
+  el.className = "work-strip";
+  el.textContent = label;
+  card.appendChild(el);
+  return el;
+}
+
+/* ============================================================
+   12. 执行单个剧本步骤
+   ============================================================ */
+async function runEvent(idx){
+  const ev = SCRIPT[idx];
+  if (!ev) return;
+
+  renderTeach(ev, idx);
+  if (state.follow){
+    state.selected = ev.from;
+    highlightSelection();
+  }
+
+  // 应用指令
+  if (ev.instr){
+    Object.entries(ev.instr).forEach(([k, v]) => { runtime[k].instr = v; });
+  }
+
+  if (ev.type === "work"){
+    // 内部执行：思考 → 执行 → 产出
+    setAgentState(ev.from, "thinking");
+    if (state.follow){ state.selected = ev.from; highlightSelection(); }
+    renderDetail();
+
+    const strip = workStrip(ev.from, ev.isError ? "调用工具中 · 可能失败" : "思考中 · 组织输出");
+    const thinkMs = (ev.isError ? 350 : 800) / state.speed;
+    const workMs = (ev.dur - (ev.isError ? 350 : 800)) / state.speed;
+
+    await wait(thinkMs);
+    setAgentState(ev.from, "working");
+    if (strip) strip.textContent = ev.isError ? "执行中 · 等待工具返回" : "执行中 · 产出生成中";
+    await wait(workMs);
+
+    if (strip) strip.remove();
+    applyOutputs(ev);
+    applyContexts(ev);
+    applyStates(ev);
+    state.clock += ev.dur;
+    addTimeline(ev, idx);
+  } else {
+    // 消息传递
+    const edge = findEdge(ev.from, ev.to);
+    if (!edge){ console.warn("缺少连线定义:", ev.from, ev.to); }
+    setAgentState(ev.to, "thinking");
+    if (state.follow){ state.selected = ev.to; highlightSelection(); }
+    renderDetail();
+
+    if (edge) await travel(edge, ev);
+    applyOutputs(ev);
+    applyContexts(ev);
+    applyStates(ev);
+    state.clock += ev.dur;
+    addTimeline(ev, idx);
+  }
+
+  renderDetail();
+  updateProgress(idx + 1);
+}
+
+function applyOutputs(ev){
+  if (!ev.output) return;
+  Object.entries(ev.output).forEach(([k, v]) => { runtime[k].output = v; });
+}
+function applyContexts(ev){
+  if (!ev.ctx) return;
+  Object.entries(ev.ctx).forEach(([k, list]) => {
+    list.forEach(c => runtime[k].ctx.push(c));
+  });
+}
+function applyStates(ev){
+  if (!ev.after) return;
+  Object.entries(ev.after).forEach(([k, v]) => setAgentState(k, v));
+}
+
+/* ============================================================
+   13. 控制
+   ============================================================ */
+let busy = false;
+
+async function stepOnce(){
+  if (busy || state.idx >= SCRIPT.length) return;
+  busy = true;
+  updateControls();
+  const wasPaused = state.paused;
+  state.paused = false;
+  try{
+    await runEvent(state.idx);
+    state.idx++;
+    if (state.idx >= SCRIPT.length) finish();
+  } finally {
+    state.paused = wasPaused;
+    busy = false;
+    updateControls();
+  }
+}
+
+async function autoLoop(){
+  if (state.playing) return;
+  state.playing = true;
+  updateControls();
+  while (state.playing && state.idx < SCRIPT.length){
+    if (busy){ await wait(120); continue; }
+    busy = true;
+    updateControls();
+    await runEvent(state.idx);
+    state.idx++;
+    busy = false;
+    updateControls();
+    if (state.playing && state.idx < SCRIPT.length) await wait(800 / state.speed);
+  }
+  state.playing = false;
+  if (state.idx >= SCRIPT.length) finish();
+  updateControls();
+}
+
+function finish(){
+  renderTeach(SCRIPT[SCRIPT.length - 1], SCRIPT.length - 1);
+  const chip = $("teachChip");
+  chip.textContent = "DONE · 闭环完成";
+  chip.style.background = "linear-gradient(135deg,#12a074,#0b8a63)";
+  $("teachStep").textContent = "16 步全部完成";
+}
+
+function resetAll(){
+  state.playing = false;
+  state.paused = false;
+  state.idx = 0;
+  state.clock = 0;
+  state.tlCount = 0;
+  state.follow = true;
+  state.selected = "planner";
+  $("followBtn").classList.add("on");
+  $("followBtn").textContent = "● 自动跟随";
+
+  Object.keys(runtime).forEach(k => {
+    runtime[k] = { state:"idle", ctx:[], output:"", instr:AGENTS[k].instr };
+  });
+  stageEl.querySelectorAll(".agent-card").forEach(c => {
+    c.dataset.state = "idle";
+    c.querySelector(".state-badge").textContent = "空闲";
+    c.querySelectorAll(".work-strip,.card-toast").forEach(n => n.remove());
+  });
+  stageEl.querySelectorAll(".packet").forEach(n => n.remove());
+  EDGES.forEach(e => {
+    e.el.setAttribute("class", "wire idle");
+    e.el.style.stroke = "";
+    e.el.setAttribute("marker-end", "url(#arrow-dispatch)");
+  });
+
+  tlList.innerHTML = `
+    <li class="tl-item" style="border-bottom:none">
+      <div class="tl-time">T+00:00</div>
+      <div class="tl-rail"><span class="tl-dot" style="background:#8a97ad"></span></div>
+      <div class="tl-main">
+        <div class="tl-title">等待开始</div>
+        <div class="tl-detail">点击「自动播放」进入自动演示，或「单步执行」逐帧观察每一步的因果关系。</div>
+      </div>
+    </li>`;
+  delete tlList.dataset.started;
+  $("tlCount").textContent = "0 条记录";
+
+  teachEl.classList.remove("done");
+  $("teachChip").textContent = "READY";
+  $("teachChip").style.background = "linear-gradient(135deg,#3568ef,#6f4bf0)";
+  $("teachStep").textContent = "尚未开始";
+  $("teachTitle").textContent = "点击「自动播放」或「单步执行」开始演示";
+  $("teachProblem").innerHTML = "下面这张图展示了 1 个编排器 + 5 个专业智能体的协作拓扑。请注意观察三件事：<b>①</b> 谁在给谁派单（上下级不等于有通信），<b>②</b> 消息以什么形态传递（结构化产物，不是聊天记录），<b>③</b> 评审意见如何回到链路上形成闭环。";
+  $("teachWhy").innerHTML = "<b>整体教学目标：</b>理解多智能体协作的三条主线 —— <b>分工</b>（为什么必须有规划者）、<b>交接</b>（消息该长什么样）、<b>闭环</b>（评审如何真正改变产出）。全程共 16 步，其中第 4 步是<b>刻意保留的真实故障</b>，用来演示错误处理与重试。";
+
+  updateProgress(0);
+  highlightSelection();
+  renderDetail();
+  updateControls();
+}
+
+function updateProgress(done){
+  $("progressFill").style.width = (done / SCRIPT.length * 100) + "%";
+  $("progressText").textContent = `步骤 ${done} / ${SCRIPT.length}`;
+}
+
+function updateControls(){
+  const atEnd = state.idx >= SCRIPT.length;
+  $("btnPlay").disabled = atEnd;
+  $("btnStep").disabled = atEnd || busy;
+  const playing = state.playing && !state.paused;
+  $("playLabel").textContent = playing ? "暂停" : (state.paused ? "继续" : "自动播放");
+  $("btnPlay").querySelector(".ico").textContent = playing ? "❚❚" : "▶";
+  $("btnPlay").classList.toggle("primary", !playing);
+  $("btnStep").disabled = atEnd || busy;
+}
+
+/* 事件绑定 */
+$("btnPlay").addEventListener("click", () => {
+  if (state.idx >= SCRIPT.length) return;
+  if (state.playing){
+    state.paused = !state.paused;
+    updateControls();
+  } else {
+    state.paused = false;
+    autoLoop();
+  }
+});
+$("btnStep").addEventListener("click", () => { state.paused = false; stepOnce(); });
+$("btnReset").addEventListener("click", resetAll);
+
+const speedEl = $("speed");
+speedEl.addEventListener("input", () => {
+  state.speed = parseFloat(speedEl.value);
+  $("speedVal").textContent = state.speed.toFixed(2) + "×";
+  const pct = (state.speed - 0.5) / 2.5 * 100;
+  speedEl.style.setProperty("--sp", pct + "%");
+});
+
+$("followBtn").addEventListener("click", () => {
+  state.follow = !state.follow;
+  $("followBtn").classList.toggle("on", state.follow);
+  $("followBtn").textContent = state.follow ? "● 自动跟随" : "○ 自动跟随";
+  if (state.follow && SCRIPT[state.idx]){
+    state.selected = state.idx > 0 ? (SCRIPT[state.idx - 1].to || SCRIPT[state.idx - 1].from) : "planner";
+    highlightSelection();
+    renderDetail();
+  }
+});
+
+document.addEventListener("keydown", e => {
+  if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  if (e.code === "Space"){ e.preventDefault(); $("btnPlay").click(); }
+  else if (e.code === "ArrowRight"){ e.preventDefault(); $("btnStep").click(); }
+  else if (e.key === "r" || e.key === "R"){ resetAll(); }
+});
+
+/* ============================================================
+   14. 初始化
+   ============================================================ */
+buildCards();
+buildWires();
+layoutWires();
+highlightSelection();
+renderDetail();
+updateProgress(0);
+updateControls();
+
+const ro = new ResizeObserver(() => layoutWires());
+ro.observe(stageEl);
+window.addEventListener("resize", layoutWires);
+window.addEventListener("load", layoutWires);
+setTimeout(layoutWires, 60);
+</script>
+
+<style id="portal-back-style">
+#portal-back{position:fixed;right:14px;bottom:14px;z-index:9999;
+  right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));
+  display:inline-flex;align-items:center;gap:6px;
+  font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:#fff;background:rgba(17,24,39,.82);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:9px 15px;text-decoration:none;
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:.72;transition:opacity .18s,transform .18s}
+#portal-back:hover{opacity:1;transform:translateY(-1px)}
+#portal-back:active{transform:none}
+@media print{#portal-back{display:none}}
+</style>
+<a id="portal-back" href="../../" title="返回资源中心">← 资源中心</a>
+</body>
+</html>
