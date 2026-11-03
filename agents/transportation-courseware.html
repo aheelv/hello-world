@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>运输问题 · 表上作业法 · 交互式教学课件</title>
+<style>
+/* ============================================================
+   模块 T1：设计令牌与全局画布
+   固定 1280×720 设计画布，JS 等比缩放，任何分辨率无滚动条
+   ============================================================ */
+:root{
+  --bg-a:#eef2f8; --bg-b:#e7edf7;
+  --surface:#ffffff; --surface-2:#f6f8fc; --surface-3:#eef3fa;
+  --border:#dde4ee; --border-2:#c6d1e0;
+  --text:#141d2b; --text-2:#44516a; --muted:#7a879d;
+  --p1:#2563eb; --p1-bg:#e6efff; --p1-bd:#a9c4fb;      /* 主色·调入/强调 */
+  --p2:#c2740b; --p2-bg:#fdf2df; --p2-bd:#eec98a;      /* 琥珀·回路正号/减少 */
+  --p3:#0e7490; --p3-bg:#e2f4f8;                        /* 青·位势/负号 */
+  --ok:#15803d; --ok-bg:#e7f6ec;
+  --no:#d92d20; --no-bg:#fdeceb;
+  --r:14px; --r-sm:9px;
+  --sh-1:0 1px 2px rgba(15,23,42,.05),0 2px 10px rgba(15,23,42,.06);
+  --sh-2:0 8px 26px rgba(15,23,42,.10);
+  --font:"Inter","PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  --math:"Cambria Math","STIX Two Math","Times New Roman",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg-a);}
+body{font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input{font-family:inherit;}
+
+#stage{
+  position:fixed;left:50%;top:50%;width:1280px;height:720px;
+  transform:translate(-50%,-50%) scale(1);
+  background:
+    radial-gradient(900px 420px at 8% -10%, #ffffff 0%, rgba(255,255,255,0) 55%),
+    radial-gradient(760px 420px at 104% 112%, #e3ecff 0%, rgba(227,236,255,0) 60%),
+    linear-gradient(160deg,var(--bg-a),var(--bg-b));
+  overflow:hidden;
+}
+#stage::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(20,29,43,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(20,29,43,.045) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 100%);
+  -webkit-mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 100%);
+}
+
+/* ============================================================
+   模块 T2：课件骨架 —— 顶栏 / 幻灯片区 / 底栏
+   ============================================================ */
+#topbar{position:absolute;left:0;right:0;top:0;height:52px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 30px;z-index:30;}
+#topbar .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-2);letter-spacing:.4px;}
+#topbar .brand .logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#0e7490);
+  display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;box-shadow:var(--sh-1);}
+#topbar .meta{display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--muted);}
+#topbar .meta b{color:var(--text-2);font-weight:600;}
+#progress{position:absolute;left:0;top:52px;height:3px;width:100%;background:rgba(20,29,43,.06);z-index:30;}
+#progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2563eb,#0e7490);
+  transition:width .5s cubic-bezier(.22,.61,.36,1);}
+
+#deck{position:absolute;left:0;right:0;top:52px;bottom:56px;}
+
+#chrome{position:absolute;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 26px;z-index:30;}
+#dots{display:flex;align-items:center;gap:7px;}
+#dots button{width:9px;height:9px;border-radius:50%;background:rgba(20,29,43,.16);transition:.25s;}
+#dots button:hover{background:rgba(20,29,43,.34);transform:scale(1.25);}
+#dots button.on{background:var(--p1);width:22px;border-radius:5px;}
+#dots button.done{background:rgba(37,99,235,.42);}
+#navbtns{display:flex;align-items:center;gap:10px;}
+.navbtn{display:flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);color:var(--text-2);font-size:13.5px;
+  box-shadow:var(--sh-1);transition:.2s;}
+.navbtn:hover:not(:disabled){border-color:var(--p1-bd);color:var(--p1);transform:translateY(-1px);}
+.navbtn:disabled{opacity:.38;cursor:not-allowed;}
+.navbtn .k{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:0 5px;line-height:16px;}
+#pageNum{font-size:12.5px;color:var(--muted);min-width:74px;text-align:center;font-variant-numeric:tabular-nums;}
+#pageNum b{color:var(--text-2);font-size:14px;}
+
+/* ============================================================
+   模块 T3：幻灯片切换与元素级动画
+   ============================================================ */
+.slide{position:absolute;inset:0;padding:34px 56px 18px;opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateX(3.6%);display:flex;flex-direction:column;
+  transition:opacity .4s ease,transform .52s cubic-bezier(.22,.61,.36,1),visibility 0s linear .52s;}
+.slide.pos-left{transform:translateX(-3.6%);}
+.slide.active{opacity:1;visibility:visible;pointer-events:auto;transform:none;
+  transition:opacity .5s ease .1s,transform .58s cubic-bezier(.22,.61,.36,1) .1s;}
+
+.a{opacity:0;}
+.slide.active .a{animation:rise .6s cubic-bezier(.22,.61,.36,1) forwards;animation-delay:var(--d,0s);}
+@keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.slide.active .a.pop{animation-name:pop;}
+@keyframes pop{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:none;}}
+.slide.active .a.slidex{animation-name:slidex;}
+@keyframes slidex{from{opacity:0;transform:translateX(-22px);}to{opacity:1;transform:none;}}
+
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex:none;
+  padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.shead .ch{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--p1);
+  background:var(--p1-bg);border:1px solid var(--p1-bd);border-radius:999px;padding:3px 12px;margin-bottom:8px;}
+.shead h2{font-size:25px;font-weight:700;letter-spacing:.3px;}
+.shead .sub{font-size:13px;color:var(--muted);margin-top:3px;}
+.shead .hint{font-size:12.5px;color:var(--muted);text-align:right;line-height:1.6;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:18px 20px;}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-2);
+  background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;}
+.m{font-family:var(--math);font-style:italic;}
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 20px;border-radius:11px;
+  font-size:14.5px;font-weight:600;transition:.2s;border:1px solid transparent;}
+.btn-p{background:var(--p1);color:#fff;box-shadow:0 6px 18px rgba(37,99,235,.32);}
+.btn-p:hover{background:#1d4fd8;transform:translateY(-1px);}
+.btn-g{background:var(--surface);border-color:var(--border-2);color:var(--text-2);}
+.btn-g:hover{border-color:var(--p1-bd);color:var(--p1);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.btn-sm{height:34px;padding:0 14px;font-size:13px;border-radius:9px;}
+
+/* ============================================================
+   模块 T4：封面与结束页
+   ============================================================ */
+.cover{display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;padding:0 30px;position:relative;}
+.cover .badge{display:inline-flex;width:fit-content;align-items:center;gap:8px;font-size:13px;color:var(--p1);
+  background:var(--p1-bg);border:1px solid var(--p1-bd);border-radius:999px;padding:6px 16px;margin-bottom:24px;}
+.cover h1{font-size:60px;font-weight:800;letter-spacing:2px;line-height:1.14;}
+.cover h1 em{font-style:normal;background:linear-gradient(120deg,#2563eb,#0e7490);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.cover .en{font-size:16px;color:var(--muted);letter-spacing:5px;margin-top:12px;text-transform:uppercase;}
+.cover .lead{font-size:17px;color:var(--text-2);margin-top:20px;max-width:640px;line-height:1.8;}
+.cover .chips{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+.cover .go{margin-top:32px;display:flex;align-items:center;gap:16px;}
+.cover .keyhint{font-size:12.5px;color:var(--muted);}
+.cover svg.deco{position:absolute;right:56px;top:46%;transform:translateY(-50%);opacity:.95;pointer-events:none;}
+
+.fin{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:0;text-align:center;}
+.fin h1{font-size:50px;font-weight:800;letter-spacing:2px;}
+.fin .sub{color:var(--text-2);font-size:16px;margin-top:14px;line-height:1.9;}
+.fin .rep{display:flex;gap:16px;margin-top:32px;}
+.fin .repcard{min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:18px 22px;}
+.fin .repcard h4{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:8px;}
+.fin .repcard .v{font-size:30px;font-weight:800;color:var(--p1);}
+.fin .repcard .v.dim{color:var(--muted);font-size:20px;font-weight:600;}
+.fin .acts{display:flex;gap:14px;margin-top:34px;}
+
+/* ============================================================
+   模块 T5：目录页
+   ============================================================ */
+.toc{display:grid;grid-template-columns:400px minmax(0,1fr);gap:34px;flex:1;min-height:0;}
+.goal li{list-style:none;display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px dashed var(--border);
+  font-size:14.5px;color:var(--text-2);line-height:1.7;}
+.goal li:last-child{border:none;}
+.goal .n{flex:none;width:24px;height:24px;border-radius:8px;background:var(--p1-bg);border:1px solid var(--p1-bd);
+  color:var(--p1);font-size:12px;font-weight:700;display:grid;place-items:center;margin-top:2px;}
+.chapters{display:grid;grid-template-rows:repeat(4,1fr);gap:13px;}
+.chcard{display:flex;align-items:center;gap:18px;text-align:left;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-1);padding:13px 20px;transition:.22s;}
+.chcard:hover{transform:translateX(6px);border-color:var(--p1-bd);box-shadow:var(--sh-2);}
+.chcard .no{font-size:25px;font-weight:800;color:var(--p1);opacity:.9;width:52px;flex:none;
+  font-variant-numeric:tabular-nums;}
+.chcard h3{font-size:17px;font-weight:700;}
+.chcard p{font-size:12.5px;color:var(--muted);margin-top:3px;}
+.chcard .arr{margin-left:auto;color:var(--p1);opacity:0;transform:translateX(-6px);transition:.22s;font-size:18px;}
+.chcard:hover .arr{opacity:1;transform:none;}
+
+/* ============================================================
+   模块 T6：热点标注
+   ============================================================ */
+.hs-wrap{display:grid;grid-template-columns:minmax(0,1fr) 384px;gap:28px;flex:1;min-height:0;}
+.formula{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);
+  padding:26px 30px;font-size:20px;line-height:2.15;font-family:var(--math);position:relative;}
+.fz{border-radius:8px;padding:1px 7px;transition:.3s;border:1px dashed transparent;}
+.fz.on{background:var(--p1-bg);border-color:var(--p1-bd);color:#123a9c;}
+.hotspots{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;}
+.hs{display:flex;align-items:center;gap:9px;padding:8px 15px;border-radius:11px;background:var(--surface);
+  border:1px solid var(--border-2);font-size:13.5px;font-weight:600;color:var(--text-2);transition:.2s;}
+.hs i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--p1);color:#fff;
+  font-size:12px;display:grid;place-items:center;}
+.hs:hover{transform:translateY(-2px);border-color:var(--p1-bd);}
+.hs.on{background:var(--p1-bg);border-color:var(--p1-bd);color:var(--p1);}
+.hspanel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:18px 20px;display:flex;flex-direction:column;}
+.hspanel h4{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px;}
+.hspanel h4 i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--p1);color:#fff;
+  font-size:12px;display:grid;place-items:center;flex:none;}
+.hspanel p{font-size:13.5px;color:var(--text-2);line-height:1.85;}
+.hspanel .fm{font-family:var(--math);font-size:16px;background:var(--surface-2);border-radius:8px;
+  padding:8px 12px;margin-top:12px;border:1px solid var(--border);}
+
+/* ============================================================
+   模块 T7：运输表（本课件核心组件）
+   单元格 = 单位运价（左上小字）+ 调运量（居中大字）
+   ============================================================ */
+.ttwrap{position:relative;min-width:0;}
+.ttwrap svg.loop{position:absolute;inset:0;pointer-events:none;overflow:visible;}
+table.tt{border-collapse:separate;border-spacing:0;width:100%;background:var(--surface);
+  border:1px solid var(--border-2);border-radius:12px;overflow:hidden;font-size:14px;table-layout:fixed;}
+table.tt th,table.tt td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;}
+table.tt tr:last-child th,table.tt tr:last-child td{border-bottom:none;}
+table.tt th:last-child,table.tt td:last-child{border-right:none;}
+table.tt th{background:var(--surface-3);font-size:13px;color:var(--text-2);font-weight:600;padding:6px 4px;
+  height:46px;}
+table.tt th small{display:block;font-size:10.5px;font-weight:600;color:var(--p3);font-family:var(--math);margin-top:2px;}
+table.tt th.corner{width:142px;background:var(--surface-2);font-size:11px;color:var(--muted);font-weight:500;
+  padding-left:8px;text-align:left;letter-spacing:.3px;}
+table.tt th.sup{background:#eaf0fb;color:var(--p1);width:68px;}
+table.tt th.dem{background:#e8f5f8;color:var(--p3);}
+table.tt td{position:relative;height:58px;transition:background .25s,box-shadow .25s;}
+table.tt td .c{position:absolute;left:5px;top:3px;font-size:10.5px;color:var(--muted);font-family:var(--math);}
+table.tt td .xv{display:block;line-height:58px;font-family:var(--math);font-size:20px;font-weight:700;
+  color:var(--text);transition:color .25s;}
+table.tt td.nb .xv{color:#bcc6d5;font-weight:400;font-size:15px;}
+table.tt td.bas{background:#f5f9ff;}
+table.tt td.bas .xv{color:var(--p1);}
+table.tt td.hot{cursor:pointer;}
+table.tt td.hot:hover{background:var(--p1-bg);}
+table.tt td.sel{background:var(--p1-bg);box-shadow:inset 0 0 0 2px var(--p1);}
+table.tt td.enter{background:var(--p1-bg);box-shadow:inset 0 0 0 3px var(--p1);}
+table.tt td.neg{background:var(--no-bg);box-shadow:inset 0 0 0 2px #e7887e;}
+table.tt td.pos{background:#f3faf5;}
+table.tt td.lp{box-shadow:inset 0 0 0 2px var(--p2);}
+table.tt td.lm{box-shadow:inset 0 0 0 2px var(--p3);}
+table.tt td .sgn{position:absolute;right:5px;top:3px;font-size:13px;font-weight:800;line-height:1;}
+table.tt td .sgn.p{color:var(--p2);}
+table.tt td .sgn.m{color:var(--p3);}
+table.tt td .sv{display:block;line-height:58px;font-family:var(--math);font-size:18px;font-weight:700;}
+table.tt td .sv.n{color:var(--no);}
+table.tt td .sv.p{color:var(--ok);}
+table.tt td.gone{background:#fbfcfe;}
+table.tt td.gone .xv{text-decoration:line-through;color:#c3ccd9;}
+
+/* 逐步分配时的高亮行/列 */
+table.tt tr.act-row th.sup{background:var(--p1);color:#fff;}
+table.tt th.act-col{background:var(--p3);color:#fff;}
+
+/* ============================================================
+   模块 T8：右侧步骤面板 / 状态条 / 对比条
+   ============================================================ */
+.steps{display:flex;flex-direction:column;gap:8px;overflow:hidden;}
+.step{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border-radius:9px;
+  background:var(--surface-2);border:1px solid var(--border);font-size:12.6px;color:var(--muted);
+  line-height:1.55;transition:.28s;}
+.step .no{flex:none;width:19px;height:19px;border-radius:6px;background:#e6ebf3;color:#8b98ab;
+  font-size:11px;font-weight:700;display:grid;place-items:center;margin-top:1px;}
+.step.on{background:var(--p1-bg);border-color:var(--p1-bd);color:#123a9c;}
+.step.on .no{background:var(--p1);color:#fff;}
+.step.done{background:#f4f9f5;border-color:#cfe8d8;color:#2f6b46;}
+.step.done .no{background:var(--ok);color:#fff;}
+.step b{font-family:var(--math);font-size:13.5px;}
+.status{border-radius:10px;padding:11px 14px;font-size:13px;line-height:1.7;transition:.3s;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);}
+.status.in{background:var(--p1-bg);border-color:var(--p1-bd);color:#123a9c;}
+.status.ok{background:var(--ok-bg);border-color:#b7e2c5;color:#0d5c2c;}
+.status.warn{background:var(--p2-bg);border-color:var(--p2-bd);color:#8a5206;}
+.meter{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:var(--surface-2);
+  border:1px solid var(--border);font-size:13px;color:var(--text-2);}
+.meter b{font-family:var(--math);font-size:17px;color:var(--p1);}
+.meter span{white-space:nowrap;}
+
+/* ============================================================
+   模块 T9：判分式选择题 / 小结 / 讲解面板
+   ============================================================ */
+.opts{display:grid;gap:10px;}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;padding:11px 15px;border-radius:11px;
+  background:var(--surface);border:1.5px solid var(--border-2);font-size:14.5px;color:var(--text);
+  transition:.18s;}
+.opt.sm{padding:8px 13px;font-size:13.2px;border-radius:10px;gap:9px;}
+.opt .tag{flex:none;width:26px;height:26px;border-radius:8px;background:var(--surface-3);
+  color:var(--text-2);font-size:12.5px;font-weight:700;display:grid;place-items:center;transition:.18s;}
+.opt.sm .tag{width:23px;height:23px;font-size:11.5px;}
+.opt:hover:not(:disabled){border-color:var(--p1-bd);background:var(--p1-bg);transform:translateX(4px);}
+.opt:disabled{cursor:default;}
+.opt.correct{border-color:var(--ok);background:var(--ok-bg);color:#0d5c2c;}
+.opt.correct .tag{background:var(--ok);color:#fff;}
+.opt.wrong{border-color:var(--no);background:var(--no-bg);color:#8f1d14;}
+.opt.wrong .tag{background:var(--no);color:#fff;}
+.explain{margin-top:10px;font-size:13px;line-height:1.75;border-radius:10px;padding:11px 14px;display:none;}
+.explain.show{display:block;animation:rise .4s ease forwards;}
+.explain.good{background:var(--ok-bg);color:#0d5c2c;border:1px solid #b7e2c5;}
+.explain.bad{background:var(--no-bg);color:#8f1d14;border:1px solid #f3c1bc;}
+
+.whybox{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-1);
+  padding:14px 16px;overflow:hidden;}
+.whybox .act{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;margin-bottom:8px;}
+.act.enter{background:var(--p1-bg);color:var(--p1);border:1px solid var(--p1-bd);}
+.act.solve{background:var(--p3-bg);color:var(--p3);border:1px solid #a9d8e2;}
+.act.check{background:var(--p2-bg);color:var(--p2);border:1px solid var(--p2-bd);}
+.act.adjust{background:var(--p2-bg);color:var(--p2);border:1px solid var(--p2-bd);}
+.act.opt{background:var(--ok-bg);color:var(--ok);border:1px solid #b7e2c5;}
+.act.init{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border);border:1px solid var(--border);}
+.whybox h4{font-size:15px;font-weight:700;margin-bottom:7px;}
+.whybox p{font-size:12.8px;color:var(--text-2);line-height:1.78;}
+.facts{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.facts span{font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;
+  padding:3px 9px;color:var(--text-2);font-family:var(--math);}
+.facts span b{color:var(--p1);}
+
+.sumwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px;flex:1;min-height:0;align-content:center;}
+.sumcol{display:contents;}
+.sumcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-1);
+  padding:14px 17px;display:flex;gap:13px;align-items:flex-start;}
+.sumcard .ic{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+  font-size:14px;font-weight:800;color:#fff;}
+.sumcard h4{font-size:14.5px;font-weight:700;margin-bottom:4px;}
+.sumcard p{font-size:12.6px;color:var(--text-2);line-height:1.7;}
+.formulabar{grid-column:1 / -1;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:12px;
+  padding:11px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-family:var(--math);font-size:15.5px;}
+.formulabar .lbl{font-family:var(--font);font-size:12px;color:var(--muted);font-weight:600;}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;flex:1;min-height:0;}
+.col{display:flex;flex-direction:column;gap:13px;min-height:0;min-width:0;}
+.col.mid{justify-content:center;}
+.tiny{font-size:12.2px;color:var(--muted);line-height:1.7;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center;}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px;}
+#topbar .brand a.home{margin-left:8px;font-size:11.5px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:1px 8px;transition:.2s;}
+#topbar .brand a.home:hover{color:var(--p1);border-color:var(--p1-bd);background:var(--p1-bg);}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <header id="topbar">
+    <div class="brand"><span class="logo">⇄</span><span>运筹学 · 线性规划应用 · 交互课件</span><a class="home" href="index.html">← 课件中心</a></div>
+    <div class="meta"><span id="chapLabel">封面</span><span>|</span><span>第 <b id="pgCur">1</b> / <span id="pgAll">14</span> 页</span></div>
+  </header>
+  <div id="progress"><i></i></div>
+
+  <main id="deck">
+
+    <!-- ========== 1 封面 ========== -->
+    <section class="slide" id="s1">
+      <div class="cover">
+        <span class="badge a" style="--d:.05s">运筹学 · 线性规划应用 · 第 5 讲</span>
+        <h1 class="a" style="--d:.15s">运输问题<br><em>一张运价表里的最优调运</em></h1>
+        <div class="en a" style="--d:.28s">The Transportation Problem</div>
+        <p class="lead a" style="--d:.38s">三个产地、三个销地，运价各不相同。在满足供需的前提下，怎样调运才能让总运费最低？
+          表上作业法把线性规划「搬」进一张表格，用位势与闭回路完成求解 —— 不用画图，也不必列单纯形表。</p>
+        <div class="chips a" style="--d:.48s">
+          <span class="chip">适合：运筹学 / 物流与供应链</span>
+          <span class="chip">时长约 35 分钟</span>
+          <span class="chip">互动练习 × 5</span>
+        </div>
+        <div class="go a" style="--d:.58s">
+          <button class="btn btn-p" data-go="1">开始学习 →</button>
+          <span class="keyhint">键盘 ← → 翻页 · 空格下一页 · Home / End 首末页</span>
+        </div>
+        <svg class="deco a pop" style="--d:.5s" width="420" height="360" viewBox="0 0 420 360" fill="none">
+          <defs>
+            <linearGradient id="tg1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#2563eb" stop-opacity=".14"/><stop offset="1" stop-color="#0e7490" stop-opacity=".08"/>
+            </linearGradient>
+          </defs>
+          <rect x="18" y="30" width="384" height="300" rx="12" fill="url(#tg1)" stroke="#2563eb" stroke-opacity=".28"/>
+          <g stroke="#2563eb" stroke-opacity=".22">
+            <line x1="18" y1="130" x2="402" y2="130"/><line x1="18" y1="230" x2="402" y2="230"/>
+            <line x1="146" y1="30" x2="146" y2="330"/><line x1="274" y1="30" x2="274" y2="330"/>
+          </g>
+          <g fill="#2563eb" fill-opacity=".18">
+            <rect x="152" y="136" width="116" height="88" rx="8"/>
+            <rect x="280" y="236" width="116" height="88" rx="8"/>
+          </g>
+          <g stroke="#0e7490" stroke-width="2.4" stroke-dasharray="7 6" opacity=".85">
+            <path d="M60 190 H 200 V 96 H 340"/>
+          </g>
+          <path d="M340 96 l -13 -6 v12 z" fill="#0e7490" opacity=".85"/>
+          <g fill="#fff" stroke="#2563eb" stroke-width="2.4">
+            <circle cx="48" cy="80" r="11"/><circle cx="48" cy="180" r="11"/><circle cx="48" cy="280" r="11"/>
+            <circle cx="372" cy="80" r="11"/><circle cx="372" cy="180" r="11"/><circle cx="372" cy="280" r="11"/>
+          </g>
+          <g fill="#2563eb" font-family="Georgia,serif" font-size="12">
+            <text x="26" y="66">A₁</text><text x="26" y="166">A₂</text><text x="26" y="266">A₃</text>
+          </g>
+          <g fill="#0e7490" font-family="Georgia,serif" font-size="12">
+            <text x="382" y="66">B₁</text><text x="382" y="166">B₂</text><text x="382" y="266">B₃</text>
+          </g>
+          <circle cx="340" cy="96" r="17" fill="none" stroke="#0e7490" stroke-width="2" opacity=".5">
+            <animate attributeName="r" values="10;24" dur="2s" repeatCount="indefinite" begin="1.6s"/>
+            <animate attributeName="opacity" values=".55;0" dur="2s" repeatCount="indefinite" begin="1.6s"/>
+          </circle>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ========== 2 目录与学习目标 ========== -->
+    <section class="slide" id="s2">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">课程导览</span><h2>学习目标与目录</h2></div>
+        <div class="hint">点击右侧章节卡片<br>可直接跳转</div>
+      </div>
+      <div class="toc">
+        <div class="card a slidex" style="--d:.15s">
+          <h3 style="font-size:16px;margin-bottom:6px">学完本课你将能够</h3>
+          <ul class="goal">
+            <li><span class="n">1</span><span>把一个调运情境写成<b>运输问题模型</b>，说清 <span class="m">x<sub>ij</sub></span> 与 <span class="m">c<sub>ij</sub></span> 的含义</span></li>
+            <li><span class="n">2</span><span>用<b>西北角法</b>与<b>最小元素法</b>分别求出初始基可行解，并解释二者差异</span></li>
+            <li><span class="n">3</span><span>用<b>位势法</b>写出 <span class="m">u<sub>i</sub>+v<sub>j</sub>=c<sub>ij</sub></span>，算出每个空格的<b>检验数</b></span></li>
+            <li><span class="n">4</span><span>沿<b>闭回路</b>完成一次调整，直到全部检验数非负、方案最优</span></li>
+          </ul>
+        </div>
+        <div class="chapters">
+          <button class="chcard a slidex" style="--d:.22s" data-go="2">
+            <span class="no">01</span><span><h3>建模：从运价表到线性规划</h3><p>产销平衡 · 决策变量 · 为什么只有 m+n−1 个基格</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.32s" data-go="5">
+            <span class="no">02</span><span><h3>初始基：两种简单方法</h3><p>西北角法 · 最小元素法 · 贪心为何不一定更好</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.42s" data-go="7">
+            <span class="no">03</span><span><h3>最优性检验与调整</h3><p>位势法 · 检验数判据 · 闭回路调整</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.52s" data-go="10">
+            <span class="no">04</span><span><h3>完整迭代与测验</h3><p>动画演示 · 随堂测 · 课程小结</p></span><span class="arr">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 3 情境：从一张运价表说起 ========== -->
+    <section class="slide" id="s3">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第一章 · 建模</span><h2>1.1 从一张运价表说起</h2>
+          <div class="sub">点击表格中的任一格，看它代表的是哪一个决策变量</div></div>
+        <div class="hint">互动：运价表点选</div>
+      </div>
+      <div class="hs-wrap">
+        <div>
+          <div class="card a slidex" style="--d:.15s;padding:14px 18px;margin-bottom:14px">
+            <p style="font-size:14px;color:var(--text-2);line-height:1.85">
+              某公司有 <b>3 个仓库</b>（产地 A₁ ～ A₃），要向 <b>3 家门店</b>（销地 B₁ ～ B₃）供货。
+              每个仓库的<b>产量</b>、每家门店的<b>销量</b>已知，任意一条线路的<b>单位运价</b>也已知。
+              问：每个仓库给每家门店各发多少货，才能满足全部需求、且总运费最低？
+            </p>
+          </div>
+          <div class="ttwrap a pop" style="--d:.25s" id="wrap3">
+            <div id="tbl3"></div>
+          </div>
+          <div class="legend a" style="--d:.35s;margin-top:9px">
+            <span><i style="background:#eaf0fb;border:1px solid #a9c4fb"></i>产量（供应量）</span>
+            <span><i style="background:#e8f5f8;border:1px solid #a9d8e2"></i>销量（需求量）</span>
+            <span><i style="background:#fff;border:1px solid #c6d1e0"></i>格内左上角小字 = 单位运价 <span class="m">c<sub>ij</sub></span></span>
+          </div>
+        </div>
+        <div class="hspanel a slidex" style="--d:.3s">
+          <h4><i>?</i><span id="hspT3">点击任意一格开始</span></h4>
+          <p id="hspB3">表内每一格对应「某个产地运往某个销地」这一条线路。格子里左上角的小数字是这条线路的单位运价 —— 先把它的含义看清楚，再谈怎么求最优解。</p>
+          <div class="fm" id="hspF3" style="display:none"></div>
+          <div style="margin-top:auto;padding-top:14px;border-top:1px dashed var(--border)">
+            <div class="meter"><span>总产量 <b>20</b></span><span style="margin-left:auto">总销量 <b>20</b></span></div>
+            <p class="tiny" style="margin-top:9px">总量相等 → 这是一个<b>产销平衡</b>的运输问题，不必增设虚拟产地或销地。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 4 数学模型 ========== -->
+    <section class="slide" id="s4">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第一章 · 建模</span><h2>1.2 写出数学模型</h2>
+          <div class="sub">点击下方热点，逐个认识目标函数、两类约束与非负条件</div></div>
+        <div class="hint">互动：热点标注 × 4</div>
+      </div>
+      <div class="hs-wrap">
+        <div>
+          <div class="formula a slidex" style="--d:.15s">
+            <div><span class="fz" data-k="obj">min z = 4x₁₁ + 2x₁₂ + 5x₁₃ + 6x₂₁ + 3x₂₂ + 7x₂₃ + 5x₃₁ + 7x₃₂ + 6x₃₃</span></div>
+            <div style="font-family:var(--font);font-size:13px;color:var(--muted);margin:6px 0 2px">s.t.</div>
+            <div><span class="fz" data-k="row">x₁₁ + x₁₂ + x₁₃ = 8</span>　<span class="fz" data-k="row">x₂₁ + x₂₂ + x₂₃ = 5</span>　<span class="fz" data-k="row">x₃₁ + x₃₂ + x₃₃ = 7</span></div>
+            <div><span class="fz" data-k="col">x₁₁ + x₂₁ + x₃₁ = 4</span>　<span class="fz" data-k="col">x₁₂ + x₂₂ + x₃₂ = 6</span>　<span class="fz" data-k="col">x₁₃ + x₂₃ + x₃₃ = 10</span></div>
+            <div><span class="fz" data-k="nn">x<sub>ij</sub> ≥ 0　(i = 1,2,3; j = 1,2,3)</span></div>
+          </div>
+          <div class="hotspots">
+            <button class="hs a" style="--d:.25s" data-hs="obj"><i>1</i>目标函数</button>
+            <button class="hs a" style="--d:.3s" data-hs="row"><i>2</i>产量约束（行）</button>
+            <button class="hs a" style="--d:.35s" data-hs="col"><i>3</i>销量约束（列）</button>
+            <button class="hs a" style="--d:.4s" data-hs="nn"><i>4</i>非负条件</button>
+          </div>
+        </div>
+        <div class="hspanel a slidex" style="--d:.32s">
+          <h4><i>1</i><span id="hspT4">目标函数</span></h4>
+          <p id="hspB4">总运费 = 每条线路的「运量 × 单位运价」之和。9 条线路 9 个变量，谁该多运、谁该少运，正是要优化的内容。</p>
+          <div class="fm" id="hspF4">min z = Σᵢ Σⱼ c<sub>ij</sub> x<sub>ij</sub></div>
+          <p class="tiny" style="margin-top:auto;padding-top:12px;border-top:1px dashed var(--border)">
+            小知识：这个模型有 9 个变量、6 个等式约束，但约束之间并不独立 —— 下一节就来说明。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 5 为什么只有 m+n−1 个基格 ========== -->
+    <section class="slide" id="s5">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第一章 · 建模</span><h2>1.3 为什么基变量只有 m + n − 1 个</h2>
+          <div class="sub">这个结论决定了「初始基」需要填几格，是表上作业法的地基</div></div>
+        <div class="hint">互动：点「数一数」<br>看基格与空格</div>
+      </div>
+      <div class="grid2">
+        <div class="col mid">
+          <div class="card a slidex" style="--d:.15s;padding:16px 19px">
+            <h4 style="font-size:15px;margin-bottom:9px">一行相加 = 全部相加 = 一列相加</h4>
+            <p style="font-size:13.4px;color:var(--text-2);line-height:1.85">
+              把 3 个产地的产量约束加在一起，左边是全部 9 个变量之和，右边是 8+5+7 = 20；
+              把 3 个销地的销量约束加在一起，左边同样是全部 9 个变量之和，右边是 4+6+10 = 20。
+              也就是说，<b>任意一条约束都能由其余五条推出</b> —— 6 条约束里只有 5 条是独立的。
+            </p>
+            <div class="formulabar" style="margin-top:12px;font-size:15px">
+              <span class="lbl">结论</span>
+              <span>秩 = m + n − 1 = 3 + 3 − 1 = <b>5</b></span>
+              <span style="color:var(--muted)">→</span>
+              <span>基变量个数 = <b>5</b>，其余 9 − 5 = <b>4</b> 个为非基变量（取 0）</span>
+            </div>
+            <p class="tiny" style="margin-top:11px">
+              于是「一个基本可行解」= 在 9 格里挑 5 格填正数（叫<b>基格</b>），其余 4 格留空（叫<b>空格</b>）。
+              如果填正数的格子少于 5 个，就叫<b>退化</b>，需要补一个 0 当基格。
+            </p>
+          </div>
+          <div class="card a" style="--d:.3s;padding:12px 16px;display:flex;align-items:center;gap:12px">
+            <button class="btn btn-p btn-sm" id="btnCount">数一数这 9 格</button>
+            <span class="tiny" id="countMsg">初始方案由西北角法给出：5 个基格 + 4 个空格。</span>
+          </div>
+        </div>
+        <div class="ttwrap a pop" style="--d:.25s" id="wrap5">
+          <div id="tbl5"></div>
+          <div class="legend" style="margin-top:10px">
+            <span><i style="background:#f5f9ff;border:1px solid #a9c4fb"></i>基格（调运量 &gt; 0）</span>
+            <span><i style="background:#fff;border:1px solid #c6d1e0"></i>空格（= 0，不调运）</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 6 西北角法 ========== -->
+    <section class="slide" id="s6">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第二章 · 初始基</span><h2>2.1 西北角法：从左上角一路填下去</h2>
+          <div class="sub">每步取「剩余产量」与「剩余销量」的较小者，填完就划掉一行或一列</div></div>
+        <div class="hint">互动：逐步分配 × 5<br>共需 5 个基格</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1fr) 372px">
+        <div class="col mid">
+          <div class="ttwrap a pop" style="--d:.15s" id="wrap6"><div id="tbl6"></div></div>
+          <div class="meter a" style="--d:.25s">当前累计运费 <b id="cost6">0</b>
+            <span class="tiny" style="margin-left:auto" id="ms6">尚未开始</span></div>
+        </div>
+        <div class="col mid">
+          <div class="steps a slidex" style="--d:.2s" id="steps6"></div>
+          <div class="a" style="--d:.3s;display:flex;gap:10px">
+            <button class="btn btn-p btn-sm" id="nwNext">下一步</button>
+            <button class="btn btn-g btn-sm" id="nwReset">重置</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 7 最小元素法 ========== -->
+    <section class="slide" id="s7">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第二章 · 初始基</span><h2>2.2 最小元素法：先满足最便宜的线路</h2>
+          <div class="sub">按运价从小到大扫描，能运就尽量运 —— 但贪心未必带来更低的初始运费</div></div>
+        <div class="hint">互动：逐步分配 × 5</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1fr) 372px">
+        <div class="col mid">
+          <div class="ttwrap a pop" style="--d:.15s" id="wrap7"><div id="tbl7"></div></div>
+          <div class="meter a" style="--d:.25s">当前累计运费 <b id="cost7">0</b>
+            <span class="tiny" style="margin-left:auto" id="ms7">尚未开始</span></div>
+        </div>
+        <div class="col mid">
+          <div class="steps a slidex" style="--d:.2s" id="steps7"></div>
+          <div class="status a" style="--d:.3s" id="cmp7">两种方法的初始运费将在这里对比。</div>
+          <div class="a" style="--d:.36s;display:flex;gap:10px">
+            <button class="btn btn-p btn-sm" id="meNext">下一步</button>
+            <button class="btn btn-g btn-sm" id="meReset">重置</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 8 位势法 ========== -->
+    <section class="slide" id="s8">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 最优性检验</span><h2>3.1 位势法：先给每行每列定一个"价格"</h2>
+          <div class="sub">对每个基格列方程 u<sub>i</sub> + v<sub>j</sub> = c<sub>ij</sub>，5 个基格正好解出 3+3 个位势（差一个常数）</div></div>
+        <div class="hint">互动：逐步解位势</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1fr) 372px">
+        <div class="col mid">
+          <div class="ttwrap a pop" style="--d:.15s" id="wrap8"><div id="tbl8"></div></div>
+          <div class="status a" style="--d:.25s" id="st8">点「下一步」，从 u₁ = 0 出发，用基格方程把位势一个个解出来。</div>
+        </div>
+        <div class="col mid">
+          <div class="steps a slidex" style="--d:.2s" id="steps8"></div>
+          <div class="a" style="--d:.3s;display:flex;gap:10px">
+            <button class="btn btn-p btn-sm" id="potNext">下一步</button>
+            <button class="btn btn-g btn-sm" id="potReset">重置</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 9 检验数 ========== -->
+    <section class="slide" id="s9">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 最优性检验</span><h2>3.2 检验数：空格值不值得"调入"</h2>
+          <div class="sub">点击 4 个空格，逐个算出 σ<sub>ij</sub> = c<sub>ij</sub> − (u<sub>i</sub> + v<sub>j</sub>)</div></div>
+        <div class="hint">互动：点格算 σ × 4</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1fr) 372px">
+        <div class="col mid">
+          <div class="ttwrap a pop" style="--d:.15s" id="wrap9"><div id="tbl9"></div></div>
+          <div class="legend a" style="--d:.25s">
+            <span><i style="background:#fdeceb;border:1px solid #e7887e"></i>σ &lt; 0：调入可降低运费</span>
+            <span><i style="background:#f3faf5;border:1px solid #b7e2c5"></i>σ ≥ 0：不必调入</span>
+          </div>
+        </div>
+        <div class="col mid">
+          <div class="hspanel a slidex" style="--d:.2s;padding:15px 17px">
+            <h4 style="font-size:15px"><i>σ</i><span id="sigT">点一个空格</span></h4>
+            <p id="sigB" style="font-size:12.8px">位势已经求出：u = (0, 1, 0)，v = (4, 2, 6)。对空格 (i, j) 计算 σ<sub>ij</sub> = c<sub>ij</sub> − (u<sub>i</sub> + v<sub>j</sub>)。</p>
+            <div class="fm" id="sigF" style="font-size:14.5px;display:none"></div>
+          </div>
+          <div class="status a" style="--d:.28s" id="sigVerdict">已算 0 / 4。全部算完后给出判定。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 10 闭回路调整 ========== -->
+    <section class="slide" id="s10">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 最优性检验</span><h2>3.3 闭回路调整：把运量"转"一圈</h2>
+          <div class="sub">调入格加上 θ，回路上交替减、加 —— θ 取所有"减"格中最小的那个</div></div>
+        <div class="hint">互动：三步完成一次调整</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1fr) 372px">
+        <div class="col mid">
+          <div class="ttwrap a pop" style="--d:.15s" id="wrap10"><div id="tbl10"></div></div>
+          <div class="legend a" style="--d:.25s">
+            <span><i style="background:#fff;border:2px solid #c2740b"></i>回路上取"+"的格</span>
+            <span><i style="background:#fff;border:2px solid #0e7490"></i>回路上取"−"的格</span>
+            <span>调入格 (1,3) 的 σ = −1 &lt; 0，值得调入</span>
+          </div>
+        </div>
+        <div class="col mid">
+          <div class="hspanel a slidex" style="--d:.2s;padding:15px 17px">
+            <h4 style="font-size:15px"><i>θ</i><span id="lpT">第一步：找闭回路</span></h4>
+            <p id="lpB" style="font-size:12.8px">从调入格 (1,3) 出发，只在基格之间横向、纵向交替行走，一定能回到起点 —— 这条回路存在且唯一。</p>
+            <div class="fm" id="lpF" style="font-size:14.5px;display:none"></div>
+          </div>
+          <div class="status a" style="--d:.28s" id="lpV">等待操作。</div>
+          <div class="a" style="--d:.34s;display:flex;gap:10px">
+            <button class="btn btn-p btn-sm" id="lpNext">找闭回路</button>
+            <button class="btn btn-g btn-sm" id="lpReset">重置</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 11 完整迭代动画 ========== -->
+    <section class="slide" id="s11">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 最优性检验</span><h2>3.4 完整走一遍：从 93 到 90</h2>
+          <div class="sub">位势 → 检验数 → 闭回路 → 调整 → 再检验，循环到全部 σ ≥ 0 为止</div></div>
+        <div class="hint">可单步 / 自动播放 / 调速</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1fr) 356px">
+        <div class="col mid">
+          <div class="ttwrap a pop" style="--d:.15s" id="wrap11"><div id="tbl11"></div></div>
+          <div class="a" style="--d:.25s;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-p btn-sm" id="p11step">单步</button>
+            <button class="btn btn-g btn-sm" id="p11play">播放</button>
+            <button class="btn btn-g btn-sm" id="p11reset">重置</button>
+            <span class="tiny" style="margin-left:6px">速度</span>
+            <span id="p11speed" style="display:flex;gap:5px">
+              <button class="rbtn btn btn-g btn-sm" style="height:30px;padding:0 10px;font-size:12px" data-sp="0.6">慢</button>
+              <button class="rbtn btn btn-g btn-sm" style="height:30px;padding:0 10px;font-size:12px" data-sp="1">中</button>
+              <button class="rbtn btn btn-g btn-sm" style="height:30px;padding:0 10px;font-size:12px" data-sp="1.7">快</button>
+            </span>
+            <span class="tiny" style="margin-left:auto" id="p11prog">节拍 1 / 7</span>
+          </div>
+        </div>
+        <div class="col mid">
+          <div class="whybox a slidex" style="--d:.2s" id="w11">
+            <span class="act init" id="p11act">初始方案</span>
+            <h4 id="p11title">西北角法给出初始基可行解</h4>
+            <p id="p11why"></p>
+            <div class="facts" id="p11facts"></div>
+          </div>
+          <div class="status a" style="--d:.28s" id="p11st">当前总运费 <b style="font-family:var(--math);font-size:16px;color:var(--p1)">93</b>，还有下降空间。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 12 随堂测验 ========== -->
+    <section class="slide" id="s12">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">随堂测验</span><h2>三道题，检验一下</h2>
+          <div class="sub">每题只有一个正确答案，选完立刻给出解析</div></div>
+        <div class="hint">成绩：<b id="quizScore">0</b> / 3 题<br><span id="quizMsg">还没开始</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex:1;min-height:0;align-content:start">
+        <div class="card a" style="--d:.15s;padding:15px 16px;display:flex;flex-direction:column">
+          <span class="chip" style="width:fit-content;margin-bottom:10px">Q1 · 基变量个数</span>
+          <p style="font-size:13.6px;line-height:1.7;margin-bottom:11px">一个 <b>3 产地 4 销地</b> 的产销平衡运输问题，基变量共有几个？</p>
+          <div class="opts" data-quiz="q1">
+            <button class="opt sm" data-ok="0"><span class="tag">A</span>12 个</button>
+            <button class="opt sm" data-ok="1"><span class="tag">B</span>6 个</button>
+            <button class="opt sm" data-ok="0"><span class="tag">C</span>7 个</button>
+            <button class="opt sm" data-ok="0"><span class="tag">D</span>5 个</button>
+          </div>
+          <div class="explain" data-ex="q1"></div>
+        </div>
+        <div class="card a" style="--d:.25s;padding:15px 16px;display:flex;flex-direction:column">
+          <span class="chip" style="width:fit-content;margin-bottom:10px">Q2 · 检验数的含义</span>
+          <p style="font-size:13.6px;line-height:1.7;margin-bottom:11px">极小化问题中，某空格的检验数 <span class="m">σ<sub>ij</sub> = −2</span>，这说明什么？</p>
+          <div class="opts" data-quiz="q2">
+            <button class="opt sm" data-ok="1"><span class="tag">A</span>该格每调入 1 单位，总运费可减少 2</button>
+            <button class="opt sm" data-ok="0"><span class="tag">B</span>方案已最优，可以停止</button>
+            <button class="opt sm" data-ok="0"><span class="tag">C</span>该格运价太低，应删掉这条线路</button>
+            <button class="opt sm" data-ok="0"><span class="tag">D</span>位势一定算错了</button>
+          </div>
+          <div class="explain" data-ex="q2"></div>
+        </div>
+        <div class="card a" style="--d:.35s;padding:15px 16px;display:flex;flex-direction:column">
+          <span class="chip" style="width:fit-content;margin-bottom:10px">Q3 · 位势方程</span>
+          <p style="font-size:13.6px;line-height:1.7;margin-bottom:11px">位势方程 <span class="m">u<sub>i</sub> + v<sub>j</sub> = c<sub>ij</sub></span> 对哪些格子成立？</p>
+          <div class="opts" data-quiz="q3">
+            <button class="opt sm" data-ok="0"><span class="tag">A</span>全部 9 个格子</button>
+            <button class="opt sm" data-ok="1"><span class="tag">B</span>只有基格（已调运的格）</button>
+            <button class="opt sm" data-ok="0"><span class="tag">C</span>只有空格</button>
+            <button class="opt sm" data-ok="0"><span class="tag">D</span>检验数为正的格</button>
+          </div>
+          <div class="explain" data-ex="q3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 13 小结 ========== -->
+    <section class="slide" id="s13">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">课程小结</span><h2>一张表、四个动作</h2></div>
+        <div class="hint">表上作业法 =<br>单纯形法在运输表上的特化</div>
+      </div>
+      <div class="sumwrap">
+        <div class="sumcol">
+          <div class="sumcard a" style="--d:.15s">
+            <span class="ic" style="background:#2563eb">1</span>
+            <div><h4>建模：min z = ΣΣ c<sub>ij</sub>x<sub>ij</sub></h4>
+              <p>行约束 = 产量，列约束 = 销量，全为等式（产销平衡）。约束秩为 m+n−1，所以基格只有 5 个。</p></div>
+          </div>
+          <div class="sumcard a" style="--d:.23s">
+            <span class="ic" style="background:#0e7490">2</span>
+            <div><h4>初始基：西北角法 / 最小元素法</h4>
+              <p>前者机械地逐格填满，后者按运价从小到大贪心。本例 93 与 95 —— 贪心不一定更好，两者都只是起点。</p></div>
+          </div>
+        </div>
+        <div class="sumcol">
+          <div class="sumcard a" style="--d:.31s">
+            <span class="ic" style="background:#c2740b">3</span>
+            <div><h4>检验：位势法求 u、v，再算 σ</h4>
+              <p>基格满足 u<sub>i</sub>+v<sub>j</sub>=c<sub>ij</sub>；空格算 σ<sub>ij</sub>=c<sub>ij</sub>−(u<sub>i</sub>+v<sub>j</sub>)。出现负 σ 就必须调整。</p></div>
+          </div>
+          <div class="sumcard a" style="--d:.39s">
+            <span class="ic" style="background:#15803d">4</span>
+            <div><h4>调整：沿闭回路搬运 θ</h4>
+              <p>θ 取回路上所有"减"格的最小运量，取到 0 的那格出基。反复迭代，直到全部 σ ≥ 0。</p></div>
+          </div>
+        </div>
+        <div class="formulabar a" style="--d:.47s">
+          <span class="lbl">判据</span>
+          <span>u<sub>i</sub>+v<sub>j</sub>=c<sub>ij</sub>（基格）</span><span style="color:var(--muted)">→</span>
+          <span>σ<sub>ij</sub> = c<sub>ij</sub> − (u<sub>i</sub>+v<sub>j</sub>)（空格）</span><span style="color:var(--muted)">→</span>
+          <span>全部 σ<sub>ij</sub> ≥ 0 ⟺ 最优</span><span style="color:var(--muted)">→</span>
+          <span>本例：93 → <b style="color:var(--ok)">90</b></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 14 结束页 ========== -->
+    <section class="slide" id="s14">
+      <div class="fin">
+        <h1 class="a" style="--d:.05s">本讲结束</h1>
+        <p class="sub a" style="--d:.15s">运输问题是线性规划最经典的「结构化」特例：<br>
+          约束矩阵稀疏，于是有了更省事的表上作业法。</p>
+        <div class="rep a" style="--d:.28s">
+          <div class="repcard"><h4>随堂测验</h4><div class="v" id="repQuiz">未完成</div></div>
+          <div class="repcard"><h4>西北角初始运费</h4><div class="v">93</div></div>
+          <div class="repcard"><h4>最优运费</h4><div class="v" style="color:var(--ok)">90</div></div>
+        </div>
+        <div class="acts a" style="--d:.4s">
+          <button class="btn btn-g" id="btnRestart">重新学习</button>
+          <button class="btn btn-p" data-go="0">回到封面</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="chrome">
+    <div id="dots"></div>
+    <div id="navbtns">
+      <span id="pageNum"><b id="pn1">1</b> / <span id="pn2">14</span></span>
+      <button class="navbtn" id="btnPrev">← 上一页<span class="k">←</span></button>
+      <button class="navbtn" id="btnNext">下一页 →<span class="k">→</span></button>
+    </div>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   模块 J1：画布缩放 —— 1280×720 设计稿等比适配任意分辨率
+   ============================================================ */
+const stage = document.getElementById("stage");
+function fit(){
+  const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+  stage.style.transform = "translate(-50%,-50%) scale(" + s + ")";
+}
+window.addEventListener("resize", fit); fit();
+
+/* ============================================================
+   模块 J0：运输问题数据（本例 3 产地 × 3 销地，产销平衡）
+   ============================================================ */
+const TP = {
+  m: 3, n: 3,
+  a: [8, 5, 7],                 // 产量
+  b: [4, 6, 10],                // 销量
+  c: [[4, 2, 5], [6, 3, 7], [5, 7, 6]],   // 单位运价 c_ij
+  rn: ["A₁", "A₂", "A₃"],
+  cn: ["B₁", "B₂", "B₃"]
+};
+const NW_X  = [[4, 4, 0], [0, 2, 3], [0, 0, 7]];        // 西北角初始解，运费 93
+const ME_X  = [[2, 6, 0], [0, 0, 5], [2, 0, 5]];        // 最小元素初始解，运费 95
+const OPT_X = [[4, 1, 3], [0, 5, 0], [0, 0, 7]];        // 最优解，运费 90
+const NW_BASIS  = [[0,0],[0,1],[1,1],[1,2],[2,2]];
+const ME_BASIS  = [[0,1],[0,0],[1,2],[2,0],[2,2]];
+const OPT_BASIS = [[0,0],[0,1],[0,2],[1,1],[2,2]];
+const POT1 = { u: [0, 1, 0], v: [4, 2, 6] };            // 西北角方案的位势
+const POT2 = { u: [0, 1, 1], v: [4, 2, 5] };            // 最优方案的位势
+const SIG1 = { "0,2": -1, "1,0": 1, "2,0": 1, "2,1": 5 };   // 西北角方案的检验数
+const SIG2 = { "1,0": 1, "1,2": 1, "2,0": 0, "2,1": 4 };    // 最优方案的检验数
+const SUBD = "₀₁₂₃₄₅₆₇₈₉";
+function sb(n){ return String(n).replace(/[0-9]/g, d => SUBD[+d]); }
+function sign(n){ return n < 0 ? "−" + Math.abs(n) : String(n); }
+
+/* ============================================================
+   模块 J1b：运输表构建与渲染（全课件共用）
+   单元格 = 单位运价（左上小字） + 调运量 / 检验数（居中大字）
+   ============================================================ */
+function buildTT(host, pot){
+  pot = pot || {};
+  const hasU = Array.isArray(pot.u), hasV = Array.isArray(pot.v);
+  const h = ['<table class="tt"><thead><tr><th class="corner">产地 ＼ 销地</th>'];
+  for (let j = 0; j < TP.n; j++){
+    const s = hasV ? '<small>v' + sb(j + 1) + " = " + (pot.v[j] === null ? "?" : sign(pot.v[j])) + "</small>" : "";
+    h.push('<th class="dem">' + TP.cn[j] + s + "</th>");
+  }
+  h.push('<th class="sup">产量</th></tr></thead><tbody>');
+  for (let i = 0; i < TP.m; i++){
+    const s = hasU ? '<small>u' + sb(i + 1) + " = " + (pot.u[i] === null ? "?" : sign(pot.u[i])) + "</small>" : "";
+    h.push('<tr><th class="sup">' + TP.rn[i] + s + "</th>");
+    for (let j = 0; j < TP.n; j++)
+      h.push('<td data-i="' + i + '" data-j="' + j + '"><span class="c">' + TP.c[i][j] + '</span><b class="xv"></b></td>');
+    h.push('<th class="sup">' + TP.a[i] + "</th></tr>");
+  }
+  h.push('</tbody><tfoot><tr><th class="dem">销量</th>');
+  for (let j = 0; j < TP.n; j++) h.push('<th class="dem">' + TP.b[j] + "</th>");
+  h.push("<th>" + TP.a.reduce((s, v) => s + v, 0) + "</th></tr></tfoot></table>");
+  host.innerHTML = h.join("");
+  return host.querySelector("table");
+}
+function cellOf(tbl, i, j){ return tbl.querySelector('td[data-i="' + i + '"][data-j="' + j + '"]'); }
+function allCells(tbl){ return Array.from(tbl.querySelectorAll("td")); }
+const CELLCLS = ["nb","bas","sel","enter","neg","pos","lp","lm","gone"];
+
+function paintTP(tbl, sp){
+  const basis = sp.basis || [];
+  const isBas = (i, j) => basis.some(b => b[0] === i && b[1] === j);
+  for (let i = 0; i < TP.m; i++) for (let j = 0; j < TP.n; j++){
+    const td = cellOf(tbl, i, j), xv = td.querySelector(".xv"), key = i + "," + j;
+    CELLCLS.forEach(c => td.classList.remove(c));
+    if (sp.sigma && sp.sigma[key] !== undefined){
+      const s = sp.sigma[key];
+      xv.textContent = sign(s);
+      td.classList.add(s < 0 ? "neg" : "pos");
+    } else {
+      xv.textContent = sp.x ? String(sp.x[i][j]) : "";
+      if (sp.x && !sp.plain){
+        if (isBas(i, j)) td.classList.add("bas");
+        else if (sp.x[i][j] === 0) td.classList.add("nb");
+      }
+    }
+    if (sp.hl){
+      if (sp.hl.enter && sp.hl.enter[0] === i && sp.hl.enter[1] === j) td.classList.add("enter");
+      if (sp.hl.loop) sp.hl.loop.forEach(L => {
+        if (L.i === i && L.j === j){
+          td.classList.add(L.s === "+" ? "lp" : "lm");
+          const sg = document.createElement("span");
+          sg.className = "sgn " + (L.s === "+" ? "p" : "m");
+          sg.textContent = L.s;
+          td.appendChild(sg);
+        }
+      });
+    }
+  }
+  if (sp.hl && sp.hl.loop) drawLoop(tbl, sp.hl.loop);
+  else {
+    const w = tbl.closest(".ttwrap"), old = w && w.querySelector("svg.loop");
+    if (old) old.remove();
+  }
+}
+/* 在表格上叠加闭合回路的虚线 */
+function drawLoop(tbl, loop){
+  const wrap = tbl.closest(".ttwrap");
+  if (!wrap) return;
+  const old = wrap.querySelector("svg.loop");
+  if (old) old.remove();
+  const base = wrap.getBoundingClientRect();
+  const k = base.width / (wrap.offsetWidth || base.width);
+  const pts = loop.map(L => {
+    const r = cellOf(tbl, L.i, L.j).getBoundingClientRect();
+    return [(r.left - base.left + r.width / 2) / k, (r.top - base.top + r.height / 2) / k];
+  });
+  if (!pts.length) return;
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("class", "loop");
+  svg.setAttribute("width", wrap.offsetWidth);
+  svg.setAttribute("height", wrap.offsetHeight);
+  const poly = document.createElementNS(NS, "polyline");
+  poly.setAttribute("points", pts.concat([pts[0]]).map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" "));
+  poly.setAttribute("fill", "none");
+  poly.setAttribute("stroke", "#c2740b");
+  poly.setAttribute("stroke-width", "2");
+  poly.setAttribute("stroke-dasharray", "7 5");
+  poly.setAttribute("stroke-opacity", ".8");
+  svg.appendChild(poly);
+  wrap.appendChild(svg);
+}
+function renderFull(wrapId, sp){
+  const wrap = document.getElementById(wrapId);
+  const host = wrap.querySelector("div");
+  const tbl = buildTT(host, sp.pot);
+  paintTP(tbl, sp);
+  return tbl;
+}
+
+/* ============================================================
+   模块 J2：幻灯片导航引擎 —— 方向感知切换 + 顶部/底部导航
+   ============================================================ */
+const CHAPS = ["封面","课程导览","建模 · 情境","建模 · 模型","建模 · 基格个数",
+               "初始基 · 西北角法","初始基 · 最小元素法","检验 · 位势法","检验 · 检验数",
+               "检验 · 闭回路","完整迭代","随堂测验","课程小结","结束"];
+const slides = Array.from(document.querySelectorAll(".slide"));
+const N = slides.length;
+const nav = { idx: 0, busy: false };
+const dotsBox = document.getElementById("dots");
+slides.forEach((_, i) => {
+  const b = document.createElement("button");
+  b.title = "第 " + (i + 1) + " 页 · " + CHAPS[i];
+  b.addEventListener("click", () => goTo(i, i > nav.idx ? 1 : -1));
+  dotsBox.appendChild(b);
+});
+const dots = Array.from(dotsBox.children);
+document.getElementById("pgAll").textContent = N;
+document.getElementById("pn2").textContent = N;
+
+function renderPlace(i, dir){
+  const el = slides[i];
+  if (dir < 0){
+    el.classList.add("pos-left");
+    el.style.transition = "none"; void el.offsetWidth; el.style.transition = "";
+  } else {
+    el.classList.remove("pos-left");
+  }
+}
+function goTo(n, dir){
+  n = Math.max(0, Math.min(N - 1, n));
+  if (n === nav.idx && slides[n].classList.contains("active")) return;
+  if (nav.busy) return;
+  nav.busy = true; setTimeout(() => nav.busy = false, 260);
+  dir = dir === undefined ? (n > nav.idx ? 1 : -1) : dir;
+  const cur = slides[nav.idx], nxt = slides[n];
+  const leaving = cur !== nxt ? SLIDES[nav.idx] : null;
+  if (cur !== nxt){
+    if (dir > 0) cur.classList.add("pos-left");
+    cur.classList.remove("active");
+    renderPlace(n, dir);
+    void nxt.offsetWidth;
+    if (leaving && leaving.onLeave) leaving.onLeave();
+  }
+  nxt.classList.add("active");
+  nav.idx = n;
+  document.getElementById("progress").firstElementChild.style.width = ((n + 1) / N * 100) + "%";
+  document.getElementById("pgCur").textContent = n + 1;
+  document.getElementById("pn1").textContent = n + 1;
+  document.getElementById("chapLabel").textContent = CHAPS[n];
+  dots.forEach((d, i) => {
+    d.classList.toggle("on", i === n);
+    d.classList.toggle("done", i < n);
+  });
+  document.getElementById("btnPrev").disabled = n === 0;
+  document.getElementById("btnNext").disabled = n === N - 1;
+  if (SLIDES[n].onEnter) SLIDES[n].onEnter();
+}
+document.getElementById("btnPrev").addEventListener("click", () => goTo(nav.idx - 1, -1));
+document.getElementById("btnNext").addEventListener("click", () => goTo(nav.idx + 1, 1));
+document.querySelectorAll("[data-go]").forEach(b =>
+  b.addEventListener("click", () => goTo(+b.dataset.go, +b.dataset.go > nav.idx ? 1 : -1)));
+window.addEventListener("keydown", e => {
+  const t = e.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "BUTTON") &&
+      (e.key === " " || e.key === "Enter")) return;
+  if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " "){ e.preventDefault(); goTo(nav.idx + 1, 1); }
+  else if (e.key === "ArrowLeft" || e.key === "PageUp"){ e.preventDefault(); goTo(nav.idx - 1, -1); }
+  else if (e.key === "Home"){ e.preventDefault(); goTo(0, -1); }
+  else if (e.key === "End"){ e.preventDefault(); goTo(N - 1, 1); }
+});
+
+/* ============================================================
+   模块 J3：通用判分选择题（随堂测验三题计入成绩）
+   ============================================================ */
+const quizState = { answered: 0, correct: 0 };
+function updateQuizHud(){
+  const s = document.getElementById("quizScore");
+  if (!s) return;
+  s.textContent = quizState.correct;
+  const done = quizState.answered;
+  document.getElementById("quizMsg").textContent = done === 3
+    ? (quizState.correct === 3 ? "全对！" : "错题的解析再看一遍")
+    : "已答 " + done + " / 3";
+}
+function bindQuiz(sel, explainEl, goodText, badText, counted){
+  const box = document.querySelector(sel);
+  if (!box) return;
+  box.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (box.dataset.done) return;
+      box.dataset.done = "1";
+      const ok = btn.dataset.ok === "1";
+      box.querySelectorAll(".opt").forEach(b => {
+        b.disabled = true;
+        if (b.dataset.ok === "1") b.classList.add("correct");
+      });
+      if (!ok) btn.classList.add("wrong");
+      if (counted){ quizState.answered++; if (ok) quizState.correct++; updateQuizHud(); }
+      if (explainEl){
+        explainEl.className = "explain show " + (ok ? "good" : "bad");
+        explainEl.textContent = (ok ? "正确。" : "再想想。") + (ok ? goodText : badText);
+      }
+    });
+  });
+}
+/* ============================================================
+   模块 J7：第 6 页 —— 西北角法逐步分配
+   ============================================================ */
+const NW_STEPS = [
+  { i:0, j:0, q:4, t:"min(产量 8, 销量 4) = 4 → x₁₁ = 4；A₁ 剩 4，B₁ 已满足" },
+  { i:0, j:1, q:4, t:"A₁ 剩 4，B₂ 需 6 → x₁₂ = min(4, 6) = 4；A₁ 发完，转入 A₂ 行" },
+  { i:1, j:1, q:2, t:"B₂ 还需 2，A₂ 有 5 → x₂₂ = min(5, 2) = 2；B₂ 满足，转入 B₃ 列" },
+  { i:1, j:2, q:3, t:"A₂ 剩 3，B₃ 需 10 → x₂₃ = min(3, 10) = 3；A₂ 发完" },
+  { i:2, j:2, q:7, t:"A₃ 有 7，B₃ 还需 7 → x₃₃ = min(7, 7) = 7；全部供需满足" }
+];
+function stepEl(n, text){
+  const d = document.createElement("div");
+  d.className = "step";
+  d.innerHTML = '<span class="no">' + n + "</span><span>" + text + "</span>";
+  return d;
+}
+function zeros(){ return [[0,0,0],[0,0,0],[0,0,0]]; }
+
+(function initS6(){
+  const wrap = document.getElementById("wrap6");
+  const tbl = buildTT(wrap.querySelector("div"), null);
+  paintTP(tbl, { x: zeros() });
+  const box = document.getElementById("steps6");
+  const els = NW_STEPS.map((s, i) => { const e = stepEl(i + 1, s.t); box.appendChild(e); return e; });
+  const S = { k: 0, x: zeros(), basis: [], cost: 0 };
+  const btn = document.getElementById("nwNext");
+  function reset(){
+    S.k = 0; S.x = zeros(); S.basis = []; S.cost = 0;
+    paintTP(tbl, { x: S.x });
+    els.forEach(e => e.classList.remove("on", "done"));
+    els[0].classList.add("on");
+    document.getElementById("cost6").textContent = "0";
+    document.getElementById("ms6").textContent = "尚未开始";
+    btn.disabled = false; btn.textContent = "下一步";
+  }
+  btn.addEventListener("click", () => {
+    if (S.k >= NW_STEPS.length) return;
+    const st = NW_STEPS[S.k];
+    S.x[st.i][st.j] = st.q;
+    S.basis.push([st.i, st.j]);
+    S.cost += st.q * TP.c[st.i][st.j];
+    paintTP(tbl, { x: S.x, basis: S.basis });
+    els[S.k].classList.remove("on"); els[S.k].classList.add("done");
+    S.k++;
+    if (S.k < els.length) els[S.k].classList.add("on");
+    document.getElementById("cost6").textContent = S.cost;
+    document.getElementById("ms6").textContent = "第 " + S.k + " / 5 步" +
+      (S.k === 5 ? " · 5 个基格已填满" : "");
+    if (S.k === 5){ btn.disabled = true; btn.textContent = "已完成"; }
+  });
+  document.getElementById("nwReset").addEventListener("click", reset);
+  reset();
+})();
+
+/* ============================================================
+   模块 J8：第 7 页 —— 最小元素法逐步分配
+   ============================================================ */
+const ME_STEPS = [
+  { i:0, j:1, q:6, t:"最小运价 2 在 (A₁,B₂) → x₁₂ = min(8, 6) = 6；A₁ 剩 2，B₂ 满足" },
+  { i:0, j:0, q:2, t:"运价 3 的 (A₂,B₂) 已无需求可满足，跳过 → 取 4：(A₁,B₁)，x₁₁ = min(2, 4) = 2；A₁ 发完" },
+  { i:2, j:0, q:2, t:"运价 5 的 (A₁,B₃) 因 A₁ 已空跳过 → (A₃,B₁)：x₃₁ = min(7, 2) = 2；B₁ 满足" },
+  { i:2, j:2, q:5, t:"运价 6 的 (A₃,B₃)：x₃₃ = min(5, 10) = 5；A₃ 发完" },
+  { i:1, j:2, q:5, t:"只剩 (A₂,B₃) 运价 7：x₂₃ = min(5, 5) = 5；全部完成，总运费 95" }
+];
+(function initS7(){
+  const wrap = document.getElementById("wrap7");
+  const tbl = buildTT(wrap.querySelector("div"), null);
+  paintTP(tbl, { x: zeros() });
+  const box = document.getElementById("steps7");
+  const els = ME_STEPS.map((s, i) => { const e = stepEl(i + 1, s.t); box.appendChild(e); return e; });
+  const S = { k: 0, x: zeros(), basis: [], cost: 0 };
+  const btn = document.getElementById("meNext");
+  function reset(){
+    S.k = 0; S.x = zeros(); S.basis = []; S.cost = 0;
+    paintTP(tbl, { x: S.x });
+    els.forEach(e => e.classList.remove("on", "done"));
+    els[0].classList.add("on");
+    document.getElementById("cost7").textContent = "0";
+    document.getElementById("ms7").textContent = "尚未开始";
+    const cmp = document.getElementById("cmp7");
+    cmp.className = "status"; cmp.textContent = "两种方法的初始运费将在这里对比。";
+    btn.disabled = false; btn.textContent = "下一步";
+  }
+  btn.addEventListener("click", () => {
+    if (S.k >= ME_STEPS.length) return;
+    const st = ME_STEPS[S.k];
+    S.x[st.i][st.j] = st.q;
+    S.basis.push([st.i, st.j]);
+    S.cost += st.q * TP.c[st.i][st.j];
+    paintTP(tbl, { x: S.x, basis: S.basis });
+    els[S.k].classList.remove("on"); els[S.k].classList.add("done");
+    S.k++;
+    if (S.k < els.length) els[S.k].classList.add("on");
+    document.getElementById("cost7").textContent = S.cost;
+    document.getElementById("ms7").textContent = "第 " + S.k + " / 5 步";
+    if (S.k === 5){
+      btn.disabled = true; btn.textContent = "已完成";
+      const cmp = document.getElementById("cmp7");
+      cmp.className = "status warn";
+      cmp.innerHTML = "西北角法 <b>93</b>　·　最小元素法 <b>95</b>。<br>" +
+        "贪心只看单格运价便宜，把 A₁ 的 6 件全压在运价 2 的格子上，结果最后被迫用 7 元的线路运了 5 件。" +
+        "两种方法都只是「初始解」，谁也不能保证最优 —— 必须做检验。";
+    }
+  });
+  document.getElementById("meReset").addEventListener("click", reset);
+  reset();
+})();
+
+/* ============================================================
+   模块 J9：第 8 页 —— 位势法逐步求解
+   ============================================================ */
+const POT_STEPS = [
+  { kind:"anchor", t:"先令 u₁ = 0。位势只确定到相差一个常数，起点可任取。", set:null },
+  { i:0, j:0, t:"基格 (1,1)：u₁ + v₁ = 4 → 0 + v₁ = 4 → v₁ = 4", set:{ t:"v", k:0, val:4 } },
+  { i:0, j:1, t:"基格 (1,2)：u₁ + v₂ = 2 → 0 + v₂ = 2 → v₂ = 2", set:{ t:"v", k:1, val:2 } },
+  { i:1, j:1, t:"基格 (2,2)：u₂ + v₂ = 3 → u₂ + 2 = 3 → u₂ = 1", set:{ t:"u", k:1, val:1 } },
+  { i:1, j:2, t:"基格 (2,3)：u₂ + v₃ = 7 → 1 + v₃ = 7 → v₃ = 6", set:{ t:"v", k:2, val:6 } },
+  { i:2, j:2, t:"基格 (3,3)：u₃ + v₃ = 6 → u₃ + 6 = 6 → u₃ = 0", set:{ t:"u", k:2, val:0 } }
+];
+(function initS8(){
+  const box = document.getElementById("steps8");
+  const els = POT_STEPS.map((s, i) => { const e = stepEl(i + 1, s.t); box.appendChild(e); return e; });
+  const S = { k: 0, u: [null, null, null], v: [null, null, null] };
+  const btn = document.getElementById("potNext");
+  function draw(){
+    renderFull("wrap8", { x: NW_X, basis: NW_BASIS, pot: { u: S.u, v: S.v } });
+  }
+  function reset(){
+    S.k = 0; S.u = [null, null, null]; S.v = [null, null, null];
+    draw();
+    els.forEach(e => e.classList.remove("on", "done"));
+    els[0].classList.add("on");
+    const st = document.getElementById("st8");
+    st.className = "status";
+    st.textContent = "点「下一步」，从 u₁ = 0 出发，用基格方程把位势一个个解出来。";
+    btn.disabled = false; btn.textContent = "下一步";
+  }
+  btn.addEventListener("click", () => {
+    if (S.k >= POT_STEPS.length) return;
+    const st = POT_STEPS[S.k];
+    if (st.set){
+      if (st.set.t === "u") S.u[st.set.k] = st.set.val;
+      else S.v[st.set.k] = st.set.val;
+    }
+    draw();
+    els[S.k].classList.remove("on"); els[S.k].classList.add("done");
+    S.k++;
+    if (S.k < els.length) els[S.k].classList.add("on");
+    const msg = document.getElementById("st8");
+    if (S.k === POT_STEPS.length){
+      msg.className = "status in";
+      msg.innerHTML = "位势全部求出：u = (0, 1, 0)，v = (4, 2, 6)。" +
+        "把它们填进表头，下一步就能给 4 个空格算检验数了。";
+      btn.disabled = true; btn.textContent = "已完成";
+    } else {
+      msg.textContent = "上一步：" + st.t;
+    }
+  });
+  document.getElementById("potReset").addEventListener("click", reset);
+  reset();
+})();
+
+/* ============================================================
+   模块 J10：第 9 页 —— 检验数点选计算
+   ============================================================ */
+(function initS9(){
+  const wrap = document.getElementById("wrap9");
+  const tbl = buildTT(wrap.querySelector("div"), POT1);
+  paintTP(tbl, { x: NW_X, basis: NW_BASIS });
+  const done = {};
+  const total = Object.keys(SIG1).length;
+  allCells(tbl).forEach(td => {
+    const i = +td.dataset.i, j = +td.dataset.j, key = i + "," + j;
+    if (SIG1[key] === undefined) return;
+    td.classList.add("hot");
+    td.addEventListener("click", () => {
+      if (done[key]) return;
+      done[key] = 1;
+      const s = SIG1[key];
+      const xv = td.querySelector(".xv");
+      xv.textContent = sign(s);
+      td.classList.remove("hot");
+      td.classList.add(s < 0 ? "neg" : "pos");
+      document.getElementById("sigT").textContent = "空格 (" + (i + 1) + "," + (j + 1) + ") 的检验数";
+      document.getElementById("sigB").textContent =
+        "σ 的含义：这个格子每调入 1 单位货物，总运费会变化多少。" +
+        (s < 0 ? "负值说明调入能让总运费下降，负得越多越值得调入。"
+               : "非负说明调入不会让总运费下降，保持为 0 即可。");
+      const fm = document.getElementById("sigF");
+      fm.style.display = "block";
+      fm.textContent = "σ" + sb(i + 1) + sb(j + 1) + " = " + TP.c[i][j] + " − (" + POT1.u[i] + " + " + POT1.v[j] +
+        ") = " + sign(s) + (s < 0 ? "  < 0" : "  ≥ 0");
+      const n = Object.keys(done).length;
+      const v = document.getElementById("sigVerdict");
+      if (n < total){
+        v.className = "status";
+        v.textContent = "已算 " + n + " / " + total + "。继续点其它空格。";
+      } else {
+        v.className = "status warn";
+        v.innerHTML = "4 个检验数里只有 σ₁₃ = −1 是负数 → <b>当前方案不是最优</b>。" +
+          "把 x₁₃ 调上来、沿闭回路转一圈，就能把运费再压下去。";
+      }
+    });
+  });
+})();
+
+/* ============================================================
+   模块 J11：第 10 页 —— 闭回路三步调整
+   ============================================================ */
+const LOOP = [{ i:0, j:2, s:"+" }, { i:0, j:1, s:"-" }, { i:1, j:1, s:"+" }, { i:1, j:2, s:"-" }];
+(function initS10(){
+  const S = { k: 0 };
+  const btn = document.getElementById("lpNext");
+  const T = document.getElementById("lpT"), B = document.getElementById("lpB"),
+        F = document.getElementById("lpF"), V = document.getElementById("lpV");
+  function stage0(){
+    renderFull("wrap10", { x: NW_X, basis: NW_BASIS, hl: { enter: [0, 2] } });
+    T.textContent = "第一步：找闭回路";
+    B.textContent = "从调入格 (1,3) 出发，只在基格之间横向、纵向交替行走，一定能回到起点 —— 这条回路存在且唯一。";
+    F.style.display = "none";
+    V.className = "status"; V.textContent = "调入格 (1,3) 已用蓝框标出。点「找闭回路」。";
+    btn.textContent = "找闭回路"; btn.disabled = false;
+  }
+  function stage1(){
+    renderFull("wrap10", { x: NW_X, basis: NW_BASIS, hl: { enter: [0, 2], loop: LOOP } });
+    T.textContent = "第二步：确定 θ";
+    B.textContent = "回路上的格子交替取「+」与「−」：调入格取 +，然后按行列交替。" +
+      "θ 取所有「−」格中最小的运量 —— 这样调整之后不会出现负数。";
+    F.style.display = "block";
+    F.textContent = "θ = min(x₁₂, x₂₃) = min(4, 3) = 3";
+    V.className = "status in";
+    V.textContent = "取「−」的是 (1,2) 的 4 和 (2,3) 的 3，较小者 3 —— 所以 x₂₃ 会被减到 0 并退出基。";
+    btn.textContent = "计算 θ"; btn.disabled = false;
+  }
+  function stage2(){
+    renderFull("wrap10", { x: OPT_X, basis: OPT_BASIS });
+    T.textContent = "第三步：调整完成";
+    B.textContent = "沿回路把 3 个单位搬一圈：(1,3) 与 (2,2) 各加 3，(1,2) 与 (2,3) 各减 3。" +
+      "基格变了一个，但仍是 5 个 —— 新的基本可行解总运费 90。";
+    F.style.display = "block";
+    F.textContent = "z = 93 − 3 × (1) = 90";
+    V.className = "status ok";
+    V.innerHTML = "<b>调整完成：总运费 90。</b>再对这一方案求位势、算检验数，4 个空格分别是 1、1、0、4，全部 ≥ 0 —— 已达最优。";
+    btn.textContent = "执行调整"; btn.disabled = false;
+  }
+  btn.addEventListener("click", () => {
+    S.k++;
+    if (S.k === 1) stage1();
+    else if (S.k === 2) stage2();
+    else if (S.k === 3){ S.k = 3; btn.disabled = true; btn.textContent = "已完成"; }
+  });
+  document.getElementById("lpReset").addEventListener("click", () => { S.k = 0; stage0(); });
+  stage0();
+})();
+
+const EXPLAINS = {
+  q1: ["基变量个数 = m + n − 1 = 3 + 4 − 1 = 6。因为 7 条供需约束中只有 6 条独立，秩亏一个。",
+       "产量约束 3 条 + 销量约束 4 条 = 7 条，但它们之和两边都等于总产量，所以只有 7 − 1 = 6 条独立，基变量就是 6 个（选 B）。"],
+  q2: ["σ = −2 表示这个格子每调入 1 单位，总运费下降 2 —— 负得越多越值得调入。",
+       "检验数是「单位变化引起的目标值变化」。极小化问题里 σ < 0 意味着还能降低运费，绝对值就是每单位的节省额，所以选 A。方案最优的条件是全部 σ ≥ 0。"],
+  q3: ["位势方程只对基格成立；正是这 5 个方程解出了 3 + 3 个位势。",
+       "u_i + v_j = c_ij 是「基格」的定义式，用来解位势；对空格一般并不成立，二者的差正是检验数 σ_ij（选 B）。"]
+};
+const COUNTED = { q1: 1, q2: 1, q3: 1 };
+Object.entries({ q1: '[data-ex="q1"]', q2: '[data-ex="q2"]', q3: '[data-ex="q3"]' })
+  .forEach(([k, sel]) => bindQuiz('[data-quiz="' + k + '"]', document.querySelector(sel),
+    EXPLAINS[k][0], EXPLAINS[k][1], !!COUNTED[k]));
+
+/* ============================================================
+   模块 J4：第 3 页 —— 运价表点选，认识 x_ij 与 c_ij
+   ============================================================ */
+(function initS3(){
+  const wrap = document.getElementById("wrap3");
+  const tbl = buildTT(wrap.querySelector("div"), null);
+  paintTP(tbl, { x: null });
+  allCells(tbl).forEach(td => {
+    td.classList.add("hot");
+    td.addEventListener("click", () => {
+      allCells(tbl).forEach(o => {
+        o.classList.remove("sel", "bas");
+        o.querySelector(".xv").textContent = "";
+      });
+      const i = +td.dataset.i, j = +td.dataset.j;
+      td.classList.add("sel", "bas");
+      td.querySelector(".xv").textContent = "x" + sb(i + 1) + sb(j + 1);
+      document.getElementById("hspT3").textContent = "决策变量 x" + sb(i + 1) + sb(j + 1);
+      document.getElementById("hspB3").textContent =
+        "表示从产地 " + TP.rn[i] + " 运往销地 " + TP.cn[j] + " 的货物数量，是一个待求的非负变量。" +
+        "这条线路的单位运价是 " + TP.c[i][j] + " 元/件 —— 于是它对总运费的贡献就是 " + TP.c[i][j] + " × x" + sb(i + 1) + sb(j + 1) + "。";
+      const fm = document.getElementById("hspF3");
+      fm.style.display = "block";
+      fm.textContent = "c" + sb(i + 1) + sb(j + 1) + " = " + TP.c[i][j] + " 元/件　·　x" + sb(i + 1) + sb(j + 1) + " ≥ 0";
+    });
+  });
+})();
+
+/* ============================================================
+   模块 J5：第 4 页 —— 模型热点标注
+   ============================================================ */
+const HS4 = {
+  obj: { t: "目标函数：总运费最小", f: "min z = Σᵢ Σⱼ c_ij · x_ij",
+    b: "总运费 = 9 条线路上「运量 × 单位运价」之和。注意这里是 min 而不是 max —— 运输问题是极小化问题，所以最优性判据是「检验数全部 ≥ 0」，与极大化的单纯形法正好相反。" },
+  row: { t: "产量约束：每行之和 = 该产地产量", f: "Σⱼ x_ij = a_i　（i = 1,2,3）",
+    b: "仓库 A₁ 的 8 件货必须全部发出，既不能多也不能少 —— 所以是等式。三行加起来正好是全部 9 个变量之和 = 20。" },
+  col: { t: "销量约束：每列之和 = 该销地销量", f: "Σᵢ x_ij = b_j　（j = 1,2,3）",
+    b: "门店 B₁ 需要 4 件，必须正好收到 4 件。三列加起来同样是全部变量之和 = 20 —— 这才是「产销平衡」的确切含义：总产量 = 总销量。" },
+  nn: { t: "非负条件：运量不能为负", f: "x_ij ≥ 0",
+    b: "运量没有负值。这条看似平常的约束非常重要：它保证了基本可行解不会出现「倒着运货」，也是表上作业法只用非负数做闭回路调整的前提。" }
+};
+document.querySelectorAll("#s4 .hs").forEach(h => h.addEventListener("click", () => {
+  document.querySelectorAll("#s4 .hs").forEach(x => x.classList.remove("on"));
+  document.querySelectorAll("#s4 .fz").forEach(z => z.classList.remove("on"));
+  h.classList.add("on");
+  const k = h.dataset.hs;
+  document.querySelectorAll('#s4 .fz[data-k="' + k + '"]').forEach(z => z.classList.add("on"));
+  const d = HS4[k];
+  document.getElementById("hspT4").textContent = d.t;
+  document.getElementById("hspB4").textContent = d.b;
+  document.getElementById("hspF4").textContent = d.f;
+}));
+
+/* ============================================================
+   模块 J6：第 5 页 —— 数一数基格与空格
+   ============================================================ */
+(function initS5(){
+  const wrap = document.getElementById("wrap5");
+  const tbl = buildTT(wrap.querySelector("div"), null);
+  paintTP(tbl, { x: NW_X, plain: true });
+  document.getElementById("btnCount").addEventListener("click", () => {
+    paintTP(tbl, { x: NW_X, basis: NW_BASIS });
+    let cnt = 0;
+    allCells(tbl).forEach(td => {
+      if (td.classList.contains("bas")){
+        cnt++;
+        td.style.boxShadow = "inset 0 0 0 2px var(--p1)";
+      }
+    });
+    document.getElementById("countMsg").innerHTML =
+      "数出来：<b>" + cnt + " 个基格</b>（蓝色，调运量 &gt; 0）+ <b>" + (9 - cnt) + " 个空格</b>（灰色 0）= 9 格，" +
+      "正好符合 m + n − 1 = 5。";
+  });
+})();
+
+/* ============================================================
+   模块 J12：第 11 页 —— 完整迭代节拍播放器
+   async/await + rAF 计时；单步 / 自动播放 / 暂停 / 调速 / 重置
+   ============================================================ */
+const BEATS11 = [
+  { cls:"init", act:"初始方案", dur:3400,
+    title:"西北角法给出初始基可行解",
+    why:"5 个基格填满，其余 4 格为 0，总运费 93。它满足全部供需约束，但没有任何理由认为它最省 —— 必须检验。",
+    facts:[["基格","5 个"],["总运费","93"]],
+    spec:{ x: NW_X, basis: NW_BASIS },
+    st:"当前总运费 <b>93</b>，还有下降空间。" },
+  { cls:"solve", act:"求位势", dur:4200,
+    title:"由基格方程解出位势",
+    why:"设 u₁ = 0，沿基格链依次解出 v₁ = 4、v₂ = 2、u₂ = 1、v₃ = 6、u₃ = 0。位势可以理解为每行每列的「影子价格」。",
+    facts:[["u","(0, 1, 0)"],["v","(4, 2, 6)"],["方程数","5 = m+n−1"]],
+    spec:{ x: NW_X, basis: NW_BASIS, pot: POT1 },
+    st:"位势只由基格决定，与具体运量无关。" },
+  { cls:"check", act:"算检验数", dur:4600,
+    title:"σ₁₃ = −1，是唯一的负检验数",
+    why:"σ_ij = c_ij − (u_i + v_j)。四个空格算出来是 −1、1、1、5，只有 (1,3) 为负 —— 把 x₁₃ 调上来，每单位能省 1 元。",
+    facts:[["σ₁₃","−1"],["σ₂₁","1"],["σ₃₁","1"],["σ₃₂","5"]],
+    spec:{ x: NW_X, basis: NW_BASIS, pot: POT1, sigma: SIG1 },
+    st:"存在负检验数 → <b>当前方案不是最优</b>，需要调整。" },
+  { cls:"adjust", act:"闭回路", dur:5000,
+    title:"回路上交替加减，θ = min(4, 3) = 3",
+    why:"从调入格 (1,3) 出发，只在基格之间横纵交替行走，得到唯一闭回路 (1,3)→(1,2)→(2,2)→(2,3)。调入格取「+」，相邻交替取「−」；θ 取所有「−」格运量的最小值，保证调整后不出现负数。",
+    facts:[["回路","4 个顶点"],["θ","min(4, 3) = 3"],["出基","(2,3)"]],
+    spec:{ x: NW_X, basis: NW_BASIS, hl: { enter: [0, 2], loop: LOOP } },
+    st:"θ = 3，意味着 x₂₃ 会被减到 0 并退出基。" },
+  { cls:"adjust", act:"调整完成", dur:3800,
+    title:"搬 3 个单位，运费降到 90",
+    why:"(1,3)、(2,2) 各加 3，(1,2)、(2,3) 各减 3。(1,2) 还剩 1，仍是基格；(2,3) 归零出基，同时 (1,3) 补进来 —— 基格依然是 5 个。",
+    facts:[["新方案","x₁₂=1, x₁₃=3, x₂₂=5"],["总运费","93 − 3 = 90"]],
+    spec:{ x: OPT_X, basis: OPT_BASIS },
+    st:"总运费降到 <b>90</b>。还要再检验一次才能收工。" },
+  { cls:"opt", act:"再检验", dur:4600,
+    title:"全部 σ ≥ 0，达到最优",
+    why:"对新方案重算位势 u = (0, 1, 1)、v = (4, 2, 5)，四个空格的检验数为 1、1、0、4，全部非负 —— 再没有任何能省钱的调法了。",
+    facts:[["σ","1, 1, 0, 4"],["判定","全部 ≥ 0"]],
+    spec:{ x: OPT_X, basis: OPT_BASIS, pot: POT2, sigma: SIG2 },
+    st:"最优性判据成立，迭代停止。" },
+  { cls:"opt", act:"最优方案", dur:4200,
+    title:"最优调运方案：总运费 90",
+    why:"A₁→B₁ 4 件、A₁→B₂ 1 件、A₁→B₃ 3 件、A₂→B₂ 5 件、A₃→B₃ 7 件，其余线路为 0。比西北角初始方案省 3 元，比最小元素法的初始方案省 5 元。",
+    facts:[["初始","93"],["最优","90"],["节省","3"]],
+    spec:{ x: OPT_X, basis: OPT_BASIS },
+    st:"<b>最优解：总运费 90。</b>（该结果已用穷举全部基可行解独立验证）" }
+];
+const P11 = { beat: 0, playing: false, paused: false, speed: 1, token: 0 };
+const $11 = id => document.getElementById(id);
+function showBeat11(b){
+  renderFull("wrap11", b.spec);
+  $11("p11act").textContent = b.act;
+  $11("p11act").className = "act " + b.cls;
+  $11("p11title").textContent = b.title;
+  $11("p11why").textContent = b.why;
+  $11("p11facts").innerHTML = b.facts.map(f => "<span>" + f[0] + "：<b>" + f[1] + "</b></span>").join("");
+  $11("p11st").className = "status" + (b.cls === "opt" ? " ok" : "");
+  $11("p11st").innerHTML = b.st;
+  $11("p11prog").textContent = "节拍 " + Math.min(P11.beat + 1, BEATS11.length) + " / " + BEATS11.length;
+}
+function wait11(ms, token){
+  ms /= P11.speed;
+  return new Promise(res => {
+    const t0 = performance.now();
+    (function tick(now){
+      if (token !== undefined && token !== P11.token){ res(false); return; }
+      if (P11.paused){ requestAnimationFrame(tick); return; }
+      if (now - t0 >= ms){ res(true); return; }
+      requestAnimationFrame(tick);
+    })(performance.now());
+  });
+}
+let run11 = null;
+async function playBeat11(b, token){
+  showBeat11(b);
+  return await wait11(b.dur, token);
+}
+async function step11(){
+  if (run11 !== null){
+    showBeat11(BEATS11[run11]);
+    P11.beat = run11 + 1;
+    run11 = null; P11.token++;
+    sync11();
+    if (P11.beat >= BEATS11.length){ stop11(true); return; }
+  }
+  if (P11.beat >= BEATS11.length) return;
+  run11 = P11.beat;
+  const token = ++P11.token;
+  const ok = await playBeat11(BEATS11[run11], token);
+  if (!ok) return;
+  run11 = null; P11.beat++;
+  sync11();
+  if (P11.beat >= BEATS11.length) stop11(true);
+}
+function sync11(){
+  $11("p11prog").textContent = "节拍 " + Math.min(P11.beat + 1, BEATS11.length) + " / " + BEATS11.length;
+  $11("p11play").textContent = P11.playing ? (P11.paused ? "继续" : "暂停") : "播放";
+  $11("p11step").disabled = P11.beat >= BEATS11.length;
+  $11("p11play").disabled = P11.beat >= BEATS11.length;
+}
+function stop11(done){
+  P11.token++; P11.playing = false; P11.paused = false; run11 = null; sync11();
+  if (done) $11("p11prog").textContent = "已完成 " + BEATS11.length + " 个节拍";
+}
+async function loop11(){
+  while (P11.playing && P11.beat < BEATS11.length){
+    run11 = P11.beat;
+    const token = ++P11.token;
+    const ok = await playBeat11(BEATS11[run11], token);
+    if (!ok) return;
+    run11 = null; P11.beat++; sync11();
+    if (P11.beat >= BEATS11.length){ stop11(true); return; }
+    if (!await wait11(320, P11.token)) return;
+  }
+}
+$11("p11play").addEventListener("click", () => {
+  if (P11.beat >= BEATS11.length) return;
+  if (!P11.playing){ P11.playing = true; P11.paused = false; sync11(); loop11(); }
+  else { P11.paused = !P11.paused; sync11(); }
+});
+$11("p11step").addEventListener("click", () => {
+  if (P11.playing){ P11.playing = false; P11.paused = false; }
+  step11();
+});
+$11("p11reset").addEventListener("click", () => {
+  stop11(false); P11.beat = 0; showBeat11(BEATS11[0]); sync11();
+});
+document.querySelectorAll("#p11speed button").forEach(b => b.addEventListener("click", () => {
+  P11.speed = +b.dataset.sp;
+  document.querySelectorAll("#p11speed button").forEach(x => {
+    x.style.background = ""; x.style.color = "";
+  });
+  b.style.background = "var(--p1)"; b.style.color = "#fff";
+}));
+
+/* ============================================================
+   模块 J13：页面注册（进入 / 离开钩子）与收尾
+   ============================================================ */
+const SLIDES = slides.map((el, i) => ({
+  el,
+  onEnter: i === 10 ? () => { if (P11.beat === 0 && !P11.playing) showBeat11(BEATS11[0]); }
+        : i === 13 ? () => {
+            const q = document.getElementById("repQuiz");
+            q.textContent = quizState.answered === 3 ? (quizState.correct + " / 3") : "未完成";
+            q.classList.toggle("dim", quizState.answered < 3);
+          }
+        : null,
+  onLeave: i === 10 ? () => stop11(false) : null
+}));
+document.getElementById("btnRestart").addEventListener("click", () => location.reload());
+showBeat11(BEATS11[0]);
+sync11();
+goTo(0, 0);
+
+window.addEventListener("keydown", e => { if (e.key === "Escape") location.href = "index.html"; });
+</script>
+
+<style id="portal-back-style">
+#portal-back{position:fixed;right:14px;bottom:14px;z-index:9999;
+  right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));
+  display:inline-flex;align-items:center;gap:6px;
+  font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:#fff;background:rgba(17,24,39,.82);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:9px 15px;text-decoration:none;
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:.72;transition:opacity .18s,transform .18s}
+#portal-back:hover{opacity:1;transform:translateY(-1px)}
+#portal-back:active{transform:none}
+@media print{#portal-back{display:none}}
+</style>
+<a id="portal-back" href="../../" title="返回资源中心">← 资源中心</a>
+</body>
+</html>
