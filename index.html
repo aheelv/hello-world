@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1d3f6e">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="大连财经学院管理学院大数据管理系数据治理与技术应用课程群：14 名教师、14 门专业选修课程的课程体系与教研活动记录。">
+<title>数据治理与技术应用课程群 · 大连财经学院管理学院</title>
+<style>
+  :root{
+    --ink:#16233a; --ink2:#4d5f79; --ink3:#7c8ba1;
+    --line:#e2e8f1; --line2:#eef2f7;
+    --bg:#f5f7fb; --card:#ffffff;
+    --navy:#1d3f6e; --navy-l:#eaf0f9;
+    --teal:#0d7a83; --teal-l:#e6f4f4;
+    --amber:#a96e12; --amber-l:#fbf2e2;
+    --rose:#9c3b34; --rose-l:#f8ecea;
+    --violet:#5b4b8a; --violet-l:#eeecf7;
+    --green:#3f7a4d; --green-l:#ecf4ee;
+    --shadow:0 1px 2px rgba(22,35,58,.04), 0 8px 24px -12px rgba(22,35,58,.12);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:76px;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92);
+    backdrop-filter:blur(12px); border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex; align-items:center; gap:8px; height:56px;}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:14px; letter-spacing:.01em; margin-right:auto;}
+  .brand .mark{width:26px;height:26px;border-radius:7px;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;letter-spacing:0;}
+  nav a{
+    color:var(--ink2); text-decoration:none; font-size:13.5px; padding:6px 11px; border-radius:6px;
+    transition:.18s; white-space:nowrap;
+  }
+  nav a:hover{background:var(--navy-l); color:var(--navy);}
+  nav a.on{background:var(--navy); color:#fff;}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    background:
+      radial-gradient(900px 380px at 88% -10%, #e8f0fa 0%, rgba(232,240,250,0) 62%),
+      radial-gradient(700px 320px at 4% 110%, #e7f4f3 0%, rgba(231,244,243,0) 60%),
+      #ffffff;
+    border-bottom:1px solid var(--line); padding:56px 0 44px;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-size:12.5px; letter-spacing:.14em;
+    color:var(--teal); font-weight:600; text-transform:uppercase; margin-bottom:18px;
+  }
+  .eyebrow::before{content:""; width:22px; height:2px; background:var(--teal); display:block;}
+  h1{font-size:40px; line-height:1.28; margin:0 0 14px; letter-spacing:-.01em; font-weight:800;}
+  h1 .thin{color:var(--ink2); font-weight:500;}
+  .sub{font-size:16.5px; color:var(--ink2); max-width:760px; margin:0 0 26px;}
+  .crumb{display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-size:13px; color:var(--ink3); margin-bottom:22px;}
+  .crumb b{color:var(--navy); font-weight:600;}
+  .crumb i{font-style:normal; color:#c3cddb;}
+
+  .leaders{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:8px;}
+  .leader{
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+    display:flex; gap:14px; align-items:center; box-shadow:var(--shadow);
+  }
+  .leader .av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:17px;flex:none;}
+  .leader .lb{font-size:11.5px; letter-spacing:.1em; color:var(--ink3); text-transform:uppercase; font-weight:600;}
+  .leader .nm{font-size:16.5px; font-weight:700; line-height:1.4;}
+  .leader .de{font-size:12.5px; color:var(--ink2);}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:56px 0 8px;}
+  .shead{display:flex; align-items:flex-end; gap:16px; margin-bottom:26px; flex-wrap:wrap;}
+  .shead .num{font-size:12px; font-weight:700; letter-spacing:.16em; color:var(--teal); padding-bottom:4px;}
+  .shead h2{font-size:25px; margin:0; font-weight:750; letter-spacing:-.01em; position:relative; padding-left:16px;}
+  .shead h2::before{content:""; position:absolute; left:0; top:6px; bottom:6px; width:4px; border-radius:2px; background:var(--navy);}
+  .shead p{margin:0 0 2px; font-size:13.5px; color:var(--ink3); max-width:560px;}
+
+  /* ---------- KPI ---------- */
+  .kpis{display:grid; grid-template-columns:repeat(5,1fr); gap:12px;}
+  .kpi{background:var(--card); border:1px solid var(--line); border-radius:11px; padding:16px 16px 14px;}
+  .kpi .k{font-size:12px; color:var(--ink3); letter-spacing:.04em; margin-bottom:6px;}
+  .kpi .v{font-size:27px; font-weight:800; line-height:1.1; letter-spacing:-.02em;}
+  .kpi .v small{font-size:13px; font-weight:600; color:var(--ink2); margin-left:3px; letter-spacing:0;}
+  .kpi .x{font-size:11.5px; color:var(--ink3); margin-top:5px;}
+
+  /* ---------- ORG ---------- */
+  .org{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:24px;}
+  .chain{display:flex; align-items:center; flex-wrap:wrap; gap:0;}
+  .node{
+    border:1px solid var(--line); border-radius:9px; padding:9px 14px; font-size:13.5px; background:#fbfcfe;
+    color:var(--ink2); font-weight:600; white-space:nowrap;
+  }
+  .node small{display:block; font-size:11px; color:var(--ink3); font-weight:500; letter-spacing:.02em;}
+  .node.hl{background:var(--navy); border-color:var(--navy); color:#fff;}
+  .node.hl small{color:#c3d3e8;}
+  .arr{color:#c3cddb; padding:0 10px; font-size:15px;}
+  .sibs{display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px dashed var(--line);}
+  .sib{font-size:12.5px; color:var(--ink2); background:#f7f9fc; border:1px solid var(--line2); border-radius:20px; padding:5px 13px;}
+  .sib.self{background:var(--navy-l); border-color:#ccdcf0; color:var(--navy); font-weight:600;}
+
+  /* ---------- STRUCT ---------- */
+  .struct{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:22px;}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 24px;}
+  .panel h3{font-size:15px; margin:0 0 4px; font-weight:700;}
+  .panel .hint{font-size:12px; color:var(--ink3); margin-bottom:16px;}
+  .bars{display:flex; flex-direction:column; gap:11px;}
+  .bar{display:grid; grid-template-columns:76px 1fr 94px; align-items:center; gap:10px; font-size:13px;}
+  .bar .lab{color:var(--ink2); text-align:right;}
+  .bar .track{height:9px; background:#f0f4f9; border-radius:5px; overflow:hidden;}
+  .bar .fill{height:100%; border-radius:5px;}
+  .bar .val{font-weight:700; font-size:12.5px; color:var(--ink); text-align:left; white-space:nowrap;}
+  .bar .val span{color:var(--ink3); font-weight:500;}
+
+  /* ---------- TEACHERS ---------- */
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px;}
+  .chips{display:flex; gap:7px; flex-wrap:wrap;}
+  .chip{
+    border:1px solid var(--line); background:var(--card); color:var(--ink2); font-size:12.5px;
+    padding:5px 13px; border-radius:20px; cursor:pointer; transition:.16s; font-family:inherit;
+  }
+  .chip:hover{border-color:#c8d6e8; color:var(--navy);}
+  .chip.on{background:var(--navy); border-color:var(--navy); color:#fff;}
+  .search{
+    margin-left:auto; border:1px solid var(--line); border-radius:8px; padding:7px 12px; font-size:13px;
+    font-family:inherit; color:var(--ink); background:var(--card); outline:none; width:190px;
+  }
+  .search:focus{border-color:#b9cbe4; box-shadow:0 0 0 3px rgba(29,63,110,.07);}
+
+  .tgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+  .tcard{
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px;
+    transition:.18s; position:relative; overflow:hidden;
+  }
+  .tcard::after{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:transparent; transition:.18s;}
+  .tcard:hover{box-shadow:var(--shadow); transform:translateY(-1px);}
+  .tcard.hl{border-color:#9ec3b5; background:#fbfefc;}
+  .tcard.hl::after{background:var(--teal);}
+  .tcard .row1{display:flex; gap:11px; align-items:center; margin-bottom:12px;}
+  .tcard .av{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:14.5px;flex:none;}
+  .tcard .nm{font-size:15.5px; font-weight:700; line-height:1.3;}
+  .tcard .rl{font-size:11.5px; color:var(--teal); font-weight:600; margin-top:1px;}
+  .badge{
+    font-size:11px; font-weight:600; padding:2.5px 8px; border-radius:5px; letter-spacing:.02em; white-space:nowrap;
+  }
+  .meta{display:grid; grid-template-columns:auto 1fr; gap:3px 10px; font-size:12px; color:var(--ink2); margin-bottom:11px;}
+  .meta dt{color:var(--ink3);}
+  .meta dd{margin:0;}
+  .tcourse{
+    border-top:1px dashed var(--line); padding-top:10px; font-size:12.5px; color:var(--ink); line-height:1.55;
+  }
+  .tcourse .cl{font-size:10.5px; color:var(--ink3); letter-spacing:.08em; display:block; margin-bottom:2px;}
+  .tcourse .cc{font-size:11px; color:var(--ink3); font-variant-numeric:tabular-nums;}
+  .empty{grid-column:1/-1; text-align:center; color:var(--ink3); font-size:13.5px; padding:32px;}
+
+  /* ---------- COURSES ---------- */
+  .semstrip{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:22px;}
+  .semcard{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:15px 17px; display:flex; gap:14px; align-items:center;}
+  .semcard .sn{font-size:22px; font-weight:800; color:var(--navy); line-height:1; letter-spacing:-.02em; flex:none;}
+  .semcard .sn span{font-size:11px; font-weight:600; color:var(--ink3); display:block; letter-spacing:.06em; margin-top:3px; white-space:nowrap;}
+  .semcard .si{font-size:12.5px; color:var(--ink2); line-height:1.5;}
+  .semcard .si b{color:var(--ink); font-weight:700;}
+
+  .tablewrap{border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--card);}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{
+    background:#f8fafd; text-align:left; padding:11px 12px; font-size:11.5px; letter-spacing:.06em;
+    color:var(--ink3); font-weight:600; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  tbody td{padding:11px 12px; border-bottom:1px solid var(--line2); vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr{transition:.14s; cursor:pointer;}
+  tbody tr:hover{background:#f9fbfe;}
+  tbody tr.hl{background:#f4faf7;}
+  .cname{font-weight:600; color:var(--ink);}
+  .tag{display:inline-block; font-size:10.5px; padding:1px 6px; border-radius:4px; margin-left:6px; vertical-align:1px; font-weight:600;}
+  .t-exam{background:var(--rose-l); color:var(--rose);}
+  .t-chk{background:var(--green-l); color:var(--green);}
+  .t-zy{background:var(--violet-l); color:var(--violet);}
+  .num{font-variant-numeric:tabular-nums;}
+  .mono{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace; font-size:11.5px; color:var(--ink3); letter-spacing:-.02em;}
+  .who{display:inline-flex; align-items:center; gap:7px;}
+  .who .dot{width:6px;height:6px;border-radius:50%;flex:none;}
+  .foot-note{font-size:12px; color:var(--ink3); margin-top:12px; line-height:1.7;}
+
+  /* ---------- MATRIX ---------- */
+  .switch{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--card);}
+  .switch button{
+    border:none; background:transparent; font-family:inherit; font-size:12.5px; padding:7px 16px;
+    color:var(--ink2); cursor:pointer; transition:.15s;
+  }
+  .switch button.on{background:var(--navy); color:#fff; font-weight:600;}
+
+  .matrix{display:none; margin-top:20px;}
+  .matrix.on{display:block;}
+  .mtable td:first-child, .mtable th:first-child{padding-left:16px;}
+
+  /* ---------- COMPARE ---------- */
+  .cmp{display:grid; grid-template-columns:1.35fr 1fr; gap:22px; align-items:start;}
+  .vs{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px 22px;}
+  .vsitem{margin-bottom:16px;}
+  .vsitem:last-child{margin-bottom:0;}
+  .vsitem .top{display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;}
+  .vsitem .top b{font-weight:650;}
+  .vsitem .top span{color:var(--ink3); font-variant-numeric:tabular-nums;}
+  .dualtrack{display:flex; height:22px; border-radius:5px; overflow:hidden; border:1px solid var(--line2);}
+  .dualtrack .p{display:flex; align-items:center; font-size:10.5px; font-weight:700; color:#fff; transition:.3s; overflow:hidden; white-space:nowrap; padding:0 9px;}
+  .dualtrack .p.th{justify-content:flex-start;}
+  .dualtrack .p.pr{justify-content:flex-end;}
+
+  /* ---------- ACTIVITIES ---------- */
+  .acts{display:flex; flex-direction:column; gap:12px;}
+  .act{background:var(--card); border:1px solid var(--line); border-radius:13px; overflow:hidden;}
+  .act summary{
+    list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:16px;
+    transition:.15s;
+  }
+  .act summary::-webkit-details-marker{display:none;}
+  .act summary:hover{background:#fafcff;}
+  .act .no{
+    width:34px;height:34px;border-radius:9px;background:var(--navy-l);color:var(--navy);
+    display:grid;place-items:center;font-weight:800;font-size:14px;flex:none;
+  }
+  .act .ttl{font-size:15.5px; font-weight:700; flex:1; line-height:1.4;}
+  .act .tm{font-size:12px; color:var(--ink3); white-space:nowrap;}
+  .act .wc{font-size:11px; color:var(--teal); background:var(--teal-l); padding:2px 8px; border-radius:4px; font-weight:600; white-space:nowrap;}
+  .act .cv{color:#b3c0d2; transition:.2s; flex:none;}
+  .act[open] .cv{transform:rotate(90deg);}
+  .act .body{padding:0 22px 22px 72px; border-top:1px solid var(--line2);}
+  .act .body .info{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:6px 24px; font-size:12.5px;
+    color:var(--ink2); padding:16px 0 14px; margin-bottom:14px; border-bottom:1px dashed var(--line);
+  }
+  .act .body .info b{color:var(--ink3); font-weight:500; margin-right:6px;}
+  .act .body p{margin:0 0 12px; text-align:justify; font-size:14.2px; line-height:1.92; color:#28364b;}
+  .act .body p:last-child{margin-bottom:0;}
+  .act .body p.ind{text-indent:2em;}
+
+  /* ---------- FOOTER ---------- */
+  footer{margin-top:64px; border-top:1px solid var(--line); background:#fff; padding:32px 0 40px;}
+  footer .grid{display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:28px; font-size:12.5px; color:var(--ink3); line-height:1.85;}
+  footer h4{font-size:12px; letter-spacing:.1em; color:var(--ink2); margin:0 0 8px; font-weight:700;}
+  footer b{color:var(--ink2); font-weight:600;}
+  .disc{font-size:12px; color:var(--ink3); margin-top:22px; padding-top:18px; border-top:1px dashed var(--line); line-height:1.8;}
+
+  /* ---------- 移动端卡片列表（桌面端隐藏） ---------- */
+  .mcards{display:none; flex-direction:column; gap:10px;}
+  .mcard{background:var(--card); border:1px solid var(--line); border-radius:11px; padding:14px 15px 13px;}
+  .mcard.hl{border-color:#9ec3b5; background:#fbfefc;}
+  .mcard .mh{display:flex; align-items:flex-start; gap:8px; justify-content:space-between; margin-bottom:5px;}
+  .mcard .mname{font-size:14.5px; font-weight:700; line-height:1.45; letter-spacing:-.01em;}
+  .mcard .mcode{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace; font-size:11px; color:var(--ink3); letter-spacing:-.02em; margin-bottom:10px;}
+  .mcard .mspecs{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;}
+  .mcard .mspec{font-size:11.5px; color:var(--ink2); background:#f5f8fc; border:1px solid var(--line2); border-radius:5px; padding:3px 8px; white-space:nowrap;}
+  .mcard .mspec.k{background:var(--navy-l); border-color:#dbe6f5; color:var(--navy); font-weight:600;}
+  .mcard .mfoot{display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:9px; border-top:1px dashed var(--line); font-size:12.5px; color:var(--ink2);}
+  .mcard .mfoot .who{font-weight:600; color:var(--ink);}
+  .mgroup{margin:18px 0 10px; display:flex; align-items:baseline; gap:8px;}
+  .mgroup .gt{font-size:14px; font-weight:700; color:var(--navy);}
+  .mgroup .gd{font-size:11.5px; color:var(--ink3);}
+
+  @media (max-width:1040px){
+    .tgrid{grid-template-columns:repeat(3,1fr);}
+    .kpis{grid-template-columns:repeat(3,1fr);}
+    .struct,.cmp{grid-template-columns:1fr;}
+  }
+  /* 平板/窄屏：表格列宽不足时改用卡片，避免挤压换行 */
+  @media (max-width:900px){
+    .only-d{display:none !important;}
+    .mcards{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+    .mgroup{grid-column:1/-1; margin-top:6px;}
+  }
+  /* ========== 移动端（手机）适配 ========== */
+  @media (max-width:760px){
+    html{scroll-padding-top:96px;}
+    body{font-size:15.5px; line-height:1.8;}
+    .wrap{padding:0 16px;}
+    h1{font-size:clamp(24px,7.2vw,30px); line-height:1.32; letter-spacing:-.02em; text-wrap:balance;}
+    h1 .thin{font-size:.78em; letter-spacing:0; line-height:1.4;}
+    .sub{font-size:15px; line-height:1.75; margin-bottom:20px;}
+    .eyebrow{font-size:11.5px; letter-spacing:.1em; margin-bottom:12px;}
+    .crumb{font-size:12px; gap:4px; margin-bottom:16px; line-height:1.6;}
+    header.hero{padding:28px 0 26px;}
+    section{padding:36px 0 4px;}
+    .shead{gap:8px; margin-bottom:18px; align-items:flex-start;}
+    .shead h2{font-size:20px; padding-left:12px; width:100%; text-wrap:balance;}
+    #act .shead h2 span{display:block;}
+    .shead h2::before{width:3px; top:4px; bottom:4px;}
+    .shead p{font-size:12.8px; line-height:1.65; max-width:100%;}
+    .shead .num{font-size:11px;}
+
+    /* 顶部导航：可横向滑动，触控目标 ≥44px */
+    nav .wrap{overflow-x:auto; overflow-y:hidden; height:auto; padding:0 12px;
+      scrollbar-width:none; -webkit-overflow-scrolling:touch; gap:2px;}
+    nav .wrap::-webkit-scrollbar{display:none;}
+    nav .brand{flex:none; font-size:12.5px; height:52px; margin-right:6px;}
+    nav .brand .mark{width:24px; height:24px; font-size:11px;}
+    nav a{flex:none; display:flex; align-items:center; height:52px; padding:0 10px; font-size:13px; border-radius:0;}
+    nav a.on{background:transparent; color:var(--navy); font-weight:700; box-shadow:inset 0 -2px 0 var(--navy);}
+    nav::after{content:""; position:absolute; right:0; top:0; bottom:0; width:30px; pointer-events:none;
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.94));}
+
+    /* 负责人卡 */
+    .leaders{grid-template-columns:1fr; gap:9px;}
+    .leader{padding:12px 14px; gap:12px; border-radius:10px;}
+    .leader .av{width:40px; height:40px; font-size:15px;}
+    .leader .nm{font-size:15.5px;}
+
+    /* KPI */
+    .kpis{grid-template-columns:repeat(2,1fr); gap:9px;}
+    .kpis .kpi:last-child{grid-column:1/-1;}
+    .kpi{padding:13px 13px 12px; border-radius:10px;}
+    .kpi .k{font-size:11.5px; margin-bottom:4px;}
+    .kpi .v{font-size:23px;}
+    .kpi .x{font-size:11px; line-height:1.5;}
+
+    /* 组织链路：纵向 */
+    .org{padding:16px; border-radius:12px;}
+    .chain{flex-direction:column; align-items:stretch;}
+    .chain .node{padding:10px 13px; font-size:13.5px; border-radius:8px;}
+    .chain .arr{transform:none; width:100%; text-align:center; padding:3px 0; font-size:0; line-height:1;}
+    .chain .arr::after{content:"↓"; font-size:13px; color:#c3cddb;}
+    .sibs{gap:6px; margin-top:12px; padding-top:12px;}
+    .sib{font-size:11.5px; padding:4px 10px;}
+
+    /* 结构面板 */
+    .struct{gap:12px;}
+    .panel{padding:16px 15px; border-radius:12px;}
+    .panel h3{font-size:14.5px;}
+    .panel .hint{font-size:11.5px; line-height:1.6; margin-bottom:13px;}
+    .bar{grid-template-columns:66px 1fr 84px; gap:8px; font-size:12.5px;}
+    .bar .val{font-size:11.5px;}
+
+    /* 筛选与搜索 */
+    .toolbar{gap:8px;}
+    .chips{gap:6px;}
+    .chip{min-height:38px; padding:8px 14px; font-size:13px; display:inline-flex; align-items:center;}
+    .search{width:100%; min-height:44px; padding:10px 13px; font-size:15px; border-radius:9px;}
+
+    /* 教师卡：单列 */
+    .tgrid{grid-template-columns:1fr; gap:9px;}
+    .tcard{padding:14px; border-radius:11px;}
+    .tcard .nm{font-size:16px;}
+    .meta{font-size:12.5px; gap:4px 10px;}
+    .tcourse{font-size:13px;}
+
+    /* 课程：卡片替代表格 */
+    .semstrip{grid-template-columns:1fr; gap:9px;}
+    .semcard{padding:13px 15px; gap:12px;}
+    .semcard .sn{font-size:20px; min-width:62px; flex:none;}
+    .semcard .sn span{white-space:nowrap;}
+    .semcard .si{font-size:12.5px; line-height:1.6;}
+    .only-d{display:none !important;}
+    .mcards{display:flex;}
+
+    /* 关联视图切换按钮 */
+    .switch{width:100%;}
+    .switch button{flex:1; padding:11px 8px; font-size:13.5px;}
+
+    /* 教研活动 */
+    .acts{gap:9px;}
+    .act{border-radius:11px;}
+    .act summary{display:grid; grid-template-columns:32px 1fr auto; gap:8px 10px;
+      padding:14px 14px 13px; align-items:center;}
+    .act .no{width:32px; height:32px; font-size:13px; grid-column:1; grid-row:1;}
+    .act .ttl{grid-column:2; grid-row:1; font-size:14.5px; line-height:1.5; padding-right:4px;}
+    .act .cv{grid-column:3; grid-row:1; font-size:14px;}
+    .act .tm{grid-column:2; grid-row:2; font-size:11.5px;}
+    .act .wc{grid-column:3; grid-row:2; justify-self:end; font-size:10.5px;}
+    .act .body{padding:0 14px 16px; border-top:none;}
+    .act .body .info{grid-template-columns:1fr; gap:5px; font-size:12px;
+      padding:12px 0 12px; margin-bottom:12px; line-height:1.6;}
+    .act .body p{font-size:15px; line-height:1.9; margin-bottom:11px; text-align:justify;
+      text-justify:inter-ideograph;}
+    .act .body p.ind{text-indent:2em;}
+
+    /* 页脚 */
+    footer{margin-top:40px; padding:24px 0 32px;}
+    footer .grid{grid-template-columns:1fr; gap:18px; font-size:12px; line-height:1.8;}
+    .disc{font-size:11.5px; line-height:1.75;}
+
+    /* 对照表：卡片化 */
+    .vs{padding:16px 15px; border-radius:12px;}
+    .vsitem .top{font-size:12px;}
+    .dualtrack{height:24px;}
+    .dualtrack .p{font-size:10px;}
+
+    /* 触控反馈 */
+    tbody tr:active, .tcard:active, .mcard:active, .act summary:active{background:#f3f7fc;}
+  }
+  @media (max-width:380px){
+    .kpis{grid-template-columns:1fr;}
+    .kpi .v{font-size:22px;}
+    .act .ttl{font-size:13.8px;}
+  }
+  @media (hover:none){
+    .tcard:hover{transform:none; box-shadow:none;}
+  }
+  @media print{
+    nav{display:none;} body{background:#fff;}
+    .act .body{display:block !important;}
+    section{padding-top:28px;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="mark">财</span>数据治理与技术应用课程群</div>
+    <a href="#org">组织定位</a>
+    <a href="#team">师资队伍</a>
+    <a href="#course">课程体系</a>
+    <a href="#link">关联图谱</a>
+    <a href="#cmp">方案对照</a>
+    <a href="#act">教研活动</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="crumb">大连财经学院 <i>/</i> 管理学院 <i>/</i> 大数据管理系 <i>/</i> 大数据管理与应用 <i>/</i> <b>数据治理与技术应用课程群</b></div>
+    <div class="eyebrow">Course Group Profile · 2026</div>
+    <h1>数据治理与技术应用课程群<br><span class="thin">基层教学组织建设与教学运行概览</span></h1>
+    <p class="sub">依托大数据管理与应用专业"专业选修课程模块二：数据管理"组建，覆盖第 5—7 学期 14 门专业选修课程，由 14 名教师组成教学团队，聚焦数据存储、数据治理、数据安全与数据要素流通方向的应用型人才培养。</p>
+
+    <div class="leaders">
+      <div class="leader">
+        <div class="av" style="background:var(--navy-l);color:var(--navy)">付</div>
+        <div><div class="lb">系主任</div><div class="nm">付 琳</div><div class="de">讲师 · 硕士 · 大数据管理系</div></div>
+      </div>
+      <div class="leader">
+        <div class="av" style="background:var(--teal-l);color:var(--teal)">付</div>
+        <div><div class="lb">专业负责人</div><div class="nm">付 琳</div><div class="de">大数据管理与应用专业</div></div>
+      </div>
+      <div class="leader">
+        <div class="av" style="background:var(--amber-l);color:var(--amber)">孙</div>
+        <div><div class="lb">课程群负责人</div><div class="nm">孙智广</div><div class="de">高级工程师 · 硕士 · 14 人团队</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 1. 概览 + 组织 ============ -->
+<section id="org">
+  <div class="wrap">
+    <div class="shead">
+      <div class="num">01</div>
+      <h2>组织定位与规模</h2>
+      <p>隶属管理学院大数据管理系，是"大数据管理与应用"专业下设的两个课程群之一。</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="k">课程组教师</div><div class="v">14<small>人</small></div><div class="x">教授 1 · 副教授 1 · 高级职称 4</div></div>
+      <div class="kpi"><div class="k">承担课程</div><div class="v">14<small>门</small></div><div class="x">均为 2 学分 / 32 学时</div></div>
+      <div class="kpi"><div class="k">课程总学分</div><div class="v">28<small>学分</small></div><div class="x">模块内需修满 14 学分</div></div>
+      <div class="kpi"><div class="k">总学时</div><div class="v">448<small>学时</small></div><div class="x">理论 336 · 实践 112</div></div>
+      <div class="kpi"><div class="k">覆盖学期</div><div class="v">5—7<small>学期</small></div><div class="x">第 5 学期 4 门 · 第 6 学期 6 门 · 第 7 学期 4 门</div></div>
+    </div>
+
+    <div class="org" style="margin-top:22px">
+      <div class="chain">
+        <div class="node">大连财经学院<small>应用型本科</small></div>
+        <div class="arr">›</div>
+        <div class="node">管理学院<small>二级学院</small></div>
+        <div class="arr">›</div>
+        <div class="node">大数据管理系<small>系主任 付琳 · 21 人</small></div>
+        <div class="arr">›</div>
+        <div class="node">大数据管理与应用<small>专业负责人 付琳</small></div>
+        <div class="arr">›</div>
+        <div class="node hl">数据治理与技术应用课程群<small>负责人 孙智广 · 14 人</small></div>
+      </div>
+      <div class="sibs">
+        <span class="sib self">数据治理与技术应用课程群 · 14 人 · 本页</span>
+        <span class="sib">数智商务分析课程群 · 18 人</span>
+        <span class="sib">信息技术基础教研室 · 5 人</span>
+        <span class="sib">数智应用基础课程组 · 20 人</span>
+        <span class="sib">大数据与人工智能概论课程组 · 20 人</span>
+      </div>
+    </div>
+
+    <div class="struct">
+      <div class="panel">
+        <h3>职称结构</h3>
+        <div class="hint">正高 1 人、副高 3 人，高级职称占比 28.6%；中级 5 人为教学中坚</div>
+        <div class="bars" id="titleBars"></div>
+      </div>
+      <div class="panel">
+        <h3>学历学位与队伍特征</h3>
+        <div class="hint">硕士学位全覆盖，企业工程背景与实验教学力量互补</div>
+        <div class="bars" id="eduBars"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;padding-top:16px;border-top:1px dashed var(--line)">
+          <div><div style="font-size:11.5px;color:var(--ink3)">平均年龄</div><div style="font-size:20px;font-weight:800">38.7<span style="font-size:12px;font-weight:600;color:var(--ink2)"> 岁</span></div></div>
+          <div><div style="font-size:11.5px;color:var(--ink3)">平均校龄</div><div style="font-size:20px;font-weight:800">8.3<span style="font-size:12px;font-weight:600;color:var(--ink2)"> 年</span></div></div>
+          <div><div style="font-size:11.5px;color:var(--ink3)">35 岁以下青年骨干</div><div style="font-size:20px;font-weight:800">6<span style="font-size:12px;font-weight:600;color:var(--ink2)"> 人</span></div></div>
+          <div><div style="font-size:11.5px;color:var(--ink3)">男 / 女</div><div style="font-size:20px;font-weight:800">8<span style="font-size:12px;font-weight:600;color:var(--ink2)"> / 6</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. 师资 ============ -->
+<section id="team">
+  <div class="wrap">
+    <div class="shead">
+      <div class="num">02</div>
+      <h2>课程组教师</h2>
+      <p>14 名成员信息取自《大连财经学院基层教学组织成员信息表》，每人均对应模块内 1 门课程的主讲任务。</p>
+    </div>
+
+    <div class="toolbar">
+      <div class="chips" id="titleChips"></div>
+      <input class="search" id="search" placeholder="搜索姓名 / 课程 / 职称…" />
+    </div>
+    <div class="tgrid" id="tgrid"></div>
+  </div>
+</section>
+
+<!-- ============ 3. 课程 ============ -->
+<section id="course">
+  <div class="wrap">
+    <div class="shead">
+      <div class="num">03</div>
+      <h2>课程体系：模块二 · 数据管理</h2>
+      <p>摘自"大数据管理与应用专业指导性教学安排表（表五）"，14 门课程学分结构一致，按学期递进排布。</p>
+    </div>
+
+    <div class="semstrip">
+      <div class="semcard"><div class="sn">5<span>第 5 学期</span></div><div class="si"><b>4 门</b> · 8 学分<br>工具与思维奠基：R 语言、区块链、数据洞察、存储原理</div></div>
+      <div class="semcard"><div class="sn">6<span>第 6 学期</span></div><div class="si"><b>6 门</b> · 12 学分<br>技术纵深：日语、非结构化、安全隐私、PolarDB、数仓挖掘、调优</div></div>
+      <div class="semcard"><div class="sn">7<span>第 7 学期</span></div><div class="si"><b>4 门</b> · 8 学分<br>治理与应用：项目管理、数据质量治理、要素流转、AI 工具</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="chips" id="semChips">
+        <button class="chip on" data-sem="all">全部 14 门</button>
+        <button class="chip" data-sem="5">第 5 学期</button>
+        <button class="chip" data-sem="6">第 6 学期</button>
+        <button class="chip" data-sem="7">第 7 学期</button>
+      </div>
+    </div>
+
+    <div class="tablewrap only-d">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:34%">课程名称</th>
+            <th>课程代码</th>
+            <th class="num">学分</th>
+            <th class="num">总学时</th>
+            <th class="num">理论</th>
+            <th class="num">实践</th>
+            <th>开课学期</th>
+            <th>考核</th>
+            <th>主讲教师</th>
+          </tr>
+        </thead>
+        <tbody id="ctbody"></tbody>
+      </table>
+    </div>
+    <div class="mcards" id="courseCards"></div>
+    <div class="foot-note">
+      注：模块内课程均为 2 学分 / 32 学时（理论 24 + 实践 8），学生须在本模块修满 <b>14 学分</b>（约 7 门）。"数字经济与数据要素流转实践"开课单位标注为经济学院，由课程群协同建设。主讲教师对应关系为课程群组建方案拟定，待课程群会议确认后固化。
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. 关联 ============ -->
+<section id="link">
+  <div class="wrap">
+    <div class="shead">
+      <div class="num">04</div>
+      <h2>教师—课程关联</h2>
+      <p>同一份数据，两种看法：按学期看教学负荷分布，按教师看任务承担情况。点击任意行或卡片可双向高亮。</p>
+    </div>
+
+    <div class="switch" id="sw">
+      <button class="on" data-v="sem">按学期组织</button>
+      <button data-v="tea">按教师组织</button>
+    </div>
+
+    <div class="matrix on" id="mSem">
+      <div class="tablewrap only-d">
+        <table class="mtable">
+          <thead><tr><th style="width:20%">开课学期</th><th style="width:33%">课程</th><th>主讲教师</th><th>职称</th><th class="num">实践学时</th><th>考核方式</th></tr></thead>
+          <tbody id="semBody"></tbody>
+        </table>
+      </div>
+      <div class="mcards" id="semCards"></div>
+    </div>
+
+    <div class="matrix" id="mTea">
+      <div class="tablewrap only-d">
+        <table class="mtable">
+          <thead><tr><th style="width:20%">教师</th><th style="width:33%">承担课程</th><th>课程代码</th><th>开课学期</th><th class="num">学分/学时</th><th>考核方式</th></tr></thead>
+          <tbody id="teaBody"></tbody>
+        </table>
+      </div>
+      <div class="mcards" id="teaCards"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. 对照 ============ -->
+<section id="cmp">
+  <div class="wrap">
+    <div class="shead">
+      <div class="num">05</div>
+      <h2>标准方案与实验班方案对照</h2>
+      <p>"模块二：数据管理"为专业标准方案独有；用友新道数智金融产业学院创新人才实验班对应"金融大数据分析"模块，其中 6 门课程同名同码，理论实践配比不同。</p>
+    </div>
+
+    <div class="cmp">
+      <div>
+        <div class="tablewrap only-d">
+          <table>
+            <thead><tr><th>同名课程</th><th>标准方案<br><span style="font-weight:400;letter-spacing:0">理论 / 实践</span></th><th>实验班方案<br><span style="font-weight:400;letter-spacing:0">理论 / 实践</span></th><th>学期</th></tr></thead>
+            <tbody id="cmpBody"></tbody>
+          </table>
+        </div>
+        <div class="mcards" id="cmpCards"></div>
+      </div>
+      <div class="vs">
+        <h3 style="font-size:14px;margin:0 0 4px;font-weight:700">实践学时占比</h3>
+        <div class="hint" style="font-size:12px;color:var(--ink3);margin-bottom:18px">同名课程横向比较</div>
+        <div id="vsBox"></div>
+        <div style="margin-top:18px;padding-top:16px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--ink2);line-height:1.75">
+          实验班同名课程实践占比达 <b>50%</b>，标准方案为 <b>25%</b>。课程群可据此建立"基础版 + 强化版"两套实验包，供不同培养方案选用，避免重复开发。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. 教研活动 ============ -->
+<section id="act">
+  <div class="wrap">
+    <div class="shead">
+      <div class="num">06</div>
+      <h2><span>2026—2027 学年第一学期</span><span>教研活动记录</span></h2>
+      <p>共 4 次，每月 1 次。前两次为学校指定主题，后两次结合数据治理方向自主拟定。</p>
+    </div>
+
+    <div class="acts" id="acts"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <h4>数据来源</h4>
+        <b>①</b> 《大数据管理与应用专业人才培养方案》—— 大数据管理与应用专业指导性教学安排表（表五）<br>
+        <b>②</b> 《大数据管理与应用专业人才培养方案（用友新道数智金融产业学院创新人才实验班）》—— 表五<br>
+        <b>③</b> 《附件3：大连财经学院基层教学组织成员信息表（大数据与人工智能学院）》<br>
+        <b>④</b> 《基层教学组织队伍结构2026（最终）》
+      </div>
+      <div>
+        <h4>口径说明</h4>
+        课程数据以 2026 版培养方案表五为准；<br>
+        教师信息以附件3 为基础，出生年月由表内序列值换算为年月；<br>
+        教师与课程的对应关系为课程群组建方案拟定。
+      </div>
+      <div>
+        <h4>课程群</h4>
+        管理学院 · 大数据管理系<br>
+        大数据管理与应用专业<br>
+        负责人：孙智广　成员：14 人<br>
+        更新：2026 年 11 月
+      </div>
+    </div>
+    <div class="disc">
+      本页为内部教学管理资料，用于课程群建设、教研活动记录与基层教学组织材料归档。页面中的教师—课程对应关系、教研活动记录为课程群研讨拟定稿，正式报送前须经课程群全体会议审议。
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ================= 数据 ================= */
+const C = {
+  navy:'#1d3f6e', teal:'#0d7a83', amber:'#a96e12', rose:'#9c3b34',
+  violet:'#5b4b8a', green:'#3f7a4d', slate:'#5b6b82'
+};
+const titleColor = {
+  '教授':['var(--rose-l)','var(--rose)'],
+  '副教授':['#f6ead8','#8a5a10'],
+  '高级工程师':['var(--amber-l)','var(--amber)'],
+  '高级实验师':['var(--amber-l)','var(--amber)'],
+  '讲师':['var(--navy-l)','var(--navy)'],
+  '助教':['var(--teal-l)','var(--teal)'],
+  '未评级':['#f0f2f6','#6b7a90']
+};
+
+// 14 门课程（表五 · 模块二：数据管理）
+const courses = [
+  {code:'013222200121', name:'R语言基础及应用', sem:5, exam:'考试', teacher:'石佳鑫'},
+  {code:'013222200922', name:'区块链技术基础与创新应用', note:'专创融合课程', sem:5, exam:'考查', teacher:'徐熙辰'},
+  {code:'013222201522', name:'数据洞察与创新思维', sem:5, exam:'考查', teacher:'付琳'},
+  {code:'013222201022', name:'大数据存储原理', sem:5, exam:'考查', teacher:'杨晓光'},
+  {code:'013222200321', name:'大数据日语基础', sem:6, exam:'考试', teacher:'张文'},
+  {code:'013222201122', name:'非结构化数据分析与创新应用', sem:6, exam:'考查', teacher:'许跃雯'},
+  {code:'013222201221', name:'大数据安全与隐私保护', sem:6, exam:'考试', teacher:'刘忠党'},
+  {code:'013222202322', name:'PolarDB数据备份与恢复', sem:6, exam:'考查', teacher:'王新武'},
+  {code:'013222202522', name:'数据仓库与数据挖掘', sem:6, exam:'考查', teacher:'刘丹'},
+  {code:'013222202622', name:'数据库性能调优理论与实践', sem:6, exam:'考查', teacher:'郝建民'},
+  {code:'013222201322', name:'大数据项目管理与创新实践', sem:7, exam:'考查', teacher:'孙媛'},
+  {code:'013222201421', name:'数据质量与大数据治理', sem:7, exam:'考试', teacher:'孙智广'},
+  {code:'013222202022', name:'数字经济与数据要素流转实践', sem:7, exam:'考查', teacher:'张杰', unit:'经济学院'},
+  {code:'013222202122', name:'人工智能工具应用实践', sem:7, exam:'考查', teacher:'祁文彦'}
+];
+
+// 14 名教师
+const teachers = [
+  {name:'孙智广', gender:'男', birth:'1979.05', entry:'2024.09', edu:'大学本科', degree:'硕士', title:'高级工程师', pol:'群众', role:'课程群负责人'},
+  {name:'石佳鑫', gender:'女', birth:'1994.05', entry:'2019.12', edu:'硕士研究生', degree:'硕士', title:'讲师', pol:'群众', role:'信息技术基础教研室主任'},
+  {name:'张文',   gender:'男', birth:'1986.03', entry:'2021.08', edu:'硕士研究生', degree:'硕士', title:'助教', pol:'群众', role:''},
+  {name:'付琳',   gender:'女', birth:'1994.08', entry:'2018.03', edu:'硕士研究生', degree:'硕士', title:'讲师', pol:'群众', role:'系主任 / 专业负责人'},
+  {name:'祁文彦', gender:'女', birth:'1998.05', entry:'2023.06', edu:'硕士研究生', degree:'硕士', title:'助教', pol:'共青团员', role:''},
+  {name:'许跃雯', gender:'女', birth:'1997.03', entry:'2025.01', edu:'硕士研究生', degree:'硕士', title:'助教', pol:'共青团员', role:''},
+  {name:'刘忠党', gender:'男', birth:'1986.07', entry:'2021.03', edu:'硕士研究生', degree:'硕士', title:'讲师', pol:'中共党员', role:''},
+  {name:'徐熙辰', gender:'男', birth:'1998.06', entry:'2024.12', edu:'硕士研究生', degree:'硕士', title:'未评级', pol:'中共党员', role:''},
+  {name:'杨晓光', gender:'男', birth:'1970.10', entry:'2025.04', edu:'大学本科', degree:'硕士', title:'教授', pol:'九三学社', role:''},
+  {name:'张杰',   gender:'女', birth:'1997.08', entry:'2023.10', edu:'硕士研究生', degree:'硕士', title:'未评级', pol:'中共党员', role:''},
+  {name:'孙媛',   gender:'女', birth:'1979.01', entry:'2003.07', edu:'大学本科', degree:'硕士', title:'讲师', pol:'群众', role:''},
+  {name:'郝建民', gender:'男', birth:'1978.11', entry:'2001.07', edu:'大学本科', degree:'硕士', title:'高级实验师', pol:'中共党员', role:'专业带头人'},
+  {name:'刘丹',   gender:'男', birth:'1979.06', entry:'2002.07', edu:'硕士研究生', degree:'硕士', title:'副教授', pol:'中共党员', role:''},
+  {name:'王新武', gender:'男', birth:'1987.10', entry:'2020.03', edu:'硕士研究生', degree:'硕士', title:'讲师', pol:'群众', role:''}
+];
+teachers.forEach(t=>{ const c = courses.find(x=>x.teacher===t.name); t.course = c?c.name:'—'; t.code=c?c.code:''; t.sem=c?c.sem:''; t.exam=c?c.exam:''; });
+
+/* ================= 工具 ================= */
+const $ = s=>document.querySelector(s);
+const el = (t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
+const semName = s => '第 '+s+' 学期';
+
+/* ================= 职称柱 ================= */
+(function(){
+  const cnt = {};
+  teachers.forEach(t=>cnt[t.title]=(cnt[t.title]||0)+1);
+  const order = ['教授','副教授','高级工程师','高级实验师','讲师','助教','未评级'];
+  const colors = {'教授':'var(--rose)','副教授':'#c08a2e','高级工程师':'var(--amber)','高级实验师':'#c99a4a','讲师':'var(--navy)','助教':'var(--teal)','未评级':'#93a1b5'};
+  const box = $('#titleBars');
+  order.filter(k=>cnt[k]).forEach(k=>{
+    const n = cnt[k];
+    const b = el('div','bar');
+    b.innerHTML = `<div class="lab">${k}</div>
+      <div class="track"><div class="fill" style="width:${n/14*100}%;background:${colors[k]}"></div></div>
+      <div class="val">${n} <span>人 · ${(n/14*100).toFixed(1)}%</span></div>`;
+    box.appendChild(b);
+  });
+})();
+
+/* ================= 学历学位 ================= */
+(function(){
+  const box = $('#eduBars');
+  const data = [
+    ['最高学位 硕士', 14, 'var(--teal)'],
+    ['学历 硕士研究生', 10, 'var(--navy)'],
+    ['学历 大学本科', 4, 'var(--amber)'],
+    ['中共党员', 5, 'var(--rose)']
+  ];
+  data.forEach(([k,n,color])=>{
+    const b = el('div','bar');
+    b.innerHTML = `<div class="lab" style="width:96px">${k}</div>
+      <div class="track"><div class="fill" style="width:${n/14*100}%;background:${color}"></div></div>
+      <div class="val">${n} <span>人</span></div>`;
+    b.querySelector('.lab').style.width='96px';
+    box.appendChild(b);
+  });
+  box.querySelectorAll('.bar').forEach(b=>b.style.gridTemplateColumns='100px 1fr 94px');
+})();
+
+/* ================= 教师卡 ================= */
+let curTitle = 'all';
+function renderTeachers(){
+  const kw = ($('#search').value||'').trim().toLowerCase();
+  const grid = $('#tgrid'); grid.innerHTML='';
+  const list = teachers.filter(t=>{
+    const okT = curTitle==='all' || t.title===curTitle;
+    const okK = !kw || (t.name+t.course+t.title+(t.role||'')).toLowerCase().includes(kw);
+    return okT && okK;
+  });
+  if(!list.length){ grid.appendChild(el('div','empty','没有匹配的教师，试试其他关键词。')); return; }
+  list.forEach(t=>{
+    const [bg,fg] = titleColor[t.title] || ['#f0f2f6','#6b7a90'];
+    const card = el('div','tcard');
+    card.dataset.teacher = t.name;
+    card.dataset.course = t.course;
+    card.innerHTML = `
+      <div class="row1">
+        <div class="av" style="background:${bg};color:${fg}">${t.name[0]}</div>
+        <div style="min-width:0">
+          <div class="nm">${t.name}</div>
+          ${t.role?`<div class="rl">${t.role}</div>`:`<div class="rl" style="color:var(--ink3);font-weight:500">课程组教师</div>`}
+        </div>
+        <span class="badge" style="background:${bg};color:${fg};margin-left:auto">${t.title}</span>
+      </div>
+      <div class="meta">
+        <dt>性别 / 出生</dt><dd>${t.gender} · ${t.birth}</dd>
+        <dt>学历 / 学位</dt><dd>${t.edu} / ${t.degree}</dd>
+        <dt>入校时间</dt><dd>${t.entry}</dd>
+        <dt>政治面貌</dt><dd>${t.pol}</dd>
+      </div>
+      <div class="tcourse">
+        <span class="cl">主讲课程 · 第 ${t.sem} 学期</span>
+        ${t.course}${t.exam?` <span class="tag ${t.exam==='考试'?'t-exam':'t-chk'}">${t.exam}</span>`:''}
+        <div class="cc">${t.code}</div>
+      </div>`;
+    card.addEventListener('click', ()=>highlightCourse(t.course));
+    grid.appendChild(card);
+  });
+}
+
+/* ================= 职称筛选 ================= */
+(function(){
+  const box = $('#titleChips');
+  const cnt = {}; teachers.forEach(t=>cnt[t.title]=(cnt[t.title]||0)+1);
+  const order = ['all','教授','副教授','高级工程师','高级实验师','讲师','助教','未评级'];
+  order.filter(k=>k==='all'||cnt[k]).forEach(k=>{
+    const b = el('button','chip'+(k==='all'?' on':''), k==='all'?'全部':`${k} <span style="opacity:.65">${cnt[k]}</span>`);
+    b.dataset.t = k;
+    b.onclick = ()=>{
+      curTitle = k;
+      box.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      renderTeachers();
+    };
+    box.appendChild(b);
+  });
+})();
+$('#search').addEventListener('input', renderTeachers);
+renderTeachers();
+
+/* ================= 课程表 ================= */
+let curSem = 'all';
+function renderCourses(){
+  const tb = $('#ctbody'); tb.innerHTML='';
+  courses.filter(c=> curSem==='all' || c.sem===+curSem).forEach(c=>{
+    const tr = el('tr');
+    tr.dataset.course = c.name; tr.dataset.teacher = c.teacher;
+    tr.innerHTML = `
+      <td><span class="cname">${c.name}</span>${c.note?`<span class="tag t-zy">${c.note}</span>`:''}${c.unit?`<span class="tag t-zy">经济学院</span>`:''}</td>
+      <td class="mono">${c.code}</td>
+      <td class="num">2</td><td class="num">32</td><td class="num">24</td><td class="num">8</td>
+      <td>${semName(c.sem)}</td>
+      <td><span class="tag ${c.exam==='考试'?'t-exam':'t-chk'}" style="margin:0">${c.exam}</span></td>
+      <td><span class="who"><span class="dot" style="background:${C.teal}"></span>${c.teacher}</span></td>`;
+    tr.addEventListener('click', ()=>highlightTeacher(c.teacher));
+    tb.appendChild(tr);
+  });
+
+  /* 移动端卡片 */
+  const cardBox = $('#courseCards'); cardBox.innerHTML='';
+  courses.filter(c=> curSem==='all' || c.sem===+curSem).forEach(c=>{
+    const card = el('div','mcard');
+    card.dataset.course = c.name; card.dataset.teacher = c.teacher;
+    card.innerHTML = `
+      <div class="mh">
+        <span class="mname">${c.name}${c.note?` <span class="tag t-zy" style="vertical-align:2px">${c.note}</span>`:''}</span>
+        <span class="tag ${c.exam==='考试'?'t-exam':'t-chk'}" style="margin:0;flex:none">${c.exam}</span>
+      </div>
+      <div class="mcode">${c.code}</div>
+      <div class="mspecs">
+        <span class="mspec k">2 学分</span><span class="mspec">32 学时</span>
+        <span class="mspec">理论 24</span><span class="mspec">实践 8</span>
+      </div>
+      <div class="mfoot">
+        <span class="who"><span class="dot" style="background:${C.teal}"></span>${c.teacher}</span>
+        <span>${semName(c.sem)}</span>
+      </div>`;
+    card.addEventListener('click', ()=>highlightTeacher(c.teacher));
+    cardBox.appendChild(card);
+  });
+}
+$('#semChips').addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  $('#semChips').querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); curSem = b.dataset.sem; renderCourses();
+});
+renderCourses();
+
+/* ================= 关联矩阵 ================= */
+function renderMatrix(){
+  const sb = $('#semBody'); sb.innerHTML='';
+  [5,6,7].forEach(s=>{
+    const list = courses.filter(c=>c.sem===s);
+    list.forEach((c,i)=>{
+      const t = teachers.find(x=>x.name===c.teacher)||{title:'—'};
+      const tr = el('tr');
+      tr.dataset.course=c.name; tr.dataset.teacher=c.teacher;
+      tr.innerHTML = `
+        ${i===0?`<td rowspan="${list.length}" style="background:#fbfcfe;font-weight:700;color:var(--navy);vertical-align:top">
+          ${semName(s)}<div style="font-size:11px;color:var(--ink3);font-weight:500;margin-top:4px">${list.length} 门 · ${list.length*2} 学分</div></td>`:''}
+        <td><span class="cname">${c.name}</span></td>
+        <td><span class="who"><span class="dot" style="background:${C.teal}"></span>${c.teacher}</span></td>
+        <td style="color:var(--ink2)">${t.title}</td>
+        <td class="num">8</td>
+        <td><span class="tag ${c.exam==='考试'?'t-exam':'t-chk'}" style="margin:0">${c.exam}</span></td>`;
+      tr.addEventListener('click', ()=>highlightTeacher(c.teacher));
+      sb.appendChild(tr);
+    });
+  });
+
+  const tb = $('#teaBody'); tb.innerHTML='';
+  teachers.forEach(t=>{
+    const tr = el('tr');
+    tr.dataset.course=t.course; tr.dataset.teacher=t.name;
+    tr.innerHTML = `
+      <td><b>${t.name}</b><div style="font-size:11px;color:var(--ink3)">${t.title}</div></td>
+      <td class="cname">${t.course}</td>
+      <td class="mono">${t.code}</td>
+      <td>${semName(t.sem)}</td>
+      <td class="num">2 / 32</td>
+      <td><span class="tag ${t.exam==='考试'?'t-exam':'t-chk'}" style="margin:0">${t.exam}</span></td>`;
+    tr.addEventListener('click', ()=>highlightCourse(t.course));
+    tb.appendChild(tr);
+  });
+
+  /* 移动端：按学期卡片 */
+  const sc = $('#semCards'); sc.innerHTML='';
+  [5,6,7].forEach(s=>{
+    const list = courses.filter(c=>c.sem===s);
+    const g = el('div','mgroup');
+    g.innerHTML = `<span class="gt">${semName(s)}</span><span class="gd">${list.length} 门 · ${list.length*2} 学分</span>`;
+    sc.appendChild(g);
+    list.forEach(c=>{
+      const t = teachers.find(x=>x.name===c.teacher)||{title:'—'};
+      const card = el('div','mcard');
+      card.dataset.course=c.name; card.dataset.teacher=c.teacher;
+      card.style.padding='12px 14px';
+      card.innerHTML = `
+        <div class="mh"><span class="mname" style="font-size:14px">${c.name}</span>
+          <span class="tag ${c.exam==='考试'?'t-exam':'t-chk'}" style="margin:0;flex:none">${c.exam}</span></div>
+        <div class="mspecs" style="margin-bottom:0">
+          <span class="mspec k">${c.teacher}</span><span class="mspec">${t.title}</span><span class="mspec">实践 8 学时</span>
+        </div>`;
+      card.addEventListener('click', ()=>highlightTeacher(c.teacher));
+      sc.appendChild(card);
+    });
+  });
+
+  /* 移动端：按教师卡片 */
+  const tc = $('#teaCards'); tc.innerHTML='';
+  teachers.forEach(t=>{
+    const card = el('div','mcard');
+    card.dataset.course=t.course; card.dataset.teacher=t.name;
+    card.style.padding='12px 14px';
+    card.innerHTML = `
+      <div class="mh"><span class="mname" style="font-size:14px">${t.name}</span>
+        <span class="tag ${t.exam==='考试'?'t-exam':'t-chk'}" style="margin:0;flex:none">${t.exam}</span></div>
+      <div class="mname" style="font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px">${t.course}</div>
+      <div class="mspecs" style="margin-bottom:0">
+        <span class="mspec k">${t.title}</span><span class="mspec">${semName(t.sem)}</span><span class="mspec">2 / 32</span>
+      </div>
+      <div class="mcode" style="margin:8px 0 0">${t.code}</div>`;
+    card.addEventListener('click', ()=>highlightCourse(t.course));
+    tc.appendChild(card);
+  });
+}
+renderMatrix();
+
+$('#sw').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  $('#sw').querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  $('#mSem').classList.toggle('on', b.dataset.v==='sem');
+  $('#mTea').classList.toggle('on', b.dataset.v==='tea');
+});
+
+/* ================= 双向高亮 ================= */
+function flash(selector, attr, val){
+  document.querySelectorAll(selector).forEach(n=>n.classList.remove('hl'));
+  const hits = [...document.querySelectorAll(selector)].filter(n=>n.dataset[attr]===val);
+  hits.forEach(n=>n.classList.add('hl'));
+  if(hits.length){
+    const first = hits[0];
+    const r = first.getBoundingClientRect();
+    if(r.top<80 || r.bottom>window.innerHeight-40){
+      first.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+    setTimeout(()=>hits.forEach(n=>n.classList.remove('hl')), 3200);
+  }
+}
+function highlightTeacher(name){ flash('.tcard','teacher',name); }
+function highlightCourse(name){
+  flash('tbody tr','course',name);
+  flash('.mcard','course',name);
+  document.querySelectorAll('.tcard').forEach(n=>{ if(n.dataset.course===name) n.classList.add('hl'); });
+  setTimeout(()=>document.querySelectorAll('.tcard').forEach(n=>n.classList.remove('hl')), 3200);
+}
+
+/* ================= 方案对照 ================= */
+const cmpData = [
+  ['R语言基础及应用','013222200121',24,8,'013222200221',16,16,5],
+  ['数据洞察与创新思维','013222201522',24,8,'013222200122',16,16,5],
+  ['大数据存储原理','013222201022',24,8,'013222201222',16,16,6],
+  ['大数据日语基础','013222200321',24,8,'013222201521',16,16,6],
+  ['数字经济与数据要素流转实践','013222202022',24,8,'013222202922',16,16,7],
+  ['人工智能工具应用实践','013222202122',24,8,'013222203022',16,16,7]
+];
+(function(){
+  const tb = $('#cmpBody');
+  cmpData.forEach(d=>{
+    const tr = el('tr');
+    tr.style.cursor='default';
+    tr.innerHTML = `<td class="cname">${d[0]}<div class="mono" style="font-weight:400">${d[1]}</div></td>
+      <td class="num">${d[2]} / ${d[3]}</td>
+      <td class="num">${d[5]} / ${d[6]}</td>
+      <td>${d[7]}</td>`;
+    tb.appendChild(tr);
+  });
+
+  /* 移动端卡片 */
+  const cc = $('#cmpCards');
+  cmpData.forEach(d=>{
+    const card = el('div','mcard');
+    card.style.padding='12px 14px';
+    card.innerHTML = `
+      <div class="mh"><span class="mname" style="font-size:14px">${d[0]}</span>
+        <span class="mspec" style="flex:none;background:var(--navy-l);border-color:#dbe6f5;color:var(--navy);font-weight:600">第 ${d[7]} 学期</span></div>
+      <div class="mcode" style="margin-bottom:8px">${d[1]}</div>
+      <div class="mspecs" style="margin-bottom:0">
+        <span class="mspec">标准 ${d[2]} / ${d[3]}</span>
+        <span class="mspec k">实验班 ${d[5]} / ${d[6]}</span>
+      </div>`;
+    cc.appendChild(card);
+  });
+
+  const box = $('#vsBox');
+  const rows = [
+    ['标准方案', 24, 8, 'var(--navy)'],
+    ['实验班方案', 16, 16, 'var(--teal)']
+  ];
+  rows.forEach(([name,th,pr,color])=>{
+    const pct = pr/(th+pr)*100;
+    const d = el('div','vsitem');
+    d.innerHTML = `<div class="top"><b>${name}</b><span>实践 ${pct.toFixed(0)}% · 理论 ${(100-pct).toFixed(0)}%</span></div>
+      <div class="dualtrack">
+        <div class="p th" style="flex:${th}; background:${color}; opacity:.4">理论 ${th}</div>
+        <div class="p pr" style="flex:${pr}; background:${color}">实践 ${pr}</div>
+      </div>`;
+    box.appendChild(d);
+  });
+})();
+
+/* ================= 教研活动 ================= */
+const acts = [
+  {
+    date:'2026 年 9 月 2 日', time:'14:00—16:30', place:'管理学院 302 会议室',
+    host:'孙智广', who:'付琳、孙智广、石佳鑫、张文、祁文彦、许跃雯、刘忠党、徐熙辰、杨晓光、张杰、孙媛、郝建民、刘丹、王新武（14 人全勤）',
+    recorder:'徐熙辰', topic:'新学期集体备课：模块课程教学标准统一与首开课程衔接',
+    body:[
+      '本次集体备课由课程群负责人孙智广主持，14 名课程组教师全部参加，系主任、专业负责人付琳到场指导。会议首先对照 2026 版人才培养方案，逐门核对课程群承担的第 5 至第 7 学期共 14 门专业选修课程的课程代码、学分学时与毕业要求指标点的对应关系，确认 14 门课程均为 2 学分、32 学时（理论 24 学时、实践 8 学时），模块要求学生修满 14 学分，与方案文本完全一致。',
+      '针对本学期开设的 R 语言基础及应用、区块链技术基础与创新应用（专创融合课程）、数据洞察与创新思维、大数据存储原理四门课程，四位主讲教师分别汇报教学进度安排。与会教师围绕先修课程衔接展开讨论，一致认为应在前两周集中复习 Python 程序设计、数据库原理与应用中的数据处理与 SQL 查询内容，避免学生因工具生疏影响后续教学；R 语言课程作为模块内唯一的考试课程，须统一命题范围与实验考核标准，其余三门考查课程应强化过程性考核，实践成绩占比不低于 40%。',
+      '会议明确三项任务：一是四位主讲教师在一周内完成课程标准与教学进度表定稿；二是统一实验指导书体例，每个实验项目须写明目标、环境、步骤与评分要点；三是建立课程群共享资源目录，案例、数据集与课件统一归档。新入职教师许跃雯、祁文彦分别进行 20 分钟试讲，与会教师围绕案例导入与课堂节奏提出改进建议。会议确定本学期教研活动每月一次，双周周三下午为例会时间。'
+    ]
+  },
+  {
+    date:'2026 年 10 月 14 日', time:'14:00—16:40', place:'管理学院 302 会议室',
+    host:'孙智广', who:'付琳、孙智广、石佳鑫、张文、祁文彦、许跃雯、刘忠党、徐熙辰、杨晓光、张杰、孙媛、郝建民、刘丹、王新武（14 人）',
+    recorder:'张杰', topic:'智慧课程建设研讨：从资源上线走向教学重构',
+    body:[
+      '本次研讨以“智慧课程建设”为主题，讨论人工智能背景下课程群如何从资源上线走向教学重构。孙智广通报学校智慧课程建设与认定要求，指出 14 门课程资源建设不均衡，已有线上资源多停留在课件与习题上传层面，尚未形成结构化知识图谱与数据驱动的教学闭环。',
+      '一是知识图谱建设。大家认为应先在数据质量与大数据治理、数据仓库与数据挖掘两门核心课程试点，按“概念—方法—工具—案例”四层拆解知识点，标注先修关系与毕业要求指标点，形成可复用模板后再向其余课程推广。二是教学场景设计。付琳提出，智慧课程的关键不是“资源多”，而是“路径清”，建议以典型业务问题为主线组织学习单元，让学生在完成任务中调用知识。三是评价改革。刘丹、郝建民建议利用平台学习行为数据生成过程性评价画像，把平时成绩由“教师印象”转为“数据支撑”，同时明确数据仅用于教学改进。',
+      '会议形成四点共识：第一，本学期完成 2 门试点课程的知识图谱与数字资源包建设，2027 年春季学期扩展至全部课程；第二，统一采用“微课 + 任务单 + 随堂测”结构，每个知识点配套不超过 8 分钟的微视频；第三，由祁文彦、徐熙辰、张杰组成技术支持小组，负责平台建课、数据导出与 AI 工具测试；第四，期末形成课程群智慧课程建设方案，作为申报校级智慧课程的支撑材料。会议提醒，AI 工具引入须设置使用边界，防止学生以生成内容替代数据分析训练。'
+    ]
+  },
+  {
+    date:'2026 年 11 月 11 日', time:'14:00—16:30', place:'管理学院 302 会议室',
+    host:'孙智广', who:'孙智广、付琳、刘忠党、张杰、石佳鑫、刘丹、郝建民、王新武、徐熙辰、张文、祁文彦、许跃雯、杨晓光、孙媛（14 人）',
+    recorder:'许跃雯', topic:'数据要素市场化背景下的治理课程内容重构与案例开发',
+    body:[
+      '本次教研活动聚焦数据要素市场化配置改革对课程内容的冲击，讨论《数据质量与大数据治理》《大数据安全与隐私保护》《数字经济与数据要素流转实践》三门课程的协同重构。',
+      '孙智广结合企业实践指出，数据治理的教学重心正在从“内部质量管理”转向“质量—安全—流通”三位一体的治理能力，学生既要会做数据标准、元数据与主数据管理，也要理解数据资产确权、定价与合规流通的规则。张杰补充介绍了企业数据资源会计处理相关规定与数据管理能力成熟度（DCMM）评估要点。刘忠党提出，安全与隐私保护课程不能停留在加密算法讲解，应围绕数据分类分级、脱敏与授权、跨境流动等真实场景组织教学。',
+      '讨论中大家形成一致意见：三门课程存在内容交叉，须明确边界。数据质量与大数据治理侧重标准、流程与组织机制；大数据安全与隐私保护侧重技术手段与合规底线；数字经济与数据要素流转实践侧重场景、制度与商业模式。三课共同使用一套贯穿案例，即某商业银行的客户数据治理项目，分别从质量、安全、流通三个切口展开，形成递进式案例链，避免重复讲授。',
+      '会议确定四项任务：一是由孙智广牵头，11 月底前完成三门课程内容边界对照表；二是联合企业专家开发金融、制造、政务三个领域的治理案例，每个案例配套数据说明与讨论题；三是将数据资产入表、DCMM 评估等新内容以专题形式嵌入，课时不少于 4 学时；四是启动《数据治理案例集》编写，2027 年 6 月前形成初稿。'
+    ]
+  },
+  {
+    date:'2026 年 12 月 9 日', time:'14:00—16:50', place:'管理学院实验教学中心',
+    host:'孙智广', who:'孙智广、郝建民、刘丹、王新武、石佳鑫、付琳、杨晓光、孙媛、刘忠党、张文、张杰、徐熙辰、祁文彦、许跃雯（14 人）',
+    recorder:'王新武', topic:'课程群实践教学体系优化与产教融合协同育人',
+    body:[
+      '本次活动在管理学院实验教学中心举行，围绕实践教学体系优化与产教融合协同育人展开。会议梳理实践教学现状：14 门课程实践学时合计 112 学时，占总学时 25%，但实验项目以验证性为主，综合性、设计性项目比例偏低，部分课程实验环境依赖单机部署，与产业实际使用的云数据库、数据中台存在差距。',
+      '郝建民介绍了实验室现有平台条件，提出 PolarDB 数据备份与恢复、数据库性能调优理论与实践两门课程可依托现有实验环境开展真实数据集训练，建议按“环境搭建—故障注入—恢复验证—性能诊断”四步设计实验链条。刘丹认为，数据仓库与数据挖掘课程应引入完整的数据仓库建设项目，形成一个大作业贯穿全程，替代碎片化的小实验。',
+      '围绕产教融合，孙智广通报了与合作企业的沟通情况，企业可提供脱敏业务数据与真实治理场景，并参与课程案例评审与学生项目答辩。会议决定：一是按“基础验证—综合设计—创新探究”三个层次重构实验项目，每门课程至少设置 1 个综合设计性项目，实践成绩中综合项目占比不低于 50%；二是依托课程综合性训练与学年论文，把课程项目、学科竞赛、大学生创新创业训练计划打通，组建教师与企业导师共同指导的项目团队；三是建立毕业设计选题库，2027 届选题中来源于企业真实场景的比例不低于 60%；四是本学期末完成实验指导书修订与实验平台需求清单。',
+      '会议最后明确责任分工与时间节点，决定下学期首次教研活动围绕课程群年度建设成效进行总结与考核。'
+    ]
+  }
+];
+
+(function(){
+  const box = $('#acts');
+  acts.forEach((a,i)=>{
+    const chars = a.body.join('').replace(/\s/g,'').length;
+    const d = el('details','act');
+    if(i===0) d.open = true;
+    const info = [
+      ['活动时间', a.date+'　'+a.time],
+      ['活动地点', a.place],
+      ['主持人', a.host],
+      ['记录人', a.recorder],
+      ['活动形式', i===3?'现场研讨 + 实验室考察':'集中研讨 + 分组交流'],
+      ['参加人员', a.who]
+    ].map(([k,v],idx)=>`<div${idx===5?' style="grid-column:1/-1"':''}><b>${k}</b>${v}</div>`).join('');
+    d.innerHTML = `
+      <summary>
+        <div class="no">${i+1}</div>
+        <div class="ttl">${a.topic}</div>
+        <div class="tm">${a.date}</div>
+        <div class="wc">${chars} 字</div>
+        <div class="cv">▸</div>
+      </summary>
+      <div class="body">
+        <div class="info">${info}</div>
+        ${a.body.map(p=>`<p class="ind">${p}</p>`).join('')}
+      </div>`;
+    box.appendChild(d);
+  });
+})();
+
+/* ================= 滚动高亮 ================= */
+(function(){
+  const links = [...document.querySelectorAll('nav a')];
+  const secs = links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        links.forEach(l=>l.classList.toggle('on', l.getAttribute('href')==='#'+en.target.id));
+      }
+    });
+  }, {rootMargin:'-45% 0px -50% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+</script>
+</body>
+</html>
