@@ -1,0 +1,89 @@
+/* ── 站点共用顶部导航 ─────────────────────────────────────────────
+   四个页面共享的轻量导航条，独立于各页自身的 <style> 变量，
+   避免页面主题色差异导致样式错乱。 */
+.site-nav {
+  --sn-bg: #1a365d;
+  --sn-bg-2: #2c5282;
+  --sn-fg: #e8eef6;
+  --sn-fg-dim: #b7c8dc;
+  --sn-accent: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 1.1rem;
+  background: linear-gradient(135deg, var(--sn-bg), var(--sn-bg-2));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  box-shadow: 0 1px 6px rgba(15, 30, 60, 0.18);
+}
+
+.site-nav .sn-brand {
+  color: var(--sn-accent);
+  font-weight: 700;
+  font-size: 0.86rem;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.site-nav .sn-brand:hover {
+  opacity: 0.85;
+}
+
+.site-nav .sn-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.site-nav .sn-links a {
+  color: var(--sn-fg-dim);
+  text-decoration: none;
+  padding: 0.24rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  white-space: nowrap;
+}
+
+.site-nav .sn-links a:hover {
+  color: var(--sn-accent);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.site-nav .sn-links a[aria-current='page'] {
+  color: #1a365d;
+  background: #ffffff;
+  border-color: #ffffff;
+  font-weight: 600;
+}
+
+.site-nav .sn-links a:focus-visible,
+.site-nav .sn-brand:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .site-nav {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.76rem;
+  }
+
+  .site-nav .sn-brand {
+    font-size: 0.8rem;
+  }
+
+  .site-nav .sn-links a {
+    padding: 0.2rem 0.45rem;
+  }
+}
