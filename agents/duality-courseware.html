@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对偶理论 · 交互式教学课件</title>
+<style>
+/* ============================================================
+   模块 D1：设计令牌与全局画布（与系列课件共用同一套视觉变量）
+   ============================================================ */
+:root{
+  --bg-a:#eef2f8; --bg-b:#e7edf7;
+  --surface:#ffffff; --surface-2:#f6f8fc; --surface-3:#eef3fa;
+  --border:#dde4ee; --border-2:#c6d1e0;
+  --text:#141d2b; --text-2:#44516a; --muted:#7a879d;
+  --p1:#2563eb; --p1-bg:#e6efff; --p1-bd:#a9c4fb;
+  --p2:#c2740b; --p2-bg:#fdf2df; --p2-bd:#eec98a;
+  --p3:#0e7490; --p3-bg:#e2f4f8;
+  --ok:#15803d; --ok-bg:#e7f6ec;
+  --no:#d92d20; --no-bg:#fdeceb;
+  --r:14px; --r-sm:9px;
+  --sh-1:0 1px 2px rgba(15,23,42,.05),0 2px 10px rgba(15,23,42,.06);
+  --sh-2:0 8px 26px rgba(15,23,42,.10);
+  --font:"Inter","PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  --math:"Cambria Math","STIX Two Math","Times New Roman",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg-a);}
+body{font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+
+#stage{
+  position:fixed;left:50%;top:50%;width:1280px;height:720px;
+  transform:translate(-50%,-50%) scale(1);
+  background:
+    radial-gradient(900px 420px at 8% -10%, #ffffff 0%, rgba(255,255,255,0) 55%),
+    radial-gradient(760px 420px at 104% 112%, #e3ecff 0%, rgba(227,236,255,0) 60%),
+    linear-gradient(160deg,var(--bg-a),var(--bg-b));
+  overflow:hidden;
+}
+#stage::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(20,29,43,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(20,29,43,.045) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 100%);
+  -webkit-mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 100%);
+}
+
+/* ============================================================
+   模块 D2：课件骨架
+   ============================================================ */
+#topbar{position:absolute;left:0;right:0;top:0;height:52px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 30px;z-index:30;}
+#topbar .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-2);letter-spacing:.4px;}
+#topbar .brand .logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#0e7490);
+  display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;box-shadow:var(--sh-1);}
+#topbar .meta{display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--muted);}
+#topbar .meta b{color:var(--text-2);font-weight:600;}
+#progress{position:absolute;left:0;top:52px;height:3px;width:100%;background:rgba(20,29,43,.06);z-index:30;}
+#progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2563eb,#0e7490);
+  transition:width .5s cubic-bezier(.22,.61,.36,1);}
+#deck{position:absolute;left:0;right:0;top:52px;bottom:56px;}
+#chrome{position:absolute;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 26px;z-index:30;}
+#dots{display:flex;align-items:center;gap:7px;}
+#dots button{width:9px;height:9px;border-radius:50%;background:rgba(20,29,43,.16);transition:.25s;}
+#dots button:hover{background:rgba(20,29,43,.34);transform:scale(1.25);}
+#dots button.on{background:var(--p1);width:22px;border-radius:5px;}
+#dots button.done{background:rgba(37,99,235,.42);}
+#navbtns{display:flex;align-items:center;gap:10px;}
+.navbtn{display:flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);color:var(--text-2);font-size:13.5px;
+  box-shadow:var(--sh-1);transition:.2s;}
+.navbtn:hover:not(:disabled){border-color:var(--p1-bd);color:var(--p1);transform:translateY(-1px);}
+.navbtn:disabled{opacity:.38;cursor:not-allowed;}
+.navbtn .k{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:0 5px;line-height:16px;}
+#pageNum{font-size:12.5px;color:var(--muted);min-width:74px;text-align:center;font-variant-numeric:tabular-nums;}
+#pageNum b{color:var(--text-2);font-size:14px;}
+
+/* ============================================================
+   模块 D3：幻灯片切换与元素级动画
+   ============================================================ */
+.slide{position:absolute;inset:0;padding:34px 56px 18px;opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateX(3.6%);display:flex;flex-direction:column;
+  transition:opacity .4s ease,transform .52s cubic-bezier(.22,.61,.36,1),visibility 0s linear .52s;}
+.slide.pos-left{transform:translateX(-3.6%);}
+.slide.active{opacity:1;visibility:visible;pointer-events:auto;transform:none;
+  transition:opacity .5s ease .1s,transform .58s cubic-bezier(.22,.61,.36,1) .1s;}
+.a{opacity:0;}
+.slide.active .a{animation:rise .6s cubic-bezier(.22,.61,.36,1) forwards;animation-delay:var(--d,0s);}
+@keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.slide.active .a.pop{animation-name:pop;}
+@keyframes pop{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:none;}}
+.slide.active .a.slidex{animation-name:slidex;}
+@keyframes slidex{from{opacity:0;transform:translateX(-22px);}to{opacity:1;transform:none;}}
+
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex:none;
+  padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.shead .ch{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--p1);
+  background:var(--p1-bg);border:1px solid var(--p1-bd);border-radius:999px;padding:3px 12px;margin-bottom:8px;}
+.shead h2{font-size:25px;font-weight:700;letter-spacing:.3px;}
+.shead .sub{font-size:13px;color:var(--muted);margin-top:3px;}
+.shead .hint{font-size:12.5px;color:var(--muted);text-align:right;line-height:1.6;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:18px 20px;}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-2);
+  background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;}
+.m{font-family:var(--math);font-style:italic;}
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 20px;border-radius:11px;
+  font-size:14.5px;font-weight:600;transition:.2s;border:1px solid transparent;}
+.btn-p{background:var(--p1);color:#fff;box-shadow:0 6px 18px rgba(37,99,235,.32);}
+.btn-p:hover{background:#1d4fd8;transform:translateY(-1px);}
+.btn-g{background:var(--surface);border-color:var(--border-2);color:var(--text-2);}
+.btn-g:hover{border-color:var(--p1-bd);color:var(--p1);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.btn-sm{height:34px;padding:0 14px;font-size:13px;border-radius:9px;}
+
+/* ============================================================
+   模块 D4：封面与结束页
+   ============================================================ */
+.cover{display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;padding:0 30px;position:relative;}
+.cover .badge{display:inline-flex;width:fit-content;align-items:center;gap:8px;font-size:13px;color:var(--p1);
+  background:var(--p1-bg);border:1px solid var(--p1-bd);border-radius:999px;padding:6px 16px;margin-bottom:24px;}
+.cover h1{font-size:60px;font-weight:800;letter-spacing:2px;line-height:1.14;}
+.cover h1 em{font-style:normal;background:linear-gradient(120deg,#2563eb,#0e7490);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.cover .en{font-size:16px;color:var(--muted);letter-spacing:5px;margin-top:12px;text-transform:uppercase;}
+.cover .lead{font-size:17px;color:var(--text-2);margin-top:20px;max-width:640px;line-height:1.8;}
+.cover .chips{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+.cover .go{margin-top:32px;display:flex;align-items:center;gap:16px;}
+.cover .keyhint{font-size:12.5px;color:var(--muted);}
+.cover svg.deco{position:absolute;right:50px;top:46%;transform:translateY(-50%);opacity:.95;pointer-events:none;}
+
+.fin{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:0;text-align:center;}
+.fin h1{font-size:50px;font-weight:800;letter-spacing:2px;}
+.fin .sub{color:var(--text-2);font-size:16px;margin-top:14px;line-height:1.9;}
+.fin .rep{display:flex;gap:16px;margin-top:32px;}
+.fin .repcard{min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:18px 22px;}
+.fin .repcard h4{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:8px;}
+.fin .repcard .v{font-size:30px;font-weight:800;color:var(--p1);}
+.fin .repcard .v.dim{color:var(--muted);font-size:20px;font-weight:600;}
+.fin .acts{display:flex;gap:14px;margin-top:34px;}
+
+/* ============================================================
+   模块 D5：目录页
+   ============================================================ */
+.toc{display:grid;grid-template-columns:400px minmax(0,1fr);gap:34px;flex:1;min-height:0;}
+.goal li{list-style:none;display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px dashed var(--border);
+  font-size:14.5px;color:var(--text-2);line-height:1.7;}
+.goal li:last-child{border:none;}
+.goal .n{flex:none;width:24px;height:24px;border-radius:8px;background:var(--p1-bg);border:1px solid var(--p1-bd);
+  color:var(--p1);font-size:12px;font-weight:700;display:grid;place-items:center;margin-top:2px;}
+.chapters{display:grid;grid-template-rows:repeat(4,1fr);gap:13px;}
+.chcard{display:flex;align-items:center;gap:18px;text-align:left;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-1);padding:13px 20px;transition:.22s;}
+.chcard:hover{transform:translateX(6px);border-color:var(--p1-bd);box-shadow:var(--sh-2);}
+.chcard .no{font-size:25px;font-weight:800;color:var(--p1);opacity:.9;width:52px;flex:none;
+  font-variant-numeric:tabular-nums;}
+.chcard h3{font-size:17px;font-weight:700;}
+.chcard p{font-size:12.5px;color:var(--muted);margin-top:3px;}
+.chcard .arr{margin-left:auto;color:var(--p1);opacity:0;transform:translateX(-6px);transition:.22s;font-size:18px;}
+.chcard:hover .arr{opacity:1;transform:none;}
+
+/* ============================================================
+   模块 D6：双栏公式对照（原问题 / 对偶问题）
+   ============================================================ */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;flex:1;min-height:0;}
+.col{display:flex;flex-direction:column;gap:13px;min-height:0;min-width:0;}
+.col.mid{justify-content:center;}
+.pane{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:15px 18px;}
+.pane h4{font-size:13.5px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:8px;}
+.pane h4 .b{font-size:11px;padding:2px 9px;border-radius:999px;background:var(--p1-bg);color:var(--p1);
+  border:1px solid var(--p1-bd);font-weight:600;}
+.pane.dual h4 .b{background:var(--p2-bg);color:var(--p2);border-color:var(--p2-bd);}
+.pane .eq{font-family:var(--math);font-size:15.5px;line-height:2.05;}
+.pane .eq .sm{font-family:var(--font);font-size:12px;color:var(--muted);}
+.tk{border-radius:6px;padding:1px 6px;transition:.28s;border:1px dashed transparent;}
+.tk.on{background:var(--p1-bg);border-color:var(--p1-bd);color:#123a9c;}
+.tk.on2{background:var(--p2-bg);border-color:var(--p2-bd);color:#8a5206;}
+
+/* 映射规则表 */
+table.rules{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:13px;}
+table.rules th,table.rules td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+table.rules thead th{background:var(--surface-3);font-size:12px;color:var(--text-2);font-weight:600;}
+table.rules tbody tr{cursor:pointer;transition:.2s;}
+table.rules tbody tr:last-child td{border-bottom:none;}
+table.rules tbody tr:hover td{background:var(--surface-2);}
+table.rules tbody tr.on td{background:var(--p1-bg);color:#123a9c;}
+table.rules td.fm{font-family:var(--math);font-size:13.5px;}
+table.rules td:first-child{font-weight:600;width:112px;}
+
+/* ============================================================
+   模块 D7：弱对偶对比条
+   ============================================================ */
+.bars{display:flex;flex-direction:column;gap:14px;}
+.brow{display:grid;grid-template-columns:64px minmax(0,1fr) 92px;align-items:center;gap:12px;}
+.brow .lb{font-size:12.5px;color:var(--text-2);font-family:var(--math);}
+.brow .track{position:relative;height:32px;border-radius:8px;background:var(--surface-2);
+  border:1px solid var(--border);}
+.brow .track .ref{position:absolute;top:-5px;bottom:-5px;left:45%;border-left:1.5px dashed #15803d;opacity:.85;}
+.brow .track .ref::after{content:/36/;position:absolute;left:4px;top:-14px;font-size:10px;color:#15803d;font-family:var(--font);}
+.brow .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:7px;
+  transition:width .55s cubic-bezier(.22,.61,.36,1);}
+.fill.z{background:linear-gradient(90deg,#2563eb,#5b8cf8);}
+.fill.w{background:linear-gradient(90deg,#c2740b,#e8a33d);}
+.brow .num{font-family:var(--math);font-size:16px;font-weight:800;color:var(--text);text-align:right;}
+.selrow{display:flex;gap:8px;flex-wrap:wrap;}
+.psel{font-size:12px;padding:5px 10px;border-radius:8px;background:var(--surface);border:1.5px solid var(--border-2);
+  color:var(--text-2);font-family:var(--math);transition:.18s;}
+.psel:hover{border-color:var(--p1-bd);background:var(--p1-bg);}
+.psel.on{background:var(--p1);border-color:var(--p1);color:#fff;font-weight:700;}
+
+/* ============================================================
+   模块 D8：互补松弛配对表
+   ============================================================ */
+table.cs{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:13px;}
+table.cs th,table.cs td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;}
+table.cs thead th{background:var(--surface-3);font-size:11.5px;color:var(--text-2);font-weight:600;}
+table.cs tbody tr{cursor:pointer;transition:.22s;}
+table.cs tbody tr:last-child td{border-bottom:none;}
+table.cs tbody tr:hover td{background:var(--surface-2);}
+table.cs td.q{font-family:var(--math);font-size:13.5px;}
+table.cs td.hid{color:#c6cfdc;}
+table.cs tr.done td.hid{color:var(--text);}
+table.cs tr.done td{background:#f7fbf8;}
+table.cs tr.done td.prod{color:var(--ok);font-weight:800;font-family:var(--math);}
+table.cs td.prod{font-family:var(--math);color:#c6cfdc;}
+
+/* ============================================================
+   模块 D9：通用小组件
+   ============================================================ */
+.steps{display:flex;flex-direction:column;gap:8px;overflow:hidden;}
+.step{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border-radius:9px;
+  background:var(--surface-2);border:1px solid var(--border);font-size:12.6px;color:var(--muted);
+  line-height:1.55;transition:.28s;}
+.step .no{flex:none;width:19px;height:19px;border-radius:6px;background:#e6ebf3;color:#8b98ab;
+  font-size:11px;font-weight:700;display:grid;place-items:center;margin-top:1px;}
+.step.on{background:var(--p1-bg);border-color:var(--p1-bd);color:#123a9c;}
+.step.on .no{background:var(--p1);color:#fff;}
+.step.done{background:#f4f9f5;border-color:#cfe8d8;color:#2f6b46;}
+.step.done .no{background:var(--ok);color:#fff;}
+.step b{font-family:var(--math);font-size:13.5px;}
+.status{border-radius:10px;padding:11px 14px;font-size:13px;line-height:1.7;transition:.3s;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);}
+.status.in{background:var(--p1-bg);border-color:var(--p1-bd);color:#123a9c;}
+.status.ok{background:var(--ok-bg);border-color:#b7e2c5;color:#0d5c2c;}
+.status.warn{background:var(--p2-bg);border-color:var(--p2-bd);color:#8a5206;}
+.meter{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:var(--surface-2);
+  border:1px solid var(--border);font-size:13px;color:var(--text-2);}
+.meter b{font-family:var(--math);font-size:17px;color:var(--p1);}
+.meter span{white-space:nowrap;}
+
+.opts{display:grid;gap:9px;}
+.opt{display:flex;align-items:center;gap:11px;text-align:left;padding:11px 14px;border-radius:11px;
+  background:var(--surface);border:1.5px solid var(--border-2);font-size:14px;color:var(--text);transition:.18s;}
+.opt.sm{padding:8px 12px;font-size:13px;border-radius:10px;gap:8px;}
+.opt .tag{flex:none;width:25px;height:25px;border-radius:8px;background:var(--surface-3);
+  color:var(--text-2);font-size:12px;font-weight:700;display:grid;place-items:center;transition:.18s;}
+.opt.sm .tag{width:22px;height:22px;font-size:11px;}
+.opt:hover:not(:disabled){border-color:var(--p1-bd);background:var(--p1-bg);transform:translateX(4px);}
+.opt:disabled{cursor:default;}
+.opt.correct{border-color:var(--ok);background:var(--ok-bg);color:#0d5c2c;}
+.opt.correct .tag{background:var(--ok);color:#fff;}
+.opt.wrong{border-color:var(--no);background:var(--no-bg);color:#8f1d14;}
+.opt.wrong .tag{background:var(--no);color:#fff;}
+.explain{margin-top:10px;font-size:12.6px;line-height:1.72;border-radius:10px;padding:10px 13px;display:none;}
+.explain.show{display:block;animation:rise .4s ease forwards;}
+.explain.good{background:var(--ok-bg);color:#0d5c2c;border:1px solid #b7e2c5;}
+.explain.bad{background:var(--no-bg);color:#8f1d14;border:1px solid #f3c1bc;}
+
+.sumwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px;flex:1;min-height:0;align-content:center;}
+.sumcol{display:contents;}
+.sumcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-1);
+  padding:14px 17px;display:flex;gap:13px;align-items:flex-start;}
+.sumcard .ic{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+  font-size:14px;font-weight:800;color:#fff;}
+.sumcard h4{font-size:14.5px;font-weight:700;margin-bottom:4px;}
+.sumcard p{font-size:12.6px;color:var(--text-2);line-height:1.7;}
+.formulabar{grid-column:1 / -1;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:12px;
+  padding:11px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-family:var(--math);font-size:15.5px;}
+.formulabar .lbl{font-family:var(--font);font-size:12px;color:var(--muted);font-weight:600;}
+.tiny{font-size:12.2px;color:var(--muted);line-height:1.7;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center;}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px;}
+
+/* 夹逼图 */
+.plotbox{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-1);padding:8px 10px 4px;display:flex;flex-direction:column;}
+.plotbox svg{width:100%;height:292px;display:block;}
+#topbar .brand a.home{margin-left:8px;font-size:11.5px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:1px 8px;transition:.2s;}
+#topbar .brand a.home:hover{color:var(--p1);border-color:var(--p1-bd);background:var(--p1-bg);}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <header id="topbar">
+    <div class="brand"><span class="logo">⇋</span><span>运筹学 · 线性规划理论 · 交互课件</span><a class="home" href="index.html">← 课件中心</a></div>
+    <div class="meta"><span id="chapLabel">封面</span><span>|</span><span>第 <b id="pgCur">1</b> / <span id="pgAll">13</span> 页</span></div>
+  </header>
+  <div id="progress"><i></i></div>
+
+  <main id="deck">
+
+    <!-- ========== 1 封面 ========== -->
+    <section class="slide" id="s1">
+      <div class="cover">
+        <span class="badge a" style="--d:.05s">运筹学 · 线性规划理论 · 第 6 讲</span>
+        <h1 class="a" style="--d:.15s">对偶理论<br><em>每个问题都有它的另一面</em></h1>
+        <div class="en a" style="--d:.28s">Duality Theory</div>
+        <p class="lead a" style="--d:.38s">同一个生产计划，既可以问「怎么排产利润最高」，也可以问「这些资源各值多少钱」。
+          两个问题看似不同，答案却由同一组数字决定 —— 这就是对偶。</p>
+        <div class="chips a" style="--d:.48s">
+          <span class="chip">适合：运筹学 / 管理科学基础</span>
+          <span class="chip">时长约 30 分钟</span>
+          <span class="chip">互动练习 × 4</span>
+        </div>
+        <div class="go a" style="--d:.58s">
+          <button class="btn btn-p" data-go="1">开始学习 →</button>
+          <span class="keyhint">键盘 ← → 翻页 · 空格下一页 · Home / End 首末页</span>
+        </div>
+        <svg class="deco a pop" style="--d:.5s" width="420" height="330" viewBox="0 0 420 330" fill="none">
+          <rect x="10" y="26" width="160" height="118" rx="12" fill="#e6efff" stroke="#a9c4fb"/>
+          <rect x="250" y="186" width="160" height="118" rx="12" fill="#fdf2df" stroke="#eec98a"/>
+          <text x="34" y="60" font-family="Georgia,serif" font-size="15" fill="#2563eb" font-style="italic">max  z = cᵀx</text>
+          <text x="34" y="88" font-family="Georgia,serif" font-size="13" fill="#44516a">A x ≤ b</text>
+          <text x="34" y="112" font-family="Georgia,serif" font-size="13" fill="#44516a">x ≥ 0</text>
+          <text x="272" y="222" font-family="Georgia,serif" font-size="15" fill="#c2740b" font-style="italic">min  w = bᵀy</text>
+          <text x="272" y="250" font-family="Georgia,serif" font-size="13" fill="#44516a">Aᵀy ≥ c</text>
+          <text x="272" y="274" font-family="Georgia,serif" font-size="13" fill="#44516a">y ≥ 0</text>
+          <path d="M120 158 C 150 220, 250 120, 300 178" stroke="#0e7490" stroke-width="2" stroke-dasharray="7 6" fill="none"/>
+          <path d="M300 178 l -12 -1 l 6 -10 z" fill="#0e7490"/>
+          <text x="176" y="176" font-family="Georgia,serif" font-size="13" fill="#0e7490" font-style="italic">cᵀx* = bᵀy*</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ========== 2 目录 ========== -->
+    <section class="slide" id="s2">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">课程导览</span><h2>学习目标与目录</h2></div>
+        <div class="hint">点击右侧章节卡片<br>可直接跳转</div>
+      </div>
+      <div class="toc">
+        <div class="card a slidex" style="--d:.15s">
+          <h3 style="font-size:16px;margin-bottom:6px">学完本课你将能够</h3>
+          <ul class="goal">
+            <li><span class="n">1</span><span>由原问题<b>写出对偶模型</b>，说清约束与变量的对应关系</span></li>
+            <li><span class="n">2</span><span>用<b>弱对偶性</b>判断一个解离最优还有多远</span></li>
+            <li><span class="n">3</span><span>理解<b>强对偶性</b>：为什么最优值一定相等</span></li>
+            <li><span class="n">4</span><span>用<b>互补松弛性</b>验证一对解是否同时最优</span></li>
+          </ul>
+        </div>
+        <div class="chapters">
+          <button class="chcard a slidex" style="--d:.22s" data-go="2">
+            <span class="no">01</span><span><h3>对偶模型：从哪来</h3><p>资源估价的故事 · 映射规则 · 逐条写出</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.32s" data-go="5">
+            <span class="no">02</span><span><h3>弱对偶与强对偶</h3><p>cᵀx ≤ bᵀy · 最优值相等</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.42s" data-go="7">
+            <span class="no">03</span><span><h3>互补松弛与影子价格</h3><p>成对为零 · 资源边际价值</p></span><span class="arr">→</span>
+          </button>
+          <button class="chcard a slidex" style="--d:.52s" data-go="10">
+            <span class="no">04</span><span><h3>随堂测验与小结</h3><p>三道题 · 知识路线</p></span><span class="arr">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 3 引例 ========== -->
+    <section class="slide" id="s3">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第一章 · 对偶模型</span><h2>1.1 同一个工厂，两种问法</h2>
+          <div class="sub">点击任意一个高亮片段，看它在另一个问题里对应什么</div></div>
+        <div class="hint">互动：片段对照</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;flex:1;min-height:0">
+        <div class="grid2" style="flex:none">
+          <div class="pane a slidex" style="--d:.15s">
+            <h4><span class="b">原问题 P</span>厂长关心：怎么排产，利润最高？</h4>
+            <div class="eq">
+              <div>max z = <span class="tk" data-k="c">3x₁ + 5x₂</span></div>
+              <div style="font-family:var(--font);font-size:12.5px;color:var(--muted)">s.t.</div>
+              <div><span class="tk" data-k="b">x₁ ≤ 4</span>　<span class="sm">（原料甲）</span></div>
+              <div><span class="tk" data-k="b">2x₂ ≤ 12</span>　<span class="sm">（原料乙）</span></div>
+              <div><span class="tk" data-k="b">3x₁ + 2x₂ ≤ 18</span>　<span class="sm">（工时）</span></div>
+              <div><span class="tk" data-k="x">x₁, x₂ ≥ 0</span></div>
+            </div>
+          </div>
+          <div class="pane dual a slidex" style="--d:.25s">
+            <h4><span class="b">对偶问题 D</span>经理关心：这些资源各值多少钱？</h4>
+            <div class="eq">
+              <div>min w = <span class="tk" data-k2="b">4y₁ + 12y₂ + 18y₃</span></div>
+              <div style="font-family:var(--font);font-size:12.5px;color:var(--muted)">s.t.</div>
+              <div><span class="tk" data-k2="x">y₁ + 3y₃</span> ≥ <span class="tk" data-k2="c">3</span>　<span class="sm">（对应 x₁）</span></div>
+              <div><span class="tk" data-k2="x">2y₂ + 2y₃</span> ≥ <span class="tk" data-k2="c">5</span>　<span class="sm">（对应 x₂）</span></div>
+              <div>y₁, y₂, y₃ ≥ 0</div>
+            </div>
+          </div>
+        </div>
+        <div class="status a" style="--d:.36s" id="st3">
+          黄色高亮的是同一份数据在两个问题里的不同角色。<b>点击左侧任一高亮片段</b>，看看它在右边变成了什么。
+        </div>
+        <div class="card a" style="--d:.46s;padding:13px 18px;display:flex;gap:26px;align-items:center">
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7">
+            <b>一句话读懂</b>：原问题求「在资源限制下最多赚多少」，对偶问题求「把这些资源整体租出去，最少该收多少钱」。
+            两者互相牵制，最优值必然相等 —— 赚不到更多，也少不了要价。
+          </div>
+          <div class="chip" style="flex:none">本节结论：z* = w* = 36</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 4 对偶规则 ========== -->
+    <section class="slide" id="s4">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第一章 · 对偶模型</span><h2>1.2 五条对应规则</h2>
+          <div class="sub">点击表格中的任一行，看这条规则在本例里对应着什么</div></div>
+        <div class="hint">互动：规则点选 × 5</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1.02fr) minmax(0,1fr)">
+        <div class="col mid">
+          <table class="rules a pop" style="--d:.15s" id="rules">
+            <thead><tr><th>原问题（max，≤）</th><th>对偶问题（min，≥）</th></tr></thead>
+            <tbody>
+              <tr data-k="ncon"><td>约束个数 m</td><td class="fm">对偶变量个数 m（y₁ … y<sub>m</sub>）</td></tr>
+              <tr data-k="nvar"><td>变量个数 n</td><td class="fm">对偶约束个数 n</td></tr>
+              <tr data-k="c"><td>目标系数 c<sub>j</sub></td><td class="fm">对偶约束的右端项</td></tr>
+              <tr data-k="b"><td>约束右端 b<sub>i</sub></td><td class="fm">对偶目标系数</td></tr>
+              <tr data-k="A"><td>约束矩阵 A</td><td class="fm">转置 A<sup>T</sup>（列变行）</td></tr>
+            </tbody>
+          </table>
+          <div class="legend a" style="--d:.25s"><span>提示：所有规则都围绕「行列互换」这一件事</span></div>
+        </div>
+        <div class="col mid">
+          <div class="pane a slidex" style="--d:.28s" id="rulePane">
+            <h4><span class="b" id="ruleT">五条规则</span></h4>
+            <div class="eq" id="ruleB" style="font-size:13.5px;line-height:1.85;font-family:var(--font);color:var(--text-2)">
+              原问题有 3 个约束、2 个变量；对偶问题就有 3 个变量、2 个约束 —— 数量恰好互换。
+              同时，原来的「目标系数」跑到了对偶约束的右端，原来的「右端项」跑到了对偶的目标里。
+            </div>
+            <div class="eq" id="ruleF" style="margin-top:10px;font-size:14px;display:none"></div>
+          </div>
+          <div class="status a" style="--d:.36s" id="ruleV">点表格里的任一行试试。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 5 逐条写出对偶 ========== -->
+    <section class="slide" id="s5">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第一章 · 对偶模型</span><h2>1.3 把这个例子的对偶写出来</h2>
+          <div class="sub">按「设变量 → 写目标 → 逐列写约束 → 定符号」四步走</div></div>
+        <div class="hint">互动：逐步构建 × 5</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)">
+        <div class="col mid">
+          <div class="pane a pop" style="--d:.15s">
+            <h4><span class="b">对偶问题 D</span>逐行生成</h4>
+            <div class="eq" id="build" style="min-height:176px">
+              <div class="bline" id="bl0" style="opacity:.18">min w = 4y₁ + 12y₂ + 18y₃</div>
+              <div class="bline" id="bl1" style="opacity:.18;font-family:var(--font);font-size:12.5px;color:var(--muted)">s.t.</div>
+              <div class="bline" id="bl2" style="opacity:.18">y₁ + 0y₂ + 3y₃ ≥ 3</div>
+              <div class="bline" id="bl3" style="opacity:.18">0y₁ + 2y₂ + 2y₃ ≥ 5</div>
+              <div class="bline" id="bl4" style="opacity:.18">y₁, y₂, y₃ ≥ 0</div>
+            </div>
+          </div>
+          <div class="pane a" style="--d:.22s;padding:11px 16px">
+            <h4 style="font-size:12.5px;margin-bottom:5px">
+              <span class="b" style="background:var(--surface-3);color:var(--text-2);border-color:var(--border)">原问题</span>随时对照</h4>
+            <div class="eq" style="font-size:13px;color:var(--text-2)">
+              max z = 3x₁ + 5x₂　·　x₁ ≤ 4　·　2x₂ ≤ 12　·　3x₁ + 2x₂ ≤ 18　·　x ≥ 0
+            </div>
+          </div>
+          <div class="meter a" style="--d:.25s">已生成 <b id="bldN">0</b> / 5 行
+            <span class="tiny" style="margin-left:auto" id="bldTip">点右侧「下一步」开始</span></div>
+        </div>
+        <div class="col mid">
+          <div class="steps a slidex" style="--d:.2s" id="steps5"></div>
+          <div class="a" style="--d:.3s;display:flex;gap:10px">
+            <button class="btn btn-p btn-sm" id="bldNext">下一步</button>
+            <button class="btn btn-g btn-sm" id="bldReset">重置</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 6 弱对偶性 ========== -->
+    <section class="slide" id="s6">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第二章 · 弱对偶与强对偶</span><h2>2.1 弱对偶性：可行解互设上下界</h2>
+          <div class="sub">任取一个原问题可行解 x、任取一个对偶可行解 y，永远有 c<sup>T</sup>x ≤ b<sup>T</sup>y</div></div>
+        <div class="hint">互动：任选 x 与 y</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1.1fr) 356px">
+        <div class="col mid">
+          <div class="pane a pop" style="--d:.15s">
+            <h4>选一个原问题可行解 <span class="m" style="font-size:13px">x = (x₁, x₂)</span></h4>
+            <div class="selrow" id="pickX"></div>
+            <h4 style="margin-top:14px">选一个对偶可行解 <span class="m" style="font-size:13px">y = (y₁, y₂, y₃)</span></h4>
+            <div class="selrow" id="pickY"></div>
+          </div>
+          <div class="bars a" style="--d:.25s">
+            <div class="brow">
+              <span class="lb">c<sup>T</sup>x</span>
+              <span class="track"><i class="fill z" id="fillZ"></i><i class="ref"></i></span>
+              <span class="num" id="numZ">0</span>
+            </div>
+            <div class="brow">
+              <span class="lb">b<sup>T</sup>y</span>
+              <span class="track"><i class="fill w" id="fillW"></i><i class="ref"></i></span>
+              <span class="num" id="numW">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="col mid">
+          <div class="pane a slidex" style="--d:.28s">
+            <h4><span class="b">判断</span></h4>
+            <div class="eq" id="weakF" style="font-size:15px">c<sup>T</sup>x ≤ b<sup>T</sup>y</div>
+            <div class="tiny" id="weakGap" style="margin-top:8px">两条长度之差，就是「对偶间隙」。</div>
+            <div class="tiny" style="margin-top:6px;color:var(--muted)">绿色虚线 = 最优值 36：蓝条永远够不到它，橙条永远越不过它。</div>
+          </div>
+          <div class="status a" style="--d:.36s" id="weakV">
+            原问题的最优值不会超过 36，对偶问题的最优值不会低于 36 —— 上界与下界把最优值夹在中间。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 7 强对偶性 ========== -->
+    <section class="slide" id="s7">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第二章 · 弱对偶与强对偶</span><h2>2.2 强对偶性：最优值恰好相等</h2>
+          <div class="sub">把一批可行解的目标值标在同一根数轴上，从两侧向中间靠拢</div></div>
+        <div class="hint">互动：逐个标出</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;flex:1;min-height:0">
+        <div class="plotbox a pop" style="--d:.15s">
+          <svg id="axis" viewBox="0 0 1160 300" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="a" style="--d:.25s;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-p btn-sm" id="axisNext">标出下一个</button>
+          <button class="btn btn-g btn-sm" id="axisAll">全部标出</button>
+          <button class="btn btn-g btn-sm" id="axisReset">重置</button>
+          <span class="tiny" id="axisTip" style="margin-left:6px">蓝色 = 原问题可行解的目标值（下界），橙色 = 对偶可行解的目标值（上界）。</span>
+        </div>
+        <div class="status a" style="--d:.33s" id="axisV">
+          所有蓝点都在 36 左侧，所有橙点都在 36 右侧 —— 中间那条竖线，就是最优值。
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 8 互补松弛性 ========== -->
+    <section class="slide" id="s8">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 互补松弛与影子价格</span><h2>3.1 互补松弛性：成对为零</h2>
+          <div class="sub">点击表格每一行，展开这一对的取值与乘积</div></div>
+        <div class="hint">互动：逐对展开 × 5</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;flex:1;min-height:0">
+        <table class="cs a pop" style="--d:.15s" id="cs">
+          <thead><tr><th style="width:150px">原问题一侧</th><th style="width:90px">取值</th>
+            <th style="width:150px">对偶一侧</th><th style="width:90px">取值</th><th style="width:90px">乘积</th></tr></thead>
+          <tbody>
+            <tr data-k="1"><td class="q">松弛 s₁ = 4 − x₁</td><td class="hid">2</td>
+              <td class="q">对偶变量 y₁</td><td class="hid">0</td><td class="prod">?</td></tr>
+            <tr data-k="2"><td class="q">松弛 s₂ = 12 − 2x₂</td><td class="hid">0</td>
+              <td class="q">对偶变量 y₂</td><td class="hid">3/2</td><td class="prod">?</td></tr>
+            <tr data-k="3"><td class="q">松弛 s₃ = 18 − 3x₁ − 2x₂</td><td class="hid">0</td>
+              <td class="q">对偶变量 y₃</td><td class="hid">1</td><td class="prod">?</td></tr>
+            <tr data-k="4"><td class="q">原变量 x₁</td><td class="hid">2</td>
+              <td class="q">剩余 d₁ = y₁ + 3y₃ − 3</td><td class="hid">0</td><td class="prod">?</td></tr>
+            <tr data-k="5"><td class="q">原变量 x₂</td><td class="hid">6</td>
+              <td class="q">剩余 d₂ = 2y₂ + 2y₃ − 5</td><td class="hid">0</td><td class="prod">?</td></tr>
+          </tbody>
+        </table>
+        <div class="grid2" style="flex:none;gap:14px">
+          <div class="pane a" style="--d:.3s;padding:12px 16px">
+            <div class="eq" style="font-size:14px">y<sub>i</sub> · s<sub>i</sub> = 0　<span class="sm">（每个约束一对）</span></div>
+            <div class="tiny">资源还有剩余（s<sub>i</sub> &gt; 0），说明它不值钱，影子价格必为 0。</div>
+          </div>
+          <div class="pane a" style="--d:.36s;padding:12px 16px">
+            <div class="eq" style="font-size:14px">x<sub>j</sub> · d<sub>j</sub> = 0　<span class="sm">（每个变量一对）</span></div>
+            <div class="tiny">产品在赚钱（x<sub>j</sub> &gt; 0），说明它的对偶约束必须取等号，没有"超额利润"。</div>
+          </div>
+        </div>
+        <div class="status a" style="--d:.42s" id="csV">5 对乘积全部为 0 —— 这正是「这两个解同时最优」的判定条件。</div>
+      </div>
+    </section>
+
+    <!-- ========== 9 影子价格 ========== -->
+    <section class="slide" id="s9">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 互补松弛与影子价格</span><h2>3.2 影子价格：对偶变量的经济含义</h2>
+          <div class="sub">给某种资源多加 1 个单位，最优利润会涨多少？答案就是它的对偶变量</div></div>
+        <div class="hint">互动：三种资源各试一次</div>
+      </div>
+      <div class="grid2" style="grid-template-columns:356px minmax(0,1fr)">
+        <div class="col mid">
+          <div class="pane a slidex" style="--d:.15s">
+            <h4><span class="b">做实验</span>给资源 +1</h4>
+            <div class="opts" style="margin-top:4px">
+              <button class="opt sm" id="b1"><span class="tag">1</span>原料甲　x₁ ≤ 4 → 5</button>
+              <button class="opt sm" id="b2"><span class="tag">2</span>原料乙　2x₂ ≤ 12 → 13</button>
+              <button class="opt sm" id="b3"><span class="tag">3</span>工时　　3x₁+2x₂ ≤ 18 → 19</button>
+            </div>
+          </div>
+          <div class="status a" style="--d:.25s" id="spV">点一个按钮，看看最优利润怎么变。</div>
+        </div>
+        <div class="col mid">
+          <div class="pane a pop" style="--d:.2s">
+            <h4><span class="b">结果</span>Δz = 该资源的对偶变量</h4>
+            <table class="cs" style="border:none;box-shadow:none">
+              <thead><tr><th>资源</th><th>原上限</th><th>新上限</th><th>新最优 z</th><th>Δz = y<sub>i</sub></th></tr></thead>
+              <tbody>
+                <tr id="r1"><td class="q">原料甲</td><td class="q">4</td><td class="q">—</td><td class="q">—</td><td class="prod">—</td></tr>
+                <tr id="r2"><td class="q">原料乙</td><td class="q">12</td><td class="q">—</td><td class="q">—</td><td class="prod">—</td></tr>
+                <tr id="r3"><td class="q">工时</td><td class="q">18</td><td class="q">—</td><td class="q">—</td><td class="prod">—</td></tr>
+              </tbody>
+            </table>
+            <div class="tiny" style="margin-top:10px">
+              影子价格只在「最优基不变」的范围内有效；一旦某资源多到不再是瓶颈，它的影子价格会掉到 0。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 10 完整对照 ========== -->
+    <section class="slide" id="s10">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">第三章 · 综合</span><h2>3.3 一对最优解的全景对照</h2>
+          <div class="sub">同一份数据，两个方向，答案被四个条件牢牢锁定</div></div>
+        <div class="hint">结论：z* = w* = 36</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;flex:1;min-height:0">
+        <div class="grid2" style="flex:none">
+          <div class="pane a slidex" style="--d:.15s">
+            <h4><span class="b">原问题 P</span>max z</h4>
+            <div class="eq" style="font-size:14px;line-height:1.95">
+              max z = 3x₁ + 5x₂<br>
+              x₁ ≤ 4　·　2x₂ ≤ 12　·　3x₁ + 2x₂ ≤ 18<br>
+              <span style="color:var(--p1);font-weight:700">x* = (2, 6)　z* = 36</span>
+            </div>
+            <div class="tiny" style="margin-top:6px">两条约束取等号（原料乙、工时），原料甲还剩 2 个单位。</div>
+          </div>
+          <div class="pane dual a slidex" style="--d:.25s">
+            <h4><span class="b">对偶问题 D</span>min w</h4>
+            <div class="eq" style="font-size:14px;line-height:1.95">
+              min w = 4y₁ + 12y₂ + 18y₃<br>
+              y₁ + 3y₃ ≥ 3　·　2y₂ + 2y₃ ≥ 5<br>
+              <span style="color:var(--p2);font-weight:700">y* = (0, 3/2, 1)　w* = 36</span>
+            </div>
+            <div class="tiny" style="margin-top:6px">两条约束都取等号；原料甲不值钱，所以 y₁ = 0。</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+          <div class="card a" style="--d:.32s;padding:12px 14px">
+            <div class="tiny" style="color:var(--ok);font-weight:700;margin-bottom:4px">① x 可行</div>
+            <div class="tiny">x₁=2≤4；2×6=12≤12；3×2+2×6=18≤18 ✓</div>
+          </div>
+          <div class="card a" style="--d:.38s;padding:12px 14px">
+            <div class="tiny" style="color:var(--ok);font-weight:700;margin-bottom:4px">② y 可行</div>
+            <div class="tiny">0+3×1=3≥3；2×1.5+2×1=5≥5 ✓</div>
+          </div>
+          <div class="card a" style="--d:.44s;padding:12px 14px">
+            <div class="tiny" style="color:var(--ok);font-weight:700;margin-bottom:4px">③ 值相等</div>
+            <div class="tiny">z = 3×2+5×6 = 36；w = 12×1.5+18×1 = 36 ✓</div>
+          </div>
+          <div class="card a" style="--d:.5s;padding:12px 14px">
+            <div class="tiny" style="color:var(--ok);font-weight:700;margin-bottom:4px">④ 互补松弛</div>
+            <div class="tiny">5 对乘积全部为 0 ✓（见上一页）</div>
+          </div>
+        </div>
+        <div class="status ok a" style="--d:.56s">
+          四条同时成立，就说明 x* 与 y* 是一对最优解。<b>其中①②③是充分条件</b>：只要能找到一对可行解使目标值相等，
+          就能断言两边都已最优 —— 不需要真的把两个问题都解一遍。
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 11 随堂测验 ========== -->
+    <section class="slide" id="s11">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">随堂测验</span><h2>三道题，检验一下</h2>
+          <div class="sub">每题只有一个正确答案，选完立刻给出解析</div></div>
+        <div class="hint">成绩：<b id="quizScore">0</b> / 3 题<br><span id="quizMsg">还没开始</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex:1;min-height:0;align-content:start">
+        <div class="card a" style="--d:.15s;padding:15px 16px">
+          <span class="chip" style="width:fit-content;margin-bottom:10px">Q1 · 约束个数</span>
+          <p style="font-size:13.4px;line-height:1.7;margin-bottom:11px">原问题有 <b>3 个约束、2 个变量</b>，它的对偶问题有几个约束？</p>
+          <div class="opts" data-quiz="q1">
+            <button class="opt sm" data-ok="0"><span class="tag">A</span>3 个</button>
+            <button class="opt sm" data-ok="1"><span class="tag">B</span>2 个</button>
+            <button class="opt sm" data-ok="0"><span class="tag">C</span>5 个</button>
+            <button class="opt sm" data-ok="0"><span class="tag">D</span>6 个</button>
+          </div>
+          <div class="explain" data-ex="q1"></div>
+        </div>
+        <div class="card a" style="--d:.25s;padding:15px 16px">
+          <span class="chip" style="width:fit-content;margin-bottom:10px">Q2 · 弱对偶性</span>
+          <p style="font-size:13.4px;line-height:1.7;margin-bottom:11px">对任意可行解 <span class="m">x</span>、<span class="m">y</span>，弱对偶性保证：</p>
+          <div class="opts" data-quiz="q2">
+            <button class="opt sm" data-ok="1"><span class="tag">A</span>c<sup>T</sup>x ≤ b<sup>T</sup>y</button>
+            <button class="opt sm" data-ok="0"><span class="tag">B</span>c<sup>T</sup>x ≥ b<sup>T</sup>y</button>
+            <button class="opt sm" data-ok="0"><span class="tag">C</span>c<sup>T</sup>x = b<sup>T</sup>y</button>
+            <button class="opt sm" data-ok="0"><span class="tag">D</span>两者大小无固定关系</button>
+          </div>
+          <div class="explain" data-ex="q2"></div>
+        </div>
+        <div class="card a" style="--d:.35s;padding:15px 16px">
+          <span class="chip" style="width:fit-content;margin-bottom:10px">Q3 · 互补松弛</span>
+          <p style="font-size:13.4px;line-height:1.7;margin-bottom:11px">若第 <span class="m">i</span> 个约束的松弛变量 <span class="m">s<sub>i</sub> &gt; 0</span>，互补松弛要求：</p>
+          <div class="opts" data-quiz="q3">
+            <button class="opt sm" data-ok="0"><span class="tag">A</span>对应的 y<sub>i</sub> 必须大于 0</button>
+            <button class="opt sm" data-ok="1"><span class="tag">B</span>对应的 y<sub>i</sub> 必须等于 0</button>
+            <button class="opt sm" data-ok="0"><span class="tag">C</span>所有 x<sub>j</sub> 必须等于 0</button>
+            <button class="opt sm" data-ok="0"><span class="tag">D</span>对 y<sub>i</sub> 没有要求</button>
+          </div>
+          <div class="explain" data-ex="q3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 12 小结 ========== -->
+    <section class="slide" id="s12">
+      <div class="shead a" style="--d:.05s">
+        <div><span class="ch">课程小结</span><h2>一个问题的两面</h2></div>
+        <div class="hint">对偶不是新问题<br>而是同一份数据的另一种读法</div>
+      </div>
+      <div class="sumwrap">
+        <div class="sumcol">
+          <div class="sumcard a" style="--d:.15s">
+            <span class="ic" style="background:#2563eb">1</span>
+            <div><h4>对偶模型：行列互换</h4>
+              <p>约束 ↔ 变量、目标系数 ↔ 右端项、A ↔ A<sup>T</sup>；max 配 ≤ 与 x≥0 时，对偶是 min 配 ≥ 与 y≥0。</p></div>
+          </div>
+          <div class="sumcard a" style="--d:.23s">
+            <span class="ic" style="background:#0e7490">2</span>
+            <div><h4>弱对偶：互设上下界</h4>
+              <p>任何可行 x 给出下界，任何可行 y 给出上界：c<sup>T</sup>x ≤ b<sup>T</sup>y。差值就是「离最优还有多远」的度量。</p></div>
+          </div>
+        </div>
+        <div class="sumcol">
+          <div class="sumcard a" style="--d:.31s">
+            <span class="ic" style="background:#c2740b">3</span>
+            <div><h4>强对偶：最优值相等</h4>
+              <p>一方有最优解，另一方必有，且 z* = w*。本例 x*=(2,6)、y*=(0,3/2,1)，都等于 36。</p></div>
+          </div>
+          <div class="sumcard a" style="--d:.39s">
+            <span class="ic" style="background:#15803d">4</span>
+            <div><h4>互补松弛：成对为零</h4>
+              <p>y<sub>i</sub>s<sub>i</sub> = 0、x<sub>j</sub>d<sub>j</sub> = 0。有剩余的资源不值钱，赚钱的产品没有超额利润。</p></div>
+          </div>
+        </div>
+        <div class="formulabar a" style="--d:.47s">
+          <span class="lbl">一条链</span>
+          <span>写对偶（A → A<sup>T</sup>）</span><span style="color:var(--muted)">→</span>
+          <span>弱对偶 c<sup>T</sup>x ≤ b<sup>T</sup>y</span><span style="color:var(--muted)">→</span>
+          <span>强对偶 z* = w*</span><span style="color:var(--muted)">→</span>
+          <span>互补松弛验证</span><span style="color:var(--muted)">→</span>
+          <span>影子价格 Δz = y<sub>i</sub></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 13 结束页 ========== -->
+    <section class="slide" id="s13">
+      <div class="fin">
+        <h1 class="a" style="--d:.05s">本讲结束</h1>
+        <p class="sub a" style="--d:.15s">原问题告诉你「怎么做最好」，对偶问题告诉你「什么最值钱」。<br>
+          两者等价，却是两种完全不同的视角。</p>
+        <div class="rep a" style="--d:.28s">
+          <div class="repcard"><h4>随堂测验</h4><div class="v" id="repQuiz">未完成</div></div>
+          <div class="repcard"><h4>原问题最优值</h4><div class="v">36</div></div>
+          <div class="repcard"><h4>对偶最优值</h4><div class="v" style="color:var(--ok)">36</div></div>
+        </div>
+        <div class="acts a" style="--d:.4s">
+          <button class="btn btn-g" id="btnRestart">重新学习</button>
+          <button class="btn btn-p" data-go="0">回到封面</button>
+        </div>
+      </div>
+    </section>
+
+
+  </main>
+
+  <footer id="chrome">
+    <div id="dots"></div>
+    <div id="navbtns">
+      <span id="pageNum"><b id="pn1">1</b> / <span id="pn2">13</span></span>
+      <button class="navbtn" id="btnPrev">← 上一页<span class="k">←</span></button>
+      <button class="navbtn" id="btnNext">下一页 →<span class="k">→</span></button>
+    </div>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   模块 J1：画布缩放
+   ============================================================ */
+const stage = document.getElementById("stage");
+function fit(){
+  const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+  stage.style.transform = "translate(-50%,-50%) scale(" + s + ")";
+}
+window.addEventListener("resize", fit); fit();
+
+/* ============================================================
+   模块 J0：本例数据（原问题与对偶问题的最优解均已知）
+   ============================================================ */
+const P = { c: [3, 5], A: [[1, 0], [0, 2], [3, 2]], b: [4, 12, 18] };   // max cᵀx, Ax ≤ b
+const XSTAR = [2, 6], ZSTAR = 36;
+const YSTAR = [0, 1.5, 1], WSTAR = 36;
+
+/* ============================================================
+   模块 J2：幻灯片导航
+   ============================================================ */
+const CHAPS = ["封面","课程导览","对偶模型 · 引例","对偶模型 · 规则","对偶模型 · 写出",
+               "弱对偶性","强对偶性","互补松弛性","影子价格","全景对照",
+               "随堂测验","课程小结","结束"];
+const slides = Array.from(document.querySelectorAll(".slide"));
+const N = slides.length;
+const nav = { idx: 0, busy: false };
+const dotsBox = document.getElementById("dots");
+slides.forEach((_, i) => {
+  const b = document.createElement("button");
+  b.title = "第 " + (i + 1) + " 页 · " + CHAPS[i];
+  b.addEventListener("click", () => goTo(i, i > nav.idx ? 1 : -1));
+  dotsBox.appendChild(b);
+});
+const dots = Array.from(dotsBox.children);
+document.getElementById("pgAll").textContent = N;
+document.getElementById("pn2").textContent = N;
+
+function renderPlace(i, dir){
+  const el = slides[i];
+  if (dir < 0){
+    el.classList.add("pos-left");
+    el.style.transition = "none"; void el.offsetWidth; el.style.transition = "";
+  } else {
+    el.classList.remove("pos-left");
+  }
+}
+function goTo(n, dir){
+  n = Math.max(0, Math.min(N - 1, n));
+  if (n === nav.idx && slides[n].classList.contains("active")) return;
+  if (nav.busy) return;
+  nav.busy = true; setTimeout(() => nav.busy = false, 300);
+  dir = dir === undefined ? (n > nav.idx ? 1 : -1) : dir;
+  const cur = slides[nav.idx], nxt = slides[n];
+  const leaving = cur !== nxt ? SLIDES[nav.idx] : null;
+  if (cur !== nxt){
+    if (dir > 0) cur.classList.add("pos-left");
+    cur.classList.remove("active");
+    renderPlace(n, dir);
+    void nxt.offsetWidth;
+    if (leaving && leaving.onLeave) leaving.onLeave();
+  }
+  nxt.classList.add("active");
+  nav.idx = n;
+  document.getElementById("progress").firstElementChild.style.width = ((n + 1) / N * 100) + "%";
+  document.getElementById("pgCur").textContent = n + 1;
+  document.getElementById("pn1").textContent = n + 1;
+  document.getElementById("chapLabel").textContent = CHAPS[n];
+  dots.forEach((d, i) => {
+    d.classList.toggle("on", i === n);
+    d.classList.toggle("done", i < n);
+  });
+  document.getElementById("btnPrev").disabled = n === 0;
+  document.getElementById("btnNext").disabled = n === N - 1;
+  if (SLIDES[n].onEnter) SLIDES[n].onEnter();
+}
+document.getElementById("btnPrev").addEventListener("click", () => goTo(nav.idx - 1, -1));
+document.getElementById("btnNext").addEventListener("click", () => goTo(nav.idx + 1, 1));
+document.querySelectorAll("[data-go]").forEach(b =>
+  b.addEventListener("click", () => goTo(+b.dataset.go, +b.dataset.go > nav.idx ? 1 : -1)));
+window.addEventListener("keydown", e => {
+  const t = e.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "BUTTON") &&
+      (e.key === " " || e.key === "Enter")) return;
+  if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " "){ e.preventDefault(); goTo(nav.idx + 1, 1); }
+  else if (e.key === "ArrowLeft" || e.key === "PageUp"){ e.preventDefault(); goTo(nav.idx - 1, -1); }
+  else if (e.key === "Home"){ e.preventDefault(); goTo(0, -1); }
+  else if (e.key === "End"){ e.preventDefault(); goTo(N - 1, 1); }
+});
+
+/* ============================================================
+   模块 J3：判分式选择题
+   ============================================================ */
+const quizState = { answered: 0, correct: 0 };
+function updateQuizHud(){
+  const s = document.getElementById("quizScore");
+  if (!s) return;
+  s.textContent = quizState.correct;
+  const done = quizState.answered;
+  document.getElementById("quizMsg").textContent = done === 3
+    ? (quizState.correct === 3 ? "全对！" : "错题的解析再看一遍")
+    : "已答 " + done + " / 3";
+}
+function bindQuiz(sel, explainEl, goodText, badText, counted){
+  const box = document.querySelector(sel);
+  if (!box) return;
+  box.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (box.dataset.done) return;
+      box.dataset.done = "1";
+      const ok = btn.dataset.ok === "1";
+      box.querySelectorAll(".opt").forEach(b => {
+        b.disabled = true;
+        if (b.dataset.ok === "1") b.classList.add("correct");
+      });
+      if (!ok) btn.classList.add("wrong");
+      if (counted){ quizState.answered++; if (ok) quizState.correct++; updateQuizHud(); }
+      if (explainEl){
+        explainEl.className = "explain show " + (ok ? "good" : "bad");
+        explainEl.textContent = (ok ? "正确。" : "再想想。") + (ok ? goodText : badText);
+      }
+    });
+  });
+}
+const EXPLAINS = {
+  q1: ["对偶问题的约束个数 = 原问题的变量个数 = 2。数量恰好互换：3 个约束变 3 个变量，2 个变量变 2 个约束。",
+       "记牢这条：原问题的「约束数 m」变成对偶的「变量数 m」，原问题的「变量数 n」变成对偶的「约束数 n」。所以答案是 n = 2（选 B）。"],
+  q2: ["弱对偶性给出的是 cᵀx ≤ bᵀy —— 任何可行 x 都是「下界」，任何可行 y 都是「上界」。",
+       "极大化的原问题任何可行解都不超过极小化的对偶问题任何可行解，即 cᵀx ≤ bᵀy（选 A）。等号只在同时最优时成立，那是强对偶性。"],
+  q3: ["yᵢ·sᵢ = 0，sᵢ > 0 就意味着 yᵢ 必须为 0：有剩余的资源不值钱。",
+       "互补松弛要求 yᵢsᵢ = 0。既然 sᵢ > 0，那么只能是 yᵢ = 0（选 B）—— 这个资源还有富余，再多给一单位也不会提高利润。"]
+};
+Object.entries({ q1: '[data-ex="q1"]', q2: '[data-ex="q2"]', q3: '[data-ex="q3"]' })
+  .forEach(([k, sel]) => bindQuiz('[data-quiz="' + k + '"]', document.querySelector(sel),
+    EXPLAINS[k][0], EXPLAINS[k][1], true));
+
+/* ============================================================
+   模块 J4：第 3 页 —— 片段对照
+   ============================================================ */
+const MAP3 = {
+  c: { t: "目标系数 c = (3, 5)", b: "在原问题里，它是每件产品的利润；到了对偶问题里，它变成两条约束的<b>下限</b> —— 每件产品至少要「值」这么多，资源才不算被贱卖。" },
+  b: { t: "右端项 b = (4, 12, 18)", b: "在原问题里它是资源的可用量（上限）；到了对偶问题里，它变成目标函数的系数 —— 资源越多，整体估价越高，所以对偶要「最小化」这个估价。" },
+  x: { t: "变量 x₁, x₂", b: "原问题的每个变量，对应对偶问题的一条约束：把该变量在各约束中的系数<b>竖着</b>排成一列，就是这条对偶约束的系数。这正是 A 转置的含义。" }
+};
+document.querySelectorAll("#s3 .tk[data-k]").forEach(tk => {
+  tk.style.cursor = "pointer";
+  tk.addEventListener("click", () => {
+    document.querySelectorAll("#s3 .tk").forEach(x => x.classList.remove("on", "on2"));
+    document.querySelectorAll("#s3 .tk[data-k]").forEach(x => x.classList.remove("on"));
+    const k = tk.dataset.k;
+    document.querySelectorAll('#s3 .tk[data-k="' + k + '"]').forEach(x => { if (x.dataset.k) x.classList.add("on"); });
+    document.querySelectorAll('#s3 .tk[data-k2="' + k + '"]').forEach(x => x.classList.add("on2"));
+    const st = document.getElementById("st3");
+    st.className = "status in";
+    st.innerHTML = "<b>" + MAP3[k].t + "</b>：" + MAP3[k].b;
+  });
+});
+
+/* ============================================================
+   模块 J5：第 4 页 —— 五条对应规则
+   ============================================================ */
+const RULES = {
+  ncon: { t: "① 约束个数 → 对偶变量个数", f: "m = 3 → y₁, y₂, y₃",
+    b: "原问题 3 个约束，对偶就设 3 个变量。每个约束对应一个「资源的估价」，所以约束有几个，估价就有几个。" },
+  nvar: { t: "② 变量个数 → 对偶约束个数", f: "n = 2 → 2 条对偶约束",
+    b: "原问题 2 个变量，对偶就有 2 条约束。每个变量代表一种产品，对应一条「这种产品的定价不能低于它的利润」的约束。" },
+  c: { t: "③ 目标系数 → 对偶右端项", f: "c = (3, 5) → ≥ 3, ≥ 5",
+    b: "原问题里 c 是利润系数，到了对偶里它跑到约束右边成了下限。含义：产品 xⱼ 消耗的资源总估价，不能低于它带来的利润。" },
+  b: { t: "④ 右端项 → 对偶目标系数", f: "b = (4, 12, 18) → min w = 4y₁+12y₂+18y₃",
+    b: "原问题里 b 是资源量，到了对偶里成了目标系数。含义：总估价 = 各种资源的数量 × 单位估价，我们要让它尽量小。" },
+  A: { t: "⑤ 约束矩阵 → 转置", f: "A (3×2) → Aᵀ (2×3)",
+    b: "原问题第 i 行是第 i 个约束；对偶问题第 j 行取自原问题的第 j 列。行列一换，3×2 的矩阵就变成 2×3。" }
+};
+document.querySelectorAll("#rules tbody tr").forEach(tr => {
+  tr.addEventListener("click", () => {
+    document.querySelectorAll("#rules tbody tr").forEach(x => x.classList.remove("on"));
+    tr.classList.add("on");
+    const d = RULES[tr.dataset.k];
+    document.getElementById("ruleT").textContent = d.t;
+    document.getElementById("ruleB").textContent = d.b;
+    const f = document.getElementById("ruleF");
+    f.style.display = "block";
+    f.textContent = d.f;
+    const v = document.getElementById("ruleV");
+    v.className = "status in";
+    v.textContent = "记住这个方向：原问题的「行」是对偶的「变量」，原问题的「列」是对偶的「约束」。";
+  });
+});
+
+/* ============================================================
+   模块 J6：第 5 页 —— 逐步写出对偶模型
+   ============================================================ */
+const BLD = [
+  { lines:[], tip:"设 3 个对偶变量 y₁, y₂, y₃ ≥ 0（每个约束配一个）",
+    t:"原问题有 3 个约束，所以对偶设 3 个变量，且都要求非负（因为原问题是 ≤ 约束的极大化问题）。" },
+  { lines:[0], tip:"目标：系数取自原约束右端 b = (4, 12, 18)",
+    t:"对偶的目标是「总估价最小」：min w = 4y₁ + 12y₂ + 18y₃。系数 4、12、18 正是三种资源的可用量。" },
+  { lines:[1, 2], tip:"第 1 条约束：把 x₁ 的系数竖着读 → 1·y₁ + 3y₃ ≥ 3",
+    t:"x₁ 在三条约束中的系数是 1、0、3，竖着排成一条约束；右端是 x₁ 的利润 3。含义：生产一件 x₁ 所耗资源的总估价，不能低于它赚的 3。" },
+  { lines:[3], tip:"第 2 条约束：把 x₂ 的系数竖着读 → 2y₂ + 2y₃ ≥ 5",
+    t:"x₂ 的系数是 0、2、2，右端是它的利润 5。两条约束就写完了 —— 因为原问题只有 2 个变量。" },
+  { lines:[4], tip:"定符号：max ↔ min，≤ ↔ ≥，y ≥ 0。完成。",
+    t:"原问题是 max + ≤，所以对偶是 min + ≥。若原问题出现等式约束，对应的 y 就不受非负限制 —— 这是下一层次的细节。" }
+];
+(function initS5(){
+  const box = document.getElementById("steps5");
+  const els = BLD.map((s, i) => {
+    const d = document.createElement("div");
+    d.className = "step";
+    d.innerHTML = '<span class="no">' + (i + 1) + "</span><span>" + s.tip + "</span>";
+    box.appendChild(d); return d;
+  });
+  const lines = [0,1,2,3,4].map(i => document.getElementById("bl" + i));
+  lines.forEach(l => { l.style.transition = "opacity .45s ease, transform .45s ease"; });
+  const S = { k: 0 };
+  const btn = document.getElementById("bldNext");
+  function reset(){
+    S.k = 0;
+    lines.forEach(l => { l.style.opacity = ".18"; });
+    els.forEach(e => e.classList.remove("on", "done"));
+    els[0].classList.add("on");
+    document.getElementById("bldN").textContent = "0";
+    document.getElementById("bldTip").textContent = "点右侧「下一步」开始";
+    btn.disabled = false; btn.textContent = "下一步";
+  }
+  btn.addEventListener("click", () => {
+    if (S.k >= BLD.length) return;
+    BLD[S.k].lines.forEach(i => { lines[i].style.opacity = "1"; });
+    els[S.k].classList.remove("on"); els[S.k].classList.add("done");
+    S.k++;
+    if (S.k < els.length) els[S.k].classList.add("on");
+    const shown = S.k === 1 ? 0 : S.k === 2 ? 1 : S.k === 3 ? 3 : S.k === 4 ? 4 : 5;
+    document.getElementById("bldN").textContent = String(shown);
+    document.getElementById("bldTip").textContent = S.k >= BLD.length ? "对偶模型已完整写出" : BLD[S.k].tip;
+    if (S.k >= BLD.length){ btn.disabled = true; btn.textContent = "已完成"; }
+  });
+  document.getElementById("bldReset").addEventListener("click", reset);
+  reset();
+})();
+
+/* ============================================================
+   模块 J7：第 6 页 —— 弱对偶性实验
+   ============================================================ */
+const XOPTS = [[0,0], [2,2], [4,0], [1,3], [0,6], [2,6]];
+const YOPTS = [[0,3,1], [3,3,0], [2,4,1], [0,1.5,1]];
+const WMAX = 80;
+function fmt(v){ return Number.isInteger(v) ? String(v) : String(v); }
+(function initS6(){
+  const bx = document.getElementById("pickX"), by = document.getElementById("pickY");
+  const S = { x: 0, y: 0 };
+  XOPTS.forEach((v, i) => {
+    const b = document.createElement("button");
+    b.className = "psel"; b.textContent = "x=(" + v[0] + "," + v[1] + ")";
+    b.addEventListener("click", () => { S.x = i; draw(); });
+    bx.appendChild(b);
+  });
+  YOPTS.forEach((v, i) => {
+    const b = document.createElement("button");
+    b.className = "psel"; b.textContent = "y=(" + v.join(",") + ")";
+    b.addEventListener("click", () => { S.y = i; draw(); });
+    by.appendChild(b);
+  });
+  function draw(){
+    Array.from(bx.children).forEach((b, i) => b.classList.toggle("on", i === S.x));
+    Array.from(by.children).forEach((b, i) => b.classList.toggle("on", i === S.y));
+    const x = XOPTS[S.x], y = YOPTS[S.y];
+    const z = 3 * x[0] + 5 * x[1];
+    const w = 4 * y[0] + 12 * y[1] + 18 * y[2];
+    document.getElementById("fillZ").style.width = Math.min(100, z / WMAX * 100) + "%";
+    document.getElementById("fillW").style.width = Math.min(100, w / WMAX * 100) + "%";
+    document.getElementById("numZ").textContent = fmt(z);
+    document.getElementById("numW").textContent = fmt(w);
+    document.getElementById("weakF").innerHTML =
+      "c<sup>T</sup>x = <b style=\"color:var(--p1)\">" + fmt(z) + "</b> ≤ " +
+      "<b style=\"color:var(--p2)\">" + fmt(w) + "</b> = b<sup>T</sup>y";
+    const gap = w - z;
+    document.getElementById("weakGap").textContent = gap === 0
+      ? "对偶间隙 = 0：两边同时达到最优（这就是强对偶性）。"
+      : "对偶间隙 = " + fmt(w) + " − " + fmt(z) + " = " + fmt(gap) + "，说明这一对解都还不是最优。";
+    const v = document.getElementById("weakV");
+    if (gap === 0){
+      v.className = "status ok";
+      v.innerHTML = "间隙为 0，<b>x=(2,6) 与 y=(0,3/2,1) 同时最优</b>，两侧的值都等于 36。";
+    } else {
+      v.className = "status";
+      v.innerHTML = "间隙 " + fmt(gap) + " > 0，所以其中至少有一个还不是最优解。换几组试试，间隙只会缩小、不会为负。";
+    }
+  }
+  draw();
+})();
+
+/* ============================================================
+   模块 J8：第 7 页 —— 强对偶性数轴（夹逼）
+   ============================================================ */
+const AXZ = [0, 12, 16, 18, 30, 36];
+const AXW = [74, 54, 48, 36];
+const TA = { k: 0, total: AXZ.length + AXW.length };
+(function initS7(){
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("axis");
+  const X = v => 78 + v / 80 * 1020;
+  const mk = (tag, at, parent) => {
+    const el = document.createElementNS(NS, tag);
+    for (const k in at) el.setAttribute(k, at[k]);
+    (parent || svg).appendChild(el); return el;
+  };
+  const gBase = mk("g", {}), gMark = mk("g", {});
+  /* 轴线与刻度 */
+  mk("line", { x1: X(0) - 14, y1: 168, x2: X(80) + 14, y2: 168, stroke: "#9aa6b8", "stroke-width": 1.5 }, gBase);
+  for (let v = 0; v <= 80; v += 10){
+    mk("line", { x1: X(v), y1: 163, x2: X(v), y2: 173, stroke: "#9aa6b8", "stroke-width": 1.2 }, gBase);
+    mk("text", { x: X(v), y: 192, "font-size": 10.5, fill: "#7a879d", "text-anchor": "middle" }, gBase)
+      .textContent = v;
+  }
+  /* 间隙说明 */
+  mk("text", { x: 74, y: 46, "font-size": 12, fill: "#2563eb" }, gBase).textContent = "▼ 原问题可行解的 z（下界）";
+  mk("text", { x: 74, y: 66, "font-size": 12, fill: "#c2740b" }, gBase).textContent = "▲ 对偶可行解的 w（上界）";
+  /* 36 的竖线 */
+  const gl = mk("line", { x1: X(36), y1: 60, x2: X(36), y2: 236, stroke: "#15803d",
+    "stroke-width": 1.6, "stroke-dasharray": "5 5" }, gBase);
+  mk("rect", { x: X(36) - 47, y: 238, width: 94, height: 22, rx: 8, fill: "#e7f6ec", stroke: "#b7e2c5" }, gBase);
+  mk("text", { x: X(36), y: 253, "font-size": 11.5, fill: "#0d5c2c", "text-anchor": "middle",
+    "font-weight": "700" }, gBase).textContent = "z* = w* = 36";
+  /* 逐个标记 */
+  const marks = [];
+  AXZ.forEach((v, i) => {
+    const g = mk("g", { opacity: 0 }, gMark);
+    g.style.transition = "opacity .5s ease";
+    mk("path", { d: "M " + X(v) + " 168 l -6 -11 h 12 z", fill: "#2563eb" }, g);
+    mk("line", { x1: X(v), y1: 157, x2: X(v), y2: 168, stroke: "#2563eb", "stroke-width": 1.4 }, g);
+    const last = i === AXZ.length - 1;
+    const ty = last ? 146 : (i % 2 === 0 ? 146 : 130);
+    mk("text", { x: last ? X(v) - 9 : X(v), y: ty, "font-size": 11, fill: last ? "#15803d" : "#2563eb",
+      "text-anchor": last ? "end" : "middle", "font-weight": last ? "700" : "400" }, g).textContent = "z=" + v;
+    marks.push(g);
+  });
+  AXW.forEach((v, i) => {
+    const g = mk("g", { opacity: 0 }, gMark);
+    g.style.transition = "opacity .5s ease";
+    mk("path", { d: "M " + X(v) + " 168 l -6 11 h 12 z", fill: "#c2740b" }, g);
+    mk("line", { x1: X(v), y1: 168, x2: X(v), y2: 179, stroke: "#c2740b", "stroke-width": 1.4 }, g);
+    const top = v === 36;
+    const ty = top ? 212 : (i % 2 === 0 ? 212 : 226);
+    mk("text", { x: top ? X(v) + 9 : X(v), y: ty, "font-size": 11, fill: top ? "#15803d" : "#c2740b",
+      "text-anchor": top ? "start" : "middle", "font-weight": top ? "700" : "400" }, g).textContent = "w=" + v;
+    marks.push(g);
+  });
+  const tip = document.getElementById("axisTip"), vs = document.getElementById("axisV");
+  function show(n){
+    marks.forEach((g, i) => { g.setAttribute("opacity", i < n ? 1 : 0); });
+    TA.k = n;
+    tip.textContent = n >= marks.length
+      ? "全部标完：蓝点最右到 36，橙点最左到 36 —— 上下界在 36 处相遇。"
+      : "已标出 " + n + " / " + marks.length + " 个。";
+    if (n >= marks.length){
+      vs.className = "status ok";
+      vs.innerHTML = "所有可行解的 z 都不超过 36，所有可行解的 w 都不小于 36，而 <b>x*=(2,6)</b> 与 <b>y*=(0,3/2,1)</b> 恰好都取到 36。" +
+        "这就是强对偶性：只要两边都有可行解，最优值一定相等。";
+    } else {
+      vs.className = "status";
+      vs.innerHTML = "所有蓝点都在 36 左侧，所有橙点都在 36 右侧 —— 中间那条竖线，就是最优值。";
+    }
+  }
+  document.getElementById("axisNext").addEventListener("click", () => show(Math.min(TA.k + 1, marks.length)));
+  document.getElementById("axisAll").addEventListener("click", () => show(marks.length));
+  document.getElementById("axisReset").addEventListener("click", () => show(0));
+  show(0);
+})();
+
+/* ============================================================
+   模块 J9：第 8 页 —— 互补松弛配对
+   ============================================================ */
+(function initS8(){
+  const rows = Array.from(document.querySelectorAll("#cs tbody tr"));
+  let done = 0;
+  rows.forEach(tr => {
+    tr.addEventListener("click", () => {
+      if (tr.classList.contains("done")) return;
+      tr.classList.add("done");
+      const tds = tr.querySelectorAll("td");
+      tds[1].classList.remove("hid");
+      tds[3].classList.remove("hid");
+      tds[4].textContent = "0";
+      done++;
+      const v = document.getElementById("csV");
+      if (done === rows.length){
+        v.className = "status ok";
+        v.innerHTML = "5 对乘积全部为 0 —— 这正是「<b>x* 与 y* 同时最优</b>」的判定条件。" +
+          "注意 s₁ = 2 &gt; 0 而 y₁ = 0：原料甲还有富余，所以它对利润没有边际贡献。";
+      } else {
+        v.className = "status";
+        v.textContent = "已展开 " + done + " / 5 对。每一对里至少有一个是 0，乘积必然是 0。";
+      }
+    });
+  });
+})();
+
+/* ============================================================
+   模块 J10：第 9 页 —— 影子价格实验
+   ============================================================ */
+const SHADOW = {
+  b1: { row:"r1", lb:4, nb:5, z:36, dz:0,  y:"y₁ = 0",
+        t:"原料甲本来就有 2 个单位没用完，再多给 1 个单位也不改变最优排产，所以 Δz = 0 = y₁。" },
+  b2: { row:"r2", lb:12, nb:13, z:37.5, dz:1.5, y:"y₂ = 3/2",
+        t:"原料乙是紧约束，多 1 个单位可以让 x₂ 多产 0.5 件（5 元/件），利润涨 1.5 —— 正好等于 y₂。" },
+  b3: { row:"r3", lb:18, nb:19, z:37, dz:1, y:"y₃ = 1",
+        t:"工时也是紧约束，多 1 小时能让排产沿边界移动，利润涨 1 —— 正好等于 y₃。" }
+};
+(function initS9(){
+  ["b1", "b2", "b3"].forEach(id => {
+    document.getElementById(id).addEventListener("click", () => {
+      const d = SHADOW[id], tr = document.getElementById(d.row);
+      const td = tr.querySelectorAll("td");
+      td[2].textContent = String(d.nb);
+      td[3].textContent = String(d.z);
+      td[4].textContent = "Δz = " + String(d.dz) + " = " + d.y;
+      td[4].style.color = d.dz === 0 ? "var(--muted)" : "var(--ok)";
+      const v = document.getElementById("spV");
+      v.className = d.dz === 0 ? "status" : "status ok";
+      v.innerHTML = "<b>Δz = " + String(d.dz) + "</b>，与 " + d.y + " 完全一致。" + d.t;
+    });
+  });
+})();
+
+/* ============================================================
+   模块 J11：页面注册与收尾
+   ============================================================ */
+const SLIDES = slides.map((el, i) => ({
+  el,
+  onEnter: i === 12 ? () => {
+    const q = document.getElementById("repQuiz");
+    q.textContent = quizState.answered === 3 ? (quizState.correct + " / 3") : "未完成";
+    q.classList.toggle("dim", quizState.answered < 3);
+  } : null
+}));
+document.getElementById("btnRestart").addEventListener("click", () => location.reload());
+goTo(0, 0);
+
+window.addEventListener("keydown", e => { if (e.key === "Escape") location.href = "index.html"; });
+</script>
+
+<style id="portal-back-style">
+#portal-back{position:fixed;right:14px;bottom:14px;z-index:9999;
+  right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));
+  display:inline-flex;align-items:center;gap:6px;
+  font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:#fff;background:rgba(17,24,39,.82);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:9px 15px;text-decoration:none;
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:.72;transition:opacity .18s,transform .18s}
+#portal-back:hover{opacity:1;transform:translateY(-1px)}
+#portal-back:active{transform:none}
+@media print{#portal-back{display:none}}
+</style>
+<a id="portal-back" href="../../" title="返回资源中心">← 资源中心</a>
+</body>
+</html>
