@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>运筹学 · 交互式课件中心</title>
+<style>
+/* ============================================================
+   模块 I1：设计令牌与全局画布（与各课件共用同一套视觉变量）
+   ============================================================ */
+:root{
+  --bg-a:#eef2f8; --bg-b:#e7edf7;
+  --surface:#ffffff; --surface-2:#f6f8fc; --surface-3:#eef3fa;
+  --border:#dde4ee; --border-2:#c6d1e0;
+  --text:#141d2b; --text-2:#44516a; --muted:#7a879d;
+  --p1:#2563eb; --p1-bg:#e6efff; --p1-bd:#a9c4fb;
+  --p2:#c2740b; --p2-bg:#fdf2df; --p2-bd:#eec98a;
+  --p3:#0e7490; --p3-bg:#e2f4f8;
+  --ok:#15803d; --ok-bg:#e7f6ec;
+  --r:16px;
+  --sh-1:0 1px 2px rgba(15,23,42,.05),0 2px 10px rgba(15,23,42,.06);
+  --sh-2:0 12px 34px rgba(15,23,42,.13);
+  --font:"Inter","PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  --math:"Cambria Math","STIX Two Math","Times New Roman",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg-a);}
+body{font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+
+#stage{
+  position:fixed;left:50%;top:50%;width:1280px;height:720px;
+  transform:translate(-50%,-50%) scale(1);
+  background:
+    radial-gradient(900px 420px at 8% -10%, #ffffff 0%, rgba(255,255,255,0) 55%),
+    radial-gradient(760px 420px at 104% 112%, #e3ecff 0%, rgba(227,236,255,0) 60%),
+    linear-gradient(160deg,var(--bg-a),var(--bg-b));
+  overflow:hidden;
+}
+#stage::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(20,29,43,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(20,29,43,.045) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 100%);
+  -webkit-mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 100%);
+}
+
+/* ============================================================
+   模块 I2：顶栏与页脚
+   ============================================================ */
+#topbar{position:absolute;left:0;right:0;top:0;height:52px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 34px;z-index:10;}
+#topbar .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-2);letter-spacing:.4px;}
+#topbar .brand .logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#0e7490);
+  display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;box-shadow:var(--sh-1);}
+#topbar .meta{font-size:12.5px;color:var(--muted);display:flex;gap:14px;align-items:center;}
+#topbar .meta b{color:var(--text-2);font-weight:600;}
+
+#foot{position:absolute;left:34px;right:34px;bottom:18px;display:flex;align-items:center;
+  justify-content:space-between;font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding-top:12px;}
+#foot .kbd{display:inline-block;border:1px solid var(--border-2);border-radius:5px;padding:0 5px;
+  font-size:11px;line-height:16px;color:var(--text-2);background:var(--surface);}
+
+/* ============================================================
+   模块 I3：标题区与卡片栅格
+   ============================================================ */
+#wrap{position:absolute;left:56px;right:56px;top:76px;bottom:62px;display:flex;flex-direction:column;}
+.hero{flex:none;margin-bottom:22px;}
+.hero .badge{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--p1);
+  background:var(--p1-bg);border:1px solid var(--p1-bd);border-radius:999px;padding:5px 14px;margin-bottom:14px;}
+.hero h1{font-size:38px;font-weight:800;letter-spacing:1.2px;line-height:1.2;}
+.hero h1 em{font-style:normal;background:linear-gradient(120deg,#2563eb,#0e7490);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero p{font-size:14.5px;color:var(--text-2);margin-top:9px;line-height:1.7;max-width:760px;}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));
+  gap:18px;flex:1;min-height:0;}
+
+/* 卡片入场 */
+.a{opacity:0;}
+#stage.ready .a{animation:rise .62s cubic-bezier(.22,.61,.36,1) forwards;animation-delay:var(--d,0s);}
+@keyframes rise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+
+.kcard{position:relative;display:flex;flex-direction:column;padding:20px 22px 16px;border-radius:var(--r);
+  background:var(--surface);border:1px solid var(--border);box-shadow:var(--sh-1);overflow:hidden;
+  transition:transform .26s cubic-bezier(.22,.61,.36,1),box-shadow .26s,border-color .26s;}
+.kcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--ac,#2563eb),var(--ac2,#0e7490));opacity:.85;transition:.26s;}
+.kcard:hover{transform:translateY(-4px);box-shadow:var(--sh-2);border-color:var(--p1-bd);}
+.kcard:hover::before{width:6px;}
+.kcard .top{display:flex;align-items:flex-start;gap:14px;}
+.kcard .no{flex:none;font-size:30px;font-weight:800;color:var(--ac);opacity:.92;line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-1px;}
+.kcard h3{font-size:20px;font-weight:800;letter-spacing:.3px;}
+.kcard .en{font-size:11px;color:var(--muted);letter-spacing:2.4px;text-transform:uppercase;margin-top:3px;}
+.kcard .desc{font-size:12.6px;color:var(--text-2);line-height:1.75;margin-top:11px;max-width:470px;}
+.kcard .pts{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.kcard .pts li{font-size:12px;color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);
+  border-radius:7px;padding:4px 9px;}
+.kcard .foot{margin-top:auto;padding-top:11px;display:flex;align-items:center;gap:8px;}
+.kcard .tag{font-size:11.5px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:2px 9px;}
+.kcard .go{margin-left:auto;font-size:13px;font-weight:700;color:var(--ac);display:flex;align-items:center;gap:6px;
+  transition:.24s;}
+.kcard:hover .go{gap:11px;}
+.kcard .go i{font-style:normal;}
+
+/* 预留卡 */
+.kcard.ghost{border:1.5px dashed var(--border-2);background:rgba(255,255,255,.55);box-shadow:none;
+  justify-content:center;align-items:center;text-align:center;cursor:pointer;}
+.kcard.ghost::before{display:none;}
+.kcard.ghost:hover{border-color:var(--p1-bd);background:rgba(230,239,255,.6);transform:translateY(-4px);}
+.kcard.ghost .plus{width:46px;height:46px;border-radius:14px;border:1.5px dashed var(--border-2);
+  display:grid;place-items:center;font-size:22px;color:var(--p1);margin-bottom:12px;transition:.24s;}
+.kcard.ghost:hover .plus{border-color:var(--p1);border-style:solid;background:var(--p1-bg);}
+.kcard.ghost h3{font-size:17px;color:var(--text-2);font-weight:700;}
+.kcard.ghost p{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.7;max-width:400px;}
+
+/* 提示条 */
+#toast{position:absolute;left:50%;bottom:84px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:#141d2b;color:#fff;font-size:12.5px;line-height:1.6;padding:11px 18px;border-radius:11px;
+  box-shadow:var(--sh-2);transition:.32s;max-width:640px;text-align:center;z-index:20;}
+#toast.on{opacity:1;transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <header id="topbar">
+    <div class="brand"><span class="logo">Σ</span><span>运筹学 · 交互式课件中心</span></div>
+    <div class="meta"><span>共 <b>3</b> 个知识点</span><span>·</span><span>1 个位置预留</span></div>
+  </header>
+
+  <div id="wrap">
+    <div class="hero">
+      <span class="badge a" style="--d:.02s">Operations Research · Interactive Courseware</span>
+      <h1 class="a" style="--d:.1s">选一个<em>知识点</em>，开始学习</h1>
+      <p class="a" style="--d:.18s">每份课件都是独立的单页应用：左侧点开即用，支持键盘翻页、交互演示与随堂测验。
+        三份课件共用同一套视觉与交互语言，学完一份可直接进入下一份。</p>
+    </div>
+
+    <div class="grid">
+      <a class="kcard a" style="--d:.24s;--ac:#2563eb;--ac2:#0e7490" href="simplex-courseware.html">
+        <div class="top">
+          <span class="no">01</span>
+          <div><h3>单纯形法</h3><div class="en">The Simplex Method</div></div>
+        </div>
+        <p class="desc">变量超过两个，图解法就失效了。单纯形法把「沿顶点跳跃」翻译成一张表的行变换，让任意规模的线性规划都能手算。</p>
+        <ul class="pts">
+          <li>标准形与松弛变量</li><li>入基 / 出基 / 比值检验</li><li>枢轴运算与完整迭代</li>
+        </ul>
+        <div class="foot">
+          <span class="tag">14 页</span><span class="tag">6 个互动</span><span class="tag">含完整动画</span>
+          <span class="go">进入课件 <i>→</i></span>
+        </div>
+      </a>
+
+      <a class="kcard a" style="--d:.31s;--ac:#0e7490;--ac2:#2563eb" href="transportation-courseware.html">
+        <div class="top">
+          <span class="no">02</span>
+          <div><h3>运输问题</h3><div class="en">The Transportation Problem</div></div>
+        </div>
+        <p class="desc">三个仓库、三家门店、一张运价表。表上作业法用西北角法起步，靠位势法判断、靠闭回路调整，一步步把运费压到最低。</p>
+        <ul class="pts">
+          <li>模型构建与产销平衡</li><li>西北角法 / 最小元素法</li><li>位势法 · 闭回路调整</li>
+        </ul>
+        <div class="foot">
+          <span class="tag">14 页</span><span class="tag">5 个互动</span><span class="tag">含完整动画</span>
+          <span class="go">进入课件 <i>→</i></span>
+        </div>
+      </a>
+
+      <a class="kcard a" style="--d:.38s;--ac:#c2740b;--ac2:#0e7490" href="duality-courseware.html">
+        <div class="top">
+          <span class="no">03</span>
+          <div><h3>对偶理论</h3><div class="en">Duality Theory</div></div>
+        </div>
+        <p class="desc">同一个生产计划，换个问法就得到对偶问题：一个问「怎么排产利润最高」，一个问「这些资源最少值多少钱」。</p>
+        <ul class="pts">
+          <li>对偶模型的构造规则</li><li>弱对偶性与强对偶性</li><li>互补松弛与影子价格</li>
+        </ul>
+        <div class="foot">
+          <span class="tag">13 页</span><span class="tag">4 个互动</span><span class="tag">含数据实验</span>
+          <span class="go">进入课件 <i>→</i></span>
+        </div>
+      </a>
+
+      <div class="kcard ghost a" style="--d:.45s" id="ghost">
+        <div class="plus">+</div>
+        <h3>更多知识点 · 位置预留</h3>
+        <p>整数规划、图与网络、排队论、动态规划……<br>新增课件后，把文件放进同一目录，复制一张卡片改掉链接即可。</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="foot">
+    <span>使用方式：双击任意 HTML 文件即可在浏览器中直接打开，无需服务器、无需联网。</span>
+    <span>键盘：<span class="kbd">←</span> <span class="kbd">→</span> 翻页 · <span class="kbd">Home</span> <span class="kbd">End</span> 首末页 · <span class="kbd">Esc</span> 返回本页</span>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   模块 I1：画布缩放 —— 保证任何分辨率下不出现滚动条
+   ============================================================ */
+const stage = document.getElementById("stage");
+function fit(){
+  const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+  stage.style.transform = "translate(-50%,-50%) scale(" + s + ")";
+}
+window.addEventListener("resize", fit); fit();
+requestAnimationFrame(() => stage.classList.add("ready"));
+
+/* ============================================================
+   模块 I2：预留卡片的提示
+   ============================================================ */
+const toast = document.getElementById("toast");
+let toastTimer = null;
+function showToast(html){
+  toast.innerHTML = html;
+  toast.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("on"), 4200);
+}
+document.getElementById("ghost").addEventListener("click", () => {
+  showToast("这里留给下一个知识点：新增 <b>xxx-courseware.html</b> 后，复制一张卡片，把 href 改成新文件名即可。");
+});
+
+/* ============================================================
+   模块 I3：键盘导航 —— 数字键直达对应课件
+   ============================================================ */
+const LINKS = ["simplex-courseware.html", "transportation-courseware.html", "duality-courseware.html"];
+window.addEventListener("keydown", e => {
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= LINKS.length) location.href = LINKS[n - 1];
+  if (e.key === "Escape") showToast("已经在首页了。");
+});
+</script>
+
+<style id="portal-back-style">
+#portal-back{position:fixed;right:14px;bottom:14px;z-index:9999;
+  right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));
+  display:inline-flex;align-items:center;gap:6px;
+  font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:#fff;background:rgba(17,24,39,.82);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:9px 15px;text-decoration:none;
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:.72;transition:opacity .18s,transform .18s}
+#portal-back:hover{opacity:1;transform:translateY(-1px)}
+#portal-back:active{transform:none}
+@media print{#portal-back{display:none}}
+</style>
+<a id="portal-back" href="../../" title="返回资源中心">← 资源中心</a>
+</body>
+</html>
