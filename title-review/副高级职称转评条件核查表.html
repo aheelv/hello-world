@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>副高级职称转评 · 条件核查表</title>
+<style>
+:root{
+  --ink:#0f1c2e;--ink-2:#2c3e56;--body:#3f4f66;--muted:#7a8aa0;
+  --line:#e2e8f0;--line-2:#eef2f7;--bg:#f4f7fb;--card:#fff;
+  --brand:#17457f;--brand-2:#2a6bb0;--brand-soft:#eaf1fa;
+  --gold:#b8860b;--gold-soft:#fdf6e3;--red:#b03a2e;--red-soft:#fdeeec;
+  --green:#2c6e52;--green-soft:#eaf5ef;--violet:#5b4a8a;--violet-soft:#f0edf8;
+  --shadow:0 1px 2px rgba(15,28,46,.04),0 8px 24px -12px rgba(15,28,46,.18);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--body);line-height:1.68;font-size:14.5px;
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--ink);margin:0;font-weight:700;line-height:1.35}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+b{color:var(--ink-2)}
+
+/* header */
+header.h{
+  background:radial-gradient(900px 340px at 92% -20%,rgba(42,107,176,.16),transparent 62%),
+             linear-gradient(180deg,#fbfcfe,#f3f7fb);
+  border-bottom:1px solid var(--line);padding:40px 0 30px;position:relative;overflow:hidden;
+}
+header.h::before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(var(--line-2) 1px,transparent 1px),linear-gradient(90deg,var(--line-2) 1px,transparent 1px);
+  background-size:46px 46px;opacity:.5;mask-image:radial-gradient(70% 60% at 40% 40%,#000,transparent);pointer-events:none}
+header.h .wrap{position:relative}
+.eyebrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.pill{font-size:12px;padding:4px 11px;border-radius:999px;border:1px solid #d3e2f5;background:#fff;color:var(--brand);font-weight:600}
+.pill.gold{border-color:#eddcb4;background:var(--gold-soft);color:#8a6508}
+.pill.gray{border-color:var(--line);color:var(--muted);font-weight:500}
+h1{font-size:30px;letter-spacing:.4px}
+h1 .sub{display:block;font-size:16px;color:var(--brand);font-weight:600;margin-top:7px;letter-spacing:.6px}
+.lede{margin-top:14px;max-width:820px;font-size:14.5px;color:var(--ink-2)}
+.meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:12.5px;color:var(--muted)}
+
+/* summary bar */
+.summary{
+  position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line);
+}
+.summary-in{display:flex;align-items:center;gap:16px;padding:11px 0;flex-wrap:wrap}
+.summary .t{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap}
+.mini{display:flex;gap:14px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.mini b{font-variant-numeric:tabular-nums}
+.mini .ok b{color:var(--green)}
+.mini .no b{color:var(--red)}
+.mini .pen b{color:var(--gold)}
+.bar{flex:1;min-width:120px;height:7px;border-radius:99px;background:var(--line-2);overflow:hidden;display:flex}
+.bar i{display:block;height:100%;transition:width .25s}
+.bar .b1{background:var(--green)}
+.bar .b2{background:var(--red)}
+.bar .b3{background:var(--gold)}
+.btn{font-family:inherit;font-size:12.5px;padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink-2);cursor:pointer;font-weight:600}
+.btn:hover{border-color:#c3d7ee;color:var(--brand)}
+
+section{padding:34px 0}
+section.alt{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sechead{display:flex;align-items:flex-end;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+.sechead .idx{font-size:12.5px;font-weight:800;color:var(--brand-2);letter-spacing:2px;padding-bottom:5px}
+.sechead h2{font-size:21px;letter-spacing:.3px}
+.secdesc{font-size:13.5px;color:var(--muted);margin-top:7px;max-width:860px}
+.rule{height:1px;background:linear-gradient(90deg,var(--brand) 0,var(--brand) 52px,var(--line) 52px);margin:14px 0 20px}
+
+/* path cards */
+.paths{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.path{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 17px;box-shadow:var(--shadow)}
+.path .tag{font-size:11px;font-weight:800;letter-spacing:.5px;padding:2px 8px;border-radius:5px;display:inline-block;margin-bottom:8px}
+.path.a .tag{background:var(--brand-soft);color:var(--brand)}
+.path.b .tag{background:var(--violet-soft);color:var(--violet)}
+.path.c .tag{background:var(--red-soft);color:var(--red)}
+.path h4{font-size:14px;margin-bottom:5px}
+.path p{font-size:12.8px;color:var(--body)}
+.path .src{margin-top:9px;font-size:11.5px;color:var(--muted);padding-top:8px;border-top:1px dashed var(--line-2)}
+
+/* table */
+.tablewrap{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:13px}
+thead th{background:#f7f9fc;color:var(--ink-2);font-size:12px;font-weight:700;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.62}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fafcff}
+tr.grp td{background:#f2f6fb;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 12px}
+tr.grp .gn{font-size:13px;font-weight:800;color:var(--ink);letter-spacing:.3px}
+tr.grp .gd{font-size:12px;color:var(--muted);margin-left:9px;font-weight:400}
+td.no{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;width:38px;font-weight:700}
+td.req{width:20%;font-weight:700;color:var(--ink)}
+td.det{width:41%}
+td.bas{width:16%;font-size:11.8px;color:var(--muted)}
+td.res{width:152px;white-space:nowrap}
+.det ol,.det ul{margin:5px 0 0;padding-left:18px}
+.det li{margin:2px 0}
+.k{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:4px;vertical-align:1px}
+.k.b{background:var(--brand-soft);color:var(--brand)}
+.k.r{background:var(--red-soft);color:var(--red)}
+.k.g{background:var(--gold-soft);color:#8a6508}
+.k.v{background:var(--violet-soft);color:var(--violet)}
+
+/* 三态按钮 */
+.res{display:flex;gap:4px}
+.res button{
+  font-family:inherit;font-size:10.5px;font-weight:700;padding:3px 6px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--muted);transition:.14s;line-height:1.5;
+}
+.res button:hover{border-color:#c3d7ee}
+.res button[data-v="ok"].on{background:var(--green);border-color:var(--green);color:#fff}
+.res button[data-v="no"].on{background:var(--red);border-color:var(--red);color:#fff}
+.res button[data-v="pen"].on{background:var(--gold);border-color:var(--gold);color:#fff}
+tr.st-ok{background:rgba(44,110,82,.045)}
+tr.st-no{background:rgba(176,58,46,.05)}
+tr.st-pen{background:rgba(184,134,11,.055)}
+
+/* 待确认 */
+.todo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.todo{background:#fff;border:1px solid #eddcb4;border-top:3px solid var(--gold);border-radius:11px;padding:14px 16px}
+.todo .th{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;font-weight:700;color:var(--ink)}
+.todo .q{font-size:10.5px;font-weight:800;color:#fff;background:var(--gold);border-radius:4px;padding:1px 6px;flex:0 0 auto;margin-top:3px}
+.todo p{font-size:12.8px;margin-top:6px}
+.todo .act{margin-top:7px;font-size:12px;color:var(--muted);padding-top:7px;border-top:1px dashed #eddcb4}
+.todo .act b{color:#8a6508}
+
+.note{background:var(--gold-soft);border:1px solid #eddcb4;border-left:3px solid var(--gold);border-radius:8px;padding:10px 13px;font-size:12.8px;color:#7a5a08;margin-top:12px}
+.note .nt{font-weight:800;font-size:11.5px;letter-spacing:.5px;color:#8a6508;margin-bottom:2px}
+.warn{background:var(--red-soft);border:1px solid #f3d5d0;border-left:3px solid var(--red);border-radius:8px;padding:10px 13px;font-size:12.8px;color:#7d2b21;margin-top:12px}
+.warn .wt{font-weight:800;font-size:11.5px;letter-spacing:.5px;color:var(--red);margin-bottom:2px}
+
+footer{padding:28px 0 44px;border-top:1px solid var(--line);background:#fff;margin-top:8px}
+.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:12.3px;color:var(--muted)}
+
+@media(max-width:900px){
+  .paths{grid-template-columns:1fr}
+  .todo-grid{grid-template-columns:1fr}
+  h1{font-size:23px}
+  .tablewrap::before{content:"左右滑动可查看完整表格";display:block;padding:7px 13px;font-size:11.5px;color:var(--muted);background:#fbfcfe;border-bottom:1px solid var(--line-2)}
+  section{padding:26px 0}
+}
+@media print{
+  .summary,.btn,.res button{display:none!important}
+  body{background:#fff;font-size:11px}
+  header.h{padding:16px 0}
+  section{padding:12px 0;page-break-inside:auto}
+  .path,.todo{page-break-inside:avoid}
+  tr{page-break-inside:avoid}
+  thead{display:table-header-group}
+  .tablewrap,.path,.todo{box-shadow:none}
+  table{min-width:0;font-size:10.5px}
+  tbody td{padding:5px 7px}
+  tr.grp td{background:#eef2f7}
+  .tablewrap::before{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="h">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span class="pill">大连财经学院</span>
+      <span class="pill gold">副高级 · 同级转评</span>
+      <span class="pill gray">依据：管理办法第十五条 / 第十六条 / 补充规定（2025.11.27）</span>
+    </div>
+    <h1>副高级职称转评 · 条件核查表
+      <span class="sub">60 项要求 · 逐条判定「符合 / 不符合 / 待确认」</span>
+    </h1>
+    <p class="lede">
+      适用于<b>已具有非高校教师系列副高级职称</b>、现聘我校专任教师岗位、申请<b>转评副教授</b>（教学科研型或教学为主型）的人员。
+      所有条目均标注原文依据；文件未作规定的，一律标为「待确认」，不作推定。
+    </p>
+    <div class="meta">
+      <span>核查对象：副高级（副教授）</span>
+      <span>申报窗口：2026.10.30 — 11.03</span>
+      <span>评审类别填写：同级转评</span>
+      <span>咨询：职称评审办公室（人事处）39265028</span>
+    </div>
+  </div>
+</header>
+
+<div class="summary">
+  <div class="wrap summary-in">
+    <span class="t">判定进度</span>
+    <div class="mini">
+      <span class="ok">符合 <b id="nOk">0</b></span>
+      <span class="no">不符合 <b id="nNo">0</b></span>
+      <span class="pen">待确认 <b id="nPen">0</b></span>
+      <span>未判定 <b id="nLeft">60</b></span>
+    </div>
+    <div class="bar"><i class="b1" id="barOk"></i><i class="b2" id="barNo"></i><i class="b3" id="barPen"></i></div>
+    <button class="btn" id="reset">清空</button>
+    <button class="btn" onclick="window.print()">打印 / 存 PDF</button>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sechead"><span class="idx">00</span><h2>先定路径：你适用哪一条？</h2></div>
+    <p class="secdesc">转评不是一条规则，而是三条互斥的路径。走错路径，后面的条件全对也不算数——这是转评最常见的失败原因。</p>
+    <div class="rule"></div>
+    <div class="paths">
+      <div class="path a">
+        <span class="tag">路径 A · 主路径</span>
+        <h4>企事业单位调入 + 非高校教师系列副高</h4>
+        <p>适用《管理办法》<b>第十六条第（二）款</b>，并受《关于对职称评审管理办法的补充规定》<b>四项条件 + 两种时间情形</b>约束（本表 A—F 组全部适用）。</p>
+        <div class="src">依据：第十六条（二）＋补充规定第一、二、三项</div>
+      </div>
+      <div class="path b">
+        <span class="tag">路径 B · 通用条款</span>
+        <h4>校内转岗：现聘专任教师岗 + 原非专任教师系列职称</h4>
+        <p>适用《管理办法》<b>第十五条第（一）款</b>：从事教学科研工作<b>满 1 年</b>＋满足同级任职条件其他要求。补充规定的目录范围、岗前培训等条款<b>只约束"调入"人员</b>，是否同样约束校内转岗，文件未明确。</p>
+        <div class="src">依据：第十五条（一）；适用范围见补充规定第四项（仅"专任教师"）</div>
+      </div>
+      <div class="path c">
+        <span class="tag">路径 C · 不适用转评</span>
+        <h4>其他高校／科研机构调入，已有高校教师系列高级职称</h4>
+        <p>走<b>职称重新确认</b>（第十六条第一款）：准聘期内走特殊人才通道、<b>指标单列</b>；未获确认则按低一级职称聘任。此路径不作为"转评"受理。</p>
+        <div class="src">依据：第十六条（一）</div>
+      </div>
+    </div>
+    <div class="warn">
+      <div class="wt">先自查这一条，再往下看</div>
+      若你的副高职称是在<b>来校之后</b>取得的（无论来校在截止日前后），按补充规定第三项，<b>一律不能转评</b>，只能参加学校统一职称评审；所持行业职称证书仅作能力素质证明。请直接跳到本表 J 组。
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="sechead"><span class="idx">01</span><h2>逐条核查表</h2></div>
+    <p class="secdesc">共 60 项，分 10 组。每项给出「要求 — 具体内容与判定标准 — 原文依据」，右侧三选一记录结论。</p>
+    <div class="rule"></div>
+    <div class="tablewrap">
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:38px">#</th>
+              <th style="width:20%">要求项</th>
+              <th style="width:41%">具体内容与判定标准</th>
+              <th style="width:16%">原文依据</th>
+              <th style="width:152px">结论</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px">
+      结论说明：<b>符合</b>＝已有书面证据可支撑；<b>不符合</b>＝确定不满足，需改变申报策略；<b>待确认</b>＝文件未明确或本人材料存疑，须向人事处书面问询。
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sechead"><span class="idx">02</span><h2>文件未明确的 6 项（必须书面问询）</h2></div>
+    <p class="secdesc">以下问题在《管理办法》《补充规定》及本年度通知中均无答案，本表不作推定。</p>
+    <div class="rule"></div>
+    <div class="todo-grid" id="todos"></div>
+    <div class="note">
+      <div class="nt">问询建议</div>
+      一次性把 6 个问题写成邮件或书面清单发给职称评审办公室（39265028），要求口头＋书面答复并留存。转评属于"少数情形"，经办人对口径的理解可能存在差异，书面留痕是为了在资格初审（11.19—11.22）被卡住时有据可依。
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <b>副高级职称转评 · 条件核查表</b><br>
+      依据《大连财经学院职称评审管理办法（试行）》（大财院发〔2023〕10 号）第十五、十六条及《关于对职称评审管理办法的补充规定》（2025.11.27）编制。
+    </div>
+    <div style="text-align:right">
+      本表为自查工具，<b>不具文件效力</b>；<br>
+      以学校正式文件及人事处解释为准。
+    </div>
+  </div>
+</footer>
+
+<script>
+const G = [
+{
+  g:'A 组 · 身份与适用路径', d:'决定"能不能走转评这条路"，不满足则后续条件无意义', items:[
+  {req:'现聘岗位为专任教师岗',
+   det:'转评的对象是"专任教师系列职称"，申报人须<b>现聘用在专任教师岗位</b>。若现聘管理岗但持有专任教师职称，适用第十五条第（三）款另一通道，不走本表。',
+   bas:'第十五条（一）（三）'},
+  {req:'原职称为非专任教师系列',
+   det:'如工程技术、经济、会计、统计、卫生、出版等系列。若原职称已是高校教师系列，<b>无需转评</b>，直接按正常晋升申报。判定要点：看职称证书上的<b>系列名称</b>，不看聘任岗位。',
+   bas:'第十五条（一）'},
+  {req:'职称在《国家职业资格目录》范围内',
+   det:'须属于人社部公布的<b>最新版《国家职业资格目录》</b>。判定标准：能在目录中查到对应职业资格名称；<span class="k r">不通过</span>行业证书、培训证书、协会证书、单位内部聘任文件。',
+   bas:'补充规定 第一项(1)'},
+  {req:'不得跨岗位系列参评',
+   det:'其他系列专业技术人员须按<b>工作岗位</b>参加相应系列评审，<b>不得跨岗位系列参评</b>。判定：申报系列须与现聘岗位一致，转评正是为了消除这种不一致。',
+   bas:'第十四条'},
+  {req:'职称取得时间与来校时间的组合合规',
+   det:'仅两种组合可转评：①截止日<b>前</b>来校 + 截止日<b>前</b>取证；②截止日<b>后</b>来校 + 来校<b>前</b>取证。其余组合（见 J 组）一律不能转评。',
+   bas:'补充规定 第一、二、三项', flag:'key'}
+]},
+
+{
+  g:'B 组 · 学历与资历', d:'转评是"同级平移"，资历要求与晋升不同，注意区分', items:[
+  {req:'学历（学位）门槛',
+   det:'具备<b>大学本科及以上学历</b>，或<b>学士及以上学位</b>。判定：以毕业证／学位证为准；国外学历须有教育部留学服务中心认证。副教授任职条件中的学历要求对转评同样适用。',
+   bas:'附件1 第二十一条(一)'},
+  {req:'原职称层级须为副高级',
+   det:'转评是<b>同级</b>转换，原职称层级必须与拟转评层级<b>相同</b>。持中级职称者不能"转评副教授"，只能转评讲师。情形 B 另明确要求"层次和级别应与拟转评的层次和级别相同"。',
+   bas:'第十五条（一）；补充规定 第二项(2)'},
+  {req:'在校从事教学科研工作满 1 年',
+   det:'<b>满 1 年</b>为硬门槛，按实际到岗从事教学科研工作起算。判定：以劳动合同／聘任文件起始日＋实际承担教学任务为准；仅挂岗未授课的不计入。',
+   bas:'第十五条（一）；补充规定 第一项(3)、第二项(3)', flag:'key'},
+  {req:'"任讲师满 5 年"是否适用',
+   det:'副教授任职条件原文为"担任讲师职务满 5 年"。转评人员无讲师职称，该条应理解为由<b>"同级原任职时间连续累计计算"</b>替代。文件未逐条豁免，属理解性适用。',
+   bas:'第十五条（一）"连续累计计算"', flag:'pen'},
+  {req:'原任职年限连续计算',
+   det:'转评成功后，<b>同级原任职时间连续（累计）计算</b>，不因转评而清零。判定：转评当年即可用于计算申报正高的"任副高满 5 年"。',
+   bas:'第十五条（一）；第十六条（二）'},
+  {req:'年龄与退休状态',
+   det:'截止之日已办理退休手续，或已达到国家规定退休年龄的人员，<b>不得申报</b>。判定：以截止日当天的法定退休年龄为准。',
+   bas:'第十九条（三）'}
+]},
+
+{
+  g:'C 组 · 教学工作', d:'转评人员在校时间短，教学类指标最易"数据不足"', items:[
+  {req:'在教育教学一线任教',
+   det:'须<b>实际承担教育教学工作任务</b>，并按要求履行教师岗位职责和义务。仅有聘任文件、无授课记录的不满足。',
+   bas:'附件1 第五条'},
+  {req:'学年平均完成额定教学工作量',
+   det:'任现职期间<b>学年平均完成额定教学工作量</b>并达到考核要求。判定：以教务处教学工作量统计为准；<span class="k g">注意</span>在校不足整学年者如何折算"学年平均"，文件未明确。',
+   bas:'附件1 第五条'},
+  {req:'承担主讲工作（课程类型）',
+   det:'须承担<b>公共课、基础课或专业课的主讲工作</b>，而非仅辅导、答疑、批改作业。判定：以教学任务书／课表署名的"主讲"身份为准。',
+   bas:'附件1 第二十一/二十二条(二)'},
+  {req:'教学质量综合评议达标（分类型）',
+   det:'<b>教学科研型</b>：不低于<b>良好</b>标准；<b>教学为主型</b>：达到<b>优秀</b>标准。判定：以近三年学生评教、校院督导评教、领导与同行评教的综合结果为准。',
+   bas:'附件1 第二十一/二十二条(二)', flag:'key'},
+  {req:'年均授课学时（仅教学为主型）',
+   det:'<b>教学为主型</b>须年均授课学时<b>不少于 180 学时</b>，且年均教学工作量达到年额定教学工作量。教学科研型无此条。',
+   bas:'附件1 第二十二条(二)'},
+  {req:'思想政治教育融入教学',
+   det:'须"将思想政治教育较好融入教学过程，在学生培养工作中做出较大贡献"。判定：属评议性条款，由学科评议组结合课程思政材料评价，无量化标准。',
+   bas:'附件1 第二十一/二十二条(二)'}
+]},
+
+{
+  g:'D 组 · 业绩成果（核心门槛）', d:'转评同样要过"7 选 4"，这是转评最重的负担', items:[
+  {req:'业绩成果满足"7 选 4"（教学科研型）',
+   det:'任现职以来，下列 <b>7 项中满足任意 4 项</b>：<ol><li>第一作者／通讯作者，<b>二级 B 以上刊物 3 篇以上</b>，或二级 A 以上 2 篇以上；</li><li>独著或第一作者专著，或校级立项教材、省级以上规划教材 1 部（社科 ≥10 万字／理工 ≥5 万字）；</li><li>主持完成省级以上纵向项目 1 项，或省级以上教改课题 1 项，或<b>校级教改课题 2 项</b>；</li><li>主要参与者（排名前 3）获省级以上教学／科研奖项；</li><li>本人教学类竞赛省级二等奖以上或市级一等奖；专业竞赛省级二等奖以上、国家级三等奖以上；或指导学生获省级二等奖以上；</li><li>科技开发、成果转化取得较显著经济与社会效益；</li><li>主持纵向／横向课题，<b>每年到账经费 2 万元以上</b>（自 2026 年起算）。</li></ol>',
+   bas:'附件1 第二十一条(三)＋2025.10.22 修改通知', flag:'key'},
+  {req:'业绩成果满足"7 选 4"（教学为主型）',
+   det:'任现职以来，下列 <b>7 项中满足任意 4 项</b>：<ol><li><b>教研</b>代表作：二级 B 以上 2 篇以上，或二级 A 以上 1 篇以上；</li><li>二级 B 以上本专业论文 1 篇以上，或专著／教材 1 部（字数同上）；</li><li>主持完成<b>省级以上教育教学改革研究项目</b>；</li><li>主要参与者（前 3）获省级以上教学类重要奖项；</li><li>教学竞赛或指导学生获奖（同教学科研型第 5 项）；</li><li><b>校级以上教学名师</b>；</li><li>主持课题，每年到账经费 2 万元以上。</li></ol>',
+   bas:'附件1 第二十二条(三)＋2025.10.22 修改通知', flag:'key'},
+  {req:'业绩门槛口径已更新（勿按旧版）',
+   det:'2023 年原文为"6 选 3"，2025.10.22《关于教师（含思政教师）系列职称评价基本标准条件修改的通知》改为<b>"7 选 4"</b>，<b>自 2026 年评审起施行</b>。判定：按 4 项准备，按 3 项准备必然不达标。',
+   bas:'2025.10.22 修改通知', flag:'key'},
+  {req:'参与量化赋分排序',
+   det:'评审方式为"参照《量化赋分细则》打分"，按分数排序推荐。判定：转评人员同样参与赋分；综合类中的教师服务、教学工作量等项对在校时间短者天然不利，需以科研、教学获奖补足。',
+   bas:'第十三条（一）'},
+  {req:'门槛表按副高子表填报',
+   det:'附件 8《高级职称申报门槛表》须选<b>教师系列—副高级—对应类型</b>子表，且<b>只填达到最低要求的项数</b>，无需超额填报。',
+   bas:'通知 各单位上报材料第 5 项'}
+]},
+
+{
+  g:'E 组 · 论文与科研', d:'论文的"级别"和"作者位次"是两个独立门槛', items:[
+  {req:'论文级别按校定口径换算',
+   det:'<b>特级期刊＝A2，二级 A＝B2，二级 B＝C2，三级＝C3</b>。判定：以《大连财经学院学术论文级别认定标准（暂行）》为唯一依据；<span class="k r">易错</span>直接用期刊"影响因子"或"CSSCI／北大核心"自行套级，与校定级别不等同。',
+   bas:'2024.5.31 补充说明 第一条', flag:'key'},
+  {req:'作者位次要求',
+   det:'论文赋分<b>只统计独立作者或第一作者</b>；任职条件表述为"第一作者（通讯作者）"。判定：第二作者及以后不计入门槛；通讯作者可计入，但需有明确标注。',
+   bas:'量化赋分细则 科研类；附件1 第二十一条(三)'},
+  {req:'成果须经科研处认定并入系统',
+   det:'科研成果须经<b>科研处审核认定并录入学校科研管理系统</b>，且研究范畴与申报专业领域<b>相同或相近</b>。判定：系统外的成果<b>不可作为评定依据</b>，即使有原件。',
+   bas:'通知 二(1)(2)；2024.5.31 补充说明 第二条', flag:'key'},
+  {req:'成果须为任现职期间取得且已结项',
+   det:'只认定<b>任现职期间</b>取得的成果；课题须<b>已结项</b>。判定：以结项证书／结题文件日期为准；在研项目不计入（在研仅可作为"主持项目"的过程性说明）。',
+   bas:'通知 二(2)(1)(3)'},
+  {req:'成果取得时间截止日',
+   det:'教科研成果与获奖证书的取得时间，<b>截止到材料填报的截止日</b>（本年度为 11.03）。判定：录用通知、清样、在线优先出版是否算"取得"，文件未明确，建议按"已正式刊出"从严掌握。',
+   bas:'通知 二(2)(6)'},
+  {req:'学会、协会项目降一级',
+   det:'<b>学会、协会主办的项目降一级</b>认定成果。判定：先确认主办单位性质，再按降级后的级别比对门槛，不能按原级别填报。',
+   bas:'通知 二(2)(5)'},
+  {req:'同一成果不重复计分',
+   det:'同一成果获不同级别奖项，<b>只填报最高级别且只认定一次</b>；同一年指导多组学生参加同一比赛，<b>只认定一项最高奖项</b>；同一成果只采纳第一次赋分分配结果。',
+   bas:'通知 二(2)(7)(8)；附件9 说明'},
+  {req:'代表性成果评价（最多 5 项）',
+   det:'申报中高级职称实行<b>代表性成果评价</b>：代表作可为论文、课题、著作、项目报告、技术报告、教学成果、标准规范、创作作品等，<b>最多不超过 5 项</b>，匿名送校内外同行专家评价。<b>同意票 1/2 以上</b>才具备参加学科组评审资格；超过 1/2 不同意则当年不能参加学科组评审。',
+   bas:'第二十条（六）', flag:'key'}
+]},
+
+{
+  g:'F 组 · 培训与继续教育', d:'这一组最容易与"组织员系列"的 56 学时混淆', items:[
+  {req:'新任教师岗前培训合格（情形 A）',
+   det:'参加我校组织的新任教师岗前培训<b>合格</b>，<b>或</b>取得教师资格证书——二者满足其一即可。判定：以培训结业证明或教师资格证为准。',
+   bas:'补充规定 第一项(4)'},
+  {req:'岗前培训合格 + 高校教师资格证（情形 B）',
+   det:'截止日后<b>来校</b>者，须岗前培训<b>合格</b><b>并</b>取得<b>高校</b>教师资格证书——<b>两项都要</b>，且必须是"高校"教师资格证。<span class="k r">易错</span>按情形 A 的"或"来准备情形 B，会直接卡在资格初审。',
+   bas:'补充规定 第二项(4)', flag:'key'},
+  {req:'继续教育学时（普通教师系列）',
+   det:'教师系列基本条件（第二章第四至十条）<b>未设继续教育学时条款</b>，转评亦无学时门槛。判定：<b>不需要</b>按 56 学时准备。<span class="k g">特别提示</span>"每年集中培训不少于 56 学时"出自<b>组织员系列</b>基本条件第五条，<b>不适用于教师系列</b>，不要混用。',
+   bas:'附件1 第二章（无此条）；对照附件4 第五条', flag:'pen'},
+  {req:'思政课教师系列的培训要求',
+   det:'若转评的是<b>思想政治理论课教师</b>系列，其基本条件另有"完成国家和省有关思政课教师规定的培训任务和其它继续教育任务"的要求，与普通教师系列不同。',
+   bas:'附件6（思政课教师）第七条'}
+]},
+
+{
+  g:'G 组 · 考核与师德', d:'一票否决项集中在这一组', items:[
+  {req:'申报当年及前一年无教学责任事故',
+   det:'在<b>申报职称的当年及前一年内</b>，未发生过经学校认定的<b>教学责任事故</b>。判定：以教务处认定文件为准，口头提醒不计。',
+   bas:'附件1 第九条'},
+  {req:'无学术不端行为',
+   det:'同期未发生经学校认定的<b>学术不端</b>行为。判定：以学校认定结论为准；查实者另有 3 年延迟申报的惩戒（见 J 组）。',
+   bas:'附件1 第九条'},
+  {req:'年度考核合格',
+   det:'申报当年及前一年<b>年度考核合格</b>（部分系列表述为"上一年度考核结果"）。判定：以人事处考核档案为准；基本合格及以下不满足。',
+   bas:'附件1 第九条；通知 三(三)'},
+  {req:'思想政治考核合格',
+   det:'由<b>各基层党总支（党支部）</b>对申报人作政治思想鉴定与考核，全面考核思想政治、职业道德、为人师表、团结协作、敬业精神、遵纪守法，<b>合格者方具备申报资格</b>。有异议者由党委教师工作部牵头会同多部门复议。',
+   bas:'第二十条（三）'},
+  {req:'师德师风（第一标准）',
+   det:'师德师风为首要要求和第一标准。经学校师德建设与监督委员会认定有<b>师德失范</b>行为的，<b>取消 3 年（含当年）</b>评审资格；已通过的取消资格，<b>名额不递补</b>。',
+   bas:'第十七条', flag:'key'}
+]},
+
+{
+  g:'H 组 · 申报材料与格式', d:'转评与其他申报人共用同一套材料，差异点在写法', items:[
+  {req:'评审类别填"同级转评"',
+   det:'附件 1《职称申报人员汇总表》"评审类别"列须填<b>同级转评</b>（其余选项：正常晋升、转升、破格、直接申报、其他）。<span class="k r">易错</span>填成"正常晋升"会按晋升口径审核，直接退回。',
+   bas:'附件1 表注；通知 四(1)', flag:'key'},
+  {req:'申报专业按现从事专业填报',
+   det:'须与<b>现从事教育教学工作</b>的学科专业一致，<b>不得填报本人学历教育阶段所学专业</b>；按附件 11《本科专业目录》（2026 年 4 月更新）填名称与代码。<span class="k g">注意</span>附件 1 表注仍写"2023 年 4 月更新"，以附件 11 为准。',
+   bas:'通知 三(3)；附件11', flag:'key'},
+  {req:'人事系统完成全字段填报',
+   det:'入口：官网主页底部 → 办事大厅 → 人事系统（账号密码或钉钉扫码）。覆盖基本情况、工作经历、获奖、考核结果、教师服务、科研课题／决策咨询／专利软著、著作论文、教学工作量、教改课题、教学业绩、培训学习等栏。',
+   bas:'通知 四(一)'},
+  {req:'支撑材料电子附件按备注上传',
+   det:'每个成果、获奖的填报处均带上传备注说明，须<b>严格按备注</b>上传对应附件；漏传等于该条无支撑，职能部门将"不通过"。',
+   bas:'通知 四(一)'},
+  {req:'五类原件报所在部门',
+   det:'（1）学历、学位证书；（2）<b>高校教师资格证书</b>；（3）<b>任现职职称证书</b>（即原非高校系列副高证书，转评核心证据）；（4）科研成果原件；（5）获奖证书。原件报所在部门审核，非直接交人事处。',
+   bas:'通知 四(一)1'},
+  {req:'附件 10 报评材料（含原职称证书）',
+   det:'由<b>本人</b>依据职能部门审核确认的准确数据制作；"学历资历"部分须含<b>专业技术资格证书</b>；提交<b>纸质 1 份 + PDF 电子版 1 份</b>；按目录次序<b>装订成册并填写页码</b>。',
+   bas:'通知 四(四)；附件10 目录'},
+  {req:'复印件形式要件',
+   det:'复印件有<b>涂抹、擦痕</b>，或无单位／主管部门<b>审验公章、审验人签字</b>的，<b>一律无效</b>。判定：逐页检查签章完整性。',
+   bas:'附件10 首页说明', flag:'key'},
+  {req:'汇总表份数与单位报送',
+   det:'附件 1、2、3、4、8、9 各<b>纸质 1 份 + 电子 1 份</b>，由单位统一报送；附件 9 只报<b>今年新增</b>情况。数据须与职能部门审核通过的数据<b>完全一致</b>。',
+   bas:'通知 四(四)1—6'},
+  {req:'《评定表》一式三份',
+   det:'《辽宁省专业技术资格评定表》由人事处统一在评审系统生成，<b>纸质一式三份</b>，各单位按通知时间领取并组织填写。',
+   bas:'通知 四(四)'},
+  {req:'档案袋分装（高级专任教师）',
+   det:'须分 3 袋：科研成果及科研获奖（附件 5）、教学业绩及教改课题（附件 6）、其他获奖（附件 7），封面用 A4 纸打印粘贴。<b>袋到人事处统一领取</b>。',
+   bas:'通知 四(二)3'}
+]},
+
+{
+  g:'I 组 · 程序与年度限制', d:'转评不是独立通道，它嵌在年度评审流程里', items:[
+  {req:'一个年度最多申报一次',
+   det:'职称评审<b>原则上每年进行 1 次</b>。判定：转评无独立次数上限，但受年度节奏约束，当年未通过须等下一年度。',
+   bas:'第十二条'},
+  {req:'岗位余额',
+   det:'评审按岗位设置进行，<b>原则上没有岗位余额的不组织</b>相关系列、级别的评审。判定：须先确认本系列副高岗位是否有余额；转评是否单列指标文件未明确。',
+   bas:'第十二条', flag:'pen'},
+  {req:'与正常晋升同窗口申报',
+   det:'本年度申报窗口 <b>2026.10.30 — 11.03</b>。通知的 11 个环节中<b>未单列转评</b>，其受理是否与正常晋升同期，须书面确认。',
+   bas:'通知 第 9 页时间安排表', flag:'pen'},
+  {req:'转评是申报正高的前置条件',
+   det:'<b>同级转评成与现聘岗位同系列的职称后，方可申报现岗位高一级职称</b>。判定：未完成转评者，本年度不能同时或随后申报正高。',
+   bas:'第十五条（一）；第十六条（二）', flag:'key'}
+]},
+
+{
+  g:'J 组 · 禁止性与惩戒情形', d:'命中任一条即为"不予受理"，不是"从严审核"', items:[
+  {req:'截止日后取得非高校系列职称',
+   det:'两种组合<b>不能转评</b>：①截止日<b>后</b>来校，且职称是来校<b>后</b>取得；②截止日<b>前</b>来校，但职称是截止日<b>后</b>取得。此类人员须参加学校统一职称评审，纳入统一考核评价管理。',
+   bas:'补充规定 第三项', flag:'key'},
+  {req:'行业职称证书不能作为转评依据',
+   det:'考取的、与现从事专业教育教学密切相关的<b>行业职称证书，仅作为能力素质的证明</b>，<b>不能作为学校职称转评聘的依据</b>。',
+   bas:'补充规定 第三项', flag:'key'},
+  {req:'职称不在目录内',
+   det:'不属于《国家职业资格目录》范围的，<b>不具备转评资格</b>，在资格初审环节即被判定不予受理。',
+   bas:'补充规定 第一项(1)'},
+  {req:'专业领域不相关',
+   det:'原职称涉及的专业研究领域须与现从事领域<b>相同、相近或相关</b>；跨度过大（如工程系列转汉语言文学）判为不相关。情形 B 还要求层次、级别与拟转评一致。',
+   bas:'补充规定 第一项(2)、第二项(2)', flag:'key'},
+  {req:'已退休或已达法定退休年龄',
+   det:'截止之日已办理退休手续或已达国家规定退休年龄的，<b>不得申报</b>。',
+   bas:'第十九条（三）'},
+  {req:'提供虚假材料 / 剽窃成果',
+   det:'经查实<b>撤销职称</b>，记入职称评审诚信档案库并纳入全国信用信息共享平台，<b>延迟申报 3 年</b>。',
+   bas:'第二十四条'},
+  {req:'单位未履行审核职责',
+   det:'申报人所在单位和相关职能部门未依法履行审核职责的，对直接负责的主管人员和其他直接责任人员<b>批评教育、责令补救</b>；情节严重的依规追责。',
+   bas:'第二十七条'}
+]}
+];
+
+const TODOS = [
+  {t:'"本次职称评审截止日"指哪一天', p:'补充规定通篇以"本次职称评审截止日"为时间标尺（决定你是情形 A 还是情形 B），但未定义具体日期。本年度并存两个口径：材料填报截止日 11.03 与各单位向学校推荐截止日。', a:'以 11.03 自查，并书面确认认定口径。'},
+  {t:'转评是否占用岗位余额、是否单列指标', p:'第十六条第（一）款的"职称重新确认"明确写了"指标单列"，第十五条、第十六条第（二）款的转评<b>没有这句话</b>。是否占用副高岗位余额、无余额时是否停报，未明确。', a:'向本单位确认副高岗位余额，并向人事处确认转评指标口径。'},
+  {t:'"任讲师满 5 年"对转评是否豁免', p:'副教授任职条件要求"担任讲师职务满 5 年"，转评人员无讲师职称。按"同级原任职时间连续累计计算"理解应豁免，但文件未逐条说明。', a:'书面确认：按原副高任职年限计算，还是需另有讲师聘任经历。'},
+  {t:'在校不足整学年时"学年平均教学工作量"如何折算', p:'"学年平均完成额定教学工作量"以学年为单位统计，而转评门槛只要求在校满 1 年，跨学年者可能凑不出完整学年数据。', a:'与教务处确认统计区间与折算规则，提前取得书面口径。'},
+  {t:'补充规定是否同样约束"校内转岗"人员', p:'补充规定第一条限定"来我校任教"，第四条限定"适用于专任教师"。校内由非教师岗转任专任教师者，是否同样须满足《目录》范围、岗前培训等条件，未明确。', a:'校内转岗人员须单独确认适用条款。'},
+  {t:'转评通过后当年能否申报正高', p:'第十五条明确"转评成后方可申报高一级"，但未说明转评当年即可申报，还是须满一个评审年度。', a:'按"次年起申报"准备，并确认是否存在当年连报通道。'}
+];
+
+/* ---------- 渲染表格 ---------- */
+(function(){
+  const tb = document.getElementById('tbody');
+  let html = '', idx = 0;
+  G.forEach(g=>{
+    html += `<tr class="grp"><td colspan="5"><span class="gn">${g.g}</span><span class="gd">${g.d}</span></td></tr>`;
+    g.items.forEach(it=>{
+      idx++;
+      const flag = it.flag === 'key' ? '<span class="k r">关键</span>'
+                 : it.flag === 'pen' ? '<span class="k g">待确认</span>' : '';
+      html += `<tr data-i="${idx}">
+        <td class="no">${String(idx).padStart(2,'0')}</td>
+        <td class="req">${it.req}</td>
+        <td class="det">${flag}${it.det}</td>
+        <td class="bas">${it.bas}</td>
+        <td class="res">
+          <button data-v="ok">符合</button><button data-v="no">不符合</button><button data-v="pen">待确认</button>
+        </td>
+      </tr>`;
+    });
+  });
+  tb.innerHTML = html;
+  document.getElementById('nLeft').textContent = idx;
+})();
+
+/* ---------- 三态判定 + 统计 ---------- */
+(function(){
+  const KEY = 'dlcj2026_zp_checks';
+  const rows = [...document.querySelectorAll('#tbody tr[data-i]')];
+  const total = rows.length;
+  let state = {};
+  try{ state = JSON.parse(localStorage.getItem(KEY) || '{}'); }catch(e){ state = {}; }
+
+  function paint(){
+    let ok=0,no=0,pen=0;
+    rows.forEach(r=>{
+      const i = r.dataset.i, v = state[i];
+      r.classList.remove('st-ok','st-no','st-pen');
+      r.querySelectorAll('.res button').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
+      if(v==='ok'){ok++;r.classList.add('st-ok');}
+      else if(v==='no'){no++;r.classList.add('st-no');}
+      else if(v==='pen'){pen++;r.classList.add('st-pen');}
+    });
+    document.getElementById('nOk').textContent = ok;
+    document.getElementById('nNo').textContent = no;
+    document.getElementById('nPen').textContent = pen;
+    document.getElementById('nLeft').textContent = total-ok-no-pen;
+    const p = n => (n/total*100).toFixed(2)+'%';
+    document.getElementById('barOk').style.width = p(ok);
+    document.getElementById('barNo').style.width = p(no);
+    document.getElementById('barPen').style.width = p(pen);
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  document.getElementById('tbody').addEventListener('click', e=>{
+    const b = e.target.closest('.res button');
+    if(!b) return;
+    const tr = b.closest('tr'), i = tr.dataset.i, v = b.dataset.v;
+    if(state[i] === v) delete state[i]; else state[i] = v;
+    paint();
+  });
+
+  document.getElementById('reset').addEventListener('click', ()=>{
+    state = {};
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    paint();
+  });
+
+  paint();
+})();
+
+/* ---------- 渲染待确认 ---------- */
+(function(){
+  document.getElementById('todos').innerHTML = TODOS.map(t=>`
+    <div class="todo">
+      <div class="th"><span class="q">待确认</span>${t.t}</div>
+      <p>${t.p}</p>
+      <div class="act"><b>建议动作：</b>${t.a}</div>
+    </div>`).join('');
+})();
+</script>
+</body>
+</html>

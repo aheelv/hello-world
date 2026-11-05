@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026年申报群通知 · 汇编</title>
+<style>
+  :root{
+    --brand:#2a6bb0; --brand-2:#1f4f86; --brand-soft:#eaf2fb;
+    --ink:#16263a; --ink-2:#41506a; --muted:#76859c;
+    --line:#e3e9f2; --line-2:#eef2f8;
+    --bg:#f4f7fb; --card:#fff; --shadow:0 6px 22px -14px rgba(15,28,46,.28);
+    --red:#c0392b; --red-soft:#fbecea; --gold:#a9772a; --gold-soft:#fbf3e2;
+    --green:#2e7d4f; --green-soft:#e9f5ee;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:15px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:0 18px 70px}
+  header.top{background:linear-gradient(135deg,#2a6bb0,#3a86c8);color:#fff;padding:30px 22px 24px;margin-bottom:22px}
+  header.top .inner{max-width:960px;margin:0 auto;padding:0 18px}
+  header.top h1{margin:0 0 8px;font-size:22px;letter-spacing:.5px}
+  header.top .sub{font-size:13px;opacity:.92}
+  header.top .tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+  header.top .tags span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+    padding:3px 10px;border-radius:20px;font-size:12px}
+
+  .meta{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;
+    box-shadow:var(--shadow);margin-bottom:20px;font-size:13.5px;color:var(--ink-2)}
+  .meta b{color:var(--ink)}
+
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;
+    box-shadow:var(--shadow);margin-bottom:22px}
+  nav.toc h2{margin:0 0 10px;font-size:14px;color:var(--brand-2);letter-spacing:1px}
+  nav.toc ol{margin:0;padding-left:20px;columns:2;column-gap:26px}
+  nav.toc li{margin:4px 0;break-inside:avoid}
+  nav.toc a{color:var(--brand);text-decoration:none;font-size:13.5px}
+  nav.toc a:hover{text-decoration:underline}
+
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:20px 22px 18px;margin-bottom:18px;scroll-margin-top:14px}
+  section>h2{margin:0 0 4px;font-size:18px;color:var(--ink);display:flex;align-items:center;gap:10px}
+  section>h2 .n{background:var(--brand);color:#fff;font-size:13px;font-weight:700;width:26px;height:26px;
+    border-radius:7px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  section .lead{color:var(--ink-2);font-size:13.5px;margin:2px 0 14px}
+
+  .msg{border:1px solid var(--line-2);border-left:3px solid var(--brand);background:#fbfdff;
+    border-radius:9px;padding:12px 15px;margin:12px 0;font-size:14px;white-space:pre-wrap;word-break:break-word}
+  .msg .who{display:inline-block;font-size:11.5px;font-weight:700;color:#fff;background:var(--brand);
+    padding:1px 8px;border-radius:5px;margin-bottom:8px}
+  .msg.at{background:#fff8eb;border-left-color:var(--gold)}
+  .msg.at .who{background:var(--gold)}
+
+  ol.tips{margin:8px 0;padding-left:22px}
+  ol.tips li{margin:7px 0}
+  ol.tips li b{color:var(--ink)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .box{border:1px solid var(--line-2);border-radius:10px;padding:13px 15px;background:#fbfcfe}
+  .box h3{margin:0 0 8px;font-size:14.5px;color:var(--brand-2)}
+  .box ul{margin:0;padding-left:18px}
+  .box li{margin:5px 0;font-size:13.5px}
+
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:20px;margin-right:6px}
+  .pill.red{background:var(--red-soft);color:var(--red)}
+  .pill.gold{background:var(--gold-soft);color:var(--gold)}
+  .pill.green{background:var(--green-soft);color:var(--green)}
+  .pill.blue{background:var(--brand-soft);color:var(--brand-2)}
+
+  .note{border:1px dashed #c9b27a;background:var(--gold-soft);border-radius:9px;padding:11px 14px;
+    font-size:13px;color:#6f5212;margin:12px 0}
+  .warn{border:1px solid #f0c9c2;background:var(--red-soft);border-radius:9px;padding:11px 14px;
+    font-size:13px;color:#8a2c20;margin:12px 0}
+  .warn b{color:#7d2318}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+  table.tbl th,table.tbl td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  table.tbl th{background:var(--brand-soft);color:var(--brand-2);font-weight:700}
+  table.tbl tr:nth-child(even) td{background:#fafcff}
+
+  footer{color:var(--muted);font-size:12px;text-align:center;margin-top:24px;line-height:1.8}
+  footer .disc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 16px;text-align:left;color:var(--ink-2)}
+
+  @media(max-width:680px){
+    nav.toc ol{columns:1}
+    .grid2{grid-template-columns:1fr}
+    section{padding:16px 15px 14px}
+    header.top h1{font-size:19px}
+  }
+  @media print{
+    body{background:#fff}
+    header.top{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .wrap{max-width:none}
+    section,nav.toc,.meta{box-shadow:none;break-inside:avoid}
+    .msg,.box,.note,.warn,.pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="inner">
+    <h1>2026 年职称申报群通知 · 汇编</h1>
+    <div class="sub">大连财经学院 2026 年职称评审 · 申报群聊天记录整理</div>
+    <div class="tags">
+      <span>汇编日期：2026-11-01</span>
+      <span>消息条数：8 条</span>
+      <span>来源：申报群 / 管理学院工作群</span>
+      <span>口径：以群通知原文为准</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="meta">
+    <b>说明：</b>本页将申报群中多条分散通知，按「总体安排 → 申报渠道 → 支撑材料 → 学院审核 → 填报注意 → 工作量 → 科研成果 → 错误处理 → 催办」重新归类，<b>所有原始表述均原样保留</b>（见各区块内的引用卡片）。群消息中的“周一 / 周二 / 周四”均按 <b>2026-11-01 为周日</b> 推算为绝对日期（见文末《日期对照表》）。凡通知未明确之处，请向学院联系人 / 人事处书面确认，勿自行臆测。
+  </div>
+
+  <nav class="toc">
+    <h2>目录</h2>
+    <ol>
+      <li><a href="#s1">文件发送与系统开启</a></li>
+      <li><a href="#s2">申报渠道与系统入口</a></li>
+      <li><a href="#s3">支撑材料原件清单与报送</a></li>
+      <li><a href="#s4">学院审核安排（按层级）</a></li>
+      <li><a href="#s5">填报注意事项（9 条）</a></li>
+      <li><a href="#s6">工作量填报指南</a></li>
+      <li><a href="#s7">高职称科研成果填报（7 条）</a></li>
+      <li><a href="#s8">系统数据抓取错误处理</a></li>
+      <li><a href="#s9">催办与提醒</a></li>
+      <li><a href="#s10">附录：日期对照与关键节点</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1 -->
+  <section id="s1">
+    <h2><span class="n">1</span>文件发送与系统开启</h2>
+    <div class="lead">主通知及附件已发群；第二类文件夹（职称文件）限管理学院老师查收；系统开启时间与退群要求。</div>
+    <div class="msg">
+<span class="who">群通知</span>现将《大连财经学院2026年职称评审工作安排的通知》及附件发给你们，职称申报系统将于10月30日上午8点准时开启。
+第二个文件夹文件（命名职称文件）仅供管理学院老师查收。
+请大家对照相关文件，不符合硬件要求的老师请于周二下班前退群。</div>
+    <div class="note">📌 <b>日期推算：</b>“周二下班前退群” = <b>2026-11-03（周二）下班前</b>。系统开启 = <b>2026-10-30（周五）08:00</b>。</div>
+    <div class="warn">⚠️ <b>权限提示：</b>“职称文件”文件夹（即项目内 <code>职称文件/</code> 目录，含管理办法、量化赋分细则、补充通知等）为<b>管理学院内部</b>查收范围，勿外传。</div>
+  </section>
+
+  <!-- 2 -->
+  <section id="s2">
+    <h2><span class="n">2</span>申报渠道与系统入口</h2>
+    <div class="lead">本次申报全程在人事系统完成，线下仅报送支撑材料原件；系统填报截止时间为 11 月 3 日晚。</div>
+    <div class="msg at">
+<span class="who">@所有人</span>各位老师：
+⚠️本次申报在人事系统中完成。系统填报截止时间11月3日（周二）晚。填写后请及时查收更改意见，及时更改，之前未认定的项目不用再填写了。
+（人事系统入口：大连财经学院官网主页底部，进入办事大厅，选择人事系统，进入后使用账号密码或钉钉扫码登录）。各项成果、获奖等需要在人事系统中上传的支撑材料，已在填报处进行了备注说明，申报人员需严格按照备注说明上传。支撑材料原件在规定时间内报送至所在部门进行审核。
+申报成果满足条件请看文件。
+学院审核时间：11月2日-11月5日。</div>
+    <div class="grid2">
+      <div class="box">
+        <h3>🖥 系统入口路径</h3>
+        <ul>
+          <li>大连财经学院官网 <b>主页底部</b></li>
+          <li>→ 进入<b>办事大厅</b></li>
+          <li>→ 选择<b>人事系统</b></li>
+          <li>→ 账号密码 或 <b>钉钉扫码</b>登录</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>⏰ 关键时间</h3>
+        <ul>
+          <li><b>开启：</b>10/30（周五）08:00</li>
+          <li><b>填报截止：</b>11/3（周二）晚（系统关闭）</li>
+          <li><b>学院审核：</b>11/2—11/5</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">📌 <b>填报纪律：</b>① 提交后务必<b>及时查收更改意见并修改</b>；② <b>之前未认定的项目不用再填写</b>；③ 支撑材料须按系统填报处的<b>备注说明</b>上传；④ 原件线下报送部门审核。</div>
+  </section>
+
+  <!-- 3 -->
+  <section id="s3">
+    <h2><span class="n">3</span>支撑材料原件清单与报送</h2>
+    <div class="lead">申报人须提交 5 类支撑材料原件（交学院联系人），档案袋自备、需装袋分类。</div>
+    <div class="msg at">
+<span class="who">@所有人</span>申报人员需提供的支撑材料原件包括：材料一定交到我手上。
+1.学历学位证书；
+2.高校教师资格证书；
+3.任现职职称证书；
+4.各种科研成果原件；
+5.各种获奖证书等。
+档案袋自备。
+填报过程中有问题请钉钉在线填表。</div>
+    <table class="tbl">
+      <thead><tr><th style="width:46px">序号</th><th>支撑材料原件</th><th>说明 / 注意</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>学历学位证书</td><td>原件报送至所在部门审核</td></tr>
+        <tr><td>2</td><td>高校教师资格证书</td><td>转评 / 重新确认人员为核心证据</td></tr>
+        <tr><td>3</td><td>任现职职称证书</td><td>即现任职称证书（含非本校评审的）</td></tr>
+        <tr><td>4</td><td>各种科研成果原件</td><td>论文 / 课题 / 著作等，须纸质版</td></tr>
+        <tr><td>5</td><td>各种获奖证书等</td><td>获奖类原件</td></tr>
+      </tbody>
+    </table>
+    <div class="warn">⚠️ <b>报送要求：</b>① 原件<b>“一定交到我手上”</b>（学院联系人）；② <b>档案袋自备</b>；③ 审核时<b>需装袋 / 装袋分类</b>；④ 高职称人员另需带 <b>纸质版附件 8《高职称申报门槛填报表》</b>（见第 4、5 节）。</div>
+  </section>
+
+  <!-- 4 -->
+  <section id="s4">
+    <h2><span class="n">4</span>学院审核安排（按层级）</h2>
+    <div class="lead">学院统一审核窗口为 11/2—11/5；初中级与高职称分时段、分要求送审原件。</div>
+    <div class="msg at">
+<span class="who">@所有人</span>[太阳]申报初中级的老师请抓紧完成填报后，周一3点前带着支撑材料原件来审核，需装袋。
+[太阳]申报高职称老师 请完成系统填报后，周二-周四下班前。带着支撑材料原件来审核，按照要求装袋分类。今年高职称的老师较多，请大家一定抓紧，来缕材料。（周一会发个接龙大家预约下审原件的时间）
+高职称老师带支撑材料原件来审核时，带一份纸质版的附件8-高职称申报门槛填报表。</div>
+    <table class="tbl">
+      <thead><tr><th>层级</th><th>送审时间</th><th>要求</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill blue">初中级</span></td><td><b>周一 15:00 前</b><br>（11/2 15:00 前）</td><td>完成系统填报后，带支撑材料<b>原件</b>来审核，<b>需装袋</b></td></tr>
+        <tr><td><span class="pill red">高职称</span></td><td><b>周二—周四下班前</b><br>（11/3—11/5 下班前）</td><td>完成系统填报后，带原件来审核，<b>装袋分类</b>；另带<b>纸质版附件 8</b>；周一发接龙预约审核时间</td></tr>
+      </tbody>
+    </table>
+    <div class="note">📌 <b>日期推算：</b>“周一”=11/2，“周二—周四”=11/3—11/5。学院审核总窗口 <b>11/2—11/5</b>，与消息一致。</div>
+    <div class="warn">⚠️ <b>重点：</b>“今年高职称的老师较多”，请高职称老师务必抓紧；审核原件时间通过<b>周一接龙</b>预约，注意群内接龙通知。</div>
+  </section>
+
+  <!-- 5 -->
+  <section id="s5">
+    <h2><span class="n">5</span>填报注意事项（9 条）</h2>
+    <div class="lead">结合去年高频问题整理的填报规范，涉及评审机关、现任职务、申报专业、评审类别、附件 8、特殊人员资格等。</div>
+    <div class="msg">
+<span class="who">群通知</span>各位老师：
+职称评审填报系统已开放填报，结合去年高频问题，现将填报注意事项提醒如下：
+1. 现职称评审机关：在我校评审取得的职称，评审机关填写辽宁省教育厅；非我校评审的职称，填写职称证书上的发证机关。
+2. 现任职务：专任教师请勿填写 "专职教师"；行政人员如实填写本人工作岗位。
+3. 申报专业：辅导员申报专业填写"辅导员"，组织员申报专业填写 "组织员"，实验技术人才申报专业填写 "实验技术"，教育管理系列申报专业填写 "教育管理研究"。
+4. 评审类别：申报初级职称选择【直接申报】；晋升高一级职称选择【正常晋升】；同级转评选择【同级转评】。
+5. 申报类型及专业请勿随意修改，修改后存在填报信息丢失风险，请在填报其他信息前，先行核对确认此项内容。
+6. 工作量填报：相对数百分比栏无法输入 % 符号，只需填写百分号前数字，例如 40%，直接录入 40。辅导员工作量按学期、次数填报班会名称。
+7. 附件 8 为今年新增表格，仅限申报高级职称教职工填写，依据系统内各职能部门审核信息填报。请在下方工作表中选择对应申报系列、级别，表格内仅填写作为申报门槛的项目；若任选条件满足多项，只需填报达到最低要求数量即可。例：条件为 7 选 4，本人符合 4 项及以上，仅填写 4 项，不要多填。
+8.明确两类人员申报资格：经学校批准，外出攻读博士学位并将档案迁入博士就读院校的教职员工、以及部队退役人员将相关档案存放退伍军人事务局的教职员工，均可参加本年度职称评审。
+未尽事宜，另行通知。</div>
+    <ol class="tips">
+      <li><b>现职称评审机关：</b>本校评审取得的填“辽宁省教育厅”；非本校评审的填证书上的发证机关。</li>
+      <li><b>现任职务：</b>专任教师<b>勿填“专职教师”</b>；行政人员如实填岗位。</li>
+      <li><b>申报专业：</b>辅导员→“辅导员”；组织员→“组织员”；实验技术→“实验技术”；教育管理→“教育管理研究”。</li>
+      <li><b>评审类别：</b>初级【直接申报】；晋升【正常晋升】；同级转评【同级转评】。</li>
+      <li><b>先定类型 / 专业：</b>申报类型及专业<b>勿随意修改</b>（修改有丢失风险），先核对确认再填其他。</li>
+      <li><b>工作量 % 输入：</b>百分比栏只填数字（如 40% 录“40”）；辅导员按学期 / 次数填班会名称。</li>
+      <li><b>附件 8（仅高职称）：</b>选对应系列 / 级别，<b>只填门槛项目</b>；“7 选 4”符合 4 项及以上也<b>仅填 4 项，勿多填</b>。</li>
+      <li><b>两类特殊资格：</b>① 经批准的在职读博（档案迁至就读院校）；② 退役军人（档案存退伍军人事务局）——均可参评。</li>
+      <li><b>未尽事宜：</b>另行通知。</li>
+    </ol>
+    <div class="warn">⚠️ <b>与转评相关：</b>第 4 条明确“同级转评选择【同级转评】”——此前全景路线图 6.6 节所讲转评人员，评审类别即填此项，<b>勿填“正常晋升”</b>（填错会被按晋升口径退回）。</div>
+  </section>
+
+  <!-- 6 -->
+  <section id="s6">
+    <h2><span class="n">6</span>工作量填报指南</h2>
+    <div class="lead">工作量填表在小群进行，按指南与汇总表填报；院部教秘汇总后于 11/4 前在线填报。</div>
+    <div class="msg at">
+<span class="who">@所有人</span>@所有人 工作量填写指南已发钉钉大小群。填表在小群，请在序号行开始填，其他请不要删除</div>
+    <div class="msg">
+<span class="who">各院部教秘老师</span>各院部教秘老师：
+根据 《大连财经学院关于2026年职称评审工作安排的通知》要求，现将《2026年度职称评审工作量填报指南》和《填报汇总表（教师系列职称工作量）2026》，发送给大家，请相关老师参照填报指南和汇总表进行填报，院部汇总后，将电子版11月4日前，在线填报，相关教师按照审核通过数据，进行填报，谢谢大家。</div>
+    <div class="grid2">
+      <div class="box">
+        <h3>📋 教师个人</h3>
+        <ul>
+          <li>指南已发钉钉大小群</li>
+          <li><b>填表在小群</b></li>
+          <li>从<b>序号行开始填</b></li>
+          <li>其他内容<b>请勿删除</b></li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>🗂 院部教秘</h3>
+        <ul>
+          <li>依据《工作量填报指南》+《汇总表》</li>
+          <li>院部汇总后，<b>11/4 前在线填报</b></li>
+          <li>教师按<b>审核通过数据</b>填报</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="s7">
+    <h2><span class="n">7</span>高职称科研成果填报注意事项（7 条）</h2>
+    <div class="lead">针对高职称申报人的科研成果录入规范；初中级“满足硬性条件即可，多写多错”。</div>
+    <div class="msg at">
+<span class="who">@所有人</span>@所有人 高职称老师填报科研成果部分，请注意以下事项：（初中级老师满足硬性条件即可，多写多错）
+1.学术论文的第二作者不予认定，请勿填入系统。
+2.纵向课题只认定除主持人外的前三参与人（例如，课题组共8人，只认排名前4），排名不满足要求请勿录入。
+3.横向课题只认定主持人，参与人请勿录入。
+4.科研项目、科研获奖的级别请填写省级、市级、校级等；论文、著作、专利软著、决策咨询等科研成果的等级请填写C1、C2、C3等，请勿随意填写。
+5.课题或成果的参与人，请在"是否独立完成"一栏选"否"。
+6.学术论文"出版单位"一栏，请按照纸质期刊中版权页中的"编辑出版"填写。
+7.所有论文、著作等各类科研成果的佐证材料必须上传纸质版扫描件，电子版成果不予认定。</div>
+    <ol class="tips">
+      <li><b>论文作者：</b>第二作者不予认定，<b>勿填入系统</b>。</li>
+      <li><b>纵向课题：</b>只认主持人外的<b>前三参与人</b>（课题组 8 人也只认前 4），不符勿录。</li>
+      <li><b>横向课题：</b>只认<b>主持人</b>，参与人勿录。</li>
+      <li><b>级别 / 等级填法：</b>项目、获奖填“省级 / 市级 / 校级”等；论文、著作、专利软著、决策咨询等填“C1 / C2 / C3”等，<b>勿随意填</b>。</li>
+      <li><b>参与人标识：</b>课题或成果参与人，在“是否独立完成”选<b>“否”</b>。</li>
+      <li><b>出版单位：</b>按纸质期刊版权页的“编辑出版”填写。</li>
+      <li><b>佐证材料：</b>论文、著作等须上传<b>纸质版扫描件</b>，<b>电子版成果不予认定</b>。</li>
+    </ol>
+    <div class="warn">⚠️ <b>初中级提示：</b>“满足硬性条件即可，多写多错”——初中级老师勿超额填报科研成果，以免出错。</div>
+  </section>
+
+  <!-- 8 -->
+  <section id="s8">
+    <h2><span class="n">8</span>系统数据抓取错误处理</h2>
+    <div class="lead">系统自动抓取字段（任现职职称 / 时间等）可能出错，通过在线表格上报，由人事处后台统一处理。</div>
+    <div class="msg">
+<span class="who">群通知</span>申报系统中存在任现职职称和任现职时间抓取错误以及其他抓取错误的情况，在线填写表格，后台人事处做统一处理。</div>
+    <div class="note">📌 发现抓取错误（任现职职称、任现职时间及其他字段）→ <b>在线填写表格上报</b>，由人事处在后台统一修正，申报人无需自行反复修改。</div>
+  </section>
+
+  <!-- 9 -->
+  <section id="s9">
+    <h2><span class="n">9</span>催办与提醒</h2>
+    <div class="lead">临近截止的紧急提醒：初中级次日送审，高职称须赶在系统关闭前完成。</div>
+    <div class="msg at">
+<span class="who">@所有人</span>@所有人 初中级老师还没提交系统的请抓紧，明天需带着材料来找我审核。高职称老师也请抓紧，周二晚系统会关闭。</div>
+    <div class="note">📌 <b>日期推算：</b>“明天”= 周一（11/2），即初中级送审日（与第 4 节一致）；“周二晚系统会关闭”= <b>11/3（周二）晚</b>，与第 2 节截止时间一致。</div>
+    <div class="warn">⚠️ <b>最后关口：</b>系统于 <b>11/3（周二）晚关闭</b>，高职称老师务必在此之前完成系统填报，并于 11/3—11/5 下班前送审原件。</div>
+  </section>
+
+  <!-- 10 -->
+  <section id="s10">
+    <h2><span class="n">10</span>附录：日期对照与关键节点</h2>
+    <div class="lead">群消息采用相对星期表述，下表按 2026-11-01（周日）统一换算为绝对日期。</div>
+    <table class="tbl">
+      <thead><tr><th style="width:120px">群内表述</th><th style="width:120px">绝对日期</th><th>对应事项</th></tr></thead>
+      <tbody>
+        <tr><td>10月30日上午8点</td><td>10/30（周五）</td><td>职称申报系统开启</td></tr>
+        <tr><td>周一 3点前</td><td>11/2（周一）15:00 前</td><td>初中级带原件送审（需装袋）</td></tr>
+        <tr><td>周一（接龙）</td><td>11/2（周一）</td><td>发接龙预约高职称审原件时间</td></tr>
+        <tr><td>周二下班前（退群）</td><td>11/3（周二）下班前</td><td>不符合硬件要求者退群</td></tr>
+        <tr><td>周二—周四下班前</td><td>11/3—11/5 下班前</td><td>高职称带原件送审（装袋分类 + 附件 8）</td></tr>
+        <tr><td>周二晚 / 系统关闭</td><td>11/3（周二）晚</td><td>系统填报截止、系统关闭</td></tr>
+        <tr><td>周四</td><td>11/5（周四）</td><td>学院审核窗口最后一天</td></tr>
+        <tr><td>11月4日前（在线填报）</td><td>11/4（周三）前</td><td>院部教秘汇总工作量在线填报</td></tr>
+        <tr><td>明天（送审）</td><td>11/2（周一）</td><td>初中级未提交者次日带材料审核</td></tr>
+      </tbody>
+    </table>
+    <div class="grid2">
+      <div class="box">
+        <h3>🔑 三条红线 / 硬要求</h3>
+        <ul>
+          <li><span class="pill red">截止</span>系统 11/3 晚关闭，逾期无法填报</li>
+          <li><span class="pill gold">原件</span>5 类支撑材料原件交到联系人手上、装袋</li>
+          <li><span class="pill blue">类别</span>评审类别填错（尤其转评填“正常晋升”）会被退回</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>📎 待向联系人 / 人事处确认</h3>
+        <ul>
+          <li>“不符合硬件要求”的具体判定标准（退群依据）</li>
+          <li>“周二晚”是否为精确到时刻的关闭点</li>
+          <li>高职称附件 8 纸质版的具体交送方式</li>
+          <li>接龙预约审核的具体入口与时间</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="disc">
+      <b>本页为群通知汇编工具，非官方文件。</b>所有内容均整理自申报群聊天记录，原始表述以群内发布为准；日期换算基于 2026-11-01 为周日。若有与《大连财经学院 2026 年职称评审工作安排的通知》及附件不一致之处，<b>以正式通知及人事处解释为准</b>。本页可打印 / 存为 PDF 备查。
+    </div>
+    <div style="margin-top:10px">汇编日期 2026-11-01 · 依据：申报群 8 条通知 · 配套：职称评审全景路线图、副高级职称转评条件核查表</div>
+  </footer>
+
+</div>
+</body>
+</html>
