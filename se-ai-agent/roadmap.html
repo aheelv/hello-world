@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统工程 × AI 智能体集成平台 — 研究路线图</title>
+<style>
+:root{
+  --blue:#2E5C8A; --blue2:#4A90D9; --blue-l:#EAF2FA;
+  --green:#27AE60; --green-l:#E8F7EF;
+  --orange:#E67E22; --orange-l:#FDF2E6;
+  --pink:#D4537E;  --pink-l:#FBEDF3;
+  --purple:#7F77DD; --purple-l:#EFEEFC;
+  --ink:#22303F; --ink2:#4C5A6A; --ink3:#7A8794;
+  --line:#E2E8EF; --bg:#F7F9FC; --card:#FFFFFF;
+  --shadow:0 1px 3px rgba(34,48,63,.06),0 8px 24px rgba(34,48,63,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Microsoft YaHei","微软雅黑","PingFang SC","Hiragino Sans GB",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{display:flex; max-width:1420px; margin:0 auto; gap:0;}
+
+/* ===== 侧边导航 ===== */
+nav{
+  width:246px; flex-shrink:0; background:#fff; border-right:1px solid var(--line);
+  height:100vh; position:sticky; top:0; overflow-y:auto; padding:26px 0 40px;
+}
+nav .brand{padding:0 22px 18px; border-bottom:1px solid var(--line); margin-bottom:14px;}
+nav .brand b{display:block; font-size:16px; color:var(--blue); letter-spacing:.5px;}
+nav .brand span{font-size:11.5px; color:var(--ink3); letter-spacing:.3px;}
+nav a{
+  display:flex; align-items:center; gap:9px; padding:9px 22px; color:var(--ink2);
+  text-decoration:none; font-size:13.5px; border-left:3px solid transparent; transition:.18s;
+}
+nav a:hover{background:var(--blue-l); color:var(--blue); border-left-color:var(--blue2);}
+nav a.sub{padding-left:40px; font-size:12.5px; color:var(--ink3);}
+nav .grp{padding:12px 22px 5px; font-size:11px; color:var(--ink3); letter-spacing:1.5px; font-weight:700;}
+
+main{flex:1; min-width:0; padding:0 44px 90px;}
+
+/* ===== 页头 ===== */
+header.hero{
+  background:linear-gradient(118deg,#2E5C8A 0%,#3D74A8 45%,#4A90D9 100%);
+  color:#fff; margin:0 -44px 40px; padding:52px 44px 44px; position:relative; overflow:hidden;
+}
+header.hero::after{
+  content:""; position:absolute; right:-70px; top:-70px; width:340px; height:340px;
+  border-radius:50%; background:rgba(255,255,255,.07);
+}
+header.hero::before{
+  content:""; position:absolute; right:90px; bottom:-110px; width:230px; height:230px;
+  border-radius:50%; background:rgba(255,255,255,.05);
+}
+header.hero .kicker{font-size:12.5px; letter-spacing:3px; opacity:.85; font-weight:600;}
+header.hero h1{font-size:31px; line-height:1.35; margin:12px 0 10px; font-weight:700; letter-spacing:.5px;}
+header.hero p{font-size:14.5px; opacity:.93; max-width:880px; line-height:1.85;}
+header.hero .meta{margin-top:22px; display:flex; gap:10px; flex-wrap:wrap;}
+header.hero .meta span{
+  background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.26);
+  padding:5px 13px; border-radius:20px; font-size:12px; backdrop-filter:blur(4px);
+}
+
+/* ===== 标题 ===== */
+h2.sec{
+  font-size:23px; color:var(--blue); font-weight:700; letter-spacing:.4px;
+  padding-bottom:11px; margin:58px 0 22px; border-bottom:2px solid var(--line);
+  display:flex; align-items:baseline; gap:13px;
+}
+h2.sec .no{
+  font-size:13px; background:var(--blue); color:#fff; width:30px; height:30px;
+  border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  flex-shrink:0; font-weight:700; position:relative; top:-2px;
+}
+h2.sec em{font-style:normal; font-size:13.5px; color:var(--ink3); font-weight:400; letter-spacing:0;}
+h3{font-size:17px; color:var(--ink); margin:32px 0 13px; font-weight:700; display:flex; align-items:center; gap:9px;}
+h3::before{content:""; width:4px; height:16px; background:var(--blue2); border-radius:2px;}
+h4{font-size:15px; color:var(--blue); margin:22px 0 9px; font-weight:700;}
+p{margin-bottom:13px; color:var(--ink2);}
+ul,ol{margin:0 0 14px 22px; color:var(--ink2);}
+li{margin-bottom:7px;}
+strong{color:var(--ink); font-weight:700;}
+code{
+  background:var(--blue-l); color:var(--blue); padding:1.5px 6px; border-radius:4px;
+  font-family:Consolas,"Courier New",monospace; font-size:13px;
+}
+
+/* ===== 卡片 ===== */
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  padding:22px 24px; margin:16px 0; box-shadow:var(--shadow);
+}
+.card.tight{padding:17px 20px;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+.grid4{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+@media(max-width:1150px){.grid2,.grid3,.grid4{grid-template-columns:1fr;} main{padding:0 24px 70px;} header.hero{margin:0 -24px 34px;padding:40px 24px 36px;}}
+
+/* ===== 提示框 ===== */
+.callout{border-left:4px solid;border-radius:0 8px 8px 0; padding:15px 19px; margin:17px 0; font-size:14px;}
+.callout p:last-child{margin-bottom:0;}
+.co-blue{background:var(--blue-l); border-color:var(--blue2);}
+.co-green{background:var(--green-l); border-color:var(--green);}
+.co-orange{background:var(--orange-l); border-color:var(--orange);}
+.co-pink{background:var(--pink-l); border-color:var(--pink);}
+.co-purple{background:var(--purple-l); border-color:var(--purple);}
+.callout b{display:block; margin-bottom:5px; font-size:14px;}
+
+/* ===== 表格 ===== */
+table{width:100%; border-collapse:collapse; margin:15px 0; font-size:13.5px; background:#fff;}
+th{
+  background:var(--blue); color:#fff; padding:11px 13px; text-align:left; font-weight:600;
+  font-size:13px; letter-spacing:.3px; border-right:1px solid rgba(255,255,255,.18);
+}
+th:last-child{border-right:none;}
+td{padding:10px 13px; border-bottom:1px solid var(--line); color:var(--ink2); vertical-align:top;}
+tbody tr:nth-child(even){background:#FAFCFE;}
+tbody tr:hover{background:var(--blue-l);}
+td b{color:var(--ink);}
+
+/* ===== 徽章 ===== */
+.tag{display:inline-block; padding:2px 9px; border-radius:11px; font-size:11.5px; font-weight:600; white-space:nowrap;}
+.t-blue{background:var(--blue-l); color:var(--blue);}
+.t-green{background:var(--green-l); color:var(--green);}
+.t-orange{background:var(--orange-l); color:var(--orange);}
+.t-pink{background:var(--pink-l); color:var(--pink);}
+.t-purple{background:var(--purple-l); color:var(--purple);}
+.t-gray{background:#EEF2F6; color:var(--ink3);}
+
+/* ===== 统计块 ===== */
+.stat{background:#fff; border:1px solid var(--line); border-radius:10px; padding:18px; text-align:center; box-shadow:var(--shadow);}
+.stat .n{font-size:29px; font-weight:700; line-height:1.15; letter-spacing:-.5px;}
+.stat .l{font-size:12.5px; color:var(--ink3); margin-top:6px; line-height:1.5;}
+.s-blue .n{color:var(--blue);} .s-green .n{color:var(--green);}
+.s-orange .n{color:var(--orange);} .s-pink .n{color:var(--pink);} .s-purple .n{color:var(--purple);}
+
+/* ===== 时间线 ===== */
+.tl{position:relative; padding-left:34px; margin-top:22px;}
+.tl::before{content:""; position:absolute; left:11px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg,var(--blue2),var(--purple));}
+.tl-item{position:relative; margin-bottom:26px;}
+.tl-item::before{
+  content:""; position:absolute; left:-28px; top:5px; width:13px; height:13px; border-radius:50%;
+  background:#fff; border:3px solid var(--blue2);
+}
+.tl-item.p2::before{border-color:var(--green);} .tl-item.p3::before{border-color:var(--orange);}
+.tl-item.p4::before{border-color:var(--pink);}
+.tl-box{border:1px solid var(--line); border-radius:10px; background:#fff; padding:19px 22px; box-shadow:var(--shadow);}
+.tl-hd{display:flex; align-items:center; gap:11px; flex-wrap:wrap; margin-bottom:9px;}
+.tl-hd b{font-size:16px; color:var(--ink);}
+.tl-body{font-size:13.8px; color:var(--ink2);}
+.tl-goals{margin-top:12px; padding-top:12px; border-top:1px dashed var(--line); font-size:13.3px;}
+.tl-goals div{margin-bottom:5px; color:var(--ink2);}
+
+/* ===== 阶段进度条 ===== */
+.bar{height:9px; background:#E8EDF3; border-radius:5px; overflow:hidden; margin:9px 0 4px;}
+.bar i{display:block; height:100%; border-radius:5px;}
+.bar-cap{display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink3);}
+
+/* ===== 学习路线 ===== */
+.track{background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-bottom:18px; box-shadow:var(--shadow);}
+.track-hd{padding:15px 21px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+.track-hd .lv{width:34px; height:34px; border-radius:9px; color:#fff; font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.track-hd b{font-size:15.5px; color:var(--ink);}
+.track-hd .when{margin-left:auto; font-size:12px; color:var(--ink3);}
+.track-bd{padding:0 21px 18px; font-size:13.6px; color:var(--ink2);}
+.track-bd .row{padding:11px 0; border-top:1px solid #F0F4F8;}
+.track-bd .row b{color:var(--blue); font-weight:600; display:block; margin-bottom:3px;}
+.res{list-style:none; margin-left:0;}
+.res li{padding-left:15px; position:relative; font-size:13.2px; margin-bottom:4px; color:var(--ink2);}
+.res li::before{content:"▸"; position:absolute; left:0; color:var(--blue2);}
+
+/* ===== 象限图 ===== */
+.quad{display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; margin:18px 0;}
+.quad div{background:#fff; padding:17px 19px; font-size:13.4px;}
+.quad div h5{font-size:14.5px; margin-bottom:7px; font-weight:700;}
+.quad div p{margin:0; font-size:13px; color:var(--ink2); line-height:1.7;}
+.q-hi{background:#FFF8F0 !important;} .q-hi h5{color:var(--orange);}
+.q-star{background:#F4FBF7 !important;} .q-star h5{color:var(--green);}
+.q-easy{background:#F7FAFD !important;} .q-easy h5{color:var(--blue);}
+.q-low{background:#FBF7FA !important;} .q-low h5{color:var(--ink3);}
+
+/* ===== SVG 图容器 ===== */
+.figure{background:#fff; border:1px solid var(--line); border-radius:10px; padding:20px; margin:20px 0; box-shadow:var(--shadow);}
+.figure .cap{font-size:12.8px; color:var(--ink3); margin-top:12px; text-align:center; line-height:1.7;}
+
+/* ===== 突破点卡片 ===== */
+.gap{background:#fff; border:1px solid var(--line); border-left:5px solid var(--purple); border-radius:0 10px 10px 0; padding:19px 22px; margin:15px 0; box-shadow:var(--shadow);}
+.gap-hd{display:flex; align-items:center; gap:10px; margin-bottom:9px; flex-wrap:wrap;}
+.gap-hd b{font-size:15.5px; color:var(--purple);}
+.gap p{font-size:13.6px; margin-bottom:8px;}
+.gap .why{background:var(--purple-l); border-radius:7px; padding:11px 14px; font-size:13.2px; color:#4A4390; margin:10px 0 0;}
+
+/* ===== 检查清单 ===== */
+.check{list-style:none; margin-left:0;}
+.check li{padding-left:27px; position:relative; margin-bottom:8px; font-size:13.7px;}
+.check li::before{
+  content:"□"; position:absolute; left:0; top:-1px; font-size:16px; color:var(--blue2); font-weight:700;
+}
+
+/* ===== 页脚 ===== */
+footer{
+  margin-top:64px; padding:26px 0 0; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--ink3); line-height:1.9;
+}
+footer b{color:var(--ink2);}
+.src{font-size:12.2px; color:var(--ink3); margin-top:6px;}
+@media print{
+  nav{display:none;} body{background:#fff;} main{padding:0;}
+  header.hero{margin:0 0 20px;} .card,.gap,.figure{break-inside:avoid; box-shadow:none;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav>
+  <div class="brand">
+    <b>研究路线图</b>
+    <span>SYSTEMS ENGINEERING × AI AGENTS</span>
+  </div>
+  <div class="grp">研究定位</div>
+  <a href="#s0">◆ 总览与战略判断</a>
+  <div class="grp">七大板块</div>
+  <a href="#s1">① 学术前景</a>
+  <a href="#s2">② 研究路线</a>
+  <a href="#s3">③ 知识学习路线</a>
+  <a href="#s4">④ 热门投稿领域</a>
+  <a href="#s5">⑤ 期刊与会议</a>
+  <a href="#s6">⑥ 可能的突破点</a>
+  <a href="#s7">⑦ 执行清单</a>
+  <div class="grp">工具与资源</div>
+  <a href="#s8" class="sub">▸ 核心工具链</a>
+  <a href="#s9" class="sub">▸ 参考文献与数据</a>
+</nav>
+
+<main>
+
+<header class="hero">
+  <div class="kicker">RESEARCH ROADMAP · 2026—2029</div>
+  <h1>系统工程 × AI 智能体集成平台<br>深度分析与可执行研究路线图</h1>
+  <p>
+    本路线图面向具有数学专业背景、软件工程硕士、20 年外企 IT 工程师／架构师／项目经理经验，现任民办高校副高级专任教师的研究者。
+    目标方向：<b>系统工程方法论与 AI 智能体集成平台的结合及其应用</b>。核心策略是——不与算法竞赛者争模型能力，
+    而是以"系统工程师"的身份，占据<em>结构、治理、验证、成本</em>这块目前最稀缺的地带。
+  </p>
+  <div class="meta">
+    <span>系统科学方法论底座</span>
+    <span>多智能体协同与编排</span>
+    <span>形式化验证与可信评估</span>
+    <span>数字孪生与闭环控制</span>
+    <span>教学科研一体化</span>
+  </div>
+</header>
+
+<!-- ============ S0 ============ -->
+<h2 class="sec" id="s0"><span class="no">◆</span>总览：一页看清全局 <em>Your Competitive Position</em></h2>
+
+<p>
+  先说结论。这个方向在 2026 年是<strong>"高热度、高门槛、低饱和度"</strong>的组合——也就是说，机会很多，但绝大多数竞争者并不具备你手上有、而他们没有的东西。
+  你真正的差异化优势不是"会用 AI"，而是<strong>20 年工程实践沉淀出的系统直觉 + 数学训练带来的形式化能力 + 教学场景的一手数据</strong>。这三样东西的组合，在目前的智能体研究生态中极其稀缺。
+</p>
+
+<div class="grid4">
+  <div class="stat s-blue">
+    <div class="n">41–87%</div>
+    <div class="l">主流开源多智能体系统的实测任务失败率（MAST，1,642 条轨迹标注）</div>
+  </div>
+  <div class="stat s-orange">
+    <div class="n">15×</div>
+    <div class="l">多智能体相对单次对话的 Token 放大倍数（Anthropic 官方口径）</div>
+  </div>
+  <div class="stat s-purple">
+    <div class="n">~23%</div>
+    <div class="l">失败源于"验证层失效"——检查跑了，却给出错误结论</div>
+  </div>
+  <div class="stat s-green">
+    <div class="n">&lt;18%</div>
+    <div class="l">真正只能由多智能体诱发的失败占比（放宽口径后的上限）</div>
+  </div>
+</div>
+<div class="src">
+  数据来源：MAST（Why Do Multi-Agent LLM Systems Fail?，arXiv:2503.13657）1,642 条执行轨迹、7 个主流框架、14 类失败模式、Cohen's κ=0.88；
+  Token 成本数据来自 Anthropic Engineering 官方博客；"<18%"为对该文批评意见的放宽估计（原文指出仅约 3% 强制要求多智能体存在）。
+</div>
+
+<h3>你的能力三角，与市场上三类研究者的错位</h3>
+
+<div class="figure">
+<svg viewBox="0 0 900 300" style="width:100%;height:auto">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2E5C8A"/><stop offset="1" stop-color="#4A90D9"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#27AE60"/><stop offset="1" stop-color="#7F77DD"/>
+    </linearGradient>
+  </defs>
+  <!-- 三方定位 -->
+  <g>
+    <rect x="30" y="35" width="230" height="105" rx="10" fill="#FDF2E6" stroke="#E67E22" stroke-width="1.5"/>
+    <text x="145" y="60" font-size="14.5" font-weight="bold" fill="#E67E22" text-anchor="middle">算法／模型型研究者</text>
+    <text x="45" y="82" font-size="12.5" fill="#7A8794">• 强项：模型训练、推理加速、基准刷分</text>
+    <text x="45" y="103" font-size="12.5" fill="#7A8794">• 典型产出：SOTA 指标、模型变体</text>
+    <text x="45" y="124" font-size="12.5" fill="#7A8794">• 你的相对优势：工程落地与系统约束</text>
+  </g>
+  <g>
+    <rect x="335" y="35" width="230" height="105" rx="10" fill="#EAF2FA" stroke="#4A90D9" stroke-width="1.5"/>
+    <text x="450" y="60" font-size="14.5" font-weight="bold" fill="#2E5C8A" text-anchor="middle">系统工程／架构型研究者</text>
+    <text x="350" y="82" font-size="12.5" fill="#7A8794">• 强项：结构、接口、治理、可观测性</text>
+    <text x="350" y="103" font-size="12.5" fill="#7A8794">• 典型产出：架构方法论、流程与规范</text>
+    <text x="350" y="124" font-size="12.5" fill="#7A8794">• 短板：常缺 AI 侧的量化评估能力</text>
+  </g>
+  <g>
+    <rect x="640" y="35" width="230" height="105" rx="10" fill="#EFEEFC" stroke="#7F77DD" stroke-width="1.5"/>
+    <text x="755" y="60" font-size="14.5" font-weight="bold" fill="#7F77DD" text-anchor="middle">应用／行业型研究者</text>
+    <text x="655" y="82" font-size="12.5" fill="#7A8794">• 强项：领域知识、数据与场景入口</text>
+    <text x="655" y="103" font-size="12.5" fill="#7A8794">• 典型产出：行业解决方案、落地案例</text>
+    <text x="655" y="124" font-size="12.5" fill="#7A8794">• 短板：方法学术语薄弱、难复现</text>
+  </g>
+  <!-- 三角重叠 -->
+  <g>
+    <circle cx="470" cy="215" r="62" fill="url(#g1)" opacity="0.88"/>
+    <circle cx="520" cy="215" r="62" fill="url(#g2)" opacity="0.80"/>
+    <circle cx="495" cy="240" r="62" fill="#D4537E" opacity="0.70"/>
+    <text x="495" y="228" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">你的</text>
+    <text x="495" y="246" font-size="11.5" fill="#fff" text-anchor="middle">能力三角</text>
+  </g>
+  <text x="145" y="180" font-size="12.5" fill="#4C5A6A" text-anchor="middle">补齐：评估方法、基准建设</text>
+  <text x="755" y="180" font-size="12.5" fill="#4C5A6A" text-anchor="middle">补齐：可复现方法论、形式化</text>
+  <text x="495" y="300" font-size="12.5" fill="#22303F" text-anchor="middle">
+    数学形式化能力 × 20年工程架构直觉 × 教学科研一手场景 = 结构性差异化
+  </text>
+</svg>
+<div class="cap">图 0　三类主流研究者的能力分布与你所在的重叠区域。真正的空白不在任何单一象限内，而在三者交集。</div>
+</div>
+
+<div class="callout co-blue">
+  <b>🎯 核心战略判断</b>
+  <p>
+    2026 年智能体研究的最大误区，是把"多智能体"当成"更强的智能"来卖。MAST 的 1,642 条轨迹数据给出了一个反冷水式的结论：
+    主流多智能体系统失败率高达 41%–86.7%，且失败原因中<strong>约 44% 属于系统设计问题、约 31% 属于智能体间失配</strong>，只有一小部分源于基座模型能力不足。
+    换句话说：<em>问题从"模型不够聪明"转移到了"系统没有被良好地工程化"</em>。
+  </p>
+  <p style="margin-top:8px">
+    这正是系统工程师的主场。你的切入角度应当是：<strong>把经典系统工程方法论（V 模型、需求追溯、FMECA、STPA、架构权衡、生命周期治理）系统性地迁移到 AI 智能体系统上</strong>，
+    并解决一个学界公认但至今没有好答案的问题：<em>如何在智能体系统中建立可追溯、可验证、可治理的工程结构</em>。
+  </p>
+</div>
+
+<div class="grid3">
+  <div class="card tight">
+    <span class="tag t-green">高优先级</span>
+    <h4 style="margin-top:9px;">主线 A：可信智能体系统方法论</h4>
+    <p style="font-size:13.3px;">需求—设计—验证的 V 模型在智能体系统中的重构形式；把"可追溯性"从文档要求变成机器可检查的运行时属性。学术性强，门槛高，评审喜欢。</p>
+  </div>
+  <div class="card tight">
+    <span class="tag t-blue">高优先级</span>
+    <h4 style="margin-top:9px;">主线 B：多智能体失败机理与轻量基准</h4>
+    <p style="font-size:13.3px;">针对中文/教育/管理这类中文域任务构建 MAS 失败分类与诊断基准。相比英文编码场景，中文域的多智能体失败图谱基本是空白。</p>
+  </div>
+  <div class="card tight">
+    <span class="tag t-orange">中长期</span>
+    <h4 style="margin-top:9px;">主线 C：智能体驱动的数字孪生闭环</h4>
+    <p style="font-size:13.3px;">以 Agent 作为孪生体的"数字侧车"实现闭环优化。你的运筹学背景可直接迁移为约束求解与调度策略，命中率最高的应用出口。</p>
+  </div>
+</div>
+
+<!-- ============ S1 ============ -->
+<h2 class="sec" id="s1"><span class="no">1</span>学术前景：现状、趋势与需求驱动 <em>State of the Art &amp; Why Now</em></h2>
+
+<h3>1.1 国外研究现状：从"堆智能体"到"治智能体"</h3>
+
+<p>
+  2024–2025 年，学界与工业界的主流叙事是"智能体越多，能力越强"。到 2025 年底至 2026 年，这个叙事被系统性证据推翻。几条关键线索构成了当前的研究图景：
+</p>
+
+<table>
+  <thead>
+    <tr><th style="width:150px;">关键进展</th><th style="width:130px;">来源</th><th>核心结论与含义</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>MAST 失败分类法</b></td>
+      <td>arXiv:2503.13657（后续版本进 NeurIPS 2026 Datasets &amp; Benchmarks）</td>
+      <td>基于 Grounded Theory 自下而上构建：6 名专家精读 150 条轨迹，迭代至无新失败类型；用 LLM-as-a-judge 扩标至 1,642 条，得到 <b>14 种失败模式 / 3 大类</b>。三大类占比：系统设计 ≈44%、智能体间失配 ≈31%、任务验证 ≈24%。<br><b>对系统工程的启示：失败主因是结构问题，不是模型问题。</b></td>
+    </tr>
+    <tr>
+      <td><b>工业界架构收敛</b></td>
+      <td>Anthropic / Cognition / OpenAI / LangChain / Microsoft</td>
+      <td>2026 年主流架构收敛为 <b>"编排者 + 隔离子智能体"（orchestrator + ephemeral subagents）</b>：单一编排者持有完整上下文，子智能体在独立新鲜上下文中执行并只回传压缩摘要。Cognition 从 2025 年 6 月的"不要建多智能体"到 2026 年 3 月发布 "Devin can Manage Devins"，是行业立场的实质性反转。<br><b>对系统工程的启示：已有关于"如何编排"的经验积累，但缺乏形式化的结构理论与权衡方法。</b></td>
+    </tr>
+    <tr>
+      <td><b>成本可量化性</b></td>
+      <td>Anthropic Engineering</td>
+      <td>智能体约为普通对话的 <b>4× Token</b>，多智能体约 <b>15×</b>；某研究报告 Token 用量解释了约 80% 的性能方差。<br><b>对系统工程的启示：成本已成为一等设计约束，而多数论文仍以"准确率"单指标汇报——这是现成的批评点与改进空间。</b></td>
+    </tr>
+    <tr>
+      <td><b>委托网络的不可能性结论</b></td>
+      <td>MIT（Simchi-Levi 等）</td>
+      <td>"在没有新外部信号的前提下，任何委托型无环网络在决策论意义上都不优于集中式贝叶斯决策者。"<br><b>这是一条极强的理论锚点，为"何时不该用多智能体"提供了可引用的上界论证。</b></td>
+    </tr>
+    <tr>
+      <td><b>协议层标准化</b></td>
+      <td>MCP（Model Context Protocol）</td>
+      <td>已成为智能体接入本地文件、数据库与 SaaS 的事实标准，被形容为"AI 领域的 USB-C"。到 2026 年 2 月 10 日，业界在 MCP 与 MAS 上的整合基本完成。<br><b>对系统工程的启示：接口层标准化后，真正的差异化转移到系统结构层——这恰好是系统工程的地盘。</b></td>
+    </tr>
+    <tr>
+      <td><b>数字孪生 + 智能体</b></td>
+      <td>Future Internet 2026, 18(10), 501（结构化综述）</td>
+      <td>综述明确指出：集成智能体与数字孪生在<b>自主性、网络安全、问责、隐私、目标错配</b>上带来治理挑战，且"自主度是情境依赖的——后果越高、越不可逆的决策，需要越强的授权、验证、监控与干预机制"。<br><b>这是与你研究方向最贴合的综述级证据。</b></td>
+    </tr>
+    <tr>
+      <td><b>工业合规倒逼</b></td>
+      <td>IEEE Std（自主与半自主系统失效安全设计，2024）；西门子能源 2026 年初内部要求</td>
+      <td>关键基础设施中的工业 AI 决策必须<b>可验证、可审计、且最终由人掌握</b>。合规要求把经典系统工程实践（功能分解、故障模式分析、生命周期治理）直接嵌入 AI 系统架构。<br><b>这是本方向最刚性的需求驱动，也是你的最强论据来源。</b></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>1.2 趋势判断：五个正在收敛的研究前沿</h3>
+
+<div class="figure">
+<svg viewBox="0 0 900 340" style="width:100%;height:auto">
+  <!-- 时间轴 -->
+  <line x1="70" y1="300" x2="850" y2="300" stroke="#E2E8EF" stroke-width="2"/>
+  <polygon points="850,300 838,294 838,306" fill="#E2E8EF"/>
+  <text x="70" y="322" font-size="11.5" fill="#7A8794">2023</text>
+  <text x="255" y="322" font-size="11.5" fill="#7A8794">2024</text>
+  <text x="440" y="322" font-size="11.5" fill="#7A8794">2025</text>
+  <text x="625" y="322" font-size="11.5" fill="#7A8794">2026</text>
+  <text x="800" y="322" font-size="11.5" fill="#7A8794">2027 →</text>
+
+  <g>
+    <rect x="86" y="255" width="150" height="36" rx="7" fill="#EEF2F6" stroke="#CBD5E0"/>
+    <text x="161" y="277" font-size="12" fill="#4C5A6A" text-anchor="middle">应用概念验证期</text>
+  </g>
+  <g>
+    <rect x="240" y="255" width="150" height="36" rx="7" fill="#EAF2FA" stroke="#4A90D9"/>
+    <text x="315" y="277" font-size="12" fill="#2E5C8A" text-anchor="middle">架构范式探索期</text>
+  </g>
+  <g>
+    <rect x="400" y="255" width="150" height="36" rx="7" fill="#E8F7EF" stroke="#27AE60"/>
+    <text x="475" y="277" font-size="12" fill="#27AE60" text-anchor="middle">失败分析期</text>
+  </g>
+  <g>
+    <rect x="560" y="255" width="150" height="36" rx="7" fill="#EFEEFC" stroke="#7F77DD"/>
+    <text x="635" y="277" font-size="12" fill="#7F77DD" text-anchor="middle">结构与治理期</text>
+  </g>
+  <g>
+    <rect x="700" y="255" width="140" height="36" rx="7" fill="#FBEDF3" stroke="#D4537E"/>
+    <text x="770" y="277" font-size="12" fill="#D4537E" text-anchor="middle">形式化与验证</text>
+  </g>
+
+  <!-- 五条前沿曲线 -->
+  <path d="M100,235 C 220,215 260,180 340,165 S 520,110 660,80 S 790,52 845,44" fill="none" stroke="#4A90D9" stroke-width="2.5"/>
+  <circle cx="845" cy="44" r="4" fill="#4A90D9"/>
+  <text x="700" y="34" font-size="12.5" font-weight="bold" fill="#2E5C8A">① 结构化编排与图工程</text>
+
+  <path d="M100,180 C 240,175 320,155 400,142 S 560,118 690,100 S 800,90 845,86" fill="none" stroke="#27AE60" stroke-width="2.5"/>
+  <circle cx="845" cy="86" r="4" fill="#27AE60"/>
+  <text x="676" y="124" font-size="12.5" font-weight="bold" fill="#27AE60">② 可信评估与验证层</text>
+
+  <path d="M100,150 C 250,148 330,140 410,134 S 580,126 700,118 S 810,114 845,112" fill="none" stroke="#E67E22" stroke-width="2.5"/>
+  <circle cx="845" cy="112" r="4" fill="#E67E22"/>
+  <text x="676" y="150" font-size="12.5" font-weight="bold" fill="#E67E22">③ 成本感知的架构决策</text>
+
+  <path d="M100,205 C 230,190 300,168 380,150 S 530,128 650,112" fill="none" stroke="#7F77DD" stroke-width="2.5" stroke-dasharray="5,4"/>
+  <circle cx="650" cy="112" r="4" fill="#7F77DD"/>
+  <text x="466" y="192" font-size="12.5" font-weight="bold" fill="#7F77DD">④ 智能体 × 数字孪生闭环</text>
+
+  <path d="M100,90 C 250,92 340,100 420,110 S 600,130 720,142" fill="none" stroke="#D4537E" stroke-width="2.5" stroke-dasharray="5,4"/>
+  <circle cx="720" cy="142" r="4" fill="#D4537E"/>
+  <text x="600" y="166" font-size="12.5" font-weight="bold" fill="#D4537E">⑤ 治理、审计与人类在环</text>
+  <text x="600" y="184" font-size="11.5" fill="#7A8794">（监管驱动，持续升温）</text>
+</svg>
+<div class="cap">
+图 1　五项前沿的成熟度推演。实线为已获得实证支撑、论文产出正在增长的方向；虚线为尚处于早期、但正被监管与工业需求推向主流的方向——<b>你的切入机会在虚线，尤其在⑤与①的交叉处</b>。
+</div>
+</div>
+
+<h3>1.3 需求驱动因素：为什么现在做，而不是三年后</h3>
+
+<div class="grid2">
+  <div class="card">
+    <h4>① 合规与审计的刚性需求（最强驱动）</h4>
+    <p style="font-size:13.6px;">
+      关键基础设施与受监管行业已开始把"AI 决策可验证、可审计"写进内部强制要求（代表性案例：西门子能源 2026 年初的指令）。
+      IEEE 2024 年失效安全设计标准提供了形式框架（自治级别、人类审批检查点、紧急停机）。合规不是"以后再说"——它正在变成准入门槛。
+    </p>
+    <p style="font-size:13.6px; margin-bottom:0;"><b>对研究者的含义：</b>"治理"类研究有真实买单方，不会因为 AI 热潮退去而失去价值。</p>
+  </div>
+  <div class="card">
+    <h4>② 生产环境的多智能体可靠性危机</h4>
+    <p style="font-size:13.6px;">
+      LangChain《State of Agent Engineering》调研显示 57.3% 的受访者已有智能体在生产运行，另有 30.4% 正推进部署。但生产化程度与<em>测量能力</em>严重脱节。
+      MAST 的一个关键发现是：验证类失败在<strong>成功运行的样本中也高频出现</strong>——即"任务完成了，但校验器本身是坏的，绿色仪表盘不是验证有效的证据"。
+    </p>
+    <p style="font-size:13.6px; margin-bottom:0;"><b>对研究者的含义：</b>工业界急需能落地的评估与诊断方法，这是罕见的"学术问题 = 工程刚需"的红海之外的蓝海。</p>
+  </div>
+  <div class="card">
+    <h4>③ 成本迫使架构重新设计</h4>
+    <p style="font-size:13.6px;">
+      15× Token 放大使得"多智能体"从技术偏好变成财务决策。MIT 的不可能性结果给出了理论边界：委托型无环网络在无新外部信号时不优于集中式决策者。
+    </p>
+    <p style="font-size:13.6px; margin-bottom:0;"><b>对研究者的含义：</b>"什么时候用什么架构"需要从经验判断升级为可量化的决策理论——这是运筹学与系统工程的天然交叉口。</p>
+  </div>
+  <div class="card">
+    <h4>④ 中文域与垂直场景的评估空白</h4>
+    <p style="font-size:13.6px;">
+      现有基准与失败图谱几乎全部建立在英文编码、数学与通用助手任务上，取样框限于"协作式、多数串行、层级式"框架，未覆盖真并发、对抗性智能体、隐私分区等场景。国内教育、金融、政务、制造等场景<strong>缺乏对应基准</strong>。
+    </p>
+    <p style="font-size:13.6px; margin-bottom:0;"><b>对研究者的含义：</b>以民办高校教师身份即可获得教学场景的一手数据与实验平台，这是稀缺资源而非门槛。</p>
+  </div>
+</div>
+
+<div class="callout co-orange">
+  <b>⚠ 也要清醒看到风险</b>
+  <p>
+    第一，顶会（如 NeurIPS/ICLR/ACL）已挤满"多智能体 + 某基准"的工作，单纯刷 SOTA 无望；
+    第二，<b>《计算机集成制造系统》等国内核心期刊中"多智能体 + 调度优化"的文章已呈批量发表趋势</b>（2026 年各期可见多篇），这个组合已高度饱和；
+    第三，工业界主导的框架迭代速度远超学术出版周期，"跟进式研究"没有学术价值。
+  </p>
+  <p style="margin-top:8px"><b>结论：</b>你的论文必须落在<em>方法论与结构</em>层，而非<em>问题-算法组合</em>层。后者永远有人在做，前者没人抢。</p>
+</div>
+
+<!-- ============ S2 ============ -->
+<h2 class="sec" id="s2"><span class="no">2</span>研究路线：四阶段渐进路径 <em>Phased Roadmap &amp; Milestones</em></h2>
+
+<p>
+  整体节奏设计为 <strong>4 个阶段 / 36 个月</strong>，遵循"先复现、再度量、后建构、终反哺"的原则。
+  每一阶段都以可发表的成果与可申请的项目为出口，避免"读了两年论文没东西可写"的陷阱。
+</p>
+
+<div class="figure">
+<svg viewBox="0 0 900 190" style="width:100%;height:auto">
+  <text x="20" y="22" font-size="12.5" font-weight="bold" fill="#2E5C8A">36 个月总体时间轴</text>
+  <!-- 阶段条 -->
+  <g>
+    <rect x="20" y="35" width="192" height="46" rx="7" fill="#EAF2FA" stroke="#4A90D9" stroke-width="1.5"/>
+    <text x="116" y="54" font-size="12.5" font-weight="bold" fill="#2E5C8A" text-anchor="middle">阶段一 · 复现与建模</text>
+    <text x="116" y="71" font-size="11" fill="#4C5A6A" text-anchor="middle">M1–M8 ｜ 建立地基</text>
+  </g>
+  <g>
+    <rect x="222" y="35" width="192" height="46" rx="7" fill="#E8F7EF" stroke="#27AE60" stroke-width="1.5"/>
+    <text x="318" y="54" font-size="12.5" font-weight="bold" fill="#27AE60" text-anchor="middle">阶段二 · 度量与诊断</text>
+    <text x="318" y="71" font-size="11" fill="#4C5A6A" text-anchor="middle">M9–M18 ｜ 找到真问题</text>
+  </g>
+  <g>
+    <rect x="424" y="35" width="192" height="46" rx="7" fill="#FDF2E6" stroke="#E67E22" stroke-width="1.5"/>
+    <text x="520" y="54" font-size="12.5" font-weight="bold" fill="#E67E22" text-anchor="middle">阶段三 · 建构与验证</text>
+    <text x="520" y="71" font-size="11" fill="#4C5A6A" text-anchor="middle">M19–M28 ｜ 出原创方法</text>
+  </g>
+  <g>
+    <rect x="626" y="35" width="192" height="46" rx="7" fill="#FBEDF3" stroke="#D4537E" stroke-width="1.5"/>
+    <text x="722" y="54" font-size="12.5" font-weight="bold" fill="#D4537E" text-anchor="middle">阶段四 · 反哺与引领</text>
+    <text x="722" y="71" font-size="11" fill="#4C5A6A" text-anchor="middle">M29–M36 ｜ 立体系</text>
+  </g>
+  <!-- 成果泳道 -->
+  <text x="20" y="108" font-size="11.5" font-weight="bold" fill="#4C5A6A">阶段出口</text>
+  <line x1="90" y1="104" x2="840" y2="104" stroke="#E2E8EF"/>
+  <circle cx="116" cy="104" r="5" fill="#4A90D9"/>
+  <circle cx="318" cy="104" r="5" fill="#27AE60"/>
+  <circle cx="520" cy="104" r="5" fill="#E67E22"/>
+  <circle cx="722" cy="104" r="5" fill="#D4537E"/>
+  <text x="116" y="122" font-size="11" fill="#4C5A6A" text-anchor="middle">复现报告</text>
+  <text x="318" y="122" font-size="11" fill="#4C5A6A" text-anchor="middle">评测基准+短文</text>
+  <text x="520" y="122" font-size="11" fill="#4C5A6A" text-anchor="middle">方法论+高水平论文</text>
+  <text x="722" y="122" font-size="11" fill="#4C5A6A" text-anchor="middle">项目+专著+会议报告</text>
+  <!-- 能力增长曲线 -->
+  <text x="20" y="160" font-size="11.5" font-weight="bold" fill="#4C5A6A">独立科研能力</text>
+  <path d="M30,178 C 180,176 240,166 330,156 S 500,132 620,110 S 790,84 845,76" fill="none" stroke="#7F77DD" stroke-width="2.5"/>
+  <circle cx="845" cy="76" r="4" fill="#7F77DD"/>
+</svg>
+<div class="cap">图 2　四阶段路线。每阶段均有可交付成果作为"硬关口"，未达标不进入下一阶段。</div>
+</div>
+
+<div class="tl">
+
+  <!-- 阶段一 -->
+  <div class="tl-item">
+    <div class="tl-box">
+      <div class="tl-hd">
+        <b>阶段一 · 复现与建模：把"听说过"变成"跑过"</b>
+        <span class="tag t-blue">第 1–8 月</span>
+        <span class="tag t-gray">风险最低</span>
+      </div>
+      <div class="tl-body">
+        <p style="margin-bottom:10px">
+          目标不是创造新东西，而是建立<strong>第一手、不可替代的实验体感</strong>。你已经有 20 年工程经验，但对智能体系统需要"手感"——
+          比如：多智能体到底在哪里崩、崩的时候日志长什么样、15× Token 花在哪个环节。凡是本阶段亲自动手做过的，后续判断力会完全不同。
+        </p>
+        <ul style="margin-bottom:10px">
+          <li><b>任务 A1｜环境与基线</b>：搭建可复现的实验环境（本地可完全离线），跑通至少 2 个开源多智能体框架 + 1 条商业 API 链路；建立统一日志与追踪规范（借鉴 OpenTelemetry 思路）。</li>
+          <li><b>任务 A2｜失败复现</b>：在中文教育/管理类任务上复现 MAST 的主要失败模式（步骤重复 15.7%、不知终止条件 12.4%、推理—行动失配 13.2%、任务漂移 7.4%），验证其在非编码中文场景是否成立。</li>
+          <li><b>任务 A3｜领域建模</b>：选 1 个你真正懂的垂直场景（建议：高校教学管理 或 供应链/调度），用系统工程方法建立该场景智能体系统的<em>元模型</em>：智能体类型、接口契约、状态机、约束集合、失效模式清单。</li>
+        </ul>
+        <div class="bar"><i style="width:18%;background:#4A90D9"></i></div>
+        <div class="bar-cap"><span>论文复现精度</span><span>目标：MAST 三大类失败在中文域的分布复现，偏差 ±8%</span></div>
+        <div class="tl-goals">
+          <div><b>阶段关口：</b>一份 8–12 页的内部技术报告 + 一套开源的实验脚手架。没有这一步，后面全是空中楼阁。</div>
+          <div><b>可申请项目：</b>校级/省级教学科研项目起步（低成本、快节奏，为省级项目积累前期成果）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 阶段二 -->
+  <div class="tl-item p2">
+    <div class="tl-box">
+      <div class="tl-hd">
+        <b>阶段二 · 度量与诊断：做出第一个"别人可复用"的东西</b>
+        <span class="tag t-green">第 9–18 月</span>
+        <span class="tag t-green">性价比最高</span>
+      </div>
+      <div class="tl-body">
+        <p style="margin-bottom:10px">
+          这是<strong>整个路线中投入产出比最高的阶段</strong>。MAST 已经给了你分类法与数据集，你不需要重新发明；
+          你需要做的是<em>补上它没覆盖的那一半</em>：中文域、非串行协作、真并发与对抗性场景、以及"教学—科研"这类半结构化知识工作。
+          这是一个有明确"前人未做"证据链的空白。
+        </p>
+        <ul style="margin-bottom:10px">
+          <li><b>任务 B1｜中文域 MAS 失败分类（核心产出）</b>：以 500+ 条自采中文轨迹做二次归纳，检验 MAST 三类 14 模式是否成立、是否需增补新模式；用 Cohen's κ 报告标注一致性。</li>
+          <li><b>任务 B2｜成本—性能帕累托前沿</b>：在等 Token 预算下对比单智能体 / 编排者—子智能体 / 有界协作三架构，绘出帕累托前沿。这是对 15× 成本争议的实证裁决，具有很高引用价值。</li>
+          <li><b>任务 B3｜验证层失效的最小可复现实验</b>：构造"检查通过但结论错误"的反例集（可借鉴 MAST 的国际象棋程序案例思路），提出"校验器完备度"指标。</li>
+          <li><b>任务 B4｜教学场景试点</b>：把智能体平台用于你的三门课程（AI 工具应用实践 / AI 与创新设计 / 商务智能），采集真实教学流程中的失败案例——这是别人拿不到的数据。</li>
+        </ul>
+        <div class="bar"><i style="width:45%;background:#27AE60"></i></div>
+        <div class="bar-cap"><span>数据与基准完整度</span><span>目标：可公开的轨迹数据集 + 可复现评测脚本</span></div>
+        <div class="tl-goals">
+          <div><b>阶段关口：</b>① 提交一篇 Workshop 短文或中文核心期刊方法探讨（低门槛，先建立引用）；② 数据集在 GitHub/Zenodo 公开并有 DOI。</div>
+          <div><b>加分项：</b>把 MAST 标注管线在中文域校准后的 LLM-as-judge 版本开源——这本身就是一项被引用的工作。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 阶段三 -->
+  <div class="tl-item p3">
+    <div class="tl-box">
+      <div class="tl-hd">
+        <b>阶段三 · 建构与验证：产出原创方法论</b>
+        <span class="tag t-orange">第 19–28 月</span>
+        <span class="tag t-orange">学术增量最大</span>
+      </div>
+      <div class="tl-body">
+        <p style="margin-bottom:10px">
+          有了数据和基准，这一阶段要回答一个真正有分量的问题：<strong>如何把经典系统工程的结构约束引入智能体系统，使其获得可追溯、可验证、可治理的工程品质？</strong>
+          这是你 20 年工程经验最直接的变现空间，也是国内刊与国际刊都认的原创性。
+        </p>
+        <ul style="margin-bottom:10px">
+          <li><b>任务 C1｜智能体系统的"需求—验证"追溯模型</b>（主攻）：把 V 模型 / 需求追溯矩阵（RTM）迁移到智能体系统，提出机器可检查的<em>决策溯源图</em>（Decision Provenance Graph）：从用户目标 → 任务分解 → 工具调用 → 约束校验 → 最终输出的完整链路，每一跳可回放、可审计。参考来源中"决策溯源""provenance、versioning、replay、rollback"的系统自演化约束需求。</li>
+          <li><b>任务 C2｜智能体失效的 STPA / FMEA 分析</b>：用系统理论过程分析（STPA）做智能体系统的危害识别，扩展传统 STPA 的"控制环路"到"智能体—工具—环境"耦合环路，产出轻量级检查表。这在中文领域几乎无人做。</li>
+          <li><b>任务 C3｜约束求解与调度融合</b>（发挥运筹学优势）：把智能体的规划输出形式化为优化问题，在多智能体协同调度、资源分配、路径规划等场景中，用约束传播/整数规划/MPC 接管智能体在数值与硬约束上的决策权，让 LLM 负责意图理解与柔性部分，数学负责硬约束部分。这是<em>你独有的护城河</em>。</li>
+          <li><b>任务 C4｜形式化验证的可行切入点</b>：不必追求完全形式化。可做"关键不变量的运行时监控"——用断言/契约（contract）在运行时检查智能体的行为是否违反系统不变量（类比数据库的 invariant checking）。</li>
+        </ul>
+        <div class="bar"><i style="width:78%;background:#E67E22"></i></div>
+        <div class="bar-cap"><span>方法论完备度</span><span>目标：一套可被他人复用的形式化 + 案例验证</span></div>
+        <div class="tl-goals">
+          <div><b>阶段关口：</b>一篇方法论主论文，目标 IEEE 旗下 Q1/Q2 或 CCF-B 类期刊；配套开源框架/插件形成实质引用。</div>
+          <div><b>可申请项目：</b>教育部人文社科/省厅级项目、教育部产学合作协同育人项目（教学科研双属性是你的优势）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 阶段四 -->
+  <div class="tl-item p4">
+    <div class="tl-box">
+      <div class="tl-hd">
+        <b>阶段四 · 反哺与引领：从研究者到领域构建者</b>
+        <span class="tag t-pink">第 29–36 月</span>
+        <span class="tag t-purple">长期目标</span>
+      </div>
+      <div class="tl-body">
+        <p style="margin-bottom:10px">
+          这一阶段的标志不是又发了几篇论文，而是<strong>你的研究框架被他人当作"共同语言"使用</strong>。
+          高校教师的独特杠杆在于：能把研究前沿压缩成课程体系，培养出这个方向的学生——这本身就是学术影响力的复利。
+        </p>
+        <ul style="margin-bottom:10px">
+          <li><b>任务 D1｜课程体系化</b>：在《人工智能工具应用实践》增设"智能体系统工程"模块，把阶段一到三的成果转化为课程内容与实验项目，形成教学—科研闭环（这正是你现有教创赛的优势场景）。</li>
+          <li><b>任务 D2｜数字孪生 × 智能体闭环</b>：做一版可演示的闭环原型——以 Agent 为孪生体的"数字侧车"，通过博弈/协商算法做资源调度（如港口泊位、车间作业、算力分配）。选一个你有渠道的小规模真实场景做单案例验证。</li>
+          <li><b>任务 D3｜中文基准社区</b>：联合国内 2–3 所高校发起中文多智能体可靠性评测的联合评测（seed benchmark），争取成为基础设施提供方而非又一位使用者。</li>
+          <li><b>任务 D4｜专著与会议</b>：把四年成果凝练为一本中文学术专著或高教社教材；争取在国内系统科学/智能系统领域的重要会议（如下文推荐）做特邀报告。</li>
+        </ul>
+        <div class="bar"><i style="width:100%;background:#D4537E"></i></div>
+        <div class="bar-cap"><span>学术影响力</span><span>目标：核心领域被引 + 社区基准被采用 + 专著出版</span></div>
+        <div class="tl-goals">
+          <div><b>阶段关口：</b>形成"方法论 + 基准 + 课程 + 专著 + 联合评测"的完整体系，把研究方向从个人兴趣升级为学科议题。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callout co-green">
+  <b>✓ 阶段路线的三条设计原则</b>
+  <p><b>① 出口前置：</b>每个阶段都以"可交付物"为硬关口，而不是以"读完多少论文"为进度。阶段一产报告、阶段二产数据集、阶段三产方法论、阶段四产体系。</p>
+  <p style="margin-top:6px"><b>② 教学即研究：</b>你的三门课程是天然的实验床。教学场景的数据获取成本远低于企业合作，且"教学场景下的智能体可靠性"本身就是一个被忽视的子领域。</p>
+  <p style="margin-top:6px"><b>③ 错位竞争：</b>全程避开"多智能体 + 调度优化"这个已被填满的格子，转向"多智能体 + 工程治理 / 形式化验证 / 中文域基准"。你所有阶段的核心产出都落在结构层，不落在算法层。</p>
+</div>
+
+<!-- ============ S3 ============ -->
+<h2 class="sec" id="s3"><span class="no">3</span>预备知识学习路线图 <em>Learning Path, Prioritized</em></h2>
+
+<p>
+  以下按<strong>优先级 P0/P1/P2</strong> 与<strong>时间窗口</strong>排序。判断原则是"是否直接服务于你选定的研究主线"——凡不服务于主线的，一律降级或放弃。
+  你的优势在于已有的数学与工程基础，因此传统 CS 基础课可以快速掠过，重点在<em>新范式组件</em>与<em>方法论迁移</em>。
+</p>
+
+<div class="track">
+  <div class="track-hd" style="background:var(--purple-l);">
+    <div class="lv" style="background:#7F77DD;">P0</div>
+    <b>现代 AI 与智能体架构基础</b>
+    <span class="when">阶段一前 3 个月 · 每日 1.5–2h</span>
+  </div>
+  <div class="track-bd">
+    <div class="row">
+      <b>必须掌握的具体知识点</b>
+      Transformer 与注意力机制（不必推倒细节，但要能讲清注意力稀疏性与成本）· 预训练范式与推理时扩展（CoT / ToT / ReAct 范式演进）· 上下文工程与压缩策略 · 检索增强（RAG）的失效模式 · Agent 的感知—规划—行动—反思闭环 · ReAct / Reflexion / Plan-and-Execute 三类范式的差异与适用条件 · 工具调用与函数调用机制 · 记忆系统（短期/长期/情节记忆）· MCP 协议的作用边界与局限
+    </div>
+    <div class="row">
+      <b>关键学习资源（按性价比排序）</b>
+      <ul class="res">
+        <li><b>一手工程文献：</b>Anthropic Engineering 博客（多智能体研究系统、Managed Agents、Claude Code 架构说明）— 工业界唯一公开推理细节的一手材料，<em>必读</em>；Cognition 博客（"Don't Build Multi-Agents" 及 2026 年的反转文章）。</li>
+        <li><b>综述与教材：</b>《Artificial Intelligence: A Modern Approach》选读第 5、13、14 章（规划、约束满足、多智能体）用于快速对齐术语体系；Survey 论文按主题检索 arXiv cs.AI/cs.MA 的 multi-agent survey（每年均有更新版本）。</li>
+        <li><b>在线课程：</b>Stanford CS25（Transformers 时代课程）、DeepLearning.AI 的 LangGraph / Agentic AI 系列（工程视角，2–3 小时可入门）。</li>
+        <li><b>动手：</b>亲手实现一个不依赖框架的最小 Agent（约 200 行），把 ReAct 循环自己写一遍——这一步的价值无法被任何阅读替代。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="track">
+  <div class="track-hd" style="background:var(--blue-l);">
+    <div class="lv" style="background:#2E5C8A;">P0</div>
+    <b>系统工程方法论与形式化思维（你的差异化核心）</b>
+    <span class="when">阶段一起 · 贯穿全程</span>
+  </div>
+  <div class="track-bd">
+    <div class="row">
+      <b>必须掌握的具体知识点</b>
+      系统工程生命周期与 MBSE（模型驱动系统工程）· V 模型与需求追溯（RTM）· 需求工程与形式化需求（Hoare 三元组、时序逻辑入门）· 功能分解与架构权衡（ATAM 思想）· FMEA/FMECA 与失效模式传播 · <b>STPA（系统理论过程分析）——本方向最核心的分析工具</b>· 时空同步与时序一致性 · 架构模式与质量属性权衡 · 韧性（resilience）与安全（safety）工程 · 复杂系统与涌现性的度量
+    </div>
+    <div class="row">
+      <b>关键学习资源</b>
+      <ul class="res">
+        <li><b>STPA 必读：</b>Nancy Leveson 的 STPA 原始论文与《Engineering a Safer World》——直接对应你阶段三的主攻方向，是本路线最高回报的单一学习项。</li>
+        <li><b>MBSE：</b>INCOSE Systems Engineering Handbook（标准参考，可当字典查）；SysML v2 基础。</li>
+        <li><b>可信 AI 方法论：</b>NIST AI RMF（AI 风险管理框架）、ISO/IEC 42001（AI 管理体系标准）、IEEE 7000 系列（系统设计伦理）——治理类论文的引用基础。</li>
+        <li><b>安全关键领域：</b>IEEE Std 1012（系统验证确认）、失效安全自主系统标准（2024）——把"人类审批检查点""自治级别"写进你的方法论。</li>
+        <li><b>最高效路径：</b>结合你已有的运筹学背景，优先补 <b>控制论 / 系统动力学（SDM）</b> 与 <b>STPA</b>，这两者是把 AI 智能体纳入系统工程的直接理论桥梁。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="track">
+  <div class="track-hd" style="background:var(--green-l);">
+    <div class="lv" style="background:#27AE60;">P1</div>
+    <b>多智能体系统与协同理论（研究主战场）</b>
+    <span class="when">阶段一末 – 阶段二 · 持续加深</span>
+  </div>
+  <div class="track-bd">
+    <div class="row">
+      <b>必须掌握的具体知识点</b>
+      经典 MAS 四大分类（完全合作型/完全对抗型/混合型/完全异步型）· 通信拓扑类型（广播/共享黑板/点对点/全连接）· 任务分配机制（合同网、拍卖、CONSENSUS、市场机制）· 协商与博弈（合作博弈纳什均衡、重复博弈、机制设计）· 共识算法（尤其 Byzantine 容错 PBFT 类，用于解释"为什么集中式编排在理论上占优"）· 规划范式（集中式/分布式/分层）· 多智能体强化学习（MARL：独立学习者、CTDE 范式、信用分配问题）· 时序逻辑与 LLM 智能体结合的现状与边界
+    </div>
+    <div class="row">
+      <b>关键学习资源</b>
+      <ul class="res">
+        <li><b>现代经典（务必读原文）：</b>Wooldridge《Multi-Agent Systems: Algorithmic and Game-Theoretic Approach》——你的数学背景使这本书比多数 CS 研究者更容易吃透，<em>这是你的优势项，务必用起来</em>。</li>
+        <li><b>共识与容错：</b>Ong &amp; Cachin《Distributed Algorithms and Applications》相关章节 + PBFT 原论文。</li>
+        <li><b>机制设计与拍卖：</b>Myerson《Mechanism Design》选读（配合你已有的博弈论基础，可快速掌握）。</li>
+        <li><b>LLM-MAS 实证：</b>MAST（arXiv:2503.13657）及其批评性阅读（务必读 Austin ML Journal Club 那篇批评意见，它指出了 MAST 取样框的局限——这正是你的选题缝隙）；MultiAgentBench (MARBLE)、AgentRx、DRBench 三件套。</li>
+        <li><b>评审视角训练：</b>主动去读 3–5 篇你方向的高水平论文的 Review 意见（OpenReview 公开），学会判断"什么程度的贡献才被接受"。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="track">
+  <div class="track-hd" style="background:var(--orange-l);">
+    <div class="lv" style="background:#E67E22;">P1</div>
+    <b>分布式系统与 AI 基础设施工程（你的存量优势）</b>
+    <span class="when">阶段一 · 以补漏为主</span>
+  </div>
+  <div class="track-bd">
+    <div class="row">
+      <b>需要补齐 / 强化的知识点</b>
+      CAP 定理与一致性模型的现代变体（PACELC）· 共识算法在工程中的真实代价（Paxos/Raft 的工程复杂度）· 分布式追踪 OpenTelemetry 规范与其数据模型 <b>（重要：将直接用于你阶段一的实验脚手架与阶段三的溯源图）</b>· 事件溯源（Event Sourcing）与 CQRS——这两者与"决策溯源"思想直接同构，值得深挖 · 流处理（Flink/Kafka）· 向量数据库与检索基础设施 · 容器化与服务编排（K8s）· LLM 服务化：推理引擎、KV 缓存、批处理、限流降级 · 成本工程（FinOps for AI）：Token 预算管理、模型分级路由（小模型做门控、大模型做硬推理）
+    </div>
+    <div class="row">
+      <b>关键学习资源与说明</b>
+      <ul class="res">
+        <li><b>取舍声明：</b>你有 20 年工程经验，分布式系统只需<em>补 AI 特有的新问题</em>（成本、不确定性、概率性输出），不要重读 CAP 定理入门书。</li>
+        <li><b>最高回报单项：</b>深入理解 OpenTelemetry 的 trace/span 数据模型 → 这是把"智能体执行轨迹"变成"可审计工程制品"的现成技术底座，你的溯源图论文可以直接建立在它之上。</li>
+        <li><b>Event Sourcing 是隐藏机会：</b>智能体的决策溯源在结构上与事件溯源几乎同构，而"事件溯源用于 AI Agent 审计"目前几乎没有系统性工作，这是一个低调但新颖的切入点。</li>
+        <li><b>参考：</b>《Designing Data-Intensive Applications》第 6/7/8 章（可快速重温）、OpenTelemetry 官方文档、主流推理引擎（vLLM / SGLang）的架构说明。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="track">
+  <div class="track-hd" style="background:var(--pink-l);">
+    <div class="lv" style="background:#D4537E;">P2</div>
+    <b>数字孪生与优化方法（阶段四发力，运筹学背景直接变现）</b>
+    <span class="when">阶段三末 – 阶段四</span>
+  </div>
+  <div class="track-bd">
+    <div class="row">
+      <b>需要掌握的具体知识点</b>
+      数字孪生的五层架构（物理/数据/模型/服务/应用）与语义互操作标准（Asset Administration Shell、AAS）· 孪生数据建模与时空同步 · 混合物理—数据驱动建模（机理 + 数据的分工边界）· 代理模型与代理 AI（Surrogate）· 模型预测控制（MPC）· 多智能体系统与孪生的耦合范式（"数字侧车"模式）· 闭环控制的稳定性与安全边界
+    </div>
+    <div class="row">
+      <b>关键学习资源与你的独特抓手</b>
+      <ul class="res">
+        <li><b>关键文献：</b>Future Internet 2026, 18(10), 501（Agentic AI + DT 结构化综述，含治理框架）——这是你阶段四的第一篇必读综述。</li>
+        <li><b>标准：</b>ISO 23247 系列（数字孪生框架）、AAS 规范（工业数字孪生的互操作基石，也是工程化落地的关键）。</li>
+        <li><b>你的护城河：</b>多智能体协商调度（博弈论）+ 约束优化（CP/MIP/SMT）+ MPC 的组合，是目前工业界"每台设备抽象为一个 Agent、孪生体作为其数字侧车"这一主流架构最缺的那块数学肌肉。港口泊位（鹿特丹案例：120 个码头 Agent 博弈协商，等泊时间 38h→19h）与柔性车间多智能体调度都是可复现的落地形态。</li>
+        <li><b>注意事项：</b>这类方向的论文极多且已拥挤，<em>务必只作为应用出口，而非主攻方向</em>——你的原创性在方法论层。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="track">
+  <div class="track-hd" style="background:#F0EEF9;">
+    <div class="lv" style="background:#8A7FD8;">P2</div>
+    <b>研究方法论与学术写作（容易被忽视，但决定成败）</b>
+    <span class="when">全程并行</span>
+  </div>
+  <div class="track-bd">
+    <div class="row">
+      <b>内容要点</b>
+      定性研究方法：Grounded Theory（MAST 用的就是它）、案例研究法、Design Science Research（构建型研究范式，非常适合"提出框架+实证"这类论文）· 可复现研究规范（数据集/代码/环境/随机种子）· 定量方法：显著性检验、效应量、访谈编码一致性（Cohen's κ）· 系统综述方法（PRISMA）· 学术写作中的"贡献陈述"技巧
+    </div>
+    <div class="row">
+      <b>资源</b>
+      <ul class="res">
+        <li>Design Science Research：Peffers 等的六要素模型——建立"问题识别→目标→设计→构建→评估→结论"的论文骨架，非常适合你阶段三的产出。</li>
+        <li>PRISMA 2020 声明——阶段四若做中文域综述可直接套用。</li>
+        <li>务必学习的一个实践技巧：<b>用 Design Science 的结构写自己的论文，比套普通实证论文模板更容易让"原创性"被看见</b>。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="callout co-purple">
+  <b>⏱ 时间分配建议（在职教师版）</b>
+  <p>
+    每周投入约 <strong>8–10 小时</strong>（工作日 1h × 5 + 周末 3h × 2）即可按上述节奏推进。关键纪律：
+  </p>
+  <p style="margin-top:6px">
+    ① <b>阅读 30% / 动手 50% / 写作 20%</b> 的时间配比——你的优势在动手，千万别滑向纯阅读；<br>
+    ② <b>每个阶段必须产出可见物</b>（报告/数据集/论文/原型），不产出即视为该阶段失败；<br>
+    ③ 优先<em>可离线完成</em>的工作（数据集分析、形式化建模、论文写作），把需要联网与调 API 的部分集中在固定时段批量处理。
+  </p>
+</div>
+
+<!-- ============ S4 ============ -->
+<h2 class="sec" id="s4"><span class="no">4</span>热门投稿领域与选题方向 <em>Hot Topics &amp; Topic Selection</em></h2>
+
+<p>
+  下表把当前活跃的热点按"拥挤程度"与"你的切入难度"分象限评估。<strong>请优先瞄准左上象限（高热度 × 低饱和）</strong>——
+  这是在既有热度中仍存在空隙的位置。
+</p>
+
+<div class="quad">
+  <div class="q-star">
+    <h5>★ 首选：高热度 · 低饱和（机会窗口）</h5>
+    <p>
+      <b>① 智能体系统的可追溯性与决策溯源（Decision Provenance）</b>——把事件溯源/OTel 追踪思路引入智能体，建立机器可检查的决策链路。<br>
+      <b>② 验证层的完备性度量与失效检测</b>——MAST 指出约 23.5% 失败源于验证层，且在成功运行中同样潜伏。中文域几乎无人做。<br>
+      <b>③ 多智能体架构的成本—性能帕累托前沿与决策理论</b>——为 15× 成本争议提供实证裁决与选型规则。<br>
+      <b>④ 智能体的 STPA / FMEA 危害分析方法</b>——把安全工程工具迁移到 LLM 智能体，学科交叉空白。<br>
+      <b>⑤ 中文域多智能体可靠性基准</b>——填补 MAST 未覆盖的语言与场景。
+    </p>
+  </div>
+  <div class="q-hi">
+    <h5>⚠ 高热度 · 高饱和（谨慎，需差异化）</h5>
+    <p>
+      <b>多智能体 + 柔性作业车间/AGV 调度</b>：国内核心期刊已批量发表，门槛低、创新难。<br>
+      <b>多智能体强化学习求解调度问题</b>：算法侧红海，除非引入全新的系统结构约束。<br>
+      <b>智能体 + 数字孪生综述/架构</b>：综述已被占（Future Internet 2026 那篇就是），写综述无差异化。<br>
+      <b>Prompt 工程 / Agent 提示词技巧</b>：已进入实践饱和期，不适合作为学术主攻。
+    </p>
+  </div>
+  <div class="q-easy">
+    <h5>◆ 稳妥：中等热度 · 低饱和（易发刊，引用一般）</h5>
+    <p>
+      <b>教学场景中的智能体应用</b>——可发中文核心/教改类期刊，学术影响力有限但对职称、教学成果、申报项目有直接价值。<br>
+      <b>Agentic AI 在教育/管理领域的系统化实践</b>——案例研究易写，贡献度需靠方法论补强。<br>
+      <b>智能体平台的架构对比与选型</b>——工程价值高，学术价值需靠严谨评测方法支撑。
+    </p>
+  </div>
+  <div class="q-low">
+    <h5>○ 观察区：当前不热但可能升温</h5>
+    <p>
+      <b>智能体的持续在线自演化（continual self-evolution）</b>——需 provenance / versioning / replay / rollback 约束，是被反复提及但尚未解决的真问题。<br>
+      <b>本体工程（Ontology Engineering）</b>——为"任务完成""证据充分""状态有效"等建立共享语义，不依赖各 Agent 自行解释。<br>
+      <b>对抗性/恶意智能体的安全形式化</b>——MAST 取样框未覆盖，是明确的空白。
+    </p>
+  </div>
+</div>
+
+<h3>4.1 推荐的六个具体选题（按可行性排序）</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:30px;">#</th><th style="width:250px;">选题</th><th>核心贡献点</th><th style="width:115px;">数据/实验来源</th><th style="width:95px;">目标刊物层级</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>1</b></td>
+      <td><b>面向中文教学任务的多智能体失败模式分类与诊断基准（MAS-CN）</b></td>
+      <td>自下而上构建中文域失败分类法（验证 MAST 14 模式的普适性 + 增补新模式）；提供校准后的 LLM-as-judge 标注管线；给出 κ 一致性与诊断工具</td>
+      <td>500+ 条自采中文轨迹（教学场景为独特来源）</td>
+      <td>CCF-B / 中文核心（易中）</td>
+    </tr>
+    <tr>
+      <td><b>2</b></td>
+      <td><b>校验器完备度：智能体任务验证层失效的形式化刻画与度量</b></td>
+      <td>定义"校验器完备度"指标；构造"检查通过但结论错误"的反例族；给出运行时检测方法</td>
+      <td>反例集 + 公开基准改造</td>
+      <td>CCF-A/B 目标（高价值）</td>
+    </tr>
+    <tr>
+      <td><b>3</b></td>
+      <td><b>智能体系统的决策溯源图：基于事件溯源的可审计执行架构</b></td>
+      <td>将智能体执行过程建模为溯源图；定义可回放/可验证/可回滚的接口契约；对比现有 tracing 方案的表达能力缺口</td>
+      <td>实验平台（自建）+ 真实试点</td>
+      <td>IEEE Q1/Q2、软件工程类期刊</td>
+    </tr>
+    <tr>
+      <td><b>4</b></td>
+      <td><b>等预算约束下多智能体架构的成本—性能帕累托前沿</b></td>
+      <td>以严格 Token 预算为约束，实证裁决单智能体 vs 编排者—子智能体 vs 有界协作；给出可复用的架构选型规则</td>
+      <td>多框架 × 多任务实测</td>
+      <td>CCF-B，引用潜力高</td>
+    </tr>
+    <tr>
+      <td><b>5</b></td>
+      <td><b>基于 STPA 的 LLM 智能体系统危害识别方法</b></td>
+      <td>将 STPA 控制环路扩展到"智能体—工具—环境"耦合环路；产出轻量检查表与 2–3 个真实系统的验证</td>
+      <td>开源系统 + 自建系统</td>
+      <td>安全类 Q1/Q2、系统工程类</td>
+    </tr>
+    <tr>
+      <td><b>6</b></td>
+      <td><b>智能体系统的 V 模型重构：需求到验证的机器可检查追溯</b></td>
+      <td>提出智能体系统的 V 模型变体与机器可检查的需求—验证追溯矩阵；用形式化不变量做运行时监控</td>
+      <td>教学场景全流程试点</td>
+      <td>系统工程类 Q1（理论性最强）</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout co-pink">
+  <b>★ 选题的黄金公式（针对你的具体优势）</b>
+  <p>
+    <b>经典系统工程概念</b>（一个，尚未被迁移到智能体领域）<b>×</b> <b>多智能体真实失效数据</b>（一手，可自采）<b>×</b> <b>你的垂直场景</b>（教学/管理/调度，有渠道）。
+  </p>
+  <p style="margin-top:6px">
+    三个因子的交集天然具有原创性：前两者别人难以同时具备，第三者需要领域入口。用这个公式审视上面六个选题，你会发现每一个都成立。
+  </p>
+</div>
+
+<!-- ============ S5 ============ -->
+<h2 class="sec" id="s5"><span class="no">5</span>期刊与会议推荐 <em>Venues, Categorized by Strategy</em></h2>
+
+<p>
+  以下按<strong>影响力 / 审稿周期 / 录用难度</strong>三维分类。审稿周期为经验估计（2026 年），会随投稿量波动，请以官方公布为准。
+  <strong>建议采用"阶梯投递"策略：同一工作先投下一级确保产出，再打磨后冲上一级</strong>，避免全部精力押在顶刊上。
+</p>
+
+<h3>5.1 第一梯队 · 冲刺目标（高影响力 / 长周期 / 高难度）</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:210px;">期刊 / 会议</th><th style="width:95px;">影响力</th><th style="width:100px;">审稿周期</th><th style="width:85px;">录用难度</th><th>适配你的具体切入点</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>IEEE Transactions on Systems, Man, and Cybernetics: Systems</b>（TSMC-S）</td>
+      <td>极高（JCR Q1）</td><td>6–9 个月</td><td><span class="tag t-pink">很高</span></td>
+      <td>系统理论与方法论是你的主场。决策溯源图、V 模型重构这类"结构 + 形式化"的工作最契合。缺点：审稿极慢，周期管理是主要风险。</td>
+    </tr>
+    <tr>
+      <td><b>IEEE Transactions on Cyber-Physical Systems</b>（TCPS）</td>
+      <td>极高（Q1，新刊）</td><td>5–8 个月</td><td><span class="tag t-pink">很高</span></td>
+      <td>智能体 + 数字孪生 + 闭环控制的结合点。刊龄较短，相对"传统系统"刊竞争格局未固化，对新人相对友好。</td>
+    </tr>
+    <tr>
+      <td><b>Automatica</b> / <b>Journal of Process Control</b></td>
+      <td>极高 / 高</td><td>5–8 个月</td><td><span class="tag t-pink">很高</span></td>
+      <td>阶段四的智能体—孪生闭环工作。控制理论纯度要求高，需与运筹学/控制背景研究者合作。</td>
+    </tr>
+    <tr>
+      <td><b>NeurIPS / ICLR / ACL（主会）</b></td>
+      <td>极高</td><td>4–8 个月</td><td><span class="tag t-pink">极高</span></td>
+      <td>需要方法论层面的普适贡献 + 大规模实验。中文域数据集本身不够，需要证明方法的普适性。建议作为阶段三末的"彩票"，不作为主计划。</td>
+    </tr>
+    <tr>
+      <td><b>ACM Transactions on Software Engineering and Methodology</b>（TOSEM）</td>
+      <td>极高（Q1）</td><td>5–9 个月</td><td><span class="tag t-pink">很高</span></td>
+      <td>若把"智能体系统工程"做成软件工程方法论论文（如可复现性、实验方法、评测基准），这是最佳归宿。<b>你的 20 年工程背景在此处价值最大。</b></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>5.2 第二梯队 · 主力目标（高影响力 / 中周期 / 中等难度）⭐ 性价比最高</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:210px;">期刊 / 会议</th><th style="width:95px;">影响力</th><th style="width:100px;">审稿周期</th><th style="width:85px;">录用难度</th><th>适配说明</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Information Systems Research</b> / <b>Decision Support Systems</b> / <b>European Journal of Operational Research (EJOR)</b></td>
+      <td>高（Q1）</td><td>4–7 个月</td><td><span class="tag t-orange">中等</span></td>
+      <td><b>EJOR 是你运筹学背景的强项归宿</b>，尤其"多智能体协同的资源优化与调度"类工作；ISR/DSS 适合管理决策场景（教学管理、绩效评估）。</td>
+    </tr>
+    <tr>
+      <td><b>IEEE Transactions on Systems, Man, and Cybernetics: Part A</b> / <b>IEEE Transactions on Big Data</b></td>
+      <td>高（Q1）</td><td>3–6 个月</td><td><span class="tag t-orange">中等</span></td>
+      <td>Part A 偏人机系统与社会技术系统，<b>教学场景智能体协作可直接切入</b>；TBD 适合评测基准与数据集类工作。</td>
+    </tr>
+    <tr>
+      <td><b>Journal of Systems and Software（JSS）</b> / <b>Information &amp; Software Technology（IST）</b></td>
+      <td>高（Q1）</td><td>3–5 个月</td><td><span class="tag t-orange">中等</span></td>
+      <td>智能体平台架构、评估方法、实验方法论类论文的稳定 outlet。审稿相对友好。<b>建议作为阶段二/三的主投目标。</b></td>
+    </tr>
+    <tr>
+      <td><b>Reliability Engineering &amp; System Safety (RESS)</b> / <b>Safety Science</b></td>
+      <td>高（Q1）</td><td>3–6 个月</td><td><span class="tag t-orange">中等</span></td>
+      <td><b>STPA/FMEA 危害分析选题的最佳归宿</b>。该刊对形式化安全方法接受度好，你的"失效安全 + 合规审计"视角在这里天然受欢迎。</td>
+    </tr>
+    <tr>
+      <td><b>IEEE International Conference on Agents and AI (ICAAI)</b> / <b>PRICAI</b> / <b>ICPR</b></td>
+      <td>中高（CCF-C/B）</td><td>3–5 个月</td><td><span class="tag t-green">较低</span></td>
+      <td>国际会议，评审快、反馈具体，<b>是建立国际同行网络与修正论文的极佳起点</b>。建议阶段二就用它试水。</td>
+    </tr>
+    <tr>
+      <td><b>ACM Web Conference (WWW) / CIKM</b>（相关轨道）</td>
+      <td>高（CCF-A/B）</td><td>3–5 个月</td><td><span class="tag t-orange">中等</span></td>
+      <td>若涉及智能体平台的系统架构、检索与工具调用基础设施，CIKM 的系统类轨道有合适空间。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>5.3 第三梯队 · 稳妥目标与中文生态（低门槛 / 快周期 / 高完成率）</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:210px;">期刊 / 会议</th><th style="width:95px;">影响力</th><th style="width:100px;">审稿周期</th><th style="width:85px;">录用难度</th><th>适配说明</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>《系统工程理论与实践》</b></td>
+      <td>高（管理科学 A 级，EI 收录，中文核心）</td><td>2–4 个月</td><td><span class="tag t-green">较低</span></td>
+      <td><b>你的方向最"正统"的中文出口</b>。中国系统工程学会会刊，1981 年创刊，覆盖管理/信息/金融/能源/教育等领域。对"方法论 + 理论"类中文稿件友好，Ei 收录对评职称有实际帮助。要求：图表用黑白图、表格用三线表、摘要自明性强。</td>
+    </tr>
+    <tr>
+      <td><b>《系统工程与电子技术》</b> / <b>《控制与决策》</b></td>
+      <td>高（中文核心/EI）</td><td>2–4 个月</td><td><span class="tag t-green">较低</span></td>
+      <td>控制与决策偏理论与算法，命中率相对低但影响力稳定；系统工程与电子技术覆盖面广，工程性强。</td>
+    </tr>
+    <tr>
+      <td><b>《计算机集成制造系统》（CIMS）</b></td>
+      <td>高（EI、中文核心）</td><td>2–3 个月</td><td><span class="tag t-green">较低</span></td>
+      <td><b>重要提示：</b>该刊 2026 年已开设"设计智能体""人机共生"专辑，并在各期密集刊发多智能体调度类论文。<em>投稿窗口活跃，但该主题已饱和</em>——若投此刊，必须走"系统设计/方法论"而非"调度算法"路线。</td>
+    </tr>
+    <tr>
+      <td><b>《计算机学报》《软件学报》《自动化学报》</b></td>
+      <td>极高（CCF-A）</td><td>3–6 个月</td><td><span class="tag t-pink">高</span></td>
+      <td>CCF-A 中文顶刊，要求原创性与技术深度俱佳。<b>不建议作为首投目标</b>，但可作为阶段三顶配打磨后的冲刺选项。</td>
+    </tr>
+    <tr>
+      <td><b>《中国大学教学》《高等教学研究》《电化教育研究》</b></td>
+      <td>中（CSSCI）</td><td>1–2 个月</td><td><span class="tag t-green">很低</span></td>
+      <td>教学改革类成果出口，用于教创赛、教学成果奖、职称材料。<b>与你的主线形成互补而非替代</b>——建议每年固定投 1–2 篇，稳住教学维度的产出。</td>
+    </tr>
+    <tr>
+      <td><b>各国内国际会议（中国计算机学会 CCF 推荐会议、软件工程专委会 SEChina 等）</b></td>
+      <td>中</td><td>2–4 个月</td><td><span class="tag t-green">较低</span></td>
+      <td>快速获得同行反馈、建立网络。博士毕业/职称认定通常认可，需查本校文件。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout co-blue">
+  <b>📋 阶梯投递策略（强烈建议照此执行）</b>
+  <p>
+    <b>第 1 年（阶段一末）</b>：工作坊报告 / 中文核心方法探讨 → 目标：建立"我在这条路上"的公开记录。<br>
+    <b>第 2 年（阶段二）</b>：数据集 + 诊断工具 → 投 ICAAI/PRICAI 类会议（快审稿拿反馈）+ 中文核心双投。<b>目的是拿同行反馈，不是拿引用。</b><br>
+    <b>第 3 年（阶段三）</b>：方法论主论文 → 主投 JSS / IST / RESS / EJOR（第二梯队），若评审意见积极则改投 TSMC-S。<br>
+    <b>第 4 年（阶段四）</b>：体系化成果 → 冲 TSMC-S / TOSEM，同时把教学类成果投 CSSCI 期刊。<b>注意：不要让一年内同时有 3 篇在审，串行投递。</b>
+  </p>
+</div>
+
+<!-- ============ S6 ============ -->
+<h2 class="sec" id="s6"><span class="no">6</span>可能的突破点：研究空白地图 <em>Research Gaps &amp; Where to Break Through</em></h2>
+
+<p>
+  以下缺口均<strong>经过检索验证</strong>——每一条都对应"现有研究存在什么局限"的明确证据。真正的突破点往往不是"没人做过"，
+  而是"大家都看到了问题，但都不在你手上拥有的方法论与数据的位置来解决它"。这六条按可行性与创新性排序。
+</p>
+
+<div class="gap">
+  <div class="gap-hd">
+    <b>突破点 ① 智能体系统的需求—验证追溯结构重构</b>
+    <span class="tag t-purple">创新性 ★★★★★</span>
+    <span class="tag t-blue">可行性 ★★★★☆</span>
+    <span class="tag t-green">竞争 少</span>
+  </div>
+  <p><b>缺口描述：</b>SEBoK、INCOSE Handbook 与经典 V 模型定义了需求到验证的双向追溯结构，但这些结构假设"系统行为由确定性逻辑实现"。
+  当系统内部包含概率性决策组件时，"验证一个需求"意味着什么？传统的验证确认（V&amp;V）方法在这类系统上是否仍然成立？目前几乎没有文献系统回答这个问题。</p>
+  <p><b>你的独特位置：</b>20 年 V 模型与需求追溯实践经验 + 数学形式化能力 + 教学场景的全流程可控试点。这三者组合在学者中极为罕见。</p>
+  <div class="why"><b>可引用的证据链：</b>Future Internet 2026 综述明确指出智能体系统带来"问责、可解释性、审计"治理挑战，且高后果决策需要更强的验证机制；IEEE 2024 失效安全标准要求把经典系统工程实践直接嵌入 AI 架构。这两点共同说明"经典 V 模型在智能体上的重构"是真实且被承认的空白。</div>
+</div>
+
+<div class="gap">
+  <div class="gap-hd">
+    <b>突破点 ② 验证层失效的形式化刻画与"校验器完备度"指标</b>
+    <span class="tag t-purple">创新性 ★★★★★</span>
+    <span class="tag t-blue">可行性 ★★★★★</span>
+    <span class="tag t-green">竞争 极少</span>
+  </div>
+  <p><b>缺口描述：</b>MAST 揭示约 23.5% 的失败属于任务验证类，且关键发现是——<strong>验证类失败在"成功运行"的样本中同样高频出现</strong>，即"任务做完了，但校验器本身是坏的"。MAST 的原话是：现有验证器常做"表面检查"（能编译、没留 TODO），而仅依赖末端低层检查是不够的。但 MAST 只做了分类与统计，<em>没有给出衡量"验证层本身有多可靠"的指标</em>。这是一个被明确指出、却无人接手的问题。</p>
+  <p><b>突破方式：</b>定义"校验器完备度"（Verifier Completeness）指标；构造反例族（检查通过但结论错误）；提出运行时检测方法；从控制论角度解释为何表面检查必然失效（缺少对语义不变量的检查）。</p>
+  <div class="why"><b>为什么你做得成：</b>你 20 年的工程直觉会让你本能地追问"这个测试到底验证了什么"，而这种追问在纯 AI 背景的研究者中较罕见。这是最容易在一年内做出、且极易被引用的切入点。</div>
+</div>
+
+<div class="gap">
+  <div class="gap-hd">
+    <b>突破点 ③ 中文域多智能体失败分类与评测基础设施</b>
+    <span class="tag t-purple">创新性 ★★★★☆</span>
+    <span class="tag t-blue">可行性 ★★★★★</span>
+    <span class="tag t-green">竞争 少</span>
+  </div>
+  <p><b>缺口描述：</b>MAST 的数据集与分类法全部建立在英文编码、数学与通用助手任务上，且其取样框被明确批评为"限于合作式、多数串行、层级式框架，不含真并发、无对抗性智能体、无隐私分区"。语言维度上的空白更是完全空白——<em>没有中文域的多智能体失败图谱</em>。而中国学者有天然的语言优势与场景优势。</p>
+  <p><b>额外价值：</b>把 MAST 的 LLM-as-judge 标注管线在中文域重新校准，本身就是一项可被广泛复用的基础设施工作，引用潜力持续累积。注意：MAST 数据集中仅有 19 条为人工标注，其余为经校准的 LLM 标注，因此<em>你提供的中文域人工标注子集本身就有独立价值</em>。</p>
+  <div class="why"><b>附加优势：</b>中文域 + 教学场景的数据，几乎没有竞争者能以同样成本获得。这使它成为你建立"数据护城河"的最佳入口。</div>
+</div>
+
+<div class="gap">
+  <div class="gap-hd">
+    <b>突破点 ④ 事件溯源式"决策溯源"架构与可回放智能体</b>
+    <span class="tag t-purple">创新性 ★★★★☆</span>
+    <span class="tag t-blue">可行性 ★★★★☆</span>
+    <span class="tag t-green">竞争 少</span>
+  </div>
+  <p><b>缺口描述：</b>智能体系统的自演化需要 provenance、versioning、validation、replay、rollback 约束，这已被反复提及为必要条件。
+  但软件工程领域对此有现成的成熟答案——<strong>事件溯源（Event Sourcing）架构</strong>，它提供了完整的状态重建、审计与回滚机制。
+  目前几乎没有工作把事件溯源方法论系统性地迁移到 LLM 智能体系统上。这是一条<b>被两个领域同时忽视的连接</b>。</p>
+  <p><b>突破方式：</b>定义智能体执行的事件流模式；论证"智能体决策溯源图"与"事件溯源事件流"的结构同构性；给出基于 OpenTelemetry span 模型的实现；用"可回放的智能体执行"支撑审计与错误定位。</p>
+  <div class="why"><b>你的独特位置：</b>分布式系统与架构师背景让这件事对你几乎是"降维打击"——你能在几周内识别出同构关系，而多数 AI 研究者需要先理解事件溯源。这是典型的"用跨界经验吃信息差红利"。</div>
+</div>
+
+<div class="gap">
+  <div class="gap-hd">
+    <b>突破点 ⑤ STPA 在多智能体系统中的扩展：危害识别与治理形式化</b>
+    <span class="tag t-purple">创新性 ★★★★☆</span>
+    <span class="tag t-blue">可行性 ★★★★☆</span>
+    <span class="tag t-green">竞争 少</span>
+  </div>
+  <p><b>缺口描述：</b>STPA 已被证明能对"含自主性的系统"（无人驾驶、机器人）做有效的危害识别，但它的控制环路模型假设被控对象是一个受控的物理过程。
+  LLM 智能体的特殊性在于：<em>被控对象本身包含概率性的"决策者"</em>，且工具调用的副作用可以是非确定性的（如执行了一次错误的数据库写入）。
+  如何为这类系统构造 STPA 环路，是一个有明确技术内容但至今少人处理的问题。</p>
+  <p><b>突破方式：</b>扩展 STPA 的控制环路到"智能体—工具—环境"三层耦合；识别"幻觉驱动的错误控制动作"作为一类特有危害；产出可操作检查表；在 2–3 个真实系统上验证。</p>
+  <div class="why"><b>发表优势：</b>RESS / Safety Science 这类 Q1 刊对"形式化安全方法 + 真实系统验证"的接受度很好，而竞争者主要是安全工程背景的人——他们在 LLM 智能体侧反而不深。这是一次双向互补的交叉。</div>
+</div>
+
+<div class="gap">
+  <div class="gap-hd">
+    <b>突破点 ⑥ 等 Token 预算下的架构帕累托前沿与选型决策理论</b>
+    <span class="tag t-purple">创新性 ★★★★☆</span>
+    <span class="tag t-blue">可行性 ★★★★★</span>
+    <span class="tag t-green">竞争 少</span>
+  </div>
+  <p><b>缺口描述：</b>"多智能体比单智能体好还是坏"目前是一个<strong>被广泛讨论却没有严格裁决的争论</strong>。现有论述互相矛盾：Anthropic 报告广度优先研究任务上 +90.2%；MIT 从决策论证明无新外部信号时委托型无环网络不优于集中式决策者；MAST 数据则显示多数失败源于系统设计。问题在于——这些结论来自不同的任务、不同的预算口径、不同的评价指标，<em>无法直接比较</em>。</p>
+  <p><b>突破方式：</b>建立严格的三维实验设计：固定 Token 预算 → 对比三种架构（单智能体 / 编排者—子智能体 / 有界协作）→ 绘出成本—性能帕累托前沿。产出不是"哪个更好"的答案，而是<strong>一张"什么任务特征 → 什么架构"的选型规则表</strong>，并给出可计算的选型判据。</p>
+  <div class="why"><b>为什么这是金矿：</b>这类工作有非常明确的引用动机（所有人都在争论，都需要引用一张裁决图）；而 MIT 那条理论结论恰好给了你现成的理论锚点来解释帕累托前沿的形状。工程背景使你能控制变量做到公平对比——这是纯算法研究者常忽略的严谨性。</div>
+</div>
+</div>
+
+<div class="callout co-green">
+  <b>★ 三个必须避免的陷阱</b>
+  <p><b>① 别做"多智能体 + 某具体问题"的组合。</b>这是国内期刊已饱和的格子，也是顶会挤破头的格子。你的价值在结构层，不在应用层。</p>
+  <p style="margin-top:6px"><b>② 别追框架热点做跟进式研究。</b>框架迭代速度远超出版周期，"我基于 X 框架做了 Y"这类工作在学术上无增量。做<em>框架不变的问题</em>（追溯、验证、治理、架构决策），才有长期价值。</p>
+  <p style="margin-top:6px"><b>③ 别低估方法论类论文的写作难度。</b>"提出框架 + 实证验证"听起来简单，但审稿人一定会问：你的框架相对已有工作（如 MAST、NIST AI RMF、OTel）到底新在哪？<em>必须在写作阶段就用一张"相关工作对比表"明确划界</em>，这是本路线最常见的拒稿原因。</p>
+</div>
+
+<!-- ============ S7 ============ -->
+<h2 class="sec" id="s7"><span class="no">7</span>执行清单：未来 90 天立即开始 <em>Actionable Checklist</em></h2>
+
+<p>路线图的价值在于执行。以下 12 项不需要等待任何前置条件，本周即可启动。</p>
+
+<div class="grid2">
+  <div class="card">
+    <h4>第 1–4 周：地基与工具</h4>
+    <ul class="check">
+      <li>读完 Anthropic Engineering 关于多智能体研究系统与 Managed Agents 的全部文章，做 1500 字结构化笔记</li>
+      <li>读 MAST（arXiv:2503.13657）原文 + Austin ML Journal Club 的批评性解读，两份对照读</li>
+      <li>精读 Leveson 的 STPA 原始论文（约 20 页）——<b>本路线最高回报的单一学习项</b></li>
+      <li>确定阶段一的实验场景（建议：你的三门课程之一），并画出该场景智能体系统的元模型草图</li>
+      <li>配置本地可离线实验环境；建立统一的 trace/span 日志规范（照 OpenTelemetry 数据模型设计）</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>第 5–8 周：动手与复现</h4>
+    <ul class="check">
+      <li>不依赖任何框架，亲手实现一个约 200 行的最小 ReAct 智能体</li>
+      <li>在 2 个开源多智能体框架上跑通同一任务，记录失败现象与 Token 消耗</li>
+      <li>用 Wooldridge 多智能体教材补齐分类体系、任务分配与协商机制三个章节</li>
+      <li>选定一个具体落地场景，列出 10–15 条候选智能体失效模式（用 FMEA 格式写）</li>
+      <li>建立个人学术主页/GitHub 仓库，公开记录每周进展——为阶段二的基准发布预热</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>第 9–12 周：产出与布局</h4>
+    <ul class="check">
+      <li>完成阶段一技术报告（8–12 页），包含元模型、失效清单、实验环境说明</li>
+      <li>确定选题 ①（中文域失败分类）或 ④（决策溯源）作为首个正式研究方向</li>
+      <li>下载并通读目标期刊近 2 年 10 篇相关论文的摘要与结论，绘制"相关工作对比表"草稿</li>
+      <li>阅读 3 篇 OpenReview 公开的 Review 意见，训练评审视角</li>
+      <li>制定 12 个月投稿计划（阶梯投递），把三个阶段关口写入日历</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>持续动作：三个习惯</h4>
+    <ul class="check">
+      <li><b>每周写 200 字研究日志</b>：记录"这周我改变了什么认知"。这是两年后写论文时最宝贵的原始素材，也是最容易被自己忽视的资产</li>
+      <li><b>每月精读 1 篇 Review 意见</b>：把审稿人的疑问清单存起来，这会直接改善你的论文质量</li>
+      <li><b>每季度检查一次方向</b>：对照本路线图的阶段关口，若未达标则调整而非硬撑。路线图是导航，不是枷锁</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ S8 ============ -->
+<h2 class="sec" id="s8"><span class="no">8</span>核心工具链 <em>Toolchain</em></h2>
+
+<table>
+  <thead>
+    <tr><th style="width:120px;">层次</th><th style="width:250px;">推荐工具</th><th>说明与理由</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><b>实验编排</b></td><td>自建轻量脚手架 + OpenTelemetry 追踪</td><td><em>务必自建，不要直接用现成 Agent 框架做研究脚手架</em>——你需要控制 trace 数据的完整结构，现成框架的埋点深度不够。OTel 数据模型是事实标准，便于后续工程化对照。</td></tr>
+    <tr><td><b>多智能体框架</b></td><td>参考实现：LangGraph / Microsoft Agent Framework / Anthropic 参考架构</td><td>作为<em>被测对象</em>使用（测它们在中文场景下的失败模式），而不是作为你的方法实现载体。你需要一个干净的对照基线。</td></tr>
+    <tr><td><b>标注与分析</b></td><td>自建标注管线 + LLM-as-judge（按 MAST 方法校准到人工标注）</td><td>必须报告 Cohen's κ（MAST 达 0.88）与人工标注的准确率（MAST 达 94%）。<b>只报告 LLM 评分数值的论文在 2026 年已不足信。</b></td></tr>
+    <tr><td><b>形式化</b></td><td>SMT 求解器（Z3）、TLA+ / Alloy（规格建模）</td><td>用于突破点 ①④⑥：系统不变量建模、架构属性检查、帕累托实验的约束建模。数学背景使你上手极快。</td></tr>
+    <tr><td><b>安全分析</b></td><td>STPA 手工分析 + FMEA 表格工具</td><td>突破点 ⑤。注意：目前没有成熟的 LLM 智能体 STPA 自动化工具——<b>这本身就是工具层的研究空白</b>，可作为配套的短平快产出。</td></tr>
+    <tr><td><b>数据与复现</b></td><td>Git（版本）+ Zenodo（数据集 DOI）+ 固定随机种子 + 容器化</td><td>数据集与代码的可复现性是 2026 年 MAS 研究的准入门槛，也是 MAST 开放数据集 + pip 标注库能成为标准引用件的原因。<b>从第一天就按可复现标准工作。</b></td></tr>
+    <tr><td><b>优化求解</b></td><td>OR-Tools / MILP 求解器 / MPC 库</td><td>阶段四的约束求解与调度融合。<b>这一层是你的差异化优势所在</b>——让数学接管硬约束，让 LLM 只处理意图与柔性部分。</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ S9 ============ -->
+<h2 class="sec" id="s9"><span class="no">9</span>核心文献与数据来源 <em>Key References</em></h2>
+
+<div class="card">
+  <h4>必读文献（按优先级）</h4>
+  <ul class="res" style="margin-top:4px;">
+    <li><b>MAST — Why Do Multi-Agent LLM Systems Fail?</b>（arXiv:2503.13657，及其 v2 / NeurIPS 2026 Datasets &amp; Benchmarks 版本）——本路线的基石。含 1,642 条标注轨迹、14 种失败模式、三大分类、κ=0.88、开源标注库。<b>务必读原文与数据集，而非二手解读。</b></li>
+    <li><b>MultiAgentBench (MARBLE)</b>——里程碑 KPI 评分 + 协作质量评估的标准参考；其两项发现（研究场景下图拓扑最优、认知规划使里程碑达成率提升约 3%）意味着<b>拓扑与规划策略应作为实验变量而非固定架构决策</b>。</li>
+    <li><b>AgentRx 与 DRBench</b>——与 MAST 构成"命名（vocabulary）→ 定位（localize）→ 度量（measure）"三件套，是自行搭建评估体系时的完整参考。</li>
+    <li><b>Digital Twins and Agentic AI: Applications, Risks, and Governance Frameworks</b>（Future Internet 2026, 18(10), 501）——智能体 × 数字孪生方向最系统的综述，含治理机制分类框架，阶段四第一篇必读。</li>
+    <li><b>Anthropic Engineering</b> 系列（多智能体研究系统、Claude Code 架构、Managed Agents）——<b>唯一公开推理细节的工业界一手材料</b>，含 +90.2% 与 4×/15× Token 数据。</li>
+    <li><b>Cognition: Don't Build Multi-Agents</b>（2025-06）及 2026-03 的 "Devin can Manage Devins"——<b>两篇对照读，价值远大于单读一篇</b>，能看清行业架构共识的形成过程。</li>
+    <li><b>MIT（Simchi-Levi 等）关于委托型无环网络决策劣势的结论</b>——帕累托前沿论文（突破点 ⑥）的理论锚点。</li>
+    <li><b>Nancy Leveson, STPA</b> 原始论文 + 《Engineering a Safer World》——突破点 ⑤的核心来源。</li>
+    <li><b>IEEE Std（自主与半自主系统失效安全设计，2024）</b>——自治级别、人类审批检查点、紧急停机的形式框架，治理类论文的规范引用。</li>
+    <li><b>NIST AI RMF / ISO-IEC 42001</b>——治理与合规论证的标准基础。</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h4>数据与工具来源</h4>
+  <ul class="res" style="margin-top:4px;">
+    <li>arXiv cs.AI / cs.MA / cs.SE —— 主要研究来源；按 MAST 的 14 种失败模式 + "verification" "provenance" "governance" "benchmark" 组合检索</li>
+    <li>OpenReview —— 读审稿意见、跟踪会议截稿期（NeurIPS/ICLR/ACL 的 D&B 轨、以及 ICAAI/PRICAI 等）</li>
+    <li>Semantic Scholar / Google Scholar —— 建立被引追踪；对你自己的 4 篇核心论文设置月度引用提醒</li>
+    <li>GitHub —— MAST 标注库、MultiAgentBench、主流框架实现；<b>把实验脚手架设为公开仓库，从第一天起</b></li>
+    <li>Zenodo / Figshare —— 数据集发布与 DOI 获取（提升可引用性）</li>
+    <li>期刊官网投稿系统 —— 《系统工程理论与实践》（sysengi.com）、《计算机集成制造系统》官网（关注专辑征文）、RESS / JSS / IST / EJOR</li>
+    <li>标准文本 —— ISO 23247（数字孪生）、INCOSE SE Handbook、ISO/IEC 42001（AI 管理体系）</li>
+  </ul>
+</div>
+
+<footer>
+  <p><b>本路线图的定位：</b>它是一张导航图，不是一份铁律。2026 年智能体领域的工程实践迭代速度极快，具体技术栈会变，
+  但"用系统工程的纪律去结构化概率性系统"这个核心判断，在可预见的未来不会过时——因为这是当前多智能体系统失败率居高不下的根本原因（失败源于系统结构，而非模型能力）。</p>
+  <p style="margin-top:9px">
+    <b>最有价值的一句话：</b>模型负责产生智能，系统负责让这些智能稳定协作。未来的竞争不只是谁的模型更强、谁能接更多工具，
+    还包括谁能把概率性的智能组件组织成<em>可解释、可验证、可恢复、且持续演化但仍受治理</em>的生产系统。这个"组织"的工作，就是系统工程。
+  </p>
+  <p style="margin-top:12px; color:var(--ink3);">
+    编制时间：2026 年 10 月　|　检索数据截至：2026 年 10 月　|　建议每 6 个月复核一次文献与期刊版块信息
+  </p>
+</footer>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实施路线图 · 系统工程 × AI 智能体集成平台 — 资源清单与执行手册</title>
+<style>
+:root{
+  --blue:#2E5C8A; --blue2:#4A90D9; --blue-l:#EAF2FA;
+  --green:#27AE60; --green-l:#E8F7EF;
+  --orange:#E67E22; --orange-l:#FDF2E6;
+  --pink:#D4537E;  --pink-l:#FBEDF3;
+  --purple:#7F77DD; --purple-l:#EFEEFC;
+  --ink:#22303F; --ink2:#4C5A6A; --ink3:#7A8794;
+  --line:#E2E8EF; --bg:#F7F9FC; --card:#FFFFFF;
+  --shadow:0 1px 3px rgba(34,48,63,.06),0 8px 24px rgba(34,48,63,.05);
+  --mono:Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei","微软雅黑","PingFang SC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:15px;-webkit-font-smoothing:antialiased;}
+.wrap{display:flex;max-width:1460px;margin:0 auto;}
+nav{width:250px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);height:100vh;position:sticky;top:0;overflow-y:auto;padding:26px 0 40px;}
+nav .brand{padding:0 22px 18px;border-bottom:1px solid var(--line);margin-bottom:14px;}
+nav .brand b{display:block;font-size:16px;color:var(--blue);letter-spacing:.5px;}
+nav .brand span{font-size:11.5px;color:var(--ink3);}
+nav a{display:flex;gap:9px;padding:9px 22px;color:var(--ink2);text-decoration:none;font-size:13.5px;border-left:3px solid transparent;transition:.18s;}
+nav a:hover{background:var(--blue-l);color:var(--blue);border-left-color:var(--blue2);}
+nav a.sub{padding-left:40px;font-size:12.5px;color:var(--ink3);}
+nav .grp{padding:12px 22px 5px;font-size:11px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;}
+main{flex:1;min-width:0;padding:0 44px 90px;}
+
+header.hero{background:linear-gradient(118deg,#2E5C8A 0%,#3D74A8 45%,#4A90D9 100%);color:#fff;margin:0 -44px 38px;padding:50px 44px 42px;position:relative;overflow:hidden;}
+header.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.07);}
+header.hero::before{content:"";position:absolute;right:100px;bottom:-110px;width:230px;height:230px;border-radius:50%;background:rgba(255,255,255,.05);}
+header.hero .kicker{font-size:12.5px;letter-spacing:3px;opacity:.85;font-weight:600;}
+header.hero h1{font-size:30px;line-height:1.35;margin:12px 0 10px;font-weight:700;}
+header.hero p{font-size:14.3px;opacity:.93;max-width:920px;}
+header.hero .meta{margin-top:20px;display:flex;gap:9px;flex-wrap:wrap;}
+header.hero .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);padding:5px 13px;border-radius:20px;font-size:12px;}
+
+h2.sec{font-size:23px;color:var(--blue);font-weight:700;padding-bottom:11px;margin:56px 0 22px;border-bottom:2px solid var(--line);display:flex;align-items:baseline;gap:13px;}
+h2.sec .no{font-size:13px;background:var(--blue);color:#fff;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;position:relative;top:-2px;}
+h2.sec em{font-style:normal;font-size:13.5px;color:var(--ink3);font-weight:400;}
+h3{font-size:17px;color:var(--ink);margin:32px 0 13px;font-weight:700;display:flex;align-items:center;gap:9px;}
+h3::before{content:"";width:4px;height:16px;background:var(--blue2);border-radius:2px;}
+h4{font-size:15px;color:var(--blue);margin:22px 0 9px;font-weight:700;}
+p{margin-bottom:13px;color:var(--ink2);}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin:16px 0;box-shadow:var(--shadow);}
+.card.tight{padding:17px 20px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:1180px){.grid2,.grid3{grid-template-columns:1fr;}main{padding:0 24px 70px;}header.hero{margin:0 -24px 32px;padding:38px 24px 34px;}}
+
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:13.2px;background:#fff;}
+th{background:var(--blue);color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:12.8px;border-right:1px solid rgba(255,255,255,.18);}
+th:last-child{border-right:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:top;}
+tbody tr:nth-child(even){background:#FAFCFE;}
+tbody tr:hover{background:var(--blue-l);}
+td b{color:var(--ink);}
+.tname{color:var(--blue);font-weight:600;}
+
+/* 链接样式 —— 完整链接不用占位符 */
+a{color:var(--blue2);text-decoration:none;word-break:break-all;}
+a:hover{color:var(--blue);text-decoration:underline;}
+code{background:var(--blue-l);color:var(--blue);padding:1.5px 6px;border-radius:4px;font-family:var(--mono);font-size:12.5px;}
+pre{background:#1E2A38;color:#E4EAF2;padding:15px 18px;border-radius:8px;overflow-x:auto;font-family:var(--mono);font-size:12.6px;line-height:1.72;margin:12px 0;}
+pre code{background:none;color:#E4EAF2;padding:0;}
+.cmd{background:#F2F6FA;border:1px solid #D8E2EC;border-left:4px solid var(--blue2);border-radius:0 7px 7px 0;padding:12px 16px;margin:11px 0;font-family:var(--mono);font-size:12.7px;color:#2C3E50;overflow-x:auto;line-height:1.85;white-space:pre-wrap;}
+.cmd b{color:var(--blue);}
+
+.callout{border-left:4px solid;border-radius:0 8px 8px 0;padding:15px 19px;margin:17px 0;font-size:13.8px;}
+.callout p:last-child{margin-bottom:0;}
+.co-blue{background:var(--blue-l);border-color:var(--blue2);}
+.co-green{background:var(--green-l);border-color:var(--green);}
+.co-orange{background:var(--orange-l);border-color:var(--orange);}
+.co-pink{background:var(--pink-l);border-color:var(--pink);}
+.co-purple{background:var(--purple-l);border-color:var(--purple);}
+.callout b{display:block;margin-bottom:5px;}
+
+.tag{display:inline-block;padding:2px 9px;border-radius:11px;font-size:11.3px;font-weight:600;white-space:nowrap;}
+.t-blue{background:var(--blue-l);color:var(--blue);}
+.t-green{background:var(--green-l);color:var(--green);}
+.t-orange{background:var(--orange-l);color:var(--orange);}
+.t-pink{background:var(--pink-l);color:var(--pink);}
+.t-purple{background:var(--purple-l);color:var(--purple);}
+.t-gray{background:#EEF2F6;color:var(--ink3);}
+.t-red{background:#FDECEA;color:#C0392B;}
+
+.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:17px;text-align:center;box-shadow:var(--shadow);}
+.stat .n{font-size:26px;font-weight:700;line-height:1.15;}
+.stat .l{font-size:12.3px;color:var(--ink3);margin-top:6px;line-height:1.5;}
+.s-blue .n{color:var(--blue);}.s-green .n{color:var(--green);}
+.s-orange .n{color:var(--orange);}.s-purple .n{color:var(--purple);}.s-pink .n{color:var(--pink);}
+
+/* 阶段路线 */
+.stage{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:18px;box-shadow:var(--shadow);overflow:hidden;}
+.stage-hd{padding:16px 22px;display:flex;align-items:center;gap:13px;flex-wrap:wrap;border-bottom:1px solid var(--line);}
+.stage-hd .lv{width:36px;height:36px;border-radius:9px;color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.stage-hd b{font-size:16.5px;color:var(--ink);}
+.stage-hd .dur{margin-left:auto;font-size:12.3px;color:var(--ink3);}
+.stage-bd{padding:18px 22px 6px;}
+.row-k{margin-bottom:14px;}
+.row-k:last-child{margin-bottom:16px;}
+.row-k .lb{font-size:12.4px;font-weight:700;color:var(--blue2);letter-spacing:.6px;margin-bottom:5px;display:flex;align-items:center;gap:7px;}
+.row-k .lb::before{content:"";width:5px;height:5px;background:var(--blue2);border-radius:50%;}
+.row-k ul{margin:0 0 0 20px;font-size:13.4px;}
+.row-k li{margin-bottom:4px;}
+.dep{font-size:12.6px;color:var(--ink3);background:#F7F9FC;border:1px dashed var(--line);border-radius:7px;padding:9px 13px;margin:8px 0 14px;}
+
+.tl{position:relative;padding-left:32px;margin-top:20px;}
+.tl::before{content:"";position:absolute;left:10px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--blue2),var(--purple));}
+.tl-item{position:relative;margin-bottom:24px;}
+.tl-item::before{content:"";position:absolute;left:-27px;top:5px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--blue2);}
+.tl-box{border:1px solid var(--line);border-radius:10px;background:#fff;padding:17px 21px;box-shadow:var(--shadow);}
+.tl-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px;}
+.tl-hd b{font-size:15.5px;}
+.tl-body{font-size:13.5px;color:var(--ink2);}
+
+.check{list-style:none;margin-left:0;}
+.check li{padding-left:26px;position:relative;margin-bottom:7px;font-size:13.5px;}
+.check li::before{content:"□";position:absolute;left:0;top:-2px;font-size:16px;color:var(--blue2);font-weight:700;}
+
+.risk{border-left:5px solid;border-radius:0 10px 10px 0;background:#fff;padding:18px 22px;margin:14px 0;box-shadow:var(--shadow);}
+.risk-hd{display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap;}
+.risk-hd b{font-size:15.3px;}
+.risk p{font-size:13.5px;margin-bottom:7px;}
+.risk p:last-child{margin-bottom:0;}
+.r-h{background:#FDF7F5;border-color:#C0392B;} .r-h .risk-hd b{color:#C0392B;}
+.r-m{background:#FFFBF3;border-color:var(--orange);} .r-m .risk-hd b{color:var(--orange);}
+.r-l{background:#F6FBF8;border-color:var(--green);} .r-l .risk-hd b{color:var(--green);}
+
+.footer-note{margin-top:56px;padding-top:24px;border-top:1px solid var(--line);font-size:12.6px;color:var(--ink3);line-height:1.9;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav>
+  <div class="brand">
+    <b>实施执行手册</b>
+    <span>RESOURCES · PIPELINE · RISKS</span>
+  </div>
+  <div class="grp">快速开始</div>
+  <a href="#s0">◆ 30 分钟启动清单</a>
+  <a href="#s1">① 核心文献资源</a>
+  <a href="#s2">② 数据集资源</a>
+  <a href="#s3">③ 工具与库</a>
+  <a href="#s4">④ 框架与平台</a>
+  <div class="grp">执行部分</div>
+  <a href="#s5">⑤ 六阶段路线图</a>
+  <a href="#s6" class="sub">▸ 阶段一 环境准备</a>
+  <a href="#s6" class="sub">▸ 阶段二 数据获取</a>
+  <a href="#s6" class="sub">▸ 阶段三 数据处理</a>
+  <a href="#s6" class="sub">▸ 阶段四 方法实现</a>
+  <a href="#s6" class="sub">▸ 阶段五 评估验证</a>
+  <a href="#s6" class="sub">▸ 阶段六 部署应用</a>
+  <a href="#s7">⑥ 风险与前置条件</a>
+  <a href="#s8">⑦ 检查清单</a>
+</nav>
+
+<main>
+
+<header class="hero">
+  <div class="kicker">IMPLEMENTATION PLAYBOOK · 2026</div>
+  <h1>核心资源清单与可执行实施路线图<br>系统工程 × AI 智能体集成平台</h1>
+  <p>
+    本手册把上一版研究路线图落成可动手的版本：<b>每一项资源都给出真实可访问链接、许可协议与获取方式</b>，
+    并按「环境准备 → 数据获取 → 数据处理 → 方法实现 → 评估验证 → 部署应用」六阶段拆解，
+    标注依赖关系、产出物与时间安排。所有链接与许可信息均于 <b>2026 年 10 月</b> 逐项核实。
+  </p>
+  <div class="meta">
+    <span>MAST / AgentRx / ITBench 三大数据集已核验</span>
+    <span>国内镜像与离线替代方案</span>
+    <span>许可协议与合规约束</span>
+    <span>成本与算力预估</span>
+  </div>
+</header>
+
+<!-- ============ S0 ============ -->
+<h2 class="sec" id="s0"><span class="no">◆</span>30 分钟启动清单 <em>Start Here</em></h2>
+
+<p>如果你今天只有半小时，就做这五件事。每一步都是后续所有工作的前提，且都不需要付费或申请审批。</p>
+
+<div class="cmd"># ① 建立独立虚拟环境（Windows PowerShell / CMD 均可）
+conda create -n mast python=3.11 -y
+conda activate mast
+
+# ② 安装核心分析栈（CPU 环境即可，无需 GPU）
+pip install pandas numpy matplotlib scikit-learn openai huggingface_hub datasets
+
+# ③ 安装 MAST 官方标注库（MIT 协议）
+pip install agentdash
+
+# ④ 拉取 MAST 官方数据集（1,642 条标注轨迹）
+#    国内直连 HF 慢，先设镜像端点
+set HF_ENDPOINT=https://hf-mirror.com
+python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='mcemri/MAD', repo_type='dataset', local_dir='./data/MAD')"
+
+# ⑤ 验证安装是否成功
+python -c "import agentdash, pandas; print('agentdash OK'); from agentdash.annotator import Annotator; print(len(Annotator.list_failure_modes()), 'failure modes loaded')"</div>
+
+<div class="callout co-green">
+  <b>✓ 30 分钟后你应当拥有</b>
+  <p>
+    一个隔离的 conda 环境、MAST 的 1,642 条官方标注轨迹、14 种失败模式的完整定义与元数据（<code>list_failure_modes()</code> 返回）。
+    这就是阶段一的<b>全部地基</b>——不需要 GPU、不需要付费 API、不需要任何审批。
+  </p>
+</div>
+
+<div class="grid4">
+  <div class="stat s-blue"><div class="n">1,642</div><div class="l">MAST 官方标注轨迹数（可直接下载）</div></div>
+  <div class="stat s-purple"><div class="n">14 / 3</div><div class="l">失败模式数 / 三大类别（agentdash 内置）</div></div>
+  <div class="stat s-orange"><div class="n">MIT</div><div class="l">agentdash 许可协议，可商用可修改</div></div>
+  <div class="stat s-green"><div class="n">0 元</div><div class="l">上述全部所需成本</div></div>
+</div>
+
+<!-- ============ S1 ============ -->
+<h2 class="sec" id="s1"><span class="no">1</span>核心文献资源 <em>Literature</em></h2>
+
+<h3>1.1 第一梯队：必读（决定你的研究起点）</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:180px;">名称</th><th style="width:230px;">完整链接</th><th style="width:88px;">类型/年份</th><th>许可与使用限制</th><th style="width:210px;">适用场景</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="tname">MAST：Why Do Multi-Agent LLM Systems Fail?</td>
+      <td>全文 PDF：<a href="https://arxiv.org/pdf/2503.13657v2" target="_blank">https://arxiv.org/pdf/2503.13657v2</a><br>摘要页：<a href="https://arxiv.org/abs/2503.13657" target="_blank">https://arxiv.org/abs/2503.13657</a><br>NeurIPS 2025 D&B 版：<a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/b1041e52d3be19f0a9bc491657488e4a-Abstract-Datasets_and_Benchmarks_Track.html" target="_blank">proceedings.neurips.cc/…/b1041e52d3be19f0a9bc491657488e4a</a></td>
+      <td>预印本 2025<br>NeurIPS 2025</td>
+      <td>arXiv 论文常规许可（可下载、引用、转载需注明出处）；<b>NeurIPS 会议版数据集与标注库开源，代码 MIT</b>。论文内容不可用于商业闭源再分发。</td>
+      <td>整个研究路线的<b>基石</b>。必读原文而非二手解读——14 种失败模式的定义、Cohen's κ=0.88 的达成过程、干预案例的实验设计都要逐字读。</td>
+    </tr>
+    <tr>
+      <td class="tname">MultiAgentBench (MARBLE)</td>
+      <td>论文：<a href="https://arxiv.org/abs/2503.01935" target="_blank">https://arxiv.org/abs/2503.01935</a><br>官方代码（现行）：<a href="https://github.com/MultiagentBench/MARBLE" target="_blank">https://github.com/MultiagentBench/MARBLE</a><br>原始仓库：<a href="https://github.com/ulab-uiuc/MARBLE" target="_blank">https://github.com/ulab-uiuc/MARBLE</a></td>
+      <td>论文 2025<br>持续维护</td>
+      <td><span class="tag t-green">代码 MIT</span> <span class="tag t-green">数据 MIT</span>。可自由使用修改。<b>注意：官方代码已从 ulab-uiuc 迁至 MultiagentBench 组织，旧仓库仅作归档，请用新址。</b></td>
+      <td>里程碑 KPI 评分体系的参考实现；其"图拓扑在研究场景最优""认知规划提升 3% 里程碑达成率"两项发现意味着<b>拓扑与规划策略应作为实验变量</b>，这直接支撑你的架构帕累托实验设计。</td>
+    </tr>
+    <tr>
+      <td class="tname">AgentRx：Diagnosing AI Agent Failures from Execution Trajectories</td>
+      <td>论文：<a href="https://arxiv.org/abs/2602.02475" target="_blank">https://arxiv.org/abs/2602.02475</a><br>数据集：<a href="https://huggingface.co/datasets/microsoft/AgentRx" target="_blank">https://huggingface.co/datasets/microsoft/AgentRx</a><br>魔搭镜像：<a href="https://www.modelscope.cn/datasets/microsoft/AgentRx/summary" target="_blank">modelscope.cn/datasets/microsoft/AgentRx</a></td>
+      <td>2026-02 起<br>持续修订</td>
+      <td><span class="tag t-green">代码 MIT</span> <span class="tag t-green">数据 CC BY 4.0</span>。CC BY 4.0 允许商用与改编，<b>但必须署名并标注修改</b>。含 τ-bench retail 与 Magentic-One 两个域划分。</td>
+      <td><b>突破点②（校验器完备度）最直接的技术蓝本</b>。其"约束合成 + 逐步验证 + 证据化违规日志"流水线，正是你想要的"可审计验证层"实现范式；相对基线提升 23.6% 定位准确率、22.9% 根因归因准确率。</td>
+    </tr>
+    <tr>
+      <td class="tname">ITBench：Evaluating AI Agents across Diverse Real-World IT Automation Tasks</td>
+      <td>论文：<a href="https://arxiv.org/abs/2507.11957" target="_blank">https://arxiv.org/abs/2507.11957</a><br>代码：<a href="https://github.com/itbench-hub/ITBench" target="_blank">https://github.com/itbench-hub/ITBench</a><br>Lite 数据集：<a href="https://huggingface.co/datasets/ibm-research/ITBench-Lite" target="_blank">https://huggingface.co/datasets/ibm-research/ITBench-Lite</a></td>
+      <td>ICML 2025 oral<br>2025-02</td>
+      <td><span class="tag t-green">Apache 2.0</span>。允许商用、修改、闭源分发（保留版权声明与变更说明）。<b>需 Docker / K8s 环境；托管排行榜需申请（见 §2.3）。</b></td>
+      <td>企业级智能体的真实失败基线。SRE/CISO/FinOps 三域 94 场景，官方基线仅解决 13.8% SRE、25.2% CISO、FinOps 为 0%。<b>其场景元组形式化 p=⟨M,E,T,D⟩ 值得借鉴</b>。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>1.2 第二梯队：方法论支撑（你的差异化来源）</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:180px;">名称</th><th style="width:230px;">完整链接</th><th style="width:88px;">类型/年份</th><th>许可与使用限制</th><th style="width:210px;">适用场景</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="tname">Leveson, STPA（Systems-Theoretic Process Analysis）</td>
+      <td>NIST 官方页面：<a href="https://www.nasa.gov/safety-failure-analysis/stpa/" target="_blank">https://www.nasa.gov/safety-failure-analysis/stpa/</a><br>Leveson 主页（含全部论文与书籍信息）：<a href="https://web.mit.edu/nancy/www/" target="_blank">https://web.mit.edu/nancy/www/</a></td>
+      <td>方法论<br>2011 至今</td>
+      <td>学术方法论，无特别许可限制（引用即可）；<b>NASA 已将 STPA 纳入官方安全工程工具链</b>，引用时说明这一点可显著提升说服力。</td>
+      <td><b>突破点⑤的核心来源，路线图中最高回报的单一学习项。</b>原始论文约 20 页，配套书籍《Engineering a Safer World》。重点：把"控制环路"从物理系统扩展到"智能体—工具—环境"耦合环路。</td>
+    </tr>
+    <tr>
+      <td class="tname">Wooldridge, Multi-Agent Systems（算法与博弈论方法）</td>
+      <td>作者主页（含 PDF 与勘误）：<a href="https://www.cs.ox.ac.uk/people/wooldridge/mas/" target="_blank">https://www.cs.ox.ac.uk/people/wooldridge/mas/</a><br>Oxford 出版社页：<a href="https://global.oup.com/academic/product/multi-agent-systems-algorithmic-and-game-theoretic-approach-9780198806620" target="_blank">global.oup.com/academic/product/multi-agent-systems-…-9780198806620</a></td>
+      <td>教材 2nd ed<br>2009 / 2012</td>
+      <td>Oxford 版权，<b>不可免费分发</b>。作者主页提供章节 PDF 与勘误表（合法）。建议图书馆借阅或购买正版。</td>
+      <td>你的数学背景使这本书比多数 CS 研究者容易得多——<b>这是存量优势，务必用起来</b>。重点读分类体系、任务分配（合同网/拍卖）、协商与机制设计三部分。</td>
+    </tr>
+    <tr>
+      <td class="tname">Future Internet：Digital Twins and Agentic AI</td>
+      <td><a href="https://www.mdpi.com/1999-5903/18/10/501" target="_blank">https://www.mdpi.com/1999-5903/18/10/501</a><br>DOI：<a href="https://doi.org/10.3390/fi18100501" target="_blank">https://doi.org/10.3390/fi18100501</a></td>
+      <td>综述 2026-09-23</td>
+      <td><span class="tag t-green">开放获取 CC BY</span>。含 RQ 驱动的结构化分类框架（应用域、智能体架构、自治级别、风险类别、人类控制程度、治理机制）。</td>
+      <td>阶段四（数字孪生×智能体）的<b>第一篇必读综述</b>。其核心论断"高后果、不可逆决策需更强授权/验证/监控/干预机制"是你治理类论文的直接引用源。</td>
+    </tr>
+    <tr>
+      <td class="tname">MASEval：多智能体评估基准统一框架</td>
+      <td><a href="https://github.com/parameterlab/MASEval" target="_blank">https://github.com/parameterlab/MASEval</a><br>基准与许可清单：<a href="https://github.com/parameterlab/MASEval/blob/main/BENCHMARKS.md" target="_blank">github.com/parameterlab/MASEval/blob/main/BENCHMARKS.md</a></td>
+      <td>框架 2025</td>
+      <td>各基准许可不同（详见其 BENCHMARKS.md）。<b>已集成 MACS(CC BY 4.0)、τ²-bench(MIT)、MARBLE(MIT)、GAIA2(Meta 数据条款)、CONVERSE(MIT)。</b></td>
+      <td><b>省时利器</b>：一个框架跑多个多智能体基准，避免为每个基准重写适配。<b>务必先读 BENCHMARKS.md</b>——它整理了每个基准的来源与许可，比逐个去官网查快得多。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>1.3 第三梯队：工业界一手材料（架构判断的关键来源）</h3>
+
+<div class="card">
+  <ul>
+    <li><b>Anthropic Engineering 博客</b> — <a href="https://www.anthropic.com/engineering" target="_blank">https://www.anthropic.com/engineering</a>。重点文章：《How we built our multi-agent research system》（+90.2% 广度优先收益、4×/15× Token 成本口径）、《Building effective agents》（工程模式分类）、《Managed Agents》（2026-04 的 brain/hands 解耦架构）。<span class="tag t-orange">免费阅读</span> · <b>唯一公开推理细节的工业界一手材料</b>。</li>
+    <li><b>Cognition 工程博客</b> — <a href="https://cognition.ai/blog" target="_blank">https://cognition.ai/blog</a>。重点：《Don't Build Multi-Agagents》（2025-06 立论）与 2026-03 的 "Devin can now Manage Devins"（立场反转）。<b>两篇对照读，价值远大于单读一篇</b>——能看清行业架构共识的形成过程。</li>
+    <li><b>IBM Research ITBench 与 MAST 联合分析</b> — <a href="https://huggingface.co/blog/ibm-research/itbenchandmast" target="_blank">https://huggingface.co/blog/ibm-research/itbenchandmast</a>。用 MAST 分类法分析 310 条 ITBench 生产轨迹，得出"Gemini-3-Flash 召回 75.5%、每轨迹仅 2.6 个孤立失败（架构失效干净）"vs"开源模型级联 5.3 个复合失败"的对比。<b>这是"能力 vs 结构"论断最好的实证背书，写作时直接引用。</b></li>
+  </ul>
+</div>
+
+<!-- ============ S2 ============ -->
+<h2 class="sec" id="s2"><span class="no">2</span>数据集资源 <em>Datasets &amp; Benchmarks</em></h2>
+
+<div class="callout co-orange">
+  <b>⚠ 三个必须知道的坑</b>
+  <p>
+    <b>① 仓库 ID 陷阱：</b>MAST 数据集在 HuggingFace 上的正确 ID 是 <code>mcemri/MAD</code>，网络文章常误写为 <code>mcemri/MAST-Data</code>。<b>用错 ID 会直接 404。</b>文件名为 <code>MAD_full_dataset.json</code>（LLM 标注全量）与 <code>MAD_human_labelled_dataset.json</code>（人工标注子集）。<br>
+    <b>② 标注量的真实情况：</b>MAST 论文宣称 1,642 条轨迹，但其中<b>仅 19 条为人工标注</b>，其余为经人工标注校准的 LLM-as-a-Judge 标注（judge 与人工一致性 κ=0.77）。<em>你若要报告标注质量，必须自行抽样人工校验并报告 κ</em>，不能直接引用论文数字。<br>
+    <b>③ 数字不一致：</b>AgentRx 的轨迹数在不同材料中有 115 与 170 两个版本——<b>以最新论文（arXiv:2602.02475）为准：170 条、11 个任务设置、62.5 人时标注量、30 条一致性样本的平均两两 κ=0.89</b>。引用时务必注明版本。
+  </p>
+</div>
+
+<h3>2.1 核心数据集（立即可下载）</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:170px;">数据集</th><th style="width:220px;">完整链接</th><th style="width:105px;">规模</th><th style="width:100px;">许可</th><th>获取方式与适用场景</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="tname">MAST-Data（MAD）<br>多智能体失败标注</td>
+      <td>HF：<a href="https://huggingface.co/datasets/mcemri/MAD" target="_blank">https://huggingface.co/datasets/mcemri/MAD</a><br>代码：<a href="https://github.com/multi-agent-systems-failure-taxonomy/MAST" target="_blank">https://github.com/multi-agent-systems-failure-taxonomy/MAST</a><br>项目页：<a href="https://multi-agent-systems-failure-taxonomy.github.io/MAST/" target="_blank">https://multi-agent-systems-failure-taxonomy.github.io/MAST/</a></td>
+      <td>1,642 条轨迹<br>14 模式 / 3 类</td>
+      <td><span class="tag t-green">MIT</span><br>（代码库）</td>
+      <td><b>直接下载，无需申请。</b>见下方加载代码。适用：失败分布复现、基线对照、标注管线校准。覆盖 MetaGPT/ChatDev/HyperAgent/AppWorld/AG2/Magentic-One 六系统的运行轨迹。<br><b>官方研究页：<a href="https://sites.google.com/berkeley.edu/mast/" target="_blank">https://sites.google.com/berkeley.edu/mast/</a></b></td>
+    </tr>
+    <tr>
+      <td class="tname">AgentRx Benchmark<br>根因定位基准</td>
+      <td>HF：<a href="https://huggingface.co/datasets/microsoft/AgentRx" target="_blank">https://huggingface.co/datasets/microsoft/AgentRx</a><br>魔搭：<a href="https://www.modelscope.cn/datasets/microsoft/AgentRx/summary" target="_blank">modelscope.cn/datasets/microsoft/AgentRx</a></td>
+      <td>170 条失败轨迹<br>11 个任务设置</td>
+      <td><span class="tag t-green">CC BY 4.0</span><br><span class="tag t-green">代码 MIT</span></td>
+      <td><b>直接下载。</b>来源四组：τ-bench retail(39) / Flash 云故障(42) / Magentic-One(44) / 早期两个失败数据集(45)。每条含 step 级失败类别 + 根因标注。<b>这是你"验证层失效"选题的直接素材</b>——注意 CC BY 4.0 需署名。</td>
+    </tr>
+    <tr>
+      <td class="tname">ITBench-Lite<br>企业 IT 自动化场景</td>
+      <td>HF：<a href="https://huggingface.co/datasets/ibm-research/ITBench-Lite" target="_blank">https://huggingface.co/datasets/ibm-research/ITBench-Lite</a><br>Space 版：<a href="https://huggingface.co/spaces/ibm-research/ITBench-Lite" target="_blank">https://huggingface.co/spaces/ibm-research/ITBench-Lite</a><br>组织页：<a href="https://huggingface.co/ibm-research" target="_blank">https://huggingface.co/ibm-research</a></td>
+      <td>65 场景<br>SRE 35 / FinOps 15 / CISO 15</td>
+      <td><span class="tag t-green">Apache 2.0</span></td>
+      <td><b>直接下载（Lite 版）。</b>每场景含 alerts/metrics/OpenTelemetry 日志与 traces/K8s 资源快照 + <code>ground_truth.yaml</code>。<b>价值：它是你做"决策溯源"实验的现成可观测性数据包</b>——已有 OTel 格式，无需自建埋点。IBM 另有 AssetOpsBench（工业资产，23 场景）、CUGA 智能体集合可一并参考。</td>
+    </tr>
+    <tr>
+      <td class="tname">τ-bench / τ²-bench<br>工具—智能体—用户交互</td>
+      <td>τ²-bench 代码：<a href="https://github.com/sierra-research/tau2-bench" target="_blank">https://github.com/sierra-research/tau2-bench</a><br>MASEval 集成版：<a href="https://github.com/parameterlab/MASEval" target="_blank">https://github.com/parameterlab/MASEval</a></td>
+      <td>多轮交互<br>零售/电信/航空</td>
+      <td><span class="tag t-green">代码 MIT</span><br><span class="tag t-green">数据 MIT</span></td>
+      <td><b>直接 clone。</b>适用：AgentRx 的上游数据源，也适合做你自己的多轮协作场景。<b>注意 MASEval 文档明确标注 τ²-bench 集成版为 Beta，尚未与原实现结果对齐</b>，与既有数字比较需谨慎。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="cmd"># ===== MAST 数据集加载（已核验的可用代码）=====
+from huggingface_hub import hf_hub_download
+import json
+
+REPO_ID = "mcemri/MAD"          # 注意：不是 mcemri/MAST-Data
+
+# ① LLM 标注全量（1,642 条）
+path = hf_hub_download(repo_id=REPO_ID, filename="MAD_full_dataset.json",
+                       repo_type="dataset", local_dir="./data/MAD")
+with open(path, "r", encoding="utf-8") as f:
+    mad_full = json.load(f)
+print("全量轨迹数:", len(mad_full))
+
+# ② 人工标注子集（19 条，用于校准你的 LLM judge）
+path_h = hf_hub_download(repo_id=REPO_ID, filename="MAD_human_labelled_dataset.json",
+                         repo_type="dataset", local_dir="./data/MAD")
+with open(path_h, "r", encoding="utf-8") as f:
+    mad_human = json.load(f)
+print("人工标注轨迹数:", len(mad_human))   # 预期 19
+
+# ③ 查看 14 种失败模式定义
+from agentdash.annotator import Annotator
+modes = Annotator.list_failure_modes()
+for mid, info in modes.items():
+    print(f"{mid}\t{info['category']}\t{info['name']}")</div>
+
+<h3>2.2 中文域资源（你的数据护城河所在）</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:170px;">资源</th><th style="width:220px;">完整链接</th><th style="width:100px;">许可/性质</th><th>说明与用法</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="tname">SuperCLUE-Agent<br>（最直接的起点）</td>
+      <td><a href="https://github.com/CLUEbenchmark/SuperCLUE-Agent" target="_blank">https://github.com/CLUEbenchmark/SuperCLUE-Agent</a><br>组织主页：<a href="https://github.com/CLUEbenchmark/SuperCLUE" target="_blank">https://github.com/CLUEbenchmark/SuperCLUE</a></td>
+      <td>开放榜单<br>（部分题集需注册）</td>
+      <td><b>基于中文原生任务的 Agent 能力测评基准</b>，覆盖自我反思、CoT、长短期记忆、示例学习、长程对话、多文档问答六类任务。<b>这是目前与你的"中文多智能体失败基准"选题最接近的公开工作——务必先精读它，明确你的差异化空间在哪里（它是单智能体能力测评，你需要的是多智能体失效诊断）。</b>题集每月 100% 替换，全部原创。</td>
+    </tr>
+    <tr>
+      <td class="tname">ModelScope 魔搭社区<br>（国内数据主渠道）</td>
+      <td><a href="https://modelscope.cn/home" target="_blank">https://modelscope.cn/home</a><br>SDK：<code>pip install modelscope</code></td>
+      <td>平台免费<br>部分需 Token</td>
+      <td><b>关键基础设施。</b>提供 AgentRx 等数据集的国内镜像（<a href="https://www.modelscope.cn/datasets/microsoft/AgentRx/summary" target="_blank">modelscope.cn/datasets/microsoft/AgentRx</a>），国内直连速度快。<b>注册需绑定阿里云账号；部分数据集需在控制台创建 SDK-Token 后才能下载。</b>另有 ModelScope-Agent 框架、EvalScope 评测框架、Swift 训练工具箱。</td>
+    </tr>
+    <tr>
+      <td class="tname">中文知识评测基准<br>（可作任务素材库）</td>
+      <td>C-Eval：<a href="https://github.com/SJTU-LIT/ceval" target="_blank">github.com/SJTU-LIT/ceval</a><br>CMMLU：<a href="https://github.com/haonan-li/CMMLU" target="_blank">github.com/haonan-li/CMMLU</a><br>GAOKAO-Bench：<a href="https://github.com/OpenLMLab/GAOKAO-Bench" target="_blank">github.com/OpenLMLab/GAOKAO-Bench</a><br>AGIEval：<a href="https://github.com/microsoft/AGIEval" target="_blank">github.com/microsoft/AGIEval</a></td>
+      <td>多为开放<br>Apache/MIT</td>
+      <td>用于构造你的中文任务集：<b>C-Eval 13,948 题 / 52 学科</b>（含微积分、线代——与你运筹学背景直接相关）；<b>GAOKAO-Bench 1,781 客观题 + 1,030 主观题</b>（2010–2022 高考真题，中文长文本推理的优质素材）；AGIEval 含 20 种中国资格考试。<b>建议做法：把这些作为"任务源"，让多智能体系统去解，再分析其协作失效模式。</b></td>
+    </tr>
+    <tr>
+      <td class="tname">中文 MAS 评测基准<br>（待填补的空白）</td>
+      <td colspan="3" style="background:var(--green-l)">
+        <b>经核实：目前不存在专门针对中文多智能体系统失败的公开基准。</b>MAST、AgentRx、ITBench、MARBLE 全部为英文数据集。
+        这意味着<b>中文域多智能体失败分类与基准（MAS-CN）是完全可做的原创工作</b>——不是"填补别人没做的空白"，而是"填补一个公开可验证的空白"。
+        你的数据来源组合：SuperCLUE-Agent 任务类型框架（方法学参照）+ C-Eval/GAOKAO-Bench 题库（任务素材）+ 自采教学场景轨迹（独特数据）。
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>2.3 需申请/受管制的资源（提前 2–4 周准备）</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:180px;">资源</th><th style="width:130px;">获取方式</th><th>具体步骤与周期</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="tname">ITBench 托管排行榜<br>（非 Lite 部分）</td>
+      <td>提交申请</td>
+      <td>ITBench 全部 94 场景中，IBM 初始仅开源 11 个，其余通过<b>托管排行榜</b>评估提交的智能体。<b>流程：注册 ITBench 社区 → 提交智能体接入说明 → 等待 IBM 团队确认 → 获得受限场景访问权限。</b>周期通常数周。<b>建议：阶段一先用 ITBench-Lite（Apache 2.0，直接下载）验证方法；待有原创智能体后再申请托管版。</b></td>
+    </tr>
+    <tr>
+      <td class="tname">ModelScope SDK-Token</td>
+      <td>控制台自助</td>
+      <td>登录 modelscope.cn → 右上角头像 → 访问令牌 → 创建 SDK-Token。<b>即时生效</b>，但需绑定阿里云账号。国内下载数据集与模型的必备件，建议第 1 周就办好。</td>
+    </tr>
+    <tr>
+      <td class="tname">学术数据库权限<br>（Web of Science / Scopus / IEEE Xplore）</td>
+      <td>学校订阅</td>
+      <td>通过学校图书馆账号登录。<b>民办高校订阅档位可能偏低</b>——若无 IEEE Xplore，可用替代方案：① arXiv 预印本（覆盖 90%+ 前沿工作）；② Semantic Scholar 开放全文；③ OpenReview 公开评审意见；④ Papers with Code。<b>不必等权限到位再开始。</b></td>
+    </tr>
+    <tr>
+      <td class="tname">LLM API 密钥<br>（标注与对比实验必需）</td>
+      <td>注册开通</td>
+      <td>见 §7 风险表。核心要求：<b>agentdash 默认用 OpenAI API（o1-mini 作为 judge）</b>；国内需用国内服务商或走 ModelScope/Qwen 系列。<b>建议同时准备 2 家（主 + 备），避免单点故障与限流。</b></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============ S3 ============ -->
+<h2 class="sec" id="s3"><span class="no">3</span>工具与库 <em>Toolchain &amp; Libraries</em></h2>
+
+<table>
+  <thead>
+    <tr><th style="width:150px;">工具/库</th><th style="width:210px;">安装 / 链接</th><th style="width:88px;">许可</th><th>用途与注意事项</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="tname">agentdash<br>（MAST 官方标注库）</td>
+      <td><code>pip install agentdash</code><br>PyPI：<a href="https://pypi.org/project/agentdash/" target="_blank">https://pypi.org/project/agentdash/</a><br>源码：<a href="https://github.com/multi-agent-systems-failure-taxonomy/MAST" target="_blank">github.com/multi-agent-systems-failure-taxonomy/MAST</a></td>
+      <td><span class="tag t-green">MIT</span></td>
+      <td><b>最关键的单一工具。</b>提供 <code>Annotator(produce_taxonomy)</code> 与 <code>list_failure_modes()</code>。默认 judge 模型 <code>o1-mini</code>，需 OpenAI key。<b>中文场景必须自行校准</b>——先在 MAD 的人工标注 19 条上验证 kappa，再用于你的中文数据。<b>最新版 0.1.0（2025-08-13），Beta 阶段，接口可能变动。</b></td>
+    </tr>
+    <tr>
+      <td class="tname">OpenTelemetry<br>（追踪数据模型）</td>
+      <td><code>pip install opentelemetry-sdk opentelemetry-exporter-otlp</code><br>规范：<a href="https://opentelemetry.io/docs/specs/otel/" target="_blank">https://opentelemetry.io/docs/specs/otel/</a></td>
+      <td><span class="tag t-green">Apache 2.0</span></td>
+      <td><b>你"决策溯源"方向的技术底座。</b>trace/span 数据模型是智能体执行轨迹的现成载体；ITBench-Lite 已提供 OTel 格式的日志与 trace 数据，可直接对照你的采集格式。<b>建议：从第一天就用 OTel 规范定义自己的轨迹 schema，不要自造格式。</b></td>
+    </tr>
+    <tr>
+      <td class="tname">Z3 求解器<br>（SMT / 不变量检查）</td>
+      <td><code>pip install z3-solver</code><br>文档：<a href="https://microsoft.github.io/z3guide/docs/intro/" target="_blank">https://microsoft.github.io/z3guide/docs/intro/</a></td>
+      <td><span class="tag t-green">MIT</span></td>
+      <td>突破点①④⑥的核心工具：把智能体行为约束编码为断言，运行时检查不变量是否被违反。你的数学背景使上手极快。<b>Windows 上 pip 预编译包可用，无需编译。</b></td>
+    </tr>
+    <tr>
+      <td class="tname">TLA+ / TLC<br>（规格建模）</td>
+      <td>官方下载：<a href="https://lamport.azurewebsites.net/tla/tla.html" target="_blank">https://lamport.azurewebsites.net/tla/tla.html</a><br>GitHub：<a href="https://github.com/tlaplus/tlaplus" target="_blank">https://github.com/tlaplus/tlaplus</a></td>
+      <td><span class="tag t-green">BSD</span></td>
+      <td>用于系统级规格形式化（多智能体编排协议的状态机不变量）。<b>注意：TLA+ Toolbox 是 GUI 工具（JAR 包），命令行 TLC 可用</b>——若仅需批量验证，用 <code>tla2tools.jar</code> 命令行方式更轻量。</td>
+    </tr>
+    <tr>
+      <td class="tname">OR-Tools<br>（约束优化与调度）</td>
+      <td><code>pip install ortools</code><br>文档：<a href="https://developers.google.com/optimization" target="_blank">https://developers.google.com/optimization</a></td>
+      <td><span class="tag t-green">Apache 2.0</span></td>
+      <td>阶段四的数学护城河：CP-SAT / MILP / 最小费用流。<b>让优化器接管硬约束决策，让 LLM 只处理意图理解与柔性部分</b>——这是你相对纯 AI 研究者的结构性优势，建议从阶段二就开始搭这条管线做对照。</td>
+    </tr>
+    <tr>
+      <td class="tname">vLLM / SGLang<br>（本地推理服务）</td>
+      <td><code>pip install vllm</code><br>国内加速：<code>export VLLM_USE_MODELSCOPE=true</code><br>文档：<a href="https://docs.vllm.ai/" target="_blank">https://docs.vllm.ai/</a></td>
+      <td><span class="tag t-green">Apache 2.0</span></td>
+      <td>本地部署开源模型做成本对照实验（关键：架构帕累托实验需要跑大量同预算对照，API 成本可能不可承受）。<b>注意：vLLM 对 NVIDIA GPU 支持最成熟；无独显机器（如你的开发机）建议先用 CPU 推理或小模型 + 量化。</b>国内设 <code>VLLM_USE_MODELSCOPE=true</code> 走魔搭拉模型。</td>
+    </tr>
+    <tr>
+      <td class="tname">PyTorch / Transformers<br>（模型侧）</td>
+      <td><code>pip install torch transformers</code><br>HF：<a href="https://huggingface.co/docs/transformers/index" target="_blank">https://huggingface.co/docs/transformers/index</a></td>
+      <td>BSD / Apache 2.0</td>
+      <td>若走本地模型路线必需。Windows 装 PyTorch 建议先在 conda 内做，<b>CPU 版体积小很多</b>（无需 CUDA 版）。</td>
+    </tr>
+    <tr>
+      <td class="tname">hf-mirror<br>（国内 HF 镜像）</td>
+      <td>环境变量：<code>set HF_ENDPOINT=https://hf-mirror.com</code><br>Linux/macOS：<code>export HF_ENDPOINT=https://hf-mirror.com</code></td>
+      <td>免费加速</td>
+      <td><b>必配。</b>不设此变量在国内下载 HF 数据集大概率超时或极慢。这是本手册最实用的一条环境设置。</td>
+    </tr>
+    <tr>
+      <td class="tname">标准分析栈</td>
+      <td><code>pip install pandas numpy matplotlib scikit-learn scipy jupyter</code></td>
+      <td>BSD / MIT</td>
+      <td>轨迹数据的清洗、统计、可视化。注意 <b>kappa 系数计算</b>（<code>sklearn.metrics.cohen_kappa_score</code>）是你所有标注一致性报告的必备工具。</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============ S4 ============ -->
+<h2 class="sec" id="s4"><span class="no">4</span>框架与平台 <em>Frameworks &amp; Platforms</em></h2>
+
+<div class="callout co-purple">
+  <b>⚑ 关键原则：框架是你的「被测对象」，不是你的「实现载体」</b>
+  <p>
+    强烈建议<b>自建轻量实验脚手架</b>，而不是直接用现成 Agent 框架做研究平台。原因有三：
+    ① 现成框架的埋点深度不够，你拿不到完整的执行轨迹结构（而轨迹正是你的研究对象）；
+    ② 你需要一个干净的对照基线——用现成框架会让"框架自身的失败"污染"架构模式的失败"；
+    ③ 框架迭代极快，一旦绑定，论文复现性会受影响。
+  </p>
+  <p style="margin-top:6px">下表的框架，用途是<b>跑对照组</b>（证明你的观察不是框架特有现象）。</p>
+</div>
+
+<table>
+  <thead>
+    <tr><th style="width:150px;">框架 / 平台</th><th style="width:200px;">完整链接</th><th style="width:88px;">许可</th><th>用途与注意事项</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="tname">LangGraph</td>
+      <td><a href="https://github.com/langchain-ai/langgraph" target="_blank">https://github.com/langchain-ai/langgraph</a><br>文档：<a href="https://langchain-ai.github.io/langgraph/" target="_blank">https://langchain-ai.github.io/langgraph/</a></td>
+      <td><span class="tag t-green">MIT</span></td>
+      <td>图式编排（hub-and-spoke 拓扑的代表），<b>作为架构对照组 A</b>。社区活跃度高，便于复现他人结果。</td>
+    </tr>
+    <tr>
+      <td class="tname">Microsoft Agent Framework<br>（原 AutoGen 演进）</td>
+      <td><a href="https://github.com/microsoft/agent-framework" target="_blank">https://github.com/microsoft/agent-framework</a><br>旧版：<a href="https://github.com/microsoft/autogen" target="_blank">https://github.com/microsoft/autogen</a></td>
+      <td><span class="tag t-green">MIT</span></td>
+      <td><b>作为架构对照组 B（多层级式）。</b><b>注意：AutoGen 已并入 Agent Framework 1.0，peer-to-peer GroupChat 不再是旗舰模式</b>——复现 MAST 中的历史结果时需说明框架版本差异，这是你论文"可复现性"部分的诚实表述。</td>
+    </tr>
+    <tr>
+      <td class="tname">Magentic-One</td>
+      <td><a href="https://github.com/microsoft/magentic-one" target="_blank">https://github.com/microsoft/magentic-one</a></td>
+      <td><span class="tag t-green">MIT</span></td>
+      <td>编排者—工作者范式的官方参考实现（Orchestrator + 任务账本 + 进度账本）。<b>MAST 与 AgentRx 都用了它跑实验，且它已被证明可与 GAIA/AssistantBench/WebArena 上的 SOTA 系统统计相当</b>——是你帕累托实验的默认对照组。</td>
+    </tr>
+    <tr>
+      <td class="tname">ModelScope-Agent</td>
+      <td><a href="https://github.com/modelscope/ms-agent" target="_blank">https://github.com/modelscope/ms-agent</a><br>平台：<a href="https://modelscope.cn/home" target="_blank">https://modelscope.cn/home</a></td>
+      <td>开源<br>（平台免费）</td>
+      <td><b>国内可访问性最好的智能体平台</b>，阿里通义实验室出品。同一组织还提供 EvalScope（评测框架）、Swift（训练工具箱）。适合做国内生态的对照与落地演示。</td>
+    </tr>
+    <tr>
+      <td class="tname">MCP<br>（模型上下文协议）</td>
+      <td>规范：<a href="https://modelcontextprotocol.io/" target="_blank">https://modelcontextprotocol.io/</a><br>SDK：<a href="https://github.com/modelcontextprotocol/python-sdk" target="_blank">https://github.com/modelcontextprotocol/python-sdk</a></td>
+      <td>开放规范<br>（各语言 SDK 多为 MIT）</td>
+      <td>工具层标准接口。<b>用它的原因是"接口已标准化，差异化转移到系统结构层"</b>——这正是你方法论的立足点。建议在实验脚手架中支持 MCP 工具调用，使结果与工业生态可比。</td>
+    </tr>
+    <tr>
+      <td class="tname">Zenodo / Figshare</td>
+      <td><a href="https://zenodo.org/" target="_blank">https://zenodo.org/</a><br><a href="https://figshare.com/" target="_blank">https://figshare.com/</a></td>
+      <td>免费<br>CC BY 可选</td>
+      <td><b>数据集发布与 DOI 获取</b>。MAST 之所以能成为标准引用件，正是因为它开源了数据集与标注库。阶段二务必做这一步——<b>发布带 DOI 的数据集是本路线中引用潜力最高的单项投入。</b>建议选 CC BY 4.0（与 AgentRx 一致，最大化可复用性）。</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============ S5 ============ -->
+<h2 class="sec" id="s5"><span class="no">5</span>六阶段实施路线图 <em>Six-Stage Pipeline</em></h2>
+
+<p>整体按 <strong>28–32 周</strong>（每周 8–10 小时）设计。阶段间存在硬依赖：<b>未完成前阶段的产出物，不进入下一阶段</b>。每阶段末尾列出可验证的交付检查点。</p>
+
+<div class="stage">
+  <div class="stage-hd" style="background:var(--blue-l);">
+    <div class="lv" style="background:#2E5C8A;">①</div>
+    <b>环境准备</b>
+    <span class="tag t-blue">第 1–2 周</span>
+    <span class="dur">预计 25–35 小时</span>
+  </div>
+  <div class="stage-bd">
+    <div class="row-k">
+      <div class="lb">任务清单</div>
+      <ul>
+        <li>创建独立 conda 环境 <code>mast</code>（Python 3.11，避免污染系统环境）</li>
+        <li>安装分析栈 + <code>agentdash</code> + <code>hf-mirror</code> 环境变量</li>
+        <li>注册/确认 ModelScope 账号，创建 SDK-Token</li>
+        <li>注册 2 家 LLM API 服务商（主 + 备），各充值最小额度（见 §7 成本预估）</li>
+        <li>初始化 Git 仓库（<b>从第一天就版本控制</b>），配置 <code>.gitignore</code> 排除 <code>.env</code> 与数据大文件</li>
+        <li>安装 LangGraph / Magentic-One 作为对照框架（<code>pip install langgraph</code>）</li>
+        <li>通读 MAST 原文与 AgentRx 论文，各自写 1500 字结构化笔记</li>
+      </ul>
+    </div>
+    <div class="dep"><b>依赖：</b>无（起点）　|　<b>产出物：</b>可运行的环境 + 两篇笔记 + 干净的 Git 起点</div>
+    <div class="row-k">
+      <div class="lb">交付检查点</div>
+      <ul class="check">
+        <li><code>python -c "import agentdash"</code> 无报错，且 <code>list_failure_modes()</code> 返回 14 个模式</li>
+        <li>HF 镜像变量已生效，能在 5 分钟内下载完 MAD 数据集</li>
+        <li>API key 通过环境变量读取成功（<b>绝不硬编码进代码或提交到 Git</b>）</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-hd" style="background:var(--green-l);">
+    <div class="lv" style="background:#27AE60;">②</div>
+    <b>数据获取</b>
+    <span class="tag t-green">第 3–6 周</span>
+    <span class="dur">预计 30–40 小时</span>
+  </div>
+  <div class="stage-bd">
+    <div class="row-k">
+      <div class="lb">任务清单</div>
+      <ul>
+        <li>下载 MAST 全量（1,642）+ 人工标注子集（19），做基本统计：三大类占比、14 模式频次分布</li>
+        <li>下载 AgentRx（170 条），解析其 step 级失败标注与根因标注结构</li>
+        <li>下载 ITBench-Lite（65 场景），<b>重点分析其 OTel 日志/trace 格式</b>——这是你轨迹 schema 的对照参考</li>
+        <li>clone MARBLE 与 τ²-bench，跑通各自的最小示例</li>
+        <li>下载中文任务素材：C-Eval（选微积分/线代/运筹学相关学科）、GAOKAO-Bench 客观题、SuperCLUE-Agent 任务定义</li>
+        <li>下载 hf-mirror 镜像下的中文数据集作为交叉验证</li>
+      </ul>
+    </div>
+    <div class="dep"><b>依赖：</b>阶段一环境　|　<b>产出物：</b>本地 <code>data/</code> 目录（原始数据只读，不修改）</div>
+    <div class="row-k">
+      <div class="lb">本阶段关键动作</div>
+      <ul>
+        <li><b>立即做的分析（1 天内可得）：</b>画出 MAST 三大类失败的占比饼图与 14 模式频次条形图，核对是否与论文报告一致（系统设计 44% / 智能体间失配 31% / 验证 24%）。这是你阶段一技术报告的第一张图，也是你所有后续论文的基线。</li>
+      </ul>
+    </div>
+    <div class="row-k">
+      <div class="lb">交付检查点</div>
+      <ul class="check">
+        <li>所有数据文件记录 SHA256 校验值（可复现性要求）</li>
+        <li>MAST 三大类占比与你独立统计的偏差 ≤ 8%</li>
+        <li>写完 <code>data/README.md</code>：每个数据集的来源链接、许可、获取日期、规模、校验值</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-hd" style="background:var(--orange-l);">
+    <div class="lv" style="background:#E67E22;">③</div>
+    <b>数据处理与轨迹 schema 设计</b>
+    <span class="tag t-orange">第 7–12 周</span>
+    <span class="dur">预计 40–50 小时（最重阶段）</span>
+  </div>
+  <div class="stage-bd">
+    <div class="row-k">
+      <div class="lb">任务清单</div>
+      <ul>
+        <li><b>定义统一轨迹 schema（本周最关键产出）</b>：基于 OpenTelemetry trace/span 数据模型，设计覆盖多智能体执行的结构——建议字段：<code>trace_id</code> / <code>agent_id</code> / <code>role_spec</code> / <code>thought</code> / <code>action</code> / <code>tool_call</code> / <code>observation</code> / <code>handoff_to</code> / <code>token_usage</code> / <code>latency</code> / <code>constraint_check</code></li>
+        <li>写 Python ETL：把 MAST / AgentRx / 自采轨迹统一映射到你的 schema</li>
+        <li>实现 MAST 标注管线调用（<code>agentdash</code>），<b>先在 MAD 人工标注 19 条上校准 judge</b>，算 kappa，验证 ≥0.7 可用</li>
+        <li>构建多架构实验脚手架（自建，不用现成框架）：单智能体 / 编排者—子智能体 / 有界协作三模式，<b>严格固定 Token 预算变量</b></li>
+        <li>在中文任务集上跑首轮轨迹采集，目标 300+ 条</li>
+      </ul>
+    </div>
+    <div class="dep"><b>依赖：</b>阶段二数据 + 阶段一 API key　|　<b>产出物：</b>schema 定义文档（JSON Schema）+ ETL 代码 + 首轮中文轨迹数据集</div>
+    <div class="row-k">
+      <div class="lb">本阶段最容易出错的地方</div>
+      <ul>
+        <li><b>Token 预算未固定。</b>多智能体实验最大的混淆变量就是 Token 消耗——若不固定，架构对比毫无意义。<b>在脚手架层面强制记录每条轨迹的 token_usage，并在对比时按预算分层而非按总样本。</b></li>
+        <li><b>中文 judge 失准。</b>o1-mini 对中文轨迹的标注一致性未知，必须先校准再批量标注，否则后续全部结论不可信。</li>
+      </ul>
+    </div>
+    <div class="row-k">
+      <div class="lb">交付检查点</div>
+      <ul class="check">
+        <li>中文 judge 在人工标注子集上 <b>kappa ≥ 0.7</b>（不达标则改用国内模型或人工标注）</li>
+        <li>300+ 条中文轨迹通过 schema 校验，无缺失关键字段</li>
+        <li>三架构在相同预算下各跑 ≥50 次，产出可比对的结果表</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-hd" style="background:var(--purple-l);">
+    <div class="lv" style="background:#7F77DD;">④</div>
+    <b>方法 / 算法实现</b>
+    <span class="tag t-purple">第 13–20 周</span>
+    <span class="dur">预计 50–60 小时</span>
+  </div>
+  <div class="stage-bd">
+    <div class="row-k">
+      <div class="lb">核心任务（三条并行主线，按优先级）</div>
+      <ul>
+        <li><b>主线 A｜MAST-CN 分类与诊断工具</b>（最低风险，建议先做）：用 grounded theory 方法对中文轨迹做二次归纳——6 名标注者（或 3 人两轮 + LLM 预标）独立标注 150 条轨迹，迭代至无新失败类型；计算两两 kappa 报一致性；检验 MAST 14 模式在中文场景的普适性，识别需增补的新模式。产出：分类法定义 + 校准后的中文 judge + 诊断工具（可 pip 安装）。</li>
+        <li><b>主线 B｜校验器完备度指标</b>（学术价值最高）：借鉴 AgentRx 的"约束合成 + 逐步验证 + 证据化违规日志"三段式流水线；构造"检查通过但结论错误"的反例族；定义完备度指标；用 Z3 做关键不变量的运行时监控。<b>反例构造是难点也是亮点</b>——参考 MAST 的国际象棋程序案例思路（能编译、有测试、无 TODO，但违反规则）。</li>
+        <li><b>主线 C｜成本—性能帕累托前沿</b>（引用潜力最高）：严格等预算下对比三架构，绘帕累托前沿；用 MIT 委托网络不可能性结论解释前沿形状；产出"任务特征 → 架构"的选型规则表。数据来自阶段三的实验。</li>
+      </ul>
+    </div>
+    <div class="dep"><b>依赖：</b>阶段三 schema + 校准后 judge（<b>这是硬依赖——judge 未校准则后面全废</b>）</div>
+    <div class="row-k">
+      <div class="lb">交付检查点</div>
+      <ul class="check">
+        <li>中文分类法草案完成，报告 kappa 值与新发现模式列表</li>
+        <li>诊断工具在留出轨迹上验证稳定性（同一轨迹两次标注结果一致率 ≥ 85%）</li>
+        <li>帕累托前沿图完成，且能回答一个明确问题："在什么任务特征下用哪种架构"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-hd" style="background:var(--pink-l);">
+    <div class="lv" style="background:#D4537E;">⑤</div>
+    <b>评估验证</b>
+    <span class="tag t-pink">第 21–25 周</span>
+    <span class="dur">预计 35–45 小时</span>
+  </div>
+  <div class="stage-bd">
+    <div class="row-k">
+      <div class="lb">任务清单</div>
+      <ul>
+        <li>构建验证指标体系：<b>里程碑 KPI（对齐 MARBLE 规范）</b> + MAST 失败模式画像 + 成本调整后成功率（等预算下对比单智能体）</li>
+        <li>做消融实验：逐项施加治理措施（角色说明强化 / 层级强制 / 高层验证检查点 / 终止条件显式化），量化各自的成功率增益（参考 MAST 报告的 +9.4%、+16% 量级）</li>
+        <li>验证一致性检验：自采中文 judge 结果 vs 人工抽样标注，报告 kappa</li>
+        <li>做统计检验：显著性检验 + 效应量（不要只报 p 值，样本量小时报 Cohen's d）</li>
+        <li>可复现性打包：容器化 + 固定随机种子 + 环境清单 + 全部实验脚本</li>
+      </ul>
+    </div>
+    <div class="dep"><b>依赖：</b>阶段四全部三条主线　|　<b>产出物：</b>完整实验报告 + 可复现实验包</div>
+    <div class="row-k">
+      <div class="lb">容易被审稿人质疑的三个点（提前堵住）</div>
+      <ul>
+        <li><b>"你的方法相对 MAST 到底新在哪？"</b> → 必须在论文中给出相关工作对比表，明确划界（你的定位：中文域 + 多智能体特有失败 + 验证层度量）。</li>
+        <li><b>"LLM-as-judge 可靠吗？"</b> → 必须报人工校验子集的 kappa（MAST 的 1,642 条中仅 19 条人工标注，这点要主动说明，不隐瞒）。</li>
+        <li><b>"框架版本变了结论还成立吗？"</b> → 必须固定框架版本号并在论文中说明（AutoGen 已并入 Agent Framework 1.0，这类变化必须交代）。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-hd" style="background:#EDF7F3;">
+    <div class="lv" style="background:#1E7A5E;">⑥</div>
+    <b>发布 / 部署 / 教学应用</b>
+    <span class="tag t-green">第 26–32 周</span>
+    <span class="dur">预计 30–40 小时</span>
+  </div>
+  <div class="stage-bd">
+    <div class="row-k">
+      <div class="lb">任务清单（三个并行出口）</div>
+      <ul>
+        <li><b>数据集发布：</b>上传 Zenodo（选 CC BY 4.0），获取 DOI，写 Data Card（来源、规模、许可、标注流程、kappa、使用限制、伦理说明——<b>教学数据涉及学生信息，必须写明脱敏与知情同意处理</b>）</li>
+        <li><b>工具发布：</b>诊断工具发 PyPI（照 agentdash 的做法，MIT 协议），文档含快速开始示例</li>
+        <li><b>教学应用：</b>把标注管线与诊断工具引入《人工智能工具应用实践》课程作为实验项目，形成"研究反哺教学"的可见成果（教创赛与职称材料双重收益）</li>
+        <li><b>论文撰写：</b>按 Design Science Research 六要素结构（问题识别→目标→设计→构建→评估→结论）组织，这是让"原创性"被看见的写作骨架</li>
+        <li><b>投稿：</b>阶梯投递——先投中文核心/ICSME 类会议拿反馈，再打磨冲 JSS / IST / RESS / EJOR</li>
+      </ul>
+    </div>
+    <div class="dep"><b>依赖：</b>阶段五评估包 + 阶段二三的 schema 与工具　|　<b>产出物：</b>带 DOI 的数据集 + PyPI 包 + 课程材料 + 论文初稿</div>
+    <div class="row-k">
+      <div class="lb">交付检查点（阶段六的完成标准）</div>
+      <ul class="check">
+        <li>他人能仅凭你的 README 复现你论文中的主实验（<b>这是最硬的标准</b>）</li>
+        <li>数据集有 DOI 且许可清晰（CC BY 4.0），工具包有可安装版本</li>
+        <li>课程试点完成，至少一门课有学生实际使用了你的工具</li>
+        <li>论文初稿完成，相关工作对比表已就位</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="callout co-blue">
+  <b>📊 阶段依赖关系总览</b>
+  <p>
+    <b>②依赖①</b>（数据依赖环境与账号）→ <b>③依赖②</b>（schema 设计依赖已有数据结构的观察）→
+    <b>④依赖③</b>（方法实现强依赖校准后的 judge，这是最关键的一环）→ <b>⑤依赖④</b>（评估依赖方法产出）→
+    <b>⑥依赖⑤+②③</b>（发布需要可复现实验包，也需要早期阶段的 schema 与工具）。
+  </p>
+  <p style="margin-top:6px">
+    <b>关键路径：③→④ 的交接点（judge 校准）是最可能卡住整个项目的位置。</b>建议在第 10 周就单独预留 3 天做 judge 校准实验，不要等到阶段四才发现中文标注不可用。
+  </p>
+</div>
+
+<!-- ============ S6 ============ -->
+<h2 class="sec" id="s6"><span class="no">6</span>风险与前置条件 <em>Risks, Prerequisites &amp; Contingencies</em></h2>
+
+<div class="grid2" style="margin-bottom:18px;">
+  <div class="stat s-pink"><div class="n">62.5 h</div><div class="l">AgentRx 标注 170 条轨迹的人工工时（官方数据，可作为你人工标注量的基准）</div></div>
+  <div class="stat s-orange"><div class="n">20–24 min</div><div class="l">标注单条轨迹的平均耗时（AgentRx 实测：τ-bench 中位 36 步、Magentic-One 中位 33 步）</div></div>
+  <div class="stat s-blue"><div class="n">0 元</div><div class="l">阶段一全部所需成本（纯 CPU 环境）</div></div>
+  <div class="stat s-purple"><div class="n">28–32 周</div><div class="l">全流程总周期（每周 8–10 小时投入）</div></div>
+</div>
+
+<h3>6.1 高风险项（必须提前处理）</h3>
+
+<div class="risk r-h">
+  <div class="risk-hd"><b>H1｜LLM API 不可达或成本失控</b><span class="tag t-red">高</span><span class="tag t-red">阻断性</span></div>
+  <p><b>问题：</b>agentdash 默认依赖 OpenAI API（o1-mini 作为 judge）。若网络不可达或无支付方式，整个标注流水线直接停摆。批量标注 300+ 轨迹的 API 费用也是真实支出。</p>
+  <p><b>前置准备（本周内完成）：</b>① 注册 2 家以上服务商（主+备），各充值最小额度；② 国内优先选国内服务商（阿里/DeepSeek/智谱等）；③ 本地部署开源模型作为 judge 备选（<code>VLLM_USE_MODELSCOPE=true</code> + Qwen 系列），<b>注意：不同 judge 的标注结果不可直接混用，必须报告用了哪个</b>。</p>
+  <p><b>成本预估：</b>按每条轨迹约 3–6K token 输入、判官输出约 1K token 估算，300 条轨迹单轮标注约 100 万 token 量级。API 费用从数十到数百元不等（取决于模型选择）；<b>若跑多架构多预算对照实验，量级会显著上升——这是必须用本地模型做对照实验的原因。</b></p>
+  <p><b>降级方案：</b>若 API 全部不可用，退回"纯人工标注 + 双人独立标注"路径。按 AgentRx 的 20–24 分钟/条估算，300 条约需 100–120 人时——<b>可压缩到 100 条（约 35–40 人时）以保住阶段关口</b>，但这会降低统计效力，需在论文中说明样本量限制。</p>
+</div>
+
+<div class="risk r-h">
+  <div class="risk-hd"><b>H2｜中文 judge 校准不达标</b><span class="tag t-red">高</span><span class="tag t-red">关键路径</span></div>
+  <p><b>问题：</b>MAST 的 judge 是在英文编码/数学任务上校准的（与人工一致性 κ=0.77）。中文轨迹（尤其教学管理类半结构化任务）的标注一致性<b>完全未知</b>。若低于 0.7，后续所有基于自动标注的统计结论都不可信。</p>
+  <p><b>前置准备：</b>在第 10 周预留 3 天专门做校准实验，不要拖到阶段四。用 MAD 的 19 条人工标注做外部校准 + 你的 50 条自采中文轨迹做内部校准，双重验证。</p>
+  <p><b>降级方案：</b>① 换更强的 judge（成本上升但准确率提升）；② 对争议样本启用双 judge 交叉标注（成本翻倍，仅用于抽样审计而非全量）；③ 极限方案：全量人工标注 + 自动化仅作辅助提示（需相应缩减样本量并调整论文定位）。</p>
+</div>
+
+<div class="risk r-h">
+  <div class="risk-hd"><b>H3｜数据规模与统计效力不足</b><span class="tag t-red">高</span></div>
+  <p><b>问题：</b>多智能体实验的失败率本身很高（41–87%），若你的任务集太简单（失败率过低）或样本太少（30 条），都得不到有统计意义的分布。对比参照：MAST 用了 1,642 条、AgentRx 用了 170 条（且标注耗时 62.5 人时）。</p>
+  <p><b>应对：</b>① 任务难度要有梯度（从 C-Eval 低难度到 GAOKAO-Bench 长文本推理）；② 每个架构 × 每个预算档至少 50 次重复（这是统计效力的下限，不是理想值）；③ 如果预算不足，<b>优先保证"架构对比"的样本量，而不是"失败分类广度"的样本量</b>——因为前者是你的核心论断，后者是工具。</p>
+</div>
+
+<div class="risk r-m">
+  <div class="risk-hd"><b>M1｜框架版本漂移导致不可复现</b><span class="tag t-orange">中</span></div>
+  <p><b>问题：</b>AutoGen 已并入 Microsoft Agent Framework 1.0，peer-to-peer GroupChat 不再是旗舰模式；LangGraph 也在快速迭代。若论文写作时框架已变，<em>复现你的结论需要不同代码</em>。</p>
+  <p><b>应对：</b>① 实验当天记录 <code>pip freeze</code> 全量快照，存入 <code>environment.yml</code> 并随论文发布；② 在论文中明确报告框架名称+版本号+commit hash；③ <b>自建脚手架在此处再次体现价值</b>——你的核心代码不依赖任何第三方 Agent 框架，因此不受框架迭代影响。</p>
+</div>
+
+<div class="risk r-m">
+  <div class="risk-hd"><b>M2｜研究热点漂移使选题过时</b><span class="tag t-orange">中</span></div>
+  <p><b>问题：</b>本路线图的信息基础是 2026 年 10 月的检索结果。AI 领域半年即可换代，若半年后才发现"这个问题已被解决"，选题价值会大打折扣。</p>
+  <p><b>应对：</b>① 阶段一先做一次"竞争者扫描"——检索你的三个主选题（校验器完备度、决策溯源、中文域基准）在 2026 年 10 月之后是否已有新工作；② 选择题 ①（中文域失败分类）而非 ②（校验器完备度）作为第一个项目，因为"中文域空白"比"指标空白"更稳固；③ 每年 6 月与 12 月各复核一次。</p>
+</div>
+
+<div class="risk r-m">
+  <div class="risk-hd"><b>M3｜教学数据的伦理与合规风险</b><span class="tag t-orange">中</span><span class="tag t-blue">易被忽略</span></div>
+  <p><b>问题：</b>你的数据优势来自教学场景，这涉及学生个人信息与教学过程数据。若采集学生交互轨迹用于研究并公开发布，存在个人信息保护与知情同意的合规风险。</p>
+  <p><b>应对：</b>① 轨迹中的学生身份信息全部匿名化/假名化（用学号哈希或直接去除）；② 采集前告知并取得知情同意（课程内可作为教学环节设计的一部分，但要说明用途）；③ 数据卡中明确写出脱敏流程、同意获取方式、伦理审查情况（如学校有要求）；④ <b>建议在课程设计中就嵌入"数据伦理"教学环节</b>——这本身就是课程亮点，且能自证合规性。</p>
+</div>
+
+<div class="risk r-l">
+  <div class="risk-hd"><b>L1｜学术数据库权限不足</b><span class="tag t-green">低（已有成熟替代）</span></div>
+  <p><b>问题：</b>民办高校订阅档位可能无法访问 IEEE Xplore / Scopus / Web of Science，影响文献完整性与影响因子核算。</p>
+  <p><b>应对：</b>arXiv（覆盖 90%+ 前沿）、Semantic Scholar（开放全文与引用图）、OpenReview（公开评审意见，是训练评审视角的最佳材料）、Papers with Code、DBLP（作者与引用关系）、Google Scholar。<b>不必等权限到位再开始。</b></p>
+</div>
+
+<div class="risk r-l">
+  <div class="risk-hd"><b>L2｜本地算力不足</b><span class="tag t-green">低（可绕过）</span></div>
+  <p><b>问题：</b>若开发机无独立显卡（仅核显），无法本地运行较大规模开源模型做批量对照实验。</p>
+  <p><b>应对：</b>① 阶段一至三完全不需要 GPU（纯数据分析 + API 调用）；② 需要本地模型时用量化小模型（Qwen 系列 7B/14B AWQ/GPTQ）或 GGUF + llama.cpp 路线；③ 批量实验优先用 API + 本地脚本调度，把并发控制交给 API 侧；④ 魔搭社区提供限额免费 GPU 算力（需注册绑定阿里云）；⑤ 学校通常有实验室或高性能计算资源可申请。<b>不要让"没有 GPU"成为放弃对照实验的理由——用 API 跑对照是可行的。</b></p>
+</div>
+
+<!-- ============ S7 ============ -->
+<h2 class="sec" id="s7"><span class="no">7</span>执行检查清单 <em>Master Checklist</em></h2>
+
+<div class="grid2">
+  <div class="card">
+    <h4>第 1 周必须完成（账号与密钥前置）</h4>
+    <ul class="check">
+      <li>创建 conda 环境 <code>mast</code>，安装分析栈与 agentdash</li>
+      <li>设置 <code>HF_ENDPOINT=https://hf-mirror.com</code>（Windows 用 <code>set</code>）</li>
+      <li>注册 ModelScope，创建 SDK-Token</li>
+      <li>注册 2 家 LLM API 服务商并充值最小额度</li>
+      <li>Git 仓库初始化，<code>.gitignore</code> 排除 <code>.env</code> 与 <code>data/</code></li>
+      <li>下载 MAST 数据集，验证 1,642 条加载成功</li>
+      <li>确认 <code>list_failure_modes()</code> 返回 14 个模式</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>第 4 周必须完成（数据地基）</h4>
+    <ul class="check">
+      <li>MAST 三大类占比统计完成，与论文报告偏差 ≤ 8%</li>
+      <li>AgentRx 170 条下载并解析其标注结构</li>
+      <li>ITBench-Lite 下载完毕，重点分析其 OTel trace 格式</li>
+      <li>中文任务素材（C-Eval / GAOKAO-Bench / SuperCLUE-Agent）下载完毕</li>
+      <li>所有数据文件记录 SHA256 校验值</li>
+      <li><code>data/README.md</code> 完成（来源/许可/日期/规模/校验值）</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>第 10 周关键关口（最易卡住）</h4>
+    <ul class="check">
+      <li><b>轨迹 schema 定稿</b>（JSON Schema 文档化）</li>
+      <li><b>中文 judge 校准实验完成，kappa ≥ 0.7</b> ← <span class="tag t-red">全项目最关键的单点</span></li>
+      <li>若 kappa 不达标，此时切换方案，不要硬撑</li>
+      <li>自建实验脚手架支持三架构，Token 预算强制记录</li>
+      <li>中文轨迹首轮采集 300+ 条</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>第 20 周与第 32 周关口</h4>
+    <ul class="check">
+      <li><b>第 20 周：</b>中文分类法草案 + kappa 报告 + 诊断工具稳定性验证通过</li>
+      <li><b>第 20 周：</b>帕累托前沿图完成，能回答"何时用哪种架构"</li>
+      <li><b>第 32 周：</b>数据集发布到 Zenodo 并取得 DOI</li>
+      <li><b>第 32 周：</b>他人仅凭 README 可复现主实验（最硬标准）</li>
+      <li><b>第 32 周：</b>课程试点完成，至少一门课实际使用你的工具</li>
+      <li><b>第 32 周：</b>论文初稿完成，相关工作对比表已就位</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout co-green">
+  <b>✓ 三条执行纪律</b>
+  <p><b>① 关键路径优先。</b>整个项目的瓶颈在第 10 周的 judge 校准这一件事上。在它之前，不要投入时间做任何美化、写作、或框架搭建。</p>
+  <p style="margin-top:6px"><b>② 样本量是硬约束，不是努力方向。</b>300 条轨迹若要靠人工完成，按 20–24 分钟/条需 100–120 人时——这是一笔真实的时间投资，必须在计划中显式预留，不要假装可以"顺手标完"。</p>
+  <p style="margin-top:6px"><b>③ 可复现性从第一天建。</b>不是写论文时补。它是本路线中唯一"必须从第 1 周开始、否则后期无法补救"的事项：Git 版本控制、环境快照、SHA256 校验、数据卡。</p>
+</div>
+
+<div class="footer-note">
+  <p><b>信息时效说明：</b>本手册中所有链接、许可协议、仓库 ID、数据规模与安装命令均于 <b>2026 年 10 月</b>逐项联网核实。但以下三类信息会漂移，请在使用前二次确认：① 各框架的仓库地址（组织迁移频繁，如 AutoGen→Agent Framework、ulab-uiuc→MultiagentBench）；② API 模型名称与价格（迭代极快）；③ agentdash 版本（当前 0.1.0，Beta 阶段，接口可能变动）。</p>
+  <p style="margin-top:9px"><b>本手册与研究路线图的关系：</b>本手册解决"怎么做"（资源与执行），路线图解决"做什么"（方向与选题）。两者的衔接点是<b>阶段二到阶段三</b>：路线图确定了六个突破点与选题优先级，本手册的阶段①②③④则给出了实现任一选题所需的完整资源与执行路径。建议按本手册完成阶段一至三后，再依据路线图正式锁定主攻选题。</p>
+  <p style="margin-top:12px;color:var(--ink3)">编制时间：2026 年 10 月 9 日　|　建议每季度复核一次链接有效性与版本变化</p>
+</div>
+
+</main>
+</div>
+</body>
+</html>
