@@ -1,0 +1,90 @@
+{
+  "book_title": "超预测",
+  "book_title_en": "Superforecasting: The Art and Science of Prediction",
+  "author": "菲利普·泰特洛克 / 丹·加德纳",
+  "slug": "superforecasting",
+  "purpose": "把模糊判断改写成可结算的概率问题，拆解、更新、校准，并用记录替代「我早就说过」",
+  "category_id": "12-IndustryConsultant",
+  "principles": [
+    "用数字代替形容词：把「可能」换成 55%、63%",
+    "细颗粒度：区分 55/45 与 60/40，说明你分辨了证据强度",
+    "先取基准率，再用内视角调整",
+    "拆成费米式小问题，定位最不确定的一环",
+    "小幅频繁更新：既不过度反应，也不固守原判",
+    "事前写下概率：没有记录，就会事后修改记忆"
+  ],
+  "pitfalls": [
+    "追求精确的错误：给 87.3% 却没有依据",
+    "只更新不校准：频繁改数字，但从不结算命中率",
+    "把校准当成决策：概率对了，行动仍可能错"
+  ],
+  "checklist": [
+    "选一个你正在关心的判断（行业、项目、政策），把它写成可结算的问题：事件、时间、判定标准",
+    "先给出一个概率，颗粒度到个位（例如 63%，而不是「六成」）",
+    "写下你的内外视角：同类事情的基准率是多少，这个案例凭什么偏离",
+    "把问题拆成三到五环，标出哪一环的不确定性最大",
+    "为你的判断找两个先行指标，写清「出现什么说明我错了」",
+    "设一个复核日期，到点必须更新一次，变化不超过 10 个百分点",
+    "把最近五个判断列出来，标注发生 / 未发生，计算你的实际命中率",
+    "找出你最近一次「我早就说过」的时刻，问当时有没有写下概率",
+    "与一个观点不同的人交换理由（不是结论），只记录他提供了什么新证据",
+    "为你的团队设计一次「先独立写、再公开理由」的流程，本周用一次",
+    "把一个你坚信的宏大叙事，改写成三个可检验的小预测",
+    "复盘一次失败：区分哪部分是判断错，哪部分是运气差"
+  ],
+  "sources": [
+    {
+      "title": "《超预测》中文版书目检索（豆瓣）",
+      "url": "https://search.douban.com/book/subject_search?search_text=%E8%B6%85%E9%A2%84%E6%B5%8B&cat=1001"
+    },
+    {
+      "title": "Superforecasting 原版书目检索（Open Library）",
+      "url": "https://openlibrary.org/search?q=Superforecasting%20Tetlock"
+    },
+    {
+      "title": "Good Judgment 官方站（含 Brier 评分说明）",
+      "url": "https://goodjudgment.com/"
+    }
+  ],
+  "tags": [
+    {
+      "zh": "概率判断",
+      "en": "Probabilistic Judgment"
+    },
+    {
+      "zh": "校准",
+      "en": "Calibration"
+    },
+    {
+      "zh": "预测",
+      "en": "Forecasting"
+    }
+  ],
+  "quick_prompts": [
+    {
+      "zh": "帮我把这个模糊判断写成可结算的预测问题，并给出概率",
+      "en": "Turn my vague view into a resolvable forecast with a probability"
+    },
+    {
+      "zh": "用基准率与内外视角帮我估这件事的可能性",
+      "en": "Estimate this with base rates plus an inside view"
+    },
+    {
+      "zh": "帮我复盘最近五个判断的校准情况",
+      "en": "Review the calibration of my last five forecasts"
+    }
+  ],
+  "workflow": [
+    "把问题写成事件、时间、判定标准三要素齐全的句子",
+    "给出个位数颗粒度的初始概率",
+    "写下基准率与该案例的偏离理由",
+    "拆成三到五环，定位最不确定的一环",
+    "设复核日期，小幅更新并记录",
+    "结算后只评估校准，不评估单次输赢"
+  ],
+  "notes": [
+    "非原著全文，请购买正版对照阅读",
+    "书中的准确性建立在可结算与即时反馈上，现实需改造",
+    "部分引文为论点概述，非原文引用"
+  ]
+}

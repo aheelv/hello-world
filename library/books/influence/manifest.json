@@ -1,0 +1,90 @@
+{
+  "book_title": "影响力",
+  "book_title_en": "Influence: The Psychology of Persuasion",
+  "author": "罗伯特·西奥迪尼（Robert B. Cialdini）",
+  "slug": "influence",
+  "purpose": "识别并设计影响力路径：看清六条捷径如何被触发，也检查自己从不设防的开关",
+  "category_id": "12-IndustryConsultant",
+  "principles": [
+    "所有说服技术都作用在捷径的入口：先识别扳机，再谈内容",
+    "互惠：先给再要，拒绝—退让是最常见的变形",
+    "承诺与一致：公开、书面、费力的承诺最能锁住人",
+    "社会认同：越不确定越看别人，相似者的影响最大",
+    "喜好与权威：外表、相似、头衔、衣着都能替代判断",
+    "稀缺：数量与时间同时收紧，思考时间被压缩"
+  ],
+  "pitfalls": [
+    "把识别当成免疫：知道原理仍然会被触发，需要预设应对话术",
+    "用这些技术去操纵：短期有效，长期反噬信任",
+    "停在六条原理：2021 新版增补了第七条「统一性」"
+  ],
+  "checklist": [
+    "回想最近一次「不好意思拒绝」的场合，写下当时被触发了哪条原理",
+    "列出你近三个月买过但没在用东西，看其中多少是「限时 / 限量」促成的",
+    "收到不请自来的小礼物时，练习说一句「谢谢，不用了」，不解释",
+    "检查一次谈判：对方是否先报了一个高价，再「让步」到目标价",
+    "翻出你公开承诺过的一件事，判断你现在是在执行它，还是在维护它",
+    "在一个群里看到「大家都这样」时，找出原始数据来源，没有就标为未证实",
+    "为你的下一次评审加一条规则：先看材料，再看人",
+    "核实一位你常引用的专家：他的头衔来自哪里？在这个问题上是否相关",
+    "遇到「最后一天」时，强制自己隔 24 小时再决定",
+    "写一份个人「扳机清单」：哪三种话术最容易被说服，遇到时准备哪句话回应",
+    "在需要求助时，指定一个具体的人，而不是向人群喊话",
+    "回顾一次你因为「聊得来」而放宽标准的合作，写下后来发生了什么"
+  ],
+  "sources": [
+    {
+      "title": "《影响力》中文版书目检索（豆瓣）",
+      "url": "https://search.douban.com/book/subject_search?search_text=%E5%BD%B1%E5%93%8D%E5%8A%9B%20%E8%A5%BF%E5%A5%A5%E8%BF%AA%E5%B0%BC&cat=1001"
+    },
+    {
+      "title": "Influence 原版书目检索（Open Library）",
+      "url": "https://openlibrary.org/search?q=Influence%20Cialdini"
+    },
+    {
+      "title": "Robert Cialdini 官方站（含七条原理说明）",
+      "url": "https://www.influenceatwork.com/"
+    }
+  ],
+  "tags": [
+    {
+      "zh": "说服机制",
+      "en": "Persuasion"
+    },
+    {
+      "zh": "消费决策",
+      "en": "Consumer Choice"
+    },
+    {
+      "zh": "防御识别",
+      "en": "Defense"
+    }
+  ],
+  "quick_prompts": [
+    {
+      "zh": "帮我分析这段销售话术用了哪几条影响力原理",
+      "en": "Which influence principles does this sales script use?"
+    },
+    {
+      "zh": "我要说服团队接受这个方案，用互惠与承诺一致设计路径",
+      "en": "Design a persuasion path for my team using reciprocity and commitment"
+    },
+    {
+      "zh": "帮我列出自己最容易被说服的三个开关与应对话术",
+      "en": "List my three weakest persuasion triggers and how to respond"
+    }
+  ],
+  "workflow": [
+    "先还原对方的触发路径：用了哪条原理",
+    "判断这是真实信息还是人为制造的紧迫感",
+    "把「人和提议」分开评估",
+    "为自己写下应对话术与冷却期",
+    "正向使用：用互惠与承诺一致设计沟通顺序",
+    "复盘一次被说服的经历，更新开关清单"
+  ],
+  "notes": [
+    "非原著全文，请购买正版对照阅读",
+    "本书双用途，长期滥用会反噬信任",
+    "部分经典实验后续重复验证结果有限，引用需核对原文"
+  ]
+}

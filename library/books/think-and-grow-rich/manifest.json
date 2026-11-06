@@ -1,0 +1,76 @@
+{
+  "book_title": "思考致富",
+  "book_title_en": "Think and Grow Rich",
+  "author": "拿破仑·希尔（Napoleon Hill）",
+  "slug": "think-and-grow-rich",
+  "purpose": "帮用户把模糊的愿望拆成明确目标、可执行计划与能坚持的动作，同时识别成功学话语里的时代局限",
+  "category_id": "12-IndustryConsultant",
+  "principles": [
+    "把欲望写成数字、期限与愿意付出的代价：无法量化的愿望无法执行，也无法被检验",
+    "先建立信念再行动：用带情绪的重复把目标变成默认背景，而不是等看到结果才相信",
+    "知识只在被组织成明确计划、指向明确目标时才成为力量；专才比通才更容易被高价购买",
+    "用计划承接目标：谁做、何时完成、换回什么，并为每一步准备备选方案",
+    "迅速决断、缓慢修改：给每个重大决定设截止时间，决策自己做、信息可以听",
+    "坚持是计划的一部分：挫败时换计划、不换目标；看不到反馈时仍然继续",
+    "用智囊团替代孤军：明确的共同目的加上和谐的分工，才叫协作，否则只是互相消耗"
+  ],
+  "pitfalls": [
+    "把欲望当口号：每天朗读却没有数字、期限和计划，越读越焦虑",
+    "把计划当愿望：只写目标不写谁做什么，一遇挫折就判定「目标不可能」",
+    "把时代想象当定律：用「思想吸引财富」替代行动与验证，忽略幸存者偏差"
+  ],
+  "checklist": [
+    "把「我想要更多钱」改写成具体数字、具体日期、具体交换条件，写在一张卡片上",
+    "每天早晚朗读这张卡片两次，读到有画面、有情绪为止",
+    "列出你愿意为这个目标付出的真实代价：时间、金钱、要放弃的事",
+    "写下与目标直接相关的三项专业知识，标出你缺的那一项",
+    "为补齐缺口找一个人或一门课，本周内发出联系",
+    "把目标拆成本季度可验证的三步计划，每步写明谁做什么、何时完成",
+    "为这三步各准备一套备选方案，写下「如果失败，我改什么」",
+    "针对最困扰你的一种恐惧，写下最坏结果、发生概率与应对方案",
+    "找出本周三次「因为犹豫而错过」的时刻，记录你延迟了多久才决定",
+    "给一个重大决定设定截止时间，到点必须选，不再收集意见",
+    "组一个三人智囊团，明确共同目的、各自贡献与开会频率",
+    "每季度重读一次自己的卡片，只改数字和计划，不改方向"
+  ],
+  "sources": [
+    {"title": "中文版目录（广东人民出版社 2023，国家出版发行信息公共服务平台）", "url": "https://book.cppinfo.cn/Encyclopedias/home/Index/4531540"},
+    {"title": "1937 年初版目录（University of Wisconsin–Madison 馆藏记录）", "url": "https://search.library.wisc.edu/catalog/9914027683502121"},
+    {"title": "Napoleon Hill Foundation 官方站", "url": "http://www.napoleonhill.com/"},
+    {"title": "引文核对（对照 1937 年版正文，含误传说明）", "url": "https://quotations.pro/books/think-and-grow-rich"},
+    {"title": "Wikiquote: Napoleon Hill（含原书页码）", "url": "https://en.wikiquote.org/wiki/Napoleon_Hill"}
+  ],
+  "tags": [
+    {"zh": "目标执行", "en": "Goal Execution"},
+    {"zh": "动机工程", "en": "Motivation Design"},
+    {"zh": "批判阅读", "en": "Critical Reading"}
+  ],
+  "quick_prompts": [
+    {
+      "zh": "我有个模糊的赚钱想法，用六步法帮我写成一张可执行的目标卡片",
+      "en": "Turn my vague money goal into an executable desire card with Hill's six steps"
+    },
+    {
+      "zh": "我总是三分钟热度，用决断与坚持两章给我一套两周执行方案",
+      "en": "Give me a two-week plan for follow-through using decision and persistence"
+    },
+    {
+      "zh": "帮我判断《思考致富》里哪些方法可用、哪些只是 1937 年的时代想象",
+      "en": "Separate usable methods from 1937-era speculation in Think and Grow Rich"
+    }
+  ],
+  "workflow": [
+    "把愿望改写成数字、期限与代价",
+    "检查信念：是期待结果，还是回避行动",
+    "补齐与目标直接相关的专业知识",
+    "把目标拆成本季度三步计划与备选方案",
+    "为重大决定设截止时间，减少犹豫",
+    "组智囊团，明确共同目的与分工",
+    "季度复盘：换计划，不换目标"
+  ],
+  "notes": [
+    "非原著全文，请购买正版对照阅读",
+    "书中部分论述（思想振动、性欲转化、第六感）缺少现代科学证据",
+    "不构成投资建议，注意幸存者偏差"
+  ]
+}

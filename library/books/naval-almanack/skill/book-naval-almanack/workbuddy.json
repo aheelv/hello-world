@@ -1,0 +1,17 @@
+{
+  "display_name": "《纳瓦尔宝典》实践三问法",
+  "display_name_en": "The Almanack of Naval Ravikant Practice Guide",
+  "description_zh": "面向《纳瓦尔宝典》的实践框架：用专长、责任与杠杆构建可复利资产，用减法与临在训练稳定幸福；输出原则、易翻车点与可执行清单（非原著全文）。",
+  "description_en": "Practice Skill for 纳瓦尔宝典 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "我想用《纳瓦尔宝典》的框架梳理自己的专长与杠杆，帮我做一次个人财富盘点",
+    "我同时想做很多事，按「欲望是主动选择的不开心」帮我只保留一个最大欲望",
+    "我最近总在比较中焦虑，用幸福章节给我一份两周的减法练习清单"
+  ],
+  "examples_en": [
+    "Audit my specific knowledge and leverage with Naval's framework",
+    "Cut my desires down to one primary desire",
+    "Give me a two-week subtraction practice for envy and anxiety"
+  ]
+}

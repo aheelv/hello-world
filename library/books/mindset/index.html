@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>书籍精华总结</title>
+<meta name="description" content="结构化思维导图、核心观点与中英金句摘抄，支持检索与响应式浏览。">
+<link rel="stylesheet" href="../../assets/book.css">
+</head>
+<body>
+<div id="bar"></div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="back" href="../../index.html" title="返回书库">←</a>
+    <div class="brand"><b id="navTitle">书名</b><em id="navEn"></em></div>
+    <div class="nav-links">
+      <a href="#map">全书地图</a>
+      <a href="#ideas">核心观点</a>
+      <a href="#quotes">金句摘抄</a>
+      <a href="#action">行动清单</a>
+      <a href="#about">怎么读</a>
+    </div>
+    <div class="switcher"><select id="bookSwitch" aria-label="切换书籍"></select></div>
+    <div class="search">
+      <span class="ico">⌕</span>
+      <input id="q" type="search" placeholder="搜索关键词" autocomplete="off" aria-label="搜索观点与金句">
+      <button class="clr" id="qclr" aria-label="清空搜索">×</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow" id="heroEyebrow"></p>
+    <h1><span id="heroTitle"></span><br><em id="heroAccent"></em></h1>
+    <p class="sub" id="heroSub"></p>
+    <p class="meta" id="heroMeta"></p>
+    <div class="stats">
+      <div class="stat"><b id="st-themes">—</b><i>核心主题</i></div>
+      <div class="stat"><b id="st-ideas">—</b><i>核心观点</i></div>
+      <div class="stat"><b id="st-quotes">—</b><i>中英金句</i></div>
+      <div class="stat"><b id="st-checks">—</b><i>实践清单</i></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="map">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>全书地图</h2>
+      <p>把书拆成可数的分支，先看清骨架再读细节。点击任一分支，跳转到该主题的详细观点。</p>
+    </div>
+    <div class="map-card">
+      <svg id="mapSvg" role="img" aria-label="全书结构思维导图"></svg>
+      <div class="map-list" id="mapList"></div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <p class="map-hint" id="mapHint"></p>
+  </div>
+</section>
+
+<section id="ideas">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>核心观点 · 按主题</h2>
+      <p>每条观点都以原书章节为锚点，便于回查上下文。共 <span id="ideaCount">—</span> 条。</p>
+    </div>
+    <p class="hit" id="hitInfo"></p>
+    <div id="themes"></div>
+    <div class="empty" id="emptyIdeas">没有匹配的观点，换个关键词试试。</div>
+  </div>
+</section>
+
+<section id="quotes">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>金句摘抄</h2>
+      <p>中英对照，按主题筛选。英文取自原书；来源标注「意译」的条目为论点概述而非原文引用，中文均为编译译述。</p>
+    </div>
+    <div class="chips" id="qchips"></div>
+    <div class="quote-grid" id="quotes-grid"></div>
+    <div class="empty" id="emptyQuotes">没有匹配的金句，换个关键词试试。</div>
+  </div>
+</section>
+
+<section id="action">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>行动清单</h2>
+      <p>把观点变成动作。勾选状态保存在本地浏览器，下次打开仍在。</p>
+    </div>
+    <div class="action" id="checks"></div>
+  </div>
+</section>
+
+<section id="about" style="padding-bottom:20px">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>这本书怎么读</h2>
+      <p>不是操作手册，而是一套判断标准。按线索跳读，比从头读到尾更有效。</p>
+    </div>
+    <div class="caution" id="caution"></div>
+    <div class="theme-block" id="reading" style="--c:#4A90D9"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h4>资料来源</h4>
+    <ol id="sources"></ol>
+    <p class="note" id="footNote"></p>
+    <div class="foot-links" id="footLinks"></div>
+  </div>
+</footer>
+
+<button id="top" aria-label="回到顶部">↑</button>
+
+<script src="../../assets/books.js"></script>
+<script src="data.js"></script>
+<script src="../../assets/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "display_name": "《原则》实践三问法",
+  "display_name_en": "Principles: Life and Work Practice Guide",
+  "description_zh": "面向《原则》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明与练习。",
+  "description_en": "Practice Skill for 原则 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "用达利欧的五步流程，帮我把这个目标拆成可执行方案",
+    "我在某件事上卡住了，帮我做一次「痛苦+反思」的根因诊断",
+    "帮我把这条经验写成一条可以复用的原则"
+  ],
+  "examples_en": [
+    "Turn my goal into a plan with Dalio’s five-step process",
+    "Run a pain-plus-reflection root-cause diagnosis on my blocker",
+    "Turn this lesson into a reusable principle"
+  ]
+}

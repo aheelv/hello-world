@@ -1,0 +1,97 @@
+{
+  "book_title": "穷查理宝典",
+  "book_title_en": "Poor Charlie's Almanack",
+  "author": "查理·芒格 述 / 彼得·考夫曼 编",
+  "slug": "poor-charlies-almanack",
+  "purpose": "用多元思维模型、逆向思考与能力圈三层过滤，帮用户在复杂决策里先排除愚蠢，再谈收益",
+  "category_id": "12-IndustryConsultant",
+  "principles": [
+    "事实必须挂在模型上：孤立的记忆无法调用，先建多学科模型，再把经验挂上去",
+    "一个学科解释一切，等于没有解释：同一个问题至少用三个不同学科的视角看一遍",
+    "先问「怎么会失败」，再问「怎么能成功」：逆向思考的产出是一张负面清单",
+    "把「太难」当作正式答案：能力圈的边界比面积重要，圈外不下重注",
+    "把心理倾向做成检查表：激励、社会认同、避免不一致、被剥夺感，逐条过一遍",
+    "生意质量优先于价格便宜：好生意的时间是朋友，差生意的时间是敌人"
+  ],
+  "pitfalls": [
+    "模型收集癖：读了一堆模型却从不用于具体决定，格栅退化成书单",
+    "逆向变成犬儒：只会论证「这事必败」，不给可执行的替代方案",
+    "能力圈自欺：把「听说过」当成「看得懂」，在圈外下重注"
+  ],
+  "checklist": [
+    "挑一个你正在做的判断，写出它背后用了哪三个学科的模型；少于两个就先别下结论",
+    "把手上所有待办分进三个筐：能做、不能做、太难。把「太难」筐里的事正式划掉",
+    "对你最重要的一项投资或职业选择，列出三种最可能的失败方式，标出哪一种你无法承受",
+    "找一个人在你要判断的领域比你更懂，明确请他反驳你，并把他的话记下来",
+    "检查你最近一个结论背后的利益结构：如果结论成立，谁获益？包括你自己",
+    "为一项重大决定做一张「反过来想」清单：要保证这件事失败，我会怎么做",
+    "写下你能力圈的边界：三个你确实懂的领域，三个你以为懂但说不清的领域",
+    "选一家你持有的公司，判断它能否连续十年提价而不流失客户，写出理由",
+    "回顾一次你「跌倒后没有立刻起来」的经历，写出当时真正卡住的是什么",
+    "把每天的阅读固定成二十分钟，只读能提供模型的书，不做摘抄只写一句「这个模型能解释什么」",
+    "检查你最近一次公开表态：你现在还在为它辩护吗？如果是，找出你忽略的新证据",
+    "给自己定一条规则：任何超过月收入 30% 的支出或投入，必须隔 72 小时再决定"
+  ],
+  "sources": [
+    {
+      "title": "《穷查理宝典》中文版书目检索（豆瓣）",
+      "url": "https://search.douban.com/book/subject_search?search_text=%E7%A9%B7%E6%9F%A5%E7%90%86%E5%AE%9D%E5%85%B8&cat=1001"
+    },
+    {
+      "title": "Poor Charlie’s Almanack 原版书目检索（Open Library）",
+      "url": "https://openlibrary.org/search?q=Poor%20Charlie%27s%20Almanack"
+    },
+    {
+      "title": "Poor Charlie’s Almanack 官方站（Stripe Press 版信息）",
+      "url": "https://www.poorcharliesalmanack.com/"
+    },
+    {
+      "title": "芒格 1994 年 USC 演讲原文（A Lesson on Elementary, Worldly Wisdom）",
+      "url": "https://fs.blog/great-talks/a-lesson-on-worldly-wisdom/"
+    },
+    {
+      "title": "Charlie Munger Archive（引文出处逐条核对）",
+      "url": "https://mungerarchive.com/"
+    }
+  ],
+  "tags": [
+    {
+      "zh": "多元思维",
+      "en": "Mental Models"
+    },
+    {
+      "zh": "逆向决策",
+      "en": "Inversion"
+    },
+    {
+      "zh": "投资判断",
+      "en": "Investing"
+    }
+  ],
+  "quick_prompts": [
+    {
+      "zh": "用芒格的多元思维模型，帮我把这个决策拆成三个学科的解释",
+      "en": "Break my decision into three disciplinary lenses, Munger style"
+    },
+    {
+      "zh": "我想避免在这件事上犯蠢，用逆向思考给我列一张失败清单",
+      "en": "Invert: list how I could guarantee failure here"
+    },
+    {
+      "zh": "帮我判断这件事是否在我的能力圈内；如果不在，我该放弃还是补课",
+      "en": "Is this inside my circle of competence, and should I pass or learn?"
+    }
+  ],
+  "workflow": [
+    "把问题写成一句可判断的命题",
+    "找出三个能用上的学科模型，各写一句解释",
+    "反向列出「怎样保证失败」，形成负面清单",
+    "判断是否在能力圈内，不在就归入「太难」",
+    "过一遍心理倾向清单，标出最可能被触发的三条",
+    "给出结论与「不做什么」，并写下验证信号"
+  ],
+  "notes": [
+    "非原著全文，请购买正版对照阅读",
+    "芒格的方法依赖长期阅读积累，不可简化为「只看几个模型就重仓」"
+  ]
+}

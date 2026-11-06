@@ -1,0 +1,17 @@
+{
+  "display_name": "《思考致富》实践三问法",
+  "display_name_en": "Think and Grow Rich Practice Guide",
+  "description_zh": "面向《思考致富》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明。",
+  "description_en": "Practice Skill for 思考致富 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "我有个模糊的赚钱想法，用六步法帮我写成一张可执行的目标卡片",
+    "我总是三分钟热度，用决断与坚持两章给我一套两周执行方案",
+    "帮我判断《思考致富》里哪些方法可用、哪些只是 1937 年的时代想象"
+  ],
+  "examples_en": [
+    "Turn my vague money goal into an executable desire card with Hill's six steps",
+    "Give me a two-week plan for follow-through using decision and persistence",
+    "Separate usable methods from 1937-era speculation in Think and Grow Rich"
+  ]
+}

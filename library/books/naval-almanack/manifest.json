@@ -1,0 +1,75 @@
+{
+  "book_title": "纳瓦尔宝典",
+  "book_title_en": "The Almanack of Naval Ravikant",
+  "author": "埃里克·乔根森（Eric Jorgenson）编 / 纳瓦尔·拉维坎特（Naval Ravikant）",
+  "slug": "naval-almanack",
+  "purpose": "帮用户用「专长—责任—杠杆—判断力」构建可复利的个人资产，并用减法与临在训练稳定的内在幸福",
+  "category_id": "12-IndustryConsultant",
+  "principles": [
+    "先分清财富、金钱与地位：只积累「睡觉时仍在增值的资产」，把时间从出租转为持有",
+    "以专长立身：在好奇心与天赋的交叉处深耕到无法被培训替代，用真实身份避开同质化竞争",
+    "三种杠杆按序升级：劳动力、资本、代码与媒体，优先选择无需他人许可的杠杆",
+    "以个人名义承担责任，用股权而非工时兑现回报，让收益与产出而非投入挂钩",
+    "判断力优先于努力：方向的重要性远高于速度，重大决定慢决策、快执行",
+    "用长期游戏与长期伙伴累积复利：财富、关系、知识、声誉遵循同一套复利逻辑",
+    "幸福是减法与临在：减少欲望、降低身份感，把平静当作可训练的默认状态"
+  ],
+  "pitfalls": [
+    "把忙碌当杠杆：用更长时间换更多收入，一旦停止工作收入立即归零",
+    "把欲望当目标：同时追逐多个身份级欲望，持续制造内耗与不满足",
+    "把成功当解药：用更高的成就填补内在缺口，陷入享乐适应的跑步机"
+  ],
+  "checklist": [
+    "写下你的「专长一句话」：别人很难培训出来、你却像玩一样在做的事",
+    "给当前收入标注性质：出租时间 / 持有股权 / 睡后资产，看清三者比例",
+    "为未来六个月选定一种无需许可的杠杆：写作、代码、视频、播客中的一种",
+    "找出本周三件低于你时薪的事，删除或外包",
+    "做一次十年测试：这件事十年后还愿意做吗？不愿意就不再为它花一天",
+    "把最近一个重大决定写成判断清单：可逆性、下行风险、复利效应",
+    "只保留一个最大的欲望，其余明确标记为暂缓",
+    "每天三十分钟无输入独处或冥想，观察念头而不跟随",
+    "先修身体：睡眠、运动、日照三项基础习惯连续执行两周",
+    "每周记一条嫉妒触发点，问自己是否愿意交换对方的全部人生",
+    "每季度复盘一次：现象 → 漏了哪条原则 → 回补动作",
+    "读一本原著（科学、数学或哲学），慢读并写下你的反驳意见"
+  ],
+  "sources": [
+    {"title": "The Almanack of Naval Ravikant 官方目录", "url": "https://navalmanack.com/almanack-of-naval-ravikant/table-of-contents"},
+    {"title": "官方全文 PDF（Eric Jorgenson）", "url": "http://navalmanack.s3.amazonaws.com/Eric-Jorgenson_The-Almanack-of-Naval-Ravikant_Final.pdf"},
+    {"title": "nav.al 原始播客文稿：Product and Media are New Leverage", "url": "https://nav.al/product-media"},
+    {"title": "中文版目录（国家出版发行信息公共服务平台）", "url": "https://book.cppinfo.cn/Encyclopedias/home/index?id=4382045"},
+    {"title": "中文版书目信息（海宁市图书馆）", "url": "https://m.hnlib.com/Recommend/Detail/1828"}
+  ],
+  "tags": [
+    {"zh": "财富杠杆", "en": "Wealth Leverage"},
+    {"zh": "判断力", "en": "Judgment"},
+    {"zh": "幸福练习", "en": "Happiness Practice"}
+  ],
+  "quick_prompts": [
+    {
+      "zh": "我想用《纳瓦尔宝典》的框架梳理自己的专长与杠杆，帮我做一次个人财富盘点",
+      "en": "Audit my specific knowledge and leverage with Naval's framework"
+    },
+    {
+      "zh": "我同时想做很多事，按「欲望是主动选择的不开心」帮我只保留一个最大欲望",
+      "en": "Cut my desires down to one primary desire"
+    },
+    {
+      "zh": "我最近总在比较中焦虑，用幸福章节给我一份两周的减法练习清单",
+      "en": "Give me a two-week subtraction practice for envy and anxiety"
+    }
+  ],
+  "workflow": [
+    "盘点现状：收入性质、时间去向、可复利资产",
+    "定位专长：好奇心 × 天赋 × 不可培训",
+    "选择杠杆：优先无需许可的代码与媒体",
+    "建立判断：决策清单与心智模型",
+    "做减法：欲望、身份、信息输入",
+    "季度复盘并回补缺口"
+  ],
+  "notes": [
+    "非原著全文，请购买正版对照阅读",
+    "书中观点为作者个人经验，不构成投资建议",
+    "财富路径存在运气与幸存者偏差，勿把结果当方法"
+  ]
+}

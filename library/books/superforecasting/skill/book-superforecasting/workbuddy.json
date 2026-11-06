@@ -1,0 +1,17 @@
+{
+  "display_name": "《超预测》实践三问法",
+  "display_name_en": "Superforecasting: The Art and Science of Prediction Practice Guide",
+  "description_zh": "面向《超预测》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明。",
+  "description_en": "Practice Skill for 超预测 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "帮我把这个模糊判断写成可结算的预测问题，并给出概率",
+    "用基准率与内外视角帮我估这件事的可能性",
+    "帮我复盘最近五个判断的校准情况"
+  ],
+  "examples_en": [
+    "Turn my vague view into a resolvable forecast with a probability",
+    "Estimate this with base rates plus an inside view",
+    "Review the calibration of my last five forecasts"
+  ]
+}

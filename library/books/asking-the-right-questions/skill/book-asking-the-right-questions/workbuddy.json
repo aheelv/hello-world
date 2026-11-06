@@ -1,0 +1,17 @@
+{
+  "display_name": "《学会提问》实践三问法",
+  "display_name_en": "Asking the Right Questions: A Guide to Critical Thinking Practice Guide",
+  "description_zh": "面向《学会提问》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明。",
+  "description_en": "Practice Skill for 学会提问 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "帮我按十一问拆解这篇文章的论证结构",
+    "帮我找出这段论述里最脆弱的隐含假设",
+    "帮我给这篇论文的证据强度分级"
+  ],
+  "examples_en": [
+    "Break down this article’s argument with the eleven questions",
+    "Find the most fragile hidden assumption here",
+    "Grade the evidence strength in this paper"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "display_name": "《巴菲特致股东的信》实践三问法",
+  "display_name_en": "The Essays of Warren Buffett: Lessons for Corporate America Practice Guide",
+  "description_zh": "面向《巴菲特致股东的信》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明。",
+  "description_en": "Practice Skill for 巴菲特致股东的信 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "用所有者视角帮我分析这家公司的护城河与定价权",
+    "我想判断这笔投资是不是「用便宜价格买平庸公司」",
+    "按一美元原则检查这家公司的留存利润用得对不对"
+  ],
+  "examples_en": [
+    "Analyze this company’s moat and pricing power from an owner’s view",
+    "Am I buying a fair company at a wonderful price?",
+    "Apply the one-dollar premise to this company’s retained earnings"
+  ]
+}

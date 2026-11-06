@@ -1,0 +1,17 @@
+{
+  "display_name": "《对赌》实践三问法",
+  "display_name_en": "Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts Practice Guide",
+  "description_zh": "面向《对赌》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明与练习。",
+  "description_en": "Practice Skill for 对赌 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "帮我把这次结果拆成「决策质量」与「运气」两部分",
+    "我要做一个高风险决定，帮我做一次事前验尸",
+    "帮我设计一个求真小组的规则"
+  ],
+  "examples_en": [
+    "Split this outcome into decision quality and luck",
+    "Run a premortem on this high-stakes decision",
+    "Design the ground rules for a truthseeking pod"
+  ]
+}

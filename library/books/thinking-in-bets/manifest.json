@@ -1,0 +1,90 @@
+{
+  "book_title": "对赌",
+  "book_title_en": "Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts",
+  "author": "安妮·杜克（Annie Duke）",
+  "slug": "thinking-in-bets",
+  "purpose": "把决策与结果分开：用概率与期望值评估下注质量，用求真小组和事前验尸校准判断",
+  "category_id": "12-IndustryConsultant",
+  "principles": [
+    "决策与结果分开：好决策可能坏结果，坏决策可能赢",
+    "警惕 resulting：不要从结果倒推决策质量",
+    "把信念换成赔率：「你敢赌多少」比「你有多确定」更真实",
+    "用期望值而非单次结果判断",
+    "组求真小组：目标是一起更接近真相，不是赢争论",
+    "事前验尸与 10-10-10：把未来具体化，剥离短期情绪"
+  ],
+  "pitfalls": [
+    "用「过程好」为坏结果免责：需要同时保留结果问责",
+    "把扑克类比用过头：现实很多决策不可重复、无法结算",
+    "只复盘不记录：事后仍会自动重写记忆"
+  ],
+  "checklist": [
+    "选一个最近的结果（好或坏），把「决策质量」与「结果质量」分开打分",
+    "找出一个「用错方法但赢了」的经历，写下它固化了什么坏习惯",
+    "把你在做的一个判断写成赌注：我愿意为它押多少钱？这个数字说明我有多确定",
+    "为一项重要决定做一次事前验尸：假设已失败，写出三个最可能原因",
+    "用 10-10-10 检验一个正在纠结的选择，分别写下三个时间尺度的感受",
+    "列出三个能指出你错误的人，本周主动向他们暴露一个判断",
+    "在下次表达观点时，加上一句「我大概几成确定，可能忽略了……」",
+    "翻出你曾说过「我早就说过」的事，检查当时有没有写下判断",
+    "为一项重复性决策设一个下注上限，防止情绪上头时押太重",
+    "回顾一次亏损或失败，把原因拆成「判断」与「运气」两部分",
+    "把你的一个重要判断写给朋友，请他给出反对理由，只记录不辩解",
+    "问自己：这件事我是在评估，还是在为已经做出的决定找理由"
+  ],
+  "sources": [
+    {
+      "title": "《对赌》中文版书目检索（豆瓣）",
+      "url": "https://search.douban.com/book/subject_search?search_text=%E5%AF%B9%E8%B5%8C%20%E5%AE%89%E5%A6%AE%E6%9D%9C%E5%85%8B&cat=1001"
+    },
+    {
+      "title": "Thinking in Bets 原版书目检索（Open Library）",
+      "url": "https://openlibrary.org/search?q=Thinking%20in%20Bets%20Annie%20Duke"
+    },
+    {
+      "title": "Annie Duke 官方站（含决策方法文章）",
+      "url": "https://www.annieduke.com/"
+    }
+  ],
+  "tags": [
+    {
+      "zh": "决策复盘",
+      "en": "Decision Review"
+    },
+    {
+      "zh": "概率思维",
+      "en": "Probabilistic Thinking"
+    },
+    {
+      "zh": "团队校准",
+      "en": "Team Calibration"
+    }
+  ],
+  "quick_prompts": [
+    {
+      "zh": "帮我把这次结果拆成「决策质量」与「运气」两部分",
+      "en": "Split this outcome into decision quality and luck"
+    },
+    {
+      "zh": "我要做一个高风险决定，帮我做一次事前验尸",
+      "en": "Run a premortem on this high-stakes decision"
+    },
+    {
+      "zh": "帮我设计一个求真小组的规则",
+      "en": "Design the ground rules for a truthseeking pod"
+    }
+  ],
+  "workflow": [
+    "把结果与决策分开打分",
+    "列出当时可用的信息与忽略的线索",
+    "把判断写成赌注：愿意押多少",
+    "做一次事前验尸，写出三个失败原因",
+    "用 10-10-10 检查时间尺度",
+    "在求真小组里公开判断与理由"
+  ],
+  "notes": [
+    "非原著全文，请购买正版对照阅读",
+    "扑克类比不适用于不可重复、无法结算的决策",
+    "部分引文为论点概述，非原文引用"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "display_name": "《反脆弱》实践三问法",
+  "display_name_en": "Antifragile: Things That Gain from Disorder Practice Guide",
+  "description_zh": "面向《反脆弱》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明。",
+  "description_en": "Practice Skill for 反脆弱 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "帮我判断这件事是脆弱、坚韧还是反脆弱的，并给出改造方案",
+    "用杠铃策略帮我重新配置时间与资金",
+    "帮我给这个计划留出冗余，并写下触发条件"
+  ],
+  "examples_en": [
+    "Is this fragile, robust, or antifragile — and how do I redesign it?",
+    "Rebalance my time and money with a barbell strategy",
+    "Add redundancy to this plan and define the triggers"
+  ]
+}

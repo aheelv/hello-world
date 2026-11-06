@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我的书库</title>
+<meta name="description" content="多本书的精华总结、结构导图与金句摘抄入口，可持续新增。">
+<link rel="stylesheet" href="assets/book.css">
+<link rel="stylesheet" href="assets/shelf.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-in">
+    <div class="brand"><b id="libName">我的书库</b><em>LIBRARY</em></div>
+    <div class="nav-links">
+      <a href="#howto">新增书籍</a>
+    </div>
+    <div class="search">
+      <span class="ico">⌕</span>
+      <input id="q" type="search" placeholder="搜索书名、作者或主题" autocomplete="off" aria-label="搜索书籍">
+      <button class="clr" id="qclr" aria-label="清空搜索">×</button>
+    </div>
+  </div>
+</nav>
+
+<header class="shelf-hero">
+  <div class="wrap">
+    <p class="eyebrow">READING LIBRARY</p>
+    <h1>我的书库</h1>
+    <p class="sub" id="libSub">把读过的书拆成结构、观点与可执行的动作，而不是留一堆划线。</p>
+    <div class="shelf-stat">
+      <div><b id="stBooks">—</b>本书</div>
+      <div><b id="stPoints">—</b>条核心观点</div>
+      <div><b id="stQuotes">—</b>条中英金句</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="toolbar">
+      <div class="filters" id="filters">
+        <button class="chip on" data-group="all">全部<b>12</b></button>
+      </div>
+    </div>
+
+    <div id="shelf">
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="empty-shelf" id="emptyShelf">没有匹配的书，换个关键词或切换模块试试。</div>
+
+    <details class="howto" id="howto">
+      <summary>如何新增一本书</summary>
+      <div class="body">
+        <p>每本书是一个独立目录，页面骨架完全相同，差异只在 <code>data.js</code>。新增一本书分三步：</p>
+        <ol>
+          <li>复制 <code>books/_template/</code> 为 <code>books/你的书名拼音/</code></li>
+          <li>改写其中的 <code>data.js</code>（主题、观点、金句、清单、来源）</li>
+          <li>在 <code>assets/books.js</code> 的 <code>books</code> 数组里追加一条记录，用 <code>group</code> 指定模块</li>
+        </ol>
+        <p>刷新本页即出现新卡片；模块分区、筛选按钮、书籍页的「切换书籍」下拉、上一本/下一本、统计数字都会自动更新。新增模块只需在 <code>groups</code> 数组里加一条 <code>{ id, no, title, desc }</code>。</p>
+        <pre>{
+  slug: 'your-book',              // 目录名，须与 books/ 下一致
+  title: '书名',
+  titleEn: 'Book Title',
+  author: '作者',
+  color: '#2E5C8A',               // 本书主色
+  tag: '主题一 · 主题二',
+  group: 'c',                     // 归入哪个模块
+  summary: '一句话说明这本书解决什么问题',
+  status: 'ready'                 // ready = 上线；planned = 显示为“整理中”
+}</pre>
+        <p style="margin-top:12px">数据字段说明见 <code>README.md</code> 与 <code>books/_template/data.js</code> 的注释。</p>
+      </div>
+    </details>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="note">
+      <b>说明：</b>本页只做读书整理索引，各书页面为结构化摘要与少量引文，不是原著全文，也不替代购买正版。引文的英文以原书为准，中文为编译译述。
+    </p>
+  </div>
+</footer>
+
+<script src="assets/books.js"></script>
+<script src="assets/shelf.js"></script>
+</body>
+</html>

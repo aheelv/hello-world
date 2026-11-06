@@ -1,0 +1,17 @@
+{
+  "display_name": "《影响力》实践三问法",
+  "display_name_en": "Influence: The Psychology of Persuasion Practice Guide",
+  "description_zh": "面向《影响力》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明。",
+  "description_en": "Practice Skill for 影响力 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "帮我分析这段销售话术用了哪几条影响力原理",
+    "我要说服团队接受这个方案，用互惠与承诺一致设计路径",
+    "帮我列出自己最容易被说服的三个开关与应对话术"
+  ],
+  "examples_en": [
+    "Which influence principles does this sales script use?",
+    "Design a persuasion path for my team using reciprocity and commitment",
+    "List my three weakest persuasion triggers and how to respond"
+  ]
+}

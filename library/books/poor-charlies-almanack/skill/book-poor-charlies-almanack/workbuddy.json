@@ -1,0 +1,17 @@
+{
+  "display_name": "《穷查理宝典》实践三问法",
+  "display_name_en": "Poor Charlie's Almanack Practice Guide",
+  "description_zh": "面向《穷查理宝典》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明。",
+  "description_en": "Practice Skill for 穷查理宝典 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "用芒格的多元思维模型，帮我把这个决策拆成三个学科的解释",
+    "我想避免在这件事上犯蠢，用逆向思考给我列一张失败清单",
+    "帮我判断这件事是否在我的能力圈内；如果不在，我该放弃还是补课"
+  ],
+  "examples_en": [
+    "Break my decision into three disciplinary lenses, Munger style",
+    "Invert: list how I could guarantee failure here",
+    "Is this inside my circle of competence, and should I pass or learn?"
+  ]
+}

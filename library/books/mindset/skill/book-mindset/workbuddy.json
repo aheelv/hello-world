@@ -1,0 +1,17 @@
+{
+  "display_name": "《终身成长》实践三问法",
+  "display_name_en": "Mindset: The New Psychology of Success Practice Guide",
+  "description_zh": "面向《终身成长》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明。",
+  "description_en": "Practice Skill for 终身成长 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "帮我判断我在这件事上是固定型还是成长型思维",
+    "帮我把这次失败翻译成可训练的改进点",
+    "帮我设计一套针对过程而非天赋的表扬与批评话术"
+  ],
+  "examples_en": [
+    "Am I in a fixed or growth mindset on this?",
+    "Turn this failure into trainable improvements",
+    "Write process-praise scripts instead of talent praise"
+  ]
+}

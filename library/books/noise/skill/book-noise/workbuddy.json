@@ -1,0 +1,17 @@
+{
+  "display_name": "《噪声》实践三问法",
+  "display_name_en": "Noise: A Flaw in Human Judgment Practice Guide",
+  "description_zh": "面向《噪声》公开摘要实践框架的图文综指：三问定原则清单、讲步骤与注意事项说明与练习。",
+  "description_en": "Practice Skill for 噪声 from public summaries.",
+  "version": "1.0.0",
+  "examples_zh": [
+    "帮我给这个高频决策设计一张评分表与决策卫生流程",
+    "我想做一次噪声审查，帮我设计步骤与判定标准",
+    "帮我判断这个判断差异是噪声还是合理的价值分歧"
+  ],
+  "examples_en": [
+    "Design a scoring rubric and decision-hygiene process for this recurring call",
+    "Design a noise audit for my team, step by step",
+    "Is this disagreement noise or legitimate value disagreement?"
+  ]
+}
