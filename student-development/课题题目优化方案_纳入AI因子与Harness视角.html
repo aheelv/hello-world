@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课题题目优化方案：《数据驱动的学生培养模式创新探索》→ AI 与 Harness 视角下的重构</title>
+<style>
+:root{
+  --blue-900:#1B3D5E; --blue-800:#2E5C8A; --blue-600:#4A90D9; --blue-100:#E8F0F8;
+  --green-700:#1E8449; --green-100:#E7F4EC;
+  --orange-700:#C4651A; --orange-100:#FDF0E4;
+  --pink-700:#A83E60; --pink-100:#FBE9F0;
+  --purple-700:#6A63CC; --purple-100:#EEEDFB;
+  --red-700:#B03A3A; --red-100:#FBECEC;
+  --gray-900:#2C2C2A; --gray-700:#5F5E5A; --gray-500:#888780;
+  --gray-300:#D3D1C7; --gray-100:#F1EFE8; --page:#F7F7F5; --white:#FFFFFF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Microsoft YaHei","微软雅黑","PingFang SC",sans-serif;
+  background:var(--page);color:var(--gray-900);line-height:1.85;font-size:15px;}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 24px 72px;}
+header.doc{background:var(--white);border:1px solid var(--gray-300);
+  border-left:6px solid var(--green-700);border-radius:8px;padding:32px 36px;margin-bottom:26px;}
+header.doc .kicker{font-size:13px;color:var(--green-700);letter-spacing:2px;margin-bottom:10px;}
+header.doc h1{font-size:26px;font-weight:700;line-height:1.45;color:var(--blue-900);}
+header.doc .sub{font-size:14px;color:var(--gray-700);margin-top:12px;}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+.meta span{font-size:12.5px;color:var(--gray-700);background:var(--gray-100);
+  border:1px solid var(--gray-300);border-radius:4px;padding:4px 10px;}
+nav.toc{background:var(--white);border:1px solid var(--gray-300);border-radius:8px;
+  padding:20px 28px;margin-bottom:26px;}
+nav.toc h2{font-size:15px;font-weight:700;color:var(--blue-900);margin-bottom:10px;}
+nav.toc ol{margin-left:20px;font-size:14px;}
+nav.toc li{margin:4px 0;color:var(--gray-700);}
+section{background:var(--white);border:1px solid var(--gray-300);border-radius:8px;
+  padding:28px 32px;margin-bottom:22px;}
+section > h2{font-size:20px;font-weight:700;color:var(--blue-900);
+  padding-bottom:10px;border-bottom:2px solid var(--blue-100);margin-bottom:16px;}
+section h3{font-size:16px;font-weight:700;color:var(--blue-800);margin:20px 0 8px;}
+section h4{font-size:14.5px;font-weight:700;color:var(--gray-900);margin:14px 0 6px;}
+p{margin:9px 0;font-size:14.5px;}
+ul,ol{margin:9px 0 9px 24px;font-size:14.5px;}
+li{margin:5px 0;}
+strong{color:var(--blue-900);}
+code{background:var(--gray-100);padding:1px 6px;border-radius:3px;
+  font-family:Consolas,Monaco,monospace;font-size:13.5px;color:var(--blue-900);}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;}
+th,td{border:1px solid var(--gray-300);padding:9px 11px;text-align:left;vertical-align:top;}
+th{background:var(--blue-100);color:var(--blue-900);font-weight:700;}
+tbody tr:nth-child(even){background:#FBFBFA;}
+.box{border-radius:6px;padding:14px 18px;margin:14px 0;font-size:14px;border:1px solid;}
+.box .lbl{font-weight:700;display:block;margin-bottom:5px;font-size:14.5px;}
+.warn{background:var(--red-100);border-color:#E9BEBE;color:#5E1F1F;}
+.ok{background:var(--green-100);border-color:#B8DCC6;color:#14512F;}
+.note{background:var(--orange-100);border-color:#F0CFA8;color:#5E3310;}
+.info{background:var(--blue-100);border-color:#BBD3EA;color:#173A5C;}
+.pink{background:var(--pink-100);border-color:#EFC8D6;color:#5C2438;}
+.purple{background:var(--purple-100);border-color:#CFCAF3;color:#2F2A6B;}
+.src{font-size:12.5px;color:var(--gray-500);margin-top:6px;}
+.titlecard{border:1px solid var(--blue-600);border-radius:8px;padding:20px 24px;margin:14px 0;
+  background:#FCFDFF;}
+.titlecard.best{border-width:2px;background:#FAFEFA;}
+.titlecard .label{font-size:12.5px;color:var(--gray-700);margin-bottom:8px;}
+.titlecard .t{font-size:17.5px;font-weight:700;color:var(--blue-900);line-height:1.6;}
+.titlecard .why{font-size:13.5px;color:var(--gray-700);margin-top:10px;}
+.badge{display:inline-block;font-size:12px;padding:2px 9px;border-radius:3px;
+  background:var(--green-700);color:#fff;margin-left:8px;vertical-align:middle;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:14px 0;}
+.card{border:1px solid var(--gray-300);border-radius:6px;padding:14px 16px;background:#FDFDFC;}
+.card h5{font-size:14.5px;font-weight:700;margin-bottom:6px;}
+.card p{font-size:13.5px;margin:4px 0;color:var(--gray-700);}
+ol.refs{margin-left:22px;font-size:13px;}
+ol.refs li{margin:7px 0;color:var(--gray-700);line-height:1.7;}
+a{color:var(--blue-800);text-decoration:none;border-bottom:1px solid #BBD3EA;}
+ol.refs li{margin:7px 0;color:var(--gray-700);line-height:1.7;}
+hr{border:none;border-top:1px dashed var(--gray-300);margin:18px 0;}
+.verdict{background:linear-gradient(0deg,var(--green-100),#fff);
+  border:1px solid var(--green-700);border-radius:8px;padding:20px 26px;margin:18px 0;}
+.verdict .big{font-size:21px;font-weight:700;color:#14512F;}
+@media print{body{background:#fff;font-size:12pt;}
+  section,header.doc,nav.toc,.titlecard{page-break-inside:avoid;}
+  .wrap{max-width:100%;padding:0;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <div class="kicker">课题题目优化专项方案 · 第二轮</div>
+  <h1>纳入 AI 因子后的题目重构<br>——基于 Harness 集成开发平台普及与民办财经院校实际</h1>
+  <div class="sub">在第一轮评估结论（需修改后立项）基础上，按三项新约束重做题面：①2026年4月《"人工智能+教育"行动计划》政策窗口；②大模型竞争已从"模型能力"转向"Harness 集成开发平台"；③民办财经院校的真实条件边界</div>
+  <div class="meta">
+    <span>报告日期：2026年10月4日</span>
+    <span>触发文件：《"人工智能+教育"行动计划》（2026-04-10，五部门）</span>
+    <span>推荐方案：方案一</span>
+    <span>核心转向：AI for Education → AI in the Curriculum</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <h2>目录</h2>
+  <ol>
+    <li>第一轮评估结论的承接与本次的三个新增变量</li>
+    <li>新变量一：政策窗口已从"数字化"推进到"人工智能"</li>
+    <li>新变量二：Harness 是什么，它为什么改变研究命题</li>
+    <li>新变量三：民办财经院校的现实位置（AI 通识已成一等奖项）</li>
+    <li>两种研究范式的分野与本文的切入定位</li>
+    <li>四个候选题目方案（含推荐方案与逐项理由）</li>
+    <li>推荐方案深度论证：要素、机制、指标、创新点</li>
+    <li>题目撰写规范与常见失误</li>
+    <li>下一步行动清单</li>
+    <li>附录：新增来源清单与待核实事项</li>
+  </ol>
+</nav>
+
+<!-- ============ 1 ============ -->
+<section id="t1">
+<h2>一、第一轮评估结论的承接与本次的三个新增变量</h2>
+
+<p>第一轮评估给出的结论是<b>"需修改后立项"</b>，核心判断是<b>"好方向、弱题目"</b>：方向（数据驱动 + 培养模式改革 + 财经类 + 民办）正确且政策支撑充分，但题目因三个开放词叠加导致概念空转、边界不清、对象不明。其中曾提出的核心风险是：<b>与湖北经济学院"数智五育 + 学生一张表 + 三段式画像"的公开案例高度同构</b>。</p>
+
+<p>本次优化必须同时解决两件事：<b>一是补上原题目缺失的"AI 因子"</b>（这是您提出的核心诉求，且确实必要）；<b>二是借 AI 因子跳出与已有案例的重叠区</b>（这恰好使增加 AI 因子从"锦上添花"变成了"解决问题的手法"）。</p>
+
+<div class="box ok">
+<span class="lbl">本次优化的三个新增变量</span>
+<table style="margin-top:8px;">
+<thead><tr><th style="width:6%">序</th><th style="width:22%">新增变量</th><th>对题目设计的直接含义</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>政策窗口</b>已从"数字化"推进到"人工智能"</td><td>2026年4月10日教育部等五部门印发《"人工智能+教育"行动计划》，明确"<b>优化传统学科专业人才培养方案，指导高校开设人工智能交叉融合课程</b>""推动人工智能成为高校公共基础课""制定教师智能素养标准"。题目若仍只写"数据驱动"，<b>政策贴合度已落后于最新文件</b>。</td></tr>
+<tr><td>2</td><td><b>技术竞争焦点</b>已从模型转向 Harness</td><td>"接入大模型"不再是壁垒；<b>"如何编排与驾驭大模型"才是新的能力分水岭</b>。这使"AI 能力培养"成为可研究、可测量的独立对象，而非泛泛的"会用 AI"。</td></tr>
+<tr><td>3</td><td><b>民办财经院校</b>已在 AI 通识上形成先行案例</td><td>成都东软学院、广州华立学院等民办院校已把 AI 通识课设为全体新生必修并明确"把 AI 工具实操应用能力纳入毕业硬性标准"。<b>这既是压力也是机遇——民办院校的 AI 教改尚缺可复制的机制性证据。</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box info">
+<span class="lbl">一个重要判断：AI 因子的加入不是"加一个新热点"，而是改变了研究的坐标系</span>
+<p>当前财经类高校的 AI 教改实践，几乎全部落在"<b>用 AI 改造教学</b>"这一条线上（AI 助教、AI 学伴、数据画像、平台建设）。这条线的拥挤程度已在上一轮评估中提示。</p>
+<p>但《"人工智能+教育"行动计划》提出了一个尚未被充分落实的新要求：<b>"优化传统学科专业人才培养方案，指导高校开设人工智能交叉融合课程"</b>——这指的是<b>把 AI 能力写进培养方案本身，成为培养目标的一部分</b>。这是一条与前述完全不同的研究路线，也是本方案建议的切入点。</p>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="t2">
+<h2>二、新变量一：政策窗口已从"数字化"推进到"人工智能"</h2>
+
+<h3>2.1 《"人工智能+教育"行动计划》（2026年4月10日）关键条款</h3>
+
+<div class="box info">
+<span class="lbl">这是决定题目走向的核心文件，请务必精读申报期内的新表述</span>
+<p>教育部等五部门于 <b>2026年4月10日</b>联合印发《"人工智能+教育"行动计划》（以下简称《行动计划》），围绕"十五五"期间教育强国建设重点任务作出部署。教育部科技司负责人答记者问说明了其起草背景：<b>2025年教育部启动人工智能赋能教育试点，在 17 个省市和 18 所高校探索有效路径</b>，为《行动计划》起草提供实践参考；北京、上海、广东等 11 个地方已出台人工智能赋能教育文件。<span class="src">A级来源：教育部网站《教育部等五部门关于印发〈"人工智能+教育"行动计划〉的通知》（2026-04-10）；教育部科技司负责人答记者问（新华网转载，2026-04-10）</span></p>
+</div>
+
+<table>
+<thead><tr><th style="width:20%">条款领域</th><th>关键表述（与本题直接相关）</th></tr></thead>
+<tbody>
+<tr><td>培养目标与课程</td>
+<td>"推动人工智能成为高校公共基础课，按学科专业分类编写课程教材，推动全体学生掌握人工智能知识"；"<b>优化传统学科专业人才培养方案，指导高校开设人工智能交叉融合课程，丰富跨学科、跨专业课程群，培养复合型交叉人才</b>"；"根据人工智能技术特点，打造'短实新'的前沿创新课程"。</td></tr>
+<tr><td>教师队伍</td>
+<td>"<b>制定教师智能素养标准</b>，明确教师应具备的人工智能素养能力"；"根据不同岗位需求分层分类开展人工智能素养培训，通过多种方式实现全覆盖"；"构建情境化测评系统，开发智能化、梯度化的测评工具"。</td></tr>
+<tr><td>应用场景</td>
+<td>学生学习上"<b>研发智能学伴</b>，促进德智体美劳全面发展，重点推动网络思政育人、学生个性学习"；教师教学上"围绕课前、课中、课后教育教学全过程，加强智能教学系统应用，为教师减负增效"；学校治理上"打造教育智能大脑，聚焦政务服务、考试评价、就业服务、校园安全、资源分配等场景"。</td></tr>
+<tr><td>实施导向</td>
+<td>"<b>立足算力不足、数据不优、模型不强的人工智能发展堵点问题</b>……向成熟应用、重大任务倾向支持，<b>避免重复建设和一哄而上</b>"；"以小切口破解大难题"；"布局不求面面俱到，以项目为牵引，务求应用实效"。</td></tr>
+<tr><td>安全底线</td>
+<td>"一体保障人工智能内容安全、技术安全、数据安全、算法安全和伦理安全"；"有效<b>防范算法歧视、惰化思维、过度依赖、应试内卷、隐私泄露</b>等问题"；"避免人工智能加剧教育不均衡"。</td></tr>
+<tr><td>评价与认证</td>
+<td>"将人工智能纳入<b>教师资格考试和认证内容</b>"；"在国家及省级教学成果奖中设立<b>智能教育项目</b>"；"持续开展人工智能社会实验，规范智能产品进校园管理"。</td></tr>
+</tbody>
+</table>
+
+<div class="box ok">
+<span class="lbl">对题目设计的四条直接影响</span>
+<ol>
+<li><b>必须从"数据驱动"升级为"数据 + 智能"双驱动表述。</b>政策语言已从"教育数字化"明确推进到"人工智能+教育"，题目停留在"数据驱动"会显得落后于文件。</li>
+<li><b>"优化传统学科专业人才培养方案"是题目最有力的政策挂靠点。</b>它比"建设平台""数据画像"更接近"培养模式"的本义，且是文件明确要求高校做的动作，评审可直接引用。</li>
+<li><b>"以小切口破解大难题""避免重复建设和一哄而上"是对本题的定向支持。</b>民办院校资源有限，做不了大平台；但"小切口"（如某专业、某课程群、某类能力）恰是文件鼓励的路径。原题目"数据驱动的培养模式创新"反而有"面面俱到"之嫌。</li>
+<li><b>"防范算法歧视、惰化思维、过度依赖"为研究提供了风险维度。</b>这使"AI 能力培养的效果评价"不只是测分数，还要测"是否形成依赖与惰化"——这正是可研究的学术问题。</li>
+</ol>
+</div>
+
+<p class="src">配套背景：《教育发展"十五五"规划》提出"推进人工智能全学段教育，提升学生人工智能素养，增强提出问题、解决问题的能力"。地方层面已细化课时要求，如北京市教委要求中小学每学年不少于 8 课时人工智能通识教育。<span class="src">来源：央视网《人工智能进课堂，如何学得更好？》（2026-08-24）</span></p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="t3">
+<h2>三、新变量二：Harness 是什么，它为什么改变研究命题</h2>
+
+<h3>3.1 概念核实</h3>
+
+<div class="box purple">
+<span class="lbl">Agent Harness（智能体线束）——2026 年初正式命名的概念</span>
+<p>该概念由 Anthropic 的 Claude Code SDK 与 OpenAI Codex 团队在工程实践中确立并明确命名，指<b>包裹在大模型外面的全部软件基础设施层</b>：编排循环、工具调用、记忆系统、上下文管理、状态持久化、错误处理、安全护栏。</p>
+<p>LangChain 的 Vivek Trivedy 有一句被广泛引用的表述：<b>"如果你不是模型，你就是 Harness。"</b>开发者 Beren Millidge 在 2023 年的论文中用了一个精确类比：<b>裸模型就是一颗没有操作系统的 CPU</b>——上下文窗口是内存（快但小），外部数据库是磁盘（大但慢），工具集成是设备驱动，而 Harness 就是操作系统。他称此举是"重新发明了冯·诺依曼架构"。</p>
+<p>业界区分很清晰：<b>智能体（Agent）是涌现行为</b>——有目标、会用工具、能自我纠正的那个看得见的东西；<b>Harness 是产生这种行为的机器</b>。当有人说"我做了一个智能体"，实际做的是搭了一个 Harness 并把它指向某个模型。</p>
+<p class="src">来源：Besthub《Deep Dive into Agent Harness》（2026）、nxcode《什么是 Harness Engineering？AI Agent 开发完整指南（2026）》、53ai《同一个模型，换个 Harness 排名跳了 25 位》（2026-04-08）。<b>说明：此概念主要来源于工程社区而非学术文献，属较新术语，申报时需自行给出操作化定义。</b></p>
+</div>
+
+<h3>3.2 Harness 的三层工程结构</h3>
+
+<table>
+<thead><tr><th style="width:16%">层次</th><th style="width:26%">核心问题</th><th>工程手段</th></tr></thead>
+<tbody>
+<tr><td><b>提示工程</b><br>Prompt Engineering</td><td>模型收到什么指令</td><td>指令设计、任务分解模板、思维链引导</td></tr>
+<tr><td><b>上下文工程</b><br>Context Engineering</td><td>模型在什么时候看到什么</td><td>上下文压缩、按需检索、观察遮蔽、子智能体委派、关键信息置于首尾</td></tr>
+<tr><td><b>Harness 工程</b><br>Harness Engineering</td><td>上述两者如何与基础设施结合</td><td>工具编排、状态持久化、错误恢复、<b>验证循环</b>、安全执行、生命周期管理</td></tr>
+</tbody>
+</table>
+
+<p>第三层中的"<b>验证循环</b>"尤为关键。Claude Code 的创建者指出，<b>给模型一种验证自己工作的方式，可将质量提升 2 到 3 倍</b>。这意味着：智能体的可靠性并非只取决于模型智能，而取决于<b>是否存在可靠的自我校验机制</b>。</p>
+
+<h3>3.3 实证证据：Harness 层的影响有多大</h3>
+
+<div class="box warn">
+<span class="lbl">这是本方案最关键的实证依据——它证明"外围工程"而非"模型"是决定性变量</span>
+<table style="margin-top:8px;">
+<thead><tr><th style="width:22%">实验</th><th>设计与结果</th></tr></thead>
+<tbody>
+<tr>
+<td><b>跨 Harness 对照实验</b><br><span style="font-size:12.5px;">（Composio, 2026）</span></td>
+<td>固定同一模型（moonshotai/kimi-k3 via OpenOpenRouter）、同一推理水平、同一套托管 MCP 工具、同一批 25 个任务（覆盖 Gmail、日历、表格、AirtHub、GitHub、Slack、Notion、Linear、PagerDuty 等业务应用），仅更换 Harness。<br><b>结果：通过率最低 68%（Codex，17/25）、最高 88%（Oh My Pi，22/25），相差 20 个百分点。</b>总成本从 9.28 美元到 35.37 美元不等，单位成功成本从 0.46 到 1.96 美元不等；运行时间从 143 秒到 777 秒不等；工具调用次数从 223 到 402 不等。<br><b>关键推论：模型没变，变的是模型外面的那一层。</b></td>
+</tr>
+<tr>
+<td><b>仅改 Harness 的提升</b><br><span style="font-size:12.5px;">（LangChain）</span></td>
+<td>在 Terminal Bench 2.0 上，<b>只改变 Harness 而不改变模型</b>，得分从 <b>52.8% 跃升至 66.5%</b>（增加自我验证循环与循环检测）。另有独立研究项目让大模型自行优化这层基础设施，达到 <b>76.4%</b> 通过率，超过所有人工设计方案。同一模型仅更换 Harness，在 TerminalBench 2.0 排行榜上从 30 名开外直接跳到第 5 名。</td>
+</tr>
+<tr>
+<td><b>上下文腐化的量化影响</b></td>
+<td>当关键内容落在上下文窗口中部时，模型性能<b>下降超过 30%</b>（"Lost in the Middle"研究，Chroma 引用）。ACON 研究展示<b>26%—54% 的 token 缩减同时保持 95% 以上准确率</b>——即通过优先保留推理轨迹而非原始工具输出实现优化。</td>
+</tr>
+<tr>
+<td><b>模型与 Harness 共同进化</b></td>
+<td>Codex 团队指出"Codex 模型在 Codex 的界面上感觉比在通用聊天窗口好用"，因为模型与该特定 Harness 一起后训练；<b>更换工具实现可能降低性能</b>。这说明选择 Harness 实质上是选择生态。</td>
+</tr>
+</tbody>
+</table>
+<p class="src">来源：Composio《8 Best AI Agent Harnesses in 2026: Performance, Cost, and Speed Compared》；nxcode《Harness Engineering 完整指南（2026）》（引述 LangChain、Martin Fowler、Anthropic 与 OpenAI 官方说法）；53ai（2026-04-08）。<b>证据等级说明：以上为工程社区的测评与实践报告，非同行评审学术研究，引用时应如实标注其性质，但其揭示的方向性结论（外围工程决定智能体表现）与多个独立来源一致。</b></p>
+</div>
+
+<h3>3.4 从 Harness 到教育命题：三点关键转译</h3>
+
+<div class="box ok">
+<span class="lbl">Harness 视角给教育研究带来的三个新命题</span>
+
+<p><b>转译一：学生的"AI 素养"不是会不会用，而是会不会编排。</b>随着智能体平台把"接入大模型"变成零代码操作，<b>"会调用模型"已不再是区分度高的能力</b>。真正的区分度在于：能否把一个复杂任务拆解为步骤序列、能否为智能体配备恰当工具、能否设计验证机制以检验输出、能否在失败时诊断并修正。<b>这正好是 Harness 工程的三层结构在学生能力上的映射。</b></p>
+
+<p><b>转译二："惰化思维"风险有了机制层面的解释。</b>《"人工智能+教育"行动计划》明确要求防范"惰化思维、过度依赖"。而 Harness 工程恰恰给出了这一风险的<b>技术成因与对策</b>：如果只给模型一个任务并接受结果（无验证循环、无任务分解要求），学生就退化为答案接收者；如果强制学生设计验证步骤、提交对话日志与修改记录（Harness 的验证循环机制），则能维持高阶思维参与。<b>这使"如何用教学设计避免 AI 代劳"从经验讨论变成了可操作、可检验的设计变量。</b></p>
+
+<p><b>转译三：这为"低成本路径"提供了技术依据。</b>实证显示，外围工程（编排、验证、护栏、上下文管理）对性能的影响远超模型本身，且往往是<b>教学设计问题而非算力问题</b>。这对算力受限的民办院校是极重要的判断——<b>不必自建算力，也能通过改进编排与验证机制显著提升 AI 应用效果</b>。这与《行动计划》"避免重复建设和一哄而上"的导向完全一致。</p>
+</div>
+
+<div class="box note">
+<span class="lbl">术语使用建议（重要）</span>
+<p>"Harness" 目前是<b>工程社区术语，中文教育学文献尚无对应学术概念</b>。建议在申报文本中采取如下策略：<b>正文使用"智能体编排能力"作为中文操作化表述，并在首次出现处注明其对应的工程学概念 Agent Harness 及出处</b>。这样做既便于评审理解，也把术语选择本身转化为研究的前沿性亮点（首次将 Harness 理论引入民办财经人才培养研究）。<b>切勿将"Harness"直接写入题目</b>——评审委员会多为教育学与教学论背景，英文工程术语会显著增加理解成本与"不熟悉而扣分"的风险。</p>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="t4">
+<h2>四、新变量三：民办财经院校的现实位置</h2>
+
+<h3>4.1 民办院校已在 AI 通识上形成先行案例</h3>
+
+<p>这一检索结果改变了本方案的定位判断——<b>民办院校在 AI 教改上并不落后，甚至在某些维度更主动</b>：</p>
+
+<table>
+<thead><tr><th style="width:16%">院校</th><th style="width:14%">性质</th><th>已公开的 AI 育人举措</th></tr></thead>
+<tbody>
+<tr>
+<td><b>成都东软学院</b></td><td>民办本科<br>（工学为主）</td>
+<td>自 2025 学年起《人工智能通识》纳入<b>全体大一新生必修课</b>，全校专业覆盖；已建成 <b>53 门</b>AI 系列课程，搭建"AI+计算机""AI+数字艺术""AI+外语""AI+健康医疗"等交叉路径；2026年7月申报的《NEU-AI 平台赋能高校教学数字化转型的实践探索》<b>入选国家级数字化赋能教育管理典型案例</b>；依托多智能体智慧学习环境完成课程体系、项目实训、考核评价、教学资源支撑的全方位重构；<b>把"人工智能工具实操应用能力"纳入量化可考核的毕业硬性标准</b>。<span class="src">来源：中国教育在线四川站（2026-07-31），C级（校方宣传口径）</span></td>
+</tr>
+<tr>
+<td><b>广州华立学院</b><br><span style="font-size:12.5px;">（报道名称：转设五周年，从独立办学迈向高质量发展）</span></td><td>民办本科</td>
+<td>2025 学年全校累计开设人工智能相关课程 <b>56 门</b>，实现通识教育与专业教学全面覆盖；截至 2026 年 5 月共开设 <b>18 个微专业</b>，其中 <b>9 个与人工智能相关</b>（AI 智能体开发与应用、医药人工智能等）；<b>推动传统"教师—学生"二元交互向"教师—学生—AI 智能体"三元协同范式转型</b>，AI 智能体深度融入精讲导学、自主学习、小组研讨、成果分享四大教学环节，<b>化身助教、学伴与评价者</b>；面向全体校友免费开放微专业。<span class="src">来源：羊城晚报（2026-06-26），C级</span></td>
+</tr>
+<tr>
+<td><b>重庆工程学院</b></td><td>民办本科<br>（以工学为主，含管理学、经济学）</td>
+<td>2026 年启动"拥抱 AI 涅槃重生"战略转型，提出"<b>两融一改</b>"：产教融合（与腾讯云、中兴通讯共建 7 个现代产业学院，"企业出题—师生解题—项目结题"）、AI 融入（软件工程融入 Prompt 工程、智能体开发、大模型微调）、教学改革（<b>理论课与实践课学时比调整为 1:2</b>；考核由笔试为主转向"<b>项目交付物 + 代码审查 + 过程成果评估</b>"）；已建成 15 门校级 AI 重点课程、2 门市级重点 AI 课程，自主研发 3 个 AI 教学平台支撑"通关式"评价体系。全日制在校生约 2.1 万人。<span class="src">来源：网易新闻（自媒体原创声明，2026），C级可信度较低，仅作线索</span></td>
+</tr>
+<tr>
+<td><b>成都银杏酒店管理学院</b></td><td>民办本科<br>（管理类）</td>
+<td>制定《AI 赋能人才培养 2026 年工作计划》，推进"<b>五大行动</b>"：条件建设（教学平台升级、大模型接入、<b>智能体资源保障</b>、智慧教室）、教师素养提升（"校外专家+校内骨干"双轨培训）、课程建设（"<b>普及+专业</b>"一体化 AI 课程体系）、<b>教学智能体试点</b>（各专业遴选 1—2 门专业课，围绕"教、学、管、评、测"打造智能助教、智能学伴）、学生创新实践（"1+1"实践模式、AI 社团、"AI+"创新实践大赛）。<span class="src">来源：《中国教育报·中国教育新闻网》（2026-03-11），C级</span></td>
+</tr>
+</tbody>
+</table>
+
+<div class="box pink">
+<span class="lbl">一个重要的竞争态势判断</span>
+<p><b>民办院校的 AI 教改已经"做了动作"，但普遍缺乏可验证的成效证据。</b>四所院校的公开材料都以改革举措与经验总结为主，回答的是"我们做了什么"，几乎没有回答"效果如何测量""对照是什么""机制是什么"。</p>
+<p>这正是本课题的机会所在：<b>不要和这些院校比"做得多"，要和它们比"说得清"</b>。课题的核心学术价值应定位为——为已广泛开展但缺少证据的民办 AI 育人实践，提供可复制的机制解释与效果测量方法。</p>
+</div>
+
+<h3>4.2 民办财经类院校的 AI 育人特殊性（决定题目取舍）</h3>
+
+<table>
+<thead><tr><th style="width:20%">特殊性</th><th>对题目设计的约束</th></tr></thead>
+<tbody>
+<tr><td>专业是"财经"而非"计算机"</td>
+<td>研究对象必须处理<b>非计算机专业的 AI 素养培养</b>这一特定问题。计算机专业已有成熟的 AI 培养体系，财经专业的难点在于：如何在不牺牲专业内核的前提下，让学生具备 AI 编排能力，并使其能与财会、金融、管理知识形成真正的交叉（而非两张皮）。</td></tr>
+<tr><td>应用型定位、就业压力大</td>
+<td>研究结果必须能<b>对接就业能力</b>。《行动计划》明确"将人工智能纳入高校学生就业能力提升'双千'计划""鼓励开设相关微专业课程和微证书项目"。就业结果数据应作为重要因变量。</td></tr>
+<tr><td>经费与算力约束</td>
+<td>不能承诺自建算力或大平台。<b>应走"小切口 + 教学设计变量"路线</b>——这与 Harness 视角高度契合：优化编排与验证属于教学设计问题，不属于算力问题。</td></tr>
+<tr><td>师资数字素养落差大</td>
+<td>《行动计划》要求"制定教师智能素养标准"。研究中必须包含<b>教师侧的 AI 能力变量</b>，否则仅测学生能力会失真。</td></tr>
+<tr><td>生源差异化大</td>
+<td>学生起点差异显著，需要<b>分层设计</b>。这也带来公平性议题——防止 AI 应用加剧教育不均衡，正是《行动计划》与 Harness 护栏机制共同关注的问题。</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="t5">
+<h2>五、两种研究范式的分野与本文的切入定位</h2>
+
+<p>结合第一轮评估识别出的"撞车风险"与本轮检索到的实践现状，可以清楚地看到当前研究的两条路线：</p>
+
+<table>
+<thead><tr><th style="width:6%"></th><th style="width:23%">路线 A：AI for Education</th><th style="width:23%">路线 B：AI in the Curriculum</th></tr></thead>
+<tbody>
+<tr><td><b>研究对象</b></td><td>用 AI 改造教学过程</td><td><b>把 AI 能力本身设为培养目标</b></td></tr>
+<tr><td><b>核心问题</b></td><td>AI 能否改善教学效果？如何改进？</td><td><b>学生应具备什么样的 AI 能力？如何培养与评价？</b></td></tr>
+<tr><td><b>已有实践</b></td><td>AI 助教/学伴/数据画像/平台建设（<b>拥挤</b>）：中央财经 75 项教改项目、西安财大"西财大智学"、湖北经济学院"三张画像"、成都东软 NEU-AI 平台、广州华立"三元协同"</td><td><b>几乎空白</b>：各校做法多为"把 AI 通识课设为必修"（东软、华立），<b>但"AI 能力如何进入培养方案、如何进入评价、效果如何测量"缺乏机制性研究</b></td></tr>
+<tr><td><b>学术贡献形态</b></td><td>效果比较、模式描述、经验总结</td><td><b>能力框架构建 + 培养机制验证 + 效果测量方法</b></td></tr>
+<tr><td><b>评审风险</b></td><td><b>与已有公开案例高度同构，易被判重复</b></td><td>无先例可循，但<b>政策挂靠最直接</b>（对应《行动计划》"优化培养方案"要求）</td></tr>
+</tbody>
+</table>
+
+<div class="verdict">
+<div class="big">建议明确走路线 B：以"智能体编排能力"为核心变量</div>
+<p style="margin-top:10px;">理由有三：<b>其一，规避同构风险</b>——不与已建平台的院校比平台；<b>其二，政策挂靠最直接</b>——《行动计划》明确要求"优化传统学科专业人才培养方案""制定教师智能素养标准"，正对应路线 B 的研究对象；<b>其三，学术贡献更硬</b>——能力框架与机制验证属于可积累的学术资产，而平台建设属于可被超越的工程投入。</p>
+</div>
+
+<h3>5.1 为什么"智能体编排能力"是正确的核心变量</h3>
+
+<div class="box ok">
+<p>把前述 Harness 三层结构转译为学生的四项可测能力子域，这样处理有两个好处：一是<b>与国际前沿对齐</b>（直接对应 Prompt / Context / Harness Engineering / Verification）；二是<b>避免落入"会用 AI 工具"的浅层表述</b>。</p>
+</div>
+
+<table>
+<thead><tr><th style="width:14%">能力子域</th><th style="width:28%">内涵</th><th>可测量的行为表现（举例）</th></tr></thead>
+<tbody>
+<tr><td><b>任务分解与问题界定</b><br><span style="font-size:12.5px;">对应提示工程</span></td><td>能否把复杂财经任务拆为可执行步骤序列，识别其中的模糊与错误前提</td><td>面对"分析某公司财报并给出投资建议"这类任务，能否识别出任务本身的隐含假设、指出需要澄清的数据缺口，而不是直接要求 AI 生成答案</td></tr>
+<tr><td><b>上下文组织与资源调度</b><br><span style="font-size:12.5px;">对应上下文工程</span></td><td>能否为智能体配备恰当的信息与工具，识别其能力边界</td><td>能否为 AI 精准提供专业资料与数据，并在 AI 输出出现幻觉或逻辑断裂时定位问题来源</td></tr>
+<tr><td><b>结果验证与纠错</b><br><span style="font-size:12.5px;">对应 Harness 的验证循环</span></td><td><b>能否设计机制检验 AI 输出，而非直接采信</b></td><td>能否设计交叉验证路径、发现 AI 输出的财务数据错误或计算错误、提交修改说明与对照日志</td></tr>
+<tr><td><b>伦理与风险识别</b><br><span style="font-size:12.5px;">对应安全护栏</span></td><td>能否识别数据安全、算法歧视、学术不端、过度依赖等风险并采取防护</td><td>能否在上传涉密数据前识别风险；能否识别 AI 代写与数据造假的边界；能否说明本课程中 AI 使用的合规规则</td></tr>
+</tbody>
+</table>
+
+<div class="box info">
+<span class="lbl">这里有一个可以直接借鉴的成熟做法</span>
+<p>有学者已提出高校教学评价改革的配套做法：<b>"允许学生在作业中使用 AI，但必须提交'对话日志'和'反思报告'，说明自己如何引导 AI、修改了 AI 的哪些错误、加入了哪些原创思考"</b>；配合过程性评价（增加课堂讨论、项目阶段性汇报、实验日志、反思笔记权重）与口试答辩（现场解释思路，AI 无法代劳也无法作假）。<span class="src">来源：《中国教育新闻网》《人工智能时代大学教育改革走向何处》</span></p>
+<p><b>这一做法与 Harness 的"验证循环"机制在结构上完全同构</b>，且可直接作为本研究评价工具的设计依据——它把"验证能力"变成了可观测、可评分、可比较的行为，是本方案最重要的可落地抓手。</p>
+</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="t6">
+<h2>六、四个候选题目方案</h2>
+
+<h3>6.1 方案总览与评分对比</h3>
+
+<table>
+<thead><tr><th style="width:5%">方案</th><th style="width:30%">题目</th><th style="width:9%">范式差异性</th><th style="width:9%">政策贴合度</th><th style="width:9%">可执行性</th><th style="width:9%">风险可控</th></tr></thead>
+<tbody>
+<tr>
+<td><b>一</b><br><span class="tag">推荐</span></td>
+<td><b>智能体编排能力导向的民办财经类应用型本科人才培养模式重构与效果评估研究</b></td>
+<td><span style="color:var(--green-700)">★★★★★</span></td>
+<td><span style="color:var(--green-700)">★★★★★</span></td>
+<td><span style="color:var(--green-700)">★★★★☆</span></td>
+<td><span style="color:var(--green-700)">★★★★★</span></td>
+</tr>
+<tr>
+<td><b>二</b></td>
+<td><b>AI 素养框架下民办财经类本科人才培养方案的系统重构研究——基于智能体编排能力的课程—评价耦合机制</b></td>
+<td><span style="color:var(--green-700)">★★★★☆</span></td>
+<td><span style="color:var(--green-700)">★★★★★</span></td>
+<td><span style="color:var(--green-700)">★★★★☆</span></td>
+<td><span style="color:var(--green-700)">★★★★☆</span></td>
+</tr>
+<tr>
+<td><b>三</b></td>
+<td><b>面向智能体时代的民办财经类本科"财经+AI"复合能力培养模式构建研究——基于课程体系与评价改革的实证</b></td>
+<td><span style="color:var(--orange-700)">★★★☆☆</span></td>
+<td><span style="color:var(--green-700)">★★★★☆</span></td>
+<td><span style="color:var(--green-700)">★★★★★</span></td>
+<td><span style="color:var(--green-700)">★★★★☆</span></td>
+</tr>
+<tr>
+<td><b>四</b></td>
+<td><b>人工智能赋能民办财经类应用型本科人才培养模式创新研究——基于学习过程数据的"教—学—评"闭环机制</b></td>
+<td><span style="color:var(--orange-700)">★★☆☆☆</span></td>
+<td><span style="color:var(--green-700)">★★★★☆</span></td>
+<td><span style="color:var(--green-700)">★★★★☆</span></td>
+<td><span style="color:var(--orange-700)">★★★☆☆</span></td>
+</tr>
+</tbody>
+</table>
+
+<h3>6.2 逐个方案说明</h3>
+
+<div class="titlecard best">
+<div class="label">方案一 · <b>推荐</b> <span class="badge">首选</span></div>
+<div class="t">智能体编排能力导向的民办财经类应用型本科人才培养模式重构与效果评估研究</div>
+<div class="why">
+<b>要素分解：</b>主体=民办财经类应用型本科（明确）；变量=智能体编排能力（可测四子域）；对象=人才培养模式（保留原题目内核并收敛）；结果=效果评估（可检验）。<br>
+<b>推荐理由：</b>①同时完成"加 AI 因子"与"避撞车"两件事；②"编排能力"是 Harness 视角下最具区分度的能力概念，比"AI 素养"更具体、更可测；③"效果评估"补上了国际系统综述指出的"重预测轻效果"缺口；④"重构"而非"探索"，承诺明确；⑤题目 34 字，若申报有字数限制可精简下方短版。<br>
+<b>精简版（28 字）：</b><b>智能体编排能力导向的民办财经类人才培养模式重构与效果评估</b>
+</div>
+</div>
+
+<div class="titlecard">
+<div class="label">方案二 · 偏"方案设计"路线</div>
+<div class="t">AI 素养框架下民办财经类本科人才培养方案的系统重构研究——基于智能体编排能力的课程—评价耦合机制</div>
+<div class="why">
+<b>取向</b>：偏教育管理/课程论，适合申报方向为"教学改革研究"或"课程建设"的学科评审。<br>
+<b>优势</b>：把"AI 素养框架"作为显性产出物（能力框架图谱），交付物清晰；"课程—评价耦合"指出了培养方案内部两个最需要同步改革的要素，机制具体。<br>
+<b>不足</b>：题目较长（42 字）；"系统重构"范围偏大，与"小切口"导向存在张力；效果检验的设计未在题目中体现。<br>
+<b>适用</b>：若申报指南强调"课程体系与评价改革"，可选此方案。
+</div>
+</div>
+
+<div class="titlecard">
+<div class="label">方案三 · 偏"交叉学科"路线</div>
+<div class="t">面向智能体时代的民办财经类本科"财经+AI"复合能力培养模式构建研究——基于课程体系与评价改革的实证</div>
+<div class="why">
+<b>取向</b>：呼应中央财经大学"金融科技+计算机科学与技术""人工智能+税收"联合学位项目，也呼应财经教育界"懂财经、通技术、善创新"的共识表述。<br>
+<b>优势</b>：概念直观、易懂易传播；"实证"二字保证了学术规格；可执行性最高，因为课程建设是院校熟悉的工作。<br>
+<b>不足</b>：<b>"财经+AI"已是高度拥挤的提法</b>（五所院校公开材料均采用类似表述），范式差异性最低；"面向智能体时代"与"财经+AI"两个限定叠加后题目偏长。<br>
+<b>适用</b>：若评审偏应用、偏课程建设，可作备选；但<b>不建议作为首选</b>。
+</div>
+</div>
+
+<div class="titlecard">
+<div class="label">方案四 · 最小改动方案</div>
+<div class="t">人工智能赋能民办财经类应用型本科人才培养模式创新研究——基于学习过程数据的"教—学—评"闭环机制</div>
+<div class="why">
+<b>取向</b>：在原题目基础上做最小改动，把"数据驱动"升级为"人工智能赋能 + 学习过程数据"，并保留第一轮评估中论证过的闭环机制与干预有效性优势。<br>
+<b>优势</b>：改动最小，保留了对"重预测轻干预"空白的方法优势；"教—学—评"闭环概念清晰。<br>
+<b>不足</b>：<b>范式差异性最低</b>——仍属路线 A（用 AI 改造教学），与已建平台的院校撞车风险仍在。<br>
+<b>适用</b>：如果申报级别较低、求稳，或本校已建成 AI 平台与学习数据基础，可选此方案。
+</div>
+</div>
+
+<h3>6.3 若采用方案一，配套的三个子课题名称</h3>
+<p>若申报指南要求填列子课题，建议如下拆分（每个子课题都可独立交付，便于分头推进）：</p>
+<ol>
+<li><b>子课题一：民办财经类本科生智能体编排能力框架构建与测评工具开发</b>——解决"测什么"的问题，产出能力框架与测评量表（可含"对话日志 + 反思报告"模板）。</li>
+<li><b>子课题二：智能体编排能力融入培养方案与课程体系的机制设计</b>——解决"怎么教"的问题，产出课程—能力映射矩阵与分层教学方案。</li>
+<li><b>子课题三：基于准实验的效果评估与机制验证</b>——解决"有没有用"的问题，产出效果证据与可复制实施清单。</li>
+</ol>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="t7">
+<h2>七、推荐方案深度论证</h2>
+
+<h3>7.1 要素对照表</h3>
+
+<table>
+<thead><tr><th style="width:14%">题目要素</th><th style="width:28%">具体内容</th><th>设计理由</th></tr></thead>
+<tbody>
+<tr><td><b>主体</b></td><td>民办财经类应用型本科</td><td>锁定主体后，才具备差异化与可及性；"应用型本科"回应《教育强国纲要》与分类管理语境；"民办"回应年检与经费约束</td></tr>
+<tr><td><b>核心变量</b></td><td>智能体编排能力（四个子域）</td><td>Harness 视角的直接转译；比"AI 素养"更可测；与国际前沿对齐；无同类研究可撞</td></tr>
+<tr><td><b>变革对象</b></td><td>人才培养模式（含培养方案、课程、评价、教师）</td><td>保留原题目内核并收敛边界；"重构"比"探索"承诺明确</td></tr>
+<tr><td><b>结果指向</b></td><td>效果评估</td><td>补上"重预测轻效果"的国际空白；使研究可验收</td></tr>
+</tbody>
+</table>
+
+<h3>7.2 核心机制假设</h3>
+
+<div class="box ok">
+<span class="lbl">可检验的机制链条（本研究的理论骨架）</span>
+<p style="font-size:15px;margin-top:6px;"><b>智能体编排能力要求</b> →（课程层）<b>任务型课程设计与强制验证环节</b> →（评价层）<b>对话日志 + 反思报告 + 过程性评价权重</b> →（主体层）<b>教师智能素养支持</b> →（结果层）<b>高阶思维保持 + 专业能力形成 + 就业适配改善</b> →（反例）<b>若缺少验证环节，则 AI 使用越多，高阶思维反而下降（惰化）</b></p>
+<p style="margin-top:8px;">这条链条的价值在于：<b>它同时给出了正向假设与反向假设</b>。后者正是《"人工智能+教育"行动计划》明确要求防范的"惰化思维、过度依赖"。若研究能证实"无验证设计的高 AI 使用导致思维惰化"，其政策与学术价值将显著高于单纯的正向效果论证。</p>
+</div>
+
+<h3>7.3 创新点（建议按此顺序写入申请书）</h3>
+
+<table>
+<thead><tr><th style="width:6%">序</th><th style="width:24%">创新点</th><th>论证方式</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>将 Agent Harness 理论首次引入民办财经人才培养研究</b>，提出"智能体编排能力"作为学生 AI 素养的操作化概念，含四个子域与可测行为表现</td><td>学术前沿性 + 概念原创性。<b>需注意</b>：Harness 是工程术语，须在正文中自行完成教育学转译论证，这是可行的工作量，也是可预期的评审质询点</td></tr>
+<tr><td>2</td><td><b>构建面向财经专业的智能体编排能力测评工具</b>（含对话日志、反思报告、交叉验证任务等载体），填补"非计算机专业 AI 能力如何测"的工具空白</td><td>工具创新。三所民办院校虽已把 AI 通识设为必修，但未见配套的能力测评工具公开</td></tr>
+<tr><td>3</td><td><b>提出并检验"验证环节"作为关键变量的机制假设</b>，区分"用 AI"与"用对 AI"的效果差异</td><td>机制创新。直接对应《行动计划》防范"惰化思维、过度依赖"的要求，也回应国际文献中"高 AI 使用不等于高能力"的可能反向结论</td></tr>
+<tr><td>4</td><td><b>产出面向经费受限院校的低成本实施路径</b>，明确"不需要自建算力也能显著提升 AI 应用效果"的证据</td><td>实践创新。回应《行动计划》"避免重复建设和一哄而上"，也回应民办院校最关心的成本问题</td></tr>
+</tbody>
+</table>
+
+<h3>7.4 风险与应对</h3>
+
+<table>
+<thead><tr><th style="width:22%">风险</th><th style="width:8%">等级</th><th>应对预案</th></tr></thead>
+<tbody>
+<tr><td>评审不熟悉"Harness"概念，判定为工程术语不当</td><td><span style="color:var(--orange-700)">中</span></td><td>题目中<b>不使用</b>该词；正文用"智能体编排能力"作为中文表述，首次出现处注明英文对应与出处，并给出教育学操作性定义</td></tr>
+<tr><td>民办院校本科生 AI 使用水平过低，导致干预无效果</td><td><span style="color:var(--orange-700)">中</span></td><td>改为"能力提升幅度"的比较而非"高水平达成"的检验；把起点差异作为调节变量纳入设计；与成都东软、广州华立的必修课基础做法对照，确认起点水平</td></tr>
+<tr><td>AI 使用痕迹污染过程性评价（作弊与代写）</td><td><span style="color:var(--orange-700)">高</span></td><td>把"提交对话日志与修改说明"本身设为评分对象——这使诚实记录过程成为得分项，从激励层面解决；同时辅以口试抽查</td></tr>
+<tr><td>教师能力不足导致支撑失效</td><td><span style="color:var(--orange-700)">中</span></td><td>对应《行动计划》"制定教师智能素养标准"，本研究将教师智能素养作为调节变量，并提供教师发展简明手册；这也是研究本身的政策贡献</td></tr>
+<tr><td>题目过长超出字数限制</td><td><span style="color:var(--green-700)">低</span></td><td>已备精简版（28 字）；亦可进一步压缩为《智能体编排能力导向的民办财经人才培养模式重构研究》（24 字）</td></tr>
+<tr><td>与本校已有 AI 教改项目重复</td><td><span style="color:var(--orange-700)">中</span></td><td>申报前须盘点校内已有项目；若已有平台建设类项目，本研究应明确差异化定位为"效果评估与机制验证"，形成互补而非重复</td></tr>
+</tbody>
+</table>
+
+<h3>7.5 与第一轮评估建议的关系</h3>
+
+<div class="box info">
+<p>第一轮曾推荐《数据驱动的学业预警与分层干预机制研究》。该方案仍然成立，<b>但如果采纳本次的方案一，两者可以形成"主线—支线"关系而非替代关系</b>：</p>
+<ul>
+<li><b>本次方案一（AI 编排能力 → 培养模式重构）作为主线课题</b>：回应《行动计划》，理论贡献强，方向前沿。</li>
+<li><b>第一轮方案（预警与干预）作为子课题或配套研究</b>：提供方法论支撑（如何做准实验、如何测效果），可在主线课题中作为效果评估的技术手段，也可独立申报形成系列成果。</li>
+</ul>
+<p><b>建议做法</b>：以方案一为主申报，将"学习过程数据"降格为<b>测量手段</b>而非研究主体。这样既保留了第一轮的实证方法优势（不与纯思辨研究同质），又避免了原题目"面面俱到"的毛病——因为主变量已收敛为单一而明确的"智能体编排能力"。</p>
+</div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="t8">
+<h2>八、题目撰写规范与常见失误</h2>
+
+<table>
+<thead><tr><th style="width:40%">忌讳</th><th>对策</th></tr></thead>
+<tbody>
+<tr><td>把工程术语（Harness、Agent、Prompt、LLM）直接写入题目</td><td>题目只用教育学术语；术语在正文做转译并注明出处</td></tr>
+<tr><td>"探索""浅析""初探"</td><td>改为"重构""构建""机制""评估""实证"</td></tr>
+<tr><td>堆砌热点词（"数字化转型""智慧校园""AI+""赋能"）超过两个</td><td>只保留一个技术词（智能体）+ 一个对象词（培养模式），其余移到副标题</td></tr>
+<tr><td>"赋能""驱动"空泛使用</td><td>"赋能"无法证伪。改用具体机制动词：融入、耦合、嵌入、传导</td></tr>
+<tr><td>范围词缺失</td><td>必须明示"民办财经类应用型本科"，否则评审按最宽口径估算工作量</td></tr>
+<tr><td>题目与申报指南方向不匹配</td><td>若指南强调"课程建设"选方案二；若强调"数字化/平台"选方案四；若强调"人才培养模式改革"选方案一</td></tr>
+</tbody>
+</table>
+
+<h3>可选的等价替换词</h3>
+<p>若"编排能力"在某些评审语境下被认为偏技术化，可考虑同义替换（含义相近，按指南侧重点选择）：</p>
+<ul>
+<li><b>智能体应用能力</b>（更通俗，适合面向"教学改革"评审）</li>
+<li><b>AI 驾驭能力 / 智能驾驭能力</b>（强调主体性，适合面向"人才培养"评审）</li>
+<li><b>人机协同能力</b>（学界接受度高，但区分度下降，且与"会用 AI"难以区分，不推荐作为核心变量名）</li>
+</ul>
+<div class="box note">
+<p><b>提示：</b>不建议使用"AI 素养"作为核心变量名。原因是该词已被政策文件广泛使用（《行动计划》提出"提升学生人工智能素养"），用它作变量名会与政策话语混淆，且难以体现你研究的独特贡献——<b>"素养"太泛，"编排"才精确</b>。</p>
+</div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="t9">
+<h2>九、下一步行动清单</h2>
+<ol>
+<li><b>通读《"人工智能+教育"行动计划》全文及教育部科技司答记者问</b>（2026-04-10，教育部网站）。这是题目所有政策挂靠点的来源，必须逐条对应，不能只引标题。</li>
+<li><b>核对申报指南的学科方向与字数限制</b>，据 §8 末段判断应采用方案一、方案二还是方案四。</li>
+<li><b>盘点本校已有 AI 教改基础</b>：是否已有 AI 通识必修课、已建成哪些 AI 课程、教师参与情况、是否有校级 AI 平台。<b>这决定研究是"从零建立"还是"在已有基础上做机制验证"</b>，直接影响可行性与研究设计的表述。</li>
+<li><b>确认专业范围</b>（建议 2—3 个专业，优先选择已有 AI 通识课基础的），以及是否锁定本科层次。</li>
+<li><b>核查评价工具可行性</b>：确认现有教务系统能否支持"对话日志 + 反思报告 + 过程性评价权重"的记录与归档，这是本研究能否落地的关键工程前提。</li>
+<li><b>确定是否保留第一轮的预警与干预方案作为子课题</b>（见 §7.5）。</li>
+<li><b>按方案一撰写申请书</b>，创新点按 §7.3 顺序表述，机制假设按 §7.2 呈现（务必写出反向假设）。</li>
+<li><b>补充中文文献计量</b>：检索"人工智能素养 + 高等教育""智能体 + 人才培养"主题的 CiteSpace 分析，用于论证本选题的空白性（延续第一轮评估附录C 的建议）。</li>
+</ol>
+</section>
+
+<!-- ============ 附录 ============ -->
+<section id="ta">
+<h2>附录：新增来源清单与待核实事项</h2>
+
+<h3>A.1 新增政策来源（A级）</h3>
+<ol class="refs">
+<li>《教育部等五部门关于印发〈"人工智能+教育"行动计划〉的通知》，2026年4月10日：<a href="https://www.moe.gov.cn/srcsite/A16/s3342/202604/t20260410_1433240.html" target="_blank">教育部网站 t20260410_1433240</a></li>
+<li>《教育部科学技术与信息化司负责人就〈"人工智能+教育"行动计划〉答记者问》，2026年4月10日：<a href="https://www3.xinhuanet.com/edu/20260410/e39f42de21cc4936b82ada211f9ed709/c.html" target="_blank">新华网转载</a>。含试点背景（17个省市、18所高校）、四个起草思路（守正创新、素养为先、应用为王、智能向善）、四项政策亮点。</li>
+<li>《事关"人工智能教育"，教育部等五部门做出部署》，中国网教育，2026-04-10：<a href="https://edu.china.com.cn/2026-04/10/content_118429900.shtml" target="_blank">链接</a></li>
+<li>《人工智能进课堂，如何学得更好？》（解读"十五五"专项规划），央视网，2026-08-24：<a href="https://big5.cctv.com/gate/big5/edu.cctv.cn/2026/08/24/ARTInk635Q7DW5z65znIQmOC260824.shtml" target="_blank">链接</a>。含《教育发展"十五五"规划》表述与北京、山东课时要求。</li>
+</ol>
+
+<h3>A.2 Harness 概念来源（C级，工程社区）</h3>
+<ol class="refs">
+<li>《Deep Dive into Agent Harness: Unpacking the Architecture Behind AI Agents》，besthub.dev：<a href="https://www.besthub.dev/articles/deep-dive-into-agent-harness-unpacking-the-architecture-behind-ai-agents-43515f8e68ce" target="_blank">链接</a>｜三层工程、十二组件、Millidge 的"CPU 与操作系统"类比、Trivedy"你不是模型，你就是 Harness"。</li>
+<li>《8 Best AI Agent Harnesses in 2026: Performance, Cost, and Speed Compared》，Composio：<a href="https://composio.dev/content/best-ai-agent-harnesses" target="_blank">链接</a>｜<b>核心实证：同一 Kimi K3 模型、同一 25 任务，通过率 68%—88%，成本 9.28—35.37 美元，运行时间 143—777 秒。</b></li>
+<li>《什么是 Harness Engineering？AI Agent 开发完整指南（2026)》，nxcode.io：<a href="https://www.nxcode.io/zh/resources/news/what-is-harness-engineering-complete-guide-2026" target="_blank">链接</a>｜五个支柱、验证循环、LangChain Terminal Bench 2.0 从 52.8% 至 66.5%、"给模型验证自身工作的方式可将质量提升 2—3 倍"（Boris Cherny）。</li>
+<li>《同一个模型，换个 Harness 排名跳了 25 位：智能体基础设施完全解剖》，53ai，2026-04-08：<a href="https://www.53ai.com/news/langchain/2026040856201.html" target="_blank">链接</a>｜Akshay Pachaar 原文的中文综述，TerminalBench 2.0 从 30 名开外升至第 5 名、模型自优化 Harness 达 76.4%、上下文腐化下降超 30%、ACON 削减 26%—54% token 保持 95% 以上准确率。</li>
+<li>Microsoft Agent Framework at BUILD 2026：<a href="https://aka.ms/Build2026MicrosoftAgentFramework" target="_blank">官方页</a>｜Agent Harness 作为一等概念被纳入平台（原 AutoGen 与 Semantic Kernel 融合，2026年4月2日 1.0 GA）。<b>可作为"Harness 已成行业标准基础设施"的官方佐证。</b></li>
+</ol>
+
+<h3>A.3 民办院校实践案例来源（C级）</h3>
+<ol class="refs">
+<li>《产教融合深耕 AI 育人 这所民办高校交出高质量就业答卷》（成都东软学院），中国教育在线四川站，2026-07-31：<a href="https://sichuan.eol.cn/scgd/202607/t20260731_2761733.shtml" target="_blank">链接</a></li>
+<li>《转设五周年，从独立办学迈向高质量发展》（广州华立学院相关），羊城晚报，2026-06-26：<a href="https://ep.ycwb.com/epaper/ycwb/html/2026-06/26/content_834_756747.htm" target="_blank">链接</a></li>
+<li>《成都银杏酒店管理学院："五大行动"推进 AI 赋能人才培养改革》，《中国教育报·中国教育新闻网》，2026-03-11：<a href="http://www.jyb.cn/rmtzcg/xwy/wzxw/202603/t20260311_2111453498.html" target="_blank">链接</a></li>
+<li>《AI 工程师如何培养？重庆这所应用型本科探索"两融一改"新路径》（重庆工程学院），网易新闻自媒体，2026：<a href="https://c.m.163.com/news/a/L0E9M6DJ053693I9.html" target="_blank">链接</a> <b class="note">｜该文已声明"网易号作者上传，仅代表作者观点"，可信度较低，仅作线索。</b></li>
+</ol>
+
+<h3>A.4 本次标注的待核实与使用限制</h3>
+<table>
+<thead><tr><th style="width:34%">事项</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>Harness 的全部技术细节与实证数据</td><td><b>来源于工程社区测评与技术博客，非同行评审学术研究。</b>本报告已在正文明确标注其性质。申报文本若引用，建议：①引用 Microsoft Agent Framework 官方发布作为"行业已标准化"的佐证；②技术细节仅作为研究设计的参考，<b>不作为学术论断</b>；③核心论证仍应建立在可自行验证的教学实证之上。</td></tr>
+<tr><td>"智能体编排能力"作为学术概念</td><td><b>目前无中文教育学文献支撑，属本方案提出的原创操作化概念。</b>这是机会也是风险：申报时必须完整给出四子域的维度来源、测评工具的效度论证，并<b>预期回答"这个概念从哪来、凭什么有效"的质询</b>。</td></tr>
+<tr><td>成都东软、广州华立等院校案例数据</td><td>均为媒体报道或校方宣传口径，属C级证据。<b>可用于论证"实践已铺开但缺少效果证据"这一判断，不可用于论证具体成效数值。</b>建议在申报前通过官方渠道核实课程数量、平台上线时间等可核实项。</td></tr>
+<tr><td>重庆工程学院案例</td><td>来源为网易自媒体且已声明观点性，<b>本报告仅作线索，不建议在正式申报材料中引用。</b></td></tr>
+<tr><td>《行动计划》全文的完整条款</td><td>本报告所引条款来自教育部网站发布的通知与答记者问，<b>建议申报前完整通读原文件及附件</b>，本报告仅为摘要性引用，可能遗漏对本课题有用的条款（如经费、试点、评价认证的具体安排）。</td></tr>
+<tr><td>中文文献计量</td><td>延续第一轮评估的缺口：<b>本次仍未检索 CNKI/万方</b>。若要论证"AI 编排能力培养"确为空白，须补充该主题的中文文献计量分析。</td></tr>
+</tbody>
+</table>
+
+<hr>
+<p style="font-size:13px;color:var(--gray-500);">本报告为第一轮评估报告的续篇，其第六章"结论与建议"与附录A"建议题目备选方案"中的原方案，已被本章第六节的四方案替代。两轮报告应合并阅读，以本轮方案一为最终建议。</p>
+
+</section>
+</div>
+</body>
+</html>

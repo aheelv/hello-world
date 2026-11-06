@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高级工程师→副教授 转评资格与量化赋分分析（两版对照版）</title>
+<style>
+  :root{
+    --blue:#2E5C8A; --blue2:#4A90D9; --green:#27AE60; --orange:#E67E22;
+    --pink:#D4537E; --purple:#7F77DD; --ink:#22303f; --muted:#5b6b7b;
+    --bg:#f5f8fc; --card:#ffffff; --line:#e3ebf3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Microsoft YaHei","微软雅黑",-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.75;font-size:16px}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 22px 60px}
+  header{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border-radius:14px;
+    padding:26px 30px;box-shadow:0 6px 18px rgba(46,92,138,.18)}
+  header h1{margin:0 0 6px;font-size:24px;letter-spacing:.5px}
+  header p{margin:2px 0;opacity:.95;font-size:14px}
+  .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    padding:2px 10px;border-radius:20px;font-size:12px;margin-right:8px;margin-top:8px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 26px;
+    margin-top:20px;box-shadow:0 2px 8px rgba(46,92,138,.05)}
+  h2{font-size:20px;margin:0 0 14px;color:var(--blue);border-left:5px solid var(--blue2);padding-left:12px}
+  h3{font-size:16px;color:var(--ink);margin:18px 0 8px}
+  table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:14px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef4fb;color:var(--blue);font-weight:700}
+  tr:nth-child(even) td{background:#fafcff}
+  .ok{color:var(--green);font-weight:700}
+  .bad{color:#c0392b;font-weight:700}
+  .warn{color:var(--orange);font-weight:700}
+  .pill{display:inline-block;padding:1px 9px;border-radius:12px;font-size:12.5px;font-weight:700}
+  .pill.ok{background:#e7f6ee;color:#1e8a4c}
+  .pill.bad{background:#fdeaea;color:#c0392b}
+  .pill.warn{background:#fef1e3;color:#bf6a16}
+  .note{font-size:13px;color:var(--muted);margin:4px 0 10px}
+  .callout{border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14.5px}
+  .callout.red{background:#fdeaea;border:1px solid #f3c9c9}
+  .callout.amber{background:#fef6e7;border:1px solid #f6dcae}
+  .callout.blue{background:#eaf3fc;border:1px solid #cfe3f6}
+  .callout.green{background:#e9f8ef;border:1px solid #bfe8cf}
+  b{color:var(--ink)}
+  .kv{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+  .kv div{background:#f3f8fd;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13.5px}
+  .kv b{color:var(--blue)}
+  ul{margin:6px 0 6px 2px;padding-left:20px}
+  li{margin:5px 0}
+  .foot{font-size:12.5px;color:var(--muted);margin-top:26px;text-align:center}
+  .vers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+  .vers>div{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fafcff}
+  .vers h4{margin:0 0 8px;font-size:15px;color:var(--blue)}
+  @media(max-width:760px){.vers{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>高级工程师 → 副教授 转评：两版规则对照与资格判定</h1>
+  <p>对比《职称评审管理办法（试行）》大财院发〔2023〕10号（旧版）与《（修订）》大财院发〔2026〕13号（新版）</p>
+  <p>更新：2026-09-22 ｜ 资历：系统分析师（软考高级）＝高级工程师 ｜ 2024入职 ｜ 班导师1年 ｜ 有高校教师资格证 ｜ 软著评审前转化</p>
+  <div>
+    <span class="tag">同级转评（副高→副高）</span>
+    <span class="tag">关键变量：今年评审适用哪版</span>
+    <span class="tag">旧版无"门槛"项</span>
+  </div>
+</header>
+
+<!-- 结论 -->
+<section>
+  <h2>一、结论摘要（两版对照）</h2>
+  <div class="callout green">
+    <b>直接回答你的疑问：旧版（2023）没有"校级教学比赛二等奖1/三等奖2 或 主持市级以上纵向项目"这道门槛。</b>
+    该强制门槛是 <b>2026修订版新增</b>。2023版仅要求"任现职以来同时具备下列条件中的任意 3 项"（3选6，无单独门槛）。
+  </div>
+  <div class="callout amber">
+    <b>决定你今年够不够格的，是"今年评审适用哪套规则"这一变量：</b>
+    <ul style="margin:6px 0">
+      <li><b>若适用 2023版（很可能，因修订版2027-01-01才施行）：</b>无门槛，你只需满足"3选6"。当前已稳满足 ⑤指导学生省二等奖、⑥软著转化；③校级教改（1结项+1在研）临界、①期刊旧分级待核——大概率已具备参评资格。</li>
+      <li><b>若适用 2026修订版：</b>仍缺门槛（校级教学比赛奖 或 市级以上纵向项目），需补齐后方可参评。</li>
+    </ul>
+  </div>
+  <div class="kv">
+    <div><b>转评性质</b>：同级转评（系统分析师·软考高级＝高级工程师，属《国家职业资格目录》）</div>
+    <div><b>高校教师资格证</b>：已具备 ✓</div>
+    <div><b>双师双能</b>：需先入教师系列才能办→对平转不构成前置阻碍（moot）</div>
+    <div><b>当前可确认得分（仅2026新版口径）</b>：约 65 分</div>
+  </div>
+  <div class="callout red"><b>头号待确认项：</b>2026修订版自 2027-01-01 施行。若今年评审的申报截止日早于该日，依法适用 2023版（对你更有利）；若在之后，则适用新版。务必向人事处（职称办）确认本周期适用版本、转评通道，以及你的论文在2023版下的期刊分级。</div>
+</section>
+
+<!-- 新旧对比 -->
+<section>
+  <h2>二、新旧版 副教授（教学科研型）条件 逐条对比</h2>
+  <div class="vers">
+    <div>
+      <h4>2023版（试行）第二十一条(三)</h4>
+      <p style="margin:4px 0">结构：<b>"同时具备下列条件中的任意 3 项"</b>（无单独门槛）</p>
+      <ul style="margin:4px 0">
+        <li>1. 二级B以上刊物3篇 / 二级A 2篇</li>
+        <li>2. 专著/规划教材1部</li>
+        <li>3. 省级以上纵向1 或 省级以上教改1 或 <b>校级教改2项</b></li>
+        <li>4. 前3 获省级以上教学/科研奖</li>
+        <li>5. 省级教学竞赛二等奖以上/市级教学竞赛一等奖，或专业竞赛省级二等奖以上，或<b>第一指导教师指导学生省级二等奖以上</b></li>
+        <li>6. 科技开发/转化取得较为显著经济效益</li>
+      </ul>
+      <p class="note">注：2023版使用"二级B/二级A/三级"期刊分级体系（定义在科研工作量办法中）。</p>
+    </div>
+    <div>
+      <h4>2026修订版 第二十一条(三)</h4>
+      <p style="margin:4px 0">结构：<b>强制门槛</b> + "同时具备下列条件中的任意 4 项"</p>
+      <p style="margin:4px 0"><b>门槛（二选一）：</b>校级教学比赛二等奖1/三等奖2，或主持市级以上纵向项目1项</p>
+      <ul style="margin:4px 0">
+        <li>1. C2以上3篇 或 <b>B2以上2篇</b></li>
+        <li>2. 专著/规划教材1部</li>
+        <li>3. 省级以上纵向1 或 省级以上教改1 或 校级教改2项</li>
+        <li>4. 前3 省级以上奖</li>
+        <li>5. 省级教学竞赛二等奖以上/市级教学竞赛一等奖，或专业竞赛省级二等奖以上，或第一指导教师指导学生省级二等奖以上</li>
+        <li>6. 科技开发/转化显著效益</li>
+        <li>7. 主持纵向/横向课题，每年到账经费2万以上</li>
+      </ul>
+      <p class="note">注：2026版改用 A1/A2/B1/B2/C1/C2/C3 分级，并新增"课题经费每年2万"项。</p>
+    </div>
+  </div>
+  <div class="callout blue">
+    <b>核心差异一句话：</b>2023版是"3选6、无门槛"；2026修订版把"校级教学比赛/市级以上纵向"升级为<b>强制门槛</b>，并把数量从"3选6"提高到"门槛+4选7"。你之前被告知的"唯一硬缺口"，仅在 <b>2026修订版</b> 下存在。
+  </div>
+</section>
+
+<!-- 转评框架 -->
+<section>
+  <h2>三、转评资格框架判定（13号 §第十五条）</h2>
+  <table>
+    <tr><th>转评前提条件</th><th>判定</th><th>说明</th></tr>
+    <tr><td>现聘在专任教师岗位</td><td><span class="pill ok">满足</span></td><td>管理学院专任教师（运筹学/AI方向）</td></tr>
+    <tr><td>持有非专任教师系列副高（高级工程师）</td><td><span class="pill ok">满足</span></td><td>系统分析师（软考高级）＝高级工程师，以考代评，副高合法</td></tr>
+    <tr><td>在专任教师岗位从事教学科研满 1 年</td><td><span class="pill ok">满足</span></td><td>2024年入职，已满1年</td></tr>
+    <tr><td>高级工程师属《国家职业资格目录》</td><td><span class="pill ok">满足</span></td><td>计算机技术与软件专业技术资格（软考）列入目录；系统分析师为高级资格</td></tr>
+    <tr><td>专业研究领域相同或相近</td><td><span class="pill ok">满足</span></td><td>系统分析/软件工程 ↔ 运筹学/AI/大数据，明显相近</td></tr>
+    <tr><td>取得高校教师资格证书</td><td><span class="pill ok">满足</span></td><td>用户确认已持有</td></tr>
+    <tr><td>双师双能型教师资格（§8）</td><td><span class="pill ok">moot</span></td><td>需先入教师系列才能办→平转前无法取得，不构成前置阻碍；转评后按需办理</td></tr>
+    <tr><td>满足副教授任职条件（附件1）</td><td><span class="pill warn">看版本</span></td><td>2023版：3选6，你基本满足；2026版：缺门槛，见第四节</td></tr>
+  </table>
+</section>
+
+<!-- 你的材料 vs 两版 -->
+<section>
+  <h2>四、你的材料 对照两版 副教授条件</h2>
+
+  <h3>4.1 若适用 2023版（3选6，无门槛）</h3>
+  <table>
+    <tr><th>条件</th><th>你的对应</th><th>判定</th></tr>
+    <tr><td>① 二级B以上3篇 / 二级A 2篇</td><td>B2×3、C3×1（新版分级）</td><td><span class="pill warn">待核</span></td></tr>
+    <tr><td>② 专著/教材</td><td>未提供</td><td><span class="pill bad">缺失（非必需）</span></td></tr>
+    <tr><td>③ 校级教改2项</td><td>结项1+在研1</td><td><span class="pill warn">临界</span></td></tr>
+    <tr><td>④ 前3 省级以上奖</td><td>未提供</td><td><span class="pill bad">缺失（非必需）</span></td></tr>
+    <tr><td>⑤ 第一指导教师指导学生省级二等奖以上</td><td>指导学生省二等奖×1</td><td><span class="pill ok">满足</span></td></tr>
+    <tr><td>⑥ 科技开发/转化显著效益</td><td>软著评审前转化完成</td><td><span class="pill ok">满足</span></td></tr>
+  </table>
+  <div class="callout green">已稳满足 ⑤、⑥；③（在研教改若计"2项"）临界；①（期刊旧分级）待核。<b>只要①或③任一项成立，即满足"3选6"，资格成立。</b></div>
+
+  <h3>4.2 若适用 2026修订版（门槛 + 4选7）</h3>
+  <table>
+    <tr><th>项目</th><th>你的对应</th><th>判定</th></tr>
+    <tr><td>门槛：校级教学比赛二等奖1/三等奖2 或 主持市级以上纵向1</td><td>均无</td><td><span class="pill bad">缺失（唯一硬缺口）</span></td></tr>
+    <tr><td>① B2以上2篇</td><td>B2×3 ✓</td><td><span class="pill ok">满足</span></td></tr>
+    <tr><td>⑤ 第一指导教师指导学生省级二等奖以上</td><td>省二等奖×1 ✓</td><td><span class="pill ok">满足</span></td></tr>
+    <tr><td>⑥ 科技转化显著效益</td><td>软著转化 ✓</td><td><span class="pill ok">满足</span></td></tr>
+    <tr><td>⑦ 横向/纵向课题每年到账2万以上</td><td>横向7万 ✓</td><td><span class="pill ok">满足</span></td></tr>
+  </table>
+  <div class="callout red">4选7 已满足①⑤⑥⑦，但因<b>门槛缺失</b>，仍不具备完整资格。须补齐：校级教学比赛奖 或 市级以上纵向项目。</div>
+</section>
+
+<!-- 赋分 -->
+<section>
+  <h2>五、量化赋分（2026修订版口径，仅供参考）</h2>
+  <p class="note">若最终适用 2023版，赋分须用<b>2023版量化细则</b>（工作区未提供），分值与结构可能不同，此处仅列2026版测算。</p>
+  <table>
+    <tr><th>项目</th><th>级别/数量</th><th>赋分</th><th>小计</th><th>备注</th></tr>
+    <tr><td>学术论文 B2×3</td><td>12分/篇</td><td>36</td><td class="ok">36</td><td>第一作者</td></tr>
+    <tr><td>学术论文 C3×1</td><td>1分/篇</td><td>1</td><td>1</td><td>第一作者</td></tr>
+    <tr><td>校级教改 结项（主持）</td><td>主持人3分</td><td>3</td><td>3</td><td>—</td></tr>
+    <tr><td>校级教改 在研</td><td>主持人3分</td><td>0~3</td><td class="warn">待确认</td><td>立项即赋分则+3</td></tr>
+    <tr><td>课题到账经费（横向7万）</td><td>3万3分,每万+1,上限10</td><td>7</td><td class="ok">7</td><td>假设均为到账</td></tr>
+    <tr><td>软件著作权（已转化）</td><td>已转化2分</td><td>2</td><td class="ok">2</td><td>评审前完成转化</td></tr>
+    <tr><td>指导学生竞赛（省三/省二/市一）</td><td>5+6+5</td><td>16</td><td>16</td><td>×教务处级别系数（待查）</td></tr>
+    <tr><td colspan="3" style="text-align:right"><b>合计（保守，未含竞赛系数折减/在研教改）</b></td><td><b>65</b></td><td>—</td></tr>
+  </table>
+  <div class="callout blue">量化赋分用于"限额内排名"，无固定及格线。参照林蕾2023样本（约11篇论文、2教材、市级课题、专利转化+软著、校级教学比赛、多项省级奖）体量更厚，65分属偏弱区间，仍建议继续增厚。</div>
+</section>
+
+<!-- 风险与建议 -->
+<section>
+  <h2>六、关键风险与行动建议</h2>
+  <ul>
+    <li><b>决定性问题（头号）：</b>今年评审适用 2023版 还是 2026修订版？修订版自2027-01-01施行；若申报截止早于该日则依法用旧版（对你更有利）。<b>立即问职称办确认版本、转评名额通道。</b></li>
+    <li><b>期刊旧分级映射：</b>你给的"B2/C3"是2026版分级；若走2023版，须按旧版"二级B/二级A/三级"重核论文定级，以判定条件①。</li>
+    <li><b>在研校级教改计数：</b>确认2023版下"校级教改2项"是否含在研/立项即计，以坐实条件③。</li>
+    <li><b>若确认走2026修订版：</b>仍须补门槛——校级教学比赛奖 或 市级以上纵向项目（大连市社科联/市科技局/省教育厅）。</li>
+    <li><b>资格已齐备项：</b>高校教师资格证✓、班导师1年✓、系统分析师＝高级工程师（目录内、专业相近）✓、教学科研满1年✓。</li>
+  </ul>
+  <ol>
+    <li>向职称办确认：①本周期适用规则版本；②转评是否有单独名额；③你的论文在2023版下的期刊定级；④系统分析师转评资历认定口径。</li>
+    <li>若走2023版：整理"3选6"佐证（重点确认①或③），基本可直接参评。</li>
+    <li>若走2026修订版：报名校级教学比赛 或 主持市级以上纵向项目（双保险）。</li>
+    <li>继续增厚：增B2/C2论文、参编教材、省级奖、提升竞赛等级、教学建设项目。</li>
+  </ol>
+</section>
+
+<div class="foot">
+  本分析基于大财院发〔2023〕10号（试行）与大财院发〔2026〕13号（修订）两份办法原文逐条比对，结合用户补充信息整理，属资格预判，<b>不构成正式评审结论</b>。最终以人事处（职称办）解释与当年评审通知为准。
+</div>
+
+</div>
+</body>
+</html>

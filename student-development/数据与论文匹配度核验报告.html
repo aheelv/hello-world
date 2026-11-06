@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据与论文匹配度核验报告 · 运筹学 2025-2026-2</title>
+<style>
+:root{--blue:#2E5C8A;--blue-l:#4A90D9;--green:#27AE60;--orange:#E67E22;--pink:#D4537E;--purple:#7F77DD;
+--ink:#1F2933;--gray:#5B6B7B;--line:#DCE3EA;--bg:#F7F9FB;--card:#FFF}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft YaHei","微软雅黑",-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:15px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 22px 70px}
+header{background:linear-gradient(120deg,var(--blue),var(--blue-l));color:#fff;padding:32px 0 26px;margin-bottom:24px}
+header .wrap{padding-bottom:0}
+h1{margin:0 0 8px;font-size:25px}
+.sub{font-size:14px;opacity:.93}
+.chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.17);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:4px 13px;font-size:12.5px}
+nav{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 20px;margin-bottom:24px}
+nav b{color:var(--blue);font-size:14px}
+nav ol{margin:8px 0 0;padding-left:20px;columns:2;column-gap:34px;font-size:13.6px}
+nav a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--blue-l)}
+h2{font-size:20px;color:var(--blue);border-left:5px solid var(--blue);padding-left:12px;margin:36px 0 14px}
+h3{font-size:16px;color:var(--blue);margin:22px 0 9px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:13px 0}
+.alert{border-left:5px solid var(--orange);background:#FFF8F0}
+.alert.red{border-left-color:var(--pink);background:#FFF4F7}
+.alert.green{border-left-color:var(--green);background:#F2FAF5}
+table{width:100%;border-collapse:collapse;background:var(--card);font-size:13.2px;margin:11px 0}
+caption{caption-side:top;text-align:left;font-weight:700;color:var(--blue);padding:5px 0 8px;font-size:14px}
+th{background:var(--blue);color:#fff;padding:8px 10px;text-align:left;font-weight:600;border:1px solid var(--blue)}
+td{padding:7px 10px;border:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even){background:#FAFCFE}
+.ok{color:var(--green);font-weight:700}.part{color:var(--orange);font-weight:700}.no{color:var(--pink);font-weight:700}
+code{background:#EEF3F8;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:Consolas,monospace;font-size:12.5px;color:#0E4C7A}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:13px;margin:13px 0}
+.kv{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:12px 15px}
+.kv .k{font-size:12.2px;color:var(--gray)}
+.kv .v{font-size:19px;font-weight:700;color:var(--blue)}
+ul,ol{margin:8px 0 8px 22px;padding:0}li{margin:4px 0}
+.tag{display:inline-block;border-radius:4px;padding:1px 7px;font-size:11.5px;color:#fff}
+.t-p{background:var(--pink)}.t-h{background:var(--orange)}.t-m{background:var(--blue-l)}.t-l{background:#8FA3B5}
+footer{margin-top:40px;padding-top:16px;border-top:2px solid var(--line);font-size:12.5px;color:var(--gray)}
+@media print{nav{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>数据与论文匹配度核验报告</h1>
+<div class="sub">数据包：<code>data/提交包_运筹学2025-2026-2.zip</code>（19 类数据文件 + 549 份日志，N = 125）　·　论文：EAIT 投稿稿　·　核验日：2026-10-09</div>
+<div class="chips">
+<span class="chip">核验结论：数据真实可用，但论文设定与样本表述必须改写</span>
+<span class="chip">占位符：66 → 0</span>
+<span class="chip">文件结构核对 19/19 通过</span>
+<span class="chip">发现问题 15 项（P0 6 / P1 6 / P2 3）</span>
+</div>
+</div></header>
+<div class="wrap">
+
+<nav>
+<b>目录</b>
+<ol>
+<li><a href="#s1">一、核验范围与评判标准</a></li>
+<li><a href="#s2">二、数据真实性核验（可否使用的前提）</a></li>
+<li><a href="#s3">三、逐项核验结果</a></li>
+<li><a href="#s4">四、论文与数据的匹配度评估</a></li>
+<li><a href="#s5">五、我们发现的最关键问题：功效不足</a></li>
+<li><a href="#s6">六、统计分析结果（用于论文的全部数值）</a></li>
+<li><a href="#s7">七、已补齐改写的内容</a></li>
+<li><a href="#s8">八、发现的问题与整改建议（15 项）</a></li>
+<li><a href="#s9">九、可用性判断与中稿风险评估</a></li>
+<li><a href="#s10">十、待执行事项</a></li>
+</ol>
+</nav>
+
+<div class="card alert red" style="border-left-width:8px">
+<p><b>⚠️ 重要更正（2026-10-10 追加）</b></p>
+<p>本报告 §6.3 曾基于<b>探索性因子分析（主轴法 + 正交 varimax 旋转）</b>得出结论："数据支持'一般能力 + 四个相关 facet'，不支持四个清晰可分的子域"，并给出 AVE = .392–.412（低于 .50）。</p>
+<p><b>该结论有误，现予更正。</b>随后按期刊审稿要求补跑的验证性因子分析（lavaan 0.7.3 / R 4.6.1，MLR 估计）显示：</p>
+<ul>
+<li><b>四因子模型拟合极好</b>：CFI = .994、TLI = .993、RMSEA = .017、SRMR = .047；<b>单因子模型拟合差</b>：CFI = .776、TLI = .755、RMSEA = .101、SRMR = .085。四因子决定性优于单因子（Δχ²(6) = 422.62，p &lt; .001；ΔBIC = −287.3）。</li>
+<li><b>AVE 实为 .520–.555</b>，<b>全部达标（≥.50）</b>；Fornell–Larcker 零违例；HTMT ≤ .691。</li>
+</ul>
+<p><b>错误根源</b>（方法学教训，值得记录）：四个子域间的潜变量相关达 .607–.693，此时<b>正交 varimax 强制因子不相关属模型误设</b>——它会把公共方差挤入第一个未旋转因子（故出现首特征值 9.98 的主导假象），并系统性压低载荷，从而把 AVE 拽到 .50 以下。AVE 必须基于 CFA 的标准化载荷（已校正测量误差）计算，而非基于 EFA/PCA 型载荷。第二特征值偏低是存在强一般因子的正常表现，<b>不能据此推断子域不可分</b>。</p>
+<p>本报告 §6.3 与 §9.1 的相应表述已按 CFA 结果更正；论文 §6.2、§7、§8 与投稿信、Highlights 亦已同步更新。</p>
+</div>
+
+<h2 id="s1">一、核验范围与评判标准</h2>
+
+<h3>1.1 核验范围（四个维度）</h3>
+<table>
+<caption>表 1　核验范围定义</caption>
+<thead><tr><th style="width:14%">维度</th><th style="width:43%">具体内容</th><th style="width:43%">核验方法</th></tr></thead>
+<tbody>
+<tr><td><b>数据字段</b></td><td>19 类文件的字段集合、命名、类型、取值范围、必填性；与论文 §5.3 测量工具的一一对应</td><td>逐文件读取表头，与包内数据字典比对；与论文表 3 逐项对照</td></tr>
+<tr><td><b>样本量</b></td><td>总 N、分组 n、各表覆盖人数、主键完整性与连续性、跨表覆盖一致性</td><td>主键唯一性检验、取值域检验、跨表 pid 集合比对</td></tr>
+<tr><td><b>变量一致性</b></td><td>跨表 <code>pid</code>/<code>group</code> 一致性；派生列口径（<code>grade_std</code>、<code>log_score</code>）；量表计分与编码口径</td><td>跨表比对脚本；重算派生列并与文件值核对</td></tr>
+<tr><td><b>统计口径</b></td><td>协变量选择、自由度、偏 η² 定义、ICC 类型、κ 类型、功效参数</td><td>按定义独立重算，与文件现有值比对；复算功效与最小可检出效应</td></tr>
+</tbody>
+</table>
+
+<h3>1.2 评判标准（预先设定，未事后调整）</h3>
+<table>
+<caption>表 2　本次核验采用的阈值</caption>
+<thead><tr><th style="width:26%">指标</th><th style="width:24%">通过标准</th><th style="width:50%">来源 / 依据</th></tr></thead>
+<tbody>
+<tr><td>文件结构</td><td>行数与列数与包内说明完全一致</td><td>包内 <code>00_数据集说明.md</code> 第三节清单</td></tr>
+<tr><td>主键完整性</td><td><code>pid</code> 唯一且为 1–N 连续序列；跨表无孤儿键</td><td>本课题《数据管理规范》第三节</td></tr>
+<tr><td>跨表一致性</td><td>同一 <code>pid</code> 的 <code>group</code> 全表一致</td><td>同上</td></tr>
+<tr><td>取值合法性</td><td>量表题 1–6 整数；无越界；无非法字符</td><td>数据字典允许值</td></tr>
+<tr><td>缺失率</td><td>题项缺失 ≤10%；个案 ≤20%</td><td>本课题预设阈值</td></tr>
+<tr><td>基线等价</td><td>标准化差异 ≤0.25 SD</td><td>What Works Clearinghouse 惯例</td></tr>
+<tr><td>量表信度</td><td>Cronbach α ≥ .70</td><td>Nunnally 惯例</td></tr>
+<tr><td>组合信度 / 收敛效度</td><td>CR ≥ .70；AVE ≥ .50</td><td>Fornell &amp; Larcker (1981)</td></tr>
+<tr><td>区分效度</td><td>HTMT &lt; .85</td><td>Henseler et al. (2015)</td></tr>
+<tr><td>编码一致性</td><td>Cohen κ ≥ .70</td><td>Landis &amp; Koch (1977)</td></tr>
+<tr><td>评分者一致性</td><td>ICC(2,1) ≥ .70</td><td>Koo &amp; Li (2016)</td></tr>
+<tr><td>双编码覆盖</td><td>≥ 20%</td><td>论文 §5.3 自设承诺</td></tr>
+<tr><td>实施保真度</td><td>任务发放 / 分解要求 / 日志收集执行率 ≥85%</td><td>本课题《干预方案》预设</td></tr>
+<tr><td><b>统计功效</b></td><td>对论文主效应达到 ≥.80</td><td>论文 §5.1 先验设定（d=0.40，每组 100）</td></tr>
+</tbody>
+</table>
+
+<h2 id="s2">二、数据真实性核验（可否使用的前提）</h2>
+
+<div class="card alert green">
+<p><b>核验结论：判定为真实采集数据，可用于论文。</b>依据如下五项证据；同时明确列出一项我<b>无法</b>独立验证的内容。</p>
+</div>
+
+<h3>2.1 支持真实性的五项证据</h3>
+<table>
+<thead><tr><th style="width:22%">证据</th><th style="width:78%">观察结果</th></tr></thead>
+<tbody>
+<tr><td><b>① 日志内容异质且专业对口</b></td><td>549 份日志的题目各不相同，且全部落在运筹学教学范围内：整数规划配送中心选址（第 4 周）、排队论 M/M/c 服务窗口配置（第 7 周）等。写作质量差异明显——有的日志详细记录"覆盖关系矩阵第 5 列抄错，实际只覆盖 17 个"，有的如实写"大致核对了一下，感觉和附件接近，没有逐项回算"。<b>批量生成的数据通常不会包含这种对自身未核查行为的坦承</b>。</td></tr>
+<tr><td><b>② 时间戳与校历一致</b></td><td>日志内嵌提交时间落在 2026-03-25、2026-04-14 等，与"第 1 周 2026-03-02 起"的学期设定吻合；平台日志覆盖 2026-03-02 至 2026-06-20，共 96 个有效日期。</td></tr>
+<tr><td><b>③ 分布形态符合真实作答</b></td><td>24 个题项合计 3,000 个作答，均值 3.68–3.72、SD 1.19–1.22，分布呈单峰略偏峰形（以 D1 为例：1分22 人、2分104、3分188、4分237、5分150、6分49）。量表并非"人人高分"的天花板形态。</td></tr>
+<tr><td><b>④ 19 类文件内部自洽</b></td><td>2500 = 5 准则 × 125 人 × 2 波次 × 2 评分者；1320 = 20% 日志（110 份）× 6 编码 × 2 编码员；576 = 48 人 × 12 周；549 = 576 − 27 未提交。<b>四组数字精确闭合，且与"双编码 20%""四段结构"等采集规程一致</b>。</td></tr>
+<tr><td><b>⑤ 阴性结果的存在</b></td><td>课程成绩组间差异 d ≈ 0.00（p = .659）、调节效应不显著（p = .104）、D1/D4 子域未达显著。<b>若为迎合论文而生成，通常不会制造这些对论文不利的结果</b>。</td></tr>
+</tbody>
+</table>
+
+<div class="card alert">
+<p><b>2.2 我无法独立验证的内容（如实说明核验边界）</b></p>
+<ul>
+<li>包内<b>没有</b>伦理批准文件、平台原始导出凭证（<code>platform_export_*.xlsx</code>）、问卷平台原始导出、限时论证原始作答扫描件（仅有 <code>限时论证原始作答_说明.md</code>）。因此我无法追溯到"采集前"的原始载体，只能验证包内数据自身的内部一致性。</li>
+<li>包内<b>没有</b>匿名匹配码对照表或学号映射表，因此无法核验"125 名被试确为 126 名在册学生中的完整案例"这一主张（只能确认主键为 1–125 连续）。</li>
+<li>我的核验等同于一审（结构、逻辑、分布、内部闭合），<b>不等同于对采集过程本身的审计</b>。若期刊要求提供原始台账，需由您补齐上述凭证。</li>
+</ul>
+</div>
+
+<h2 id="s3">三、逐项核验结果</h2>
+
+<h3>3.1 文件结构与规模（19/19 通过）</h3>
+<table>
+<thead><tr><th style="width:32%">文件</th><th style="width:17%">实际（行×列）</th><th style="width:17%">包内标称</th><th style="width:34%">结论</th></tr></thead>
+<tbody>
+<tr><td>aoc_responses.csv（主表）</td><td>125 × 60</td><td>125 × 60</td><td><span class="ok">一致</span></td></tr>
+<tr><td>ailit_items.csv</td><td>125 × 14</td><td>125 × 14</td><td><span class="ok">一致</span></td></tr>
+<tr><td>critical_thinking.csv</td><td>250 × 11</td><td>250 × 11</td><td><span class="ok">一致</span></td></tr>
+<tr><td>ct_scores_long.csv</td><td>2500 × 5</td><td>2500 × 5</td><td><span class="ok">一致</span></td></tr>
+<tr><td>logs_index.csv</td><td>576 × 6</td><td>576 × 6</td><td><span class="ok">一致</span></td></tr>
+<tr><td>log_scores.csv</td><td>549 × 10</td><td>549 × 10</td><td><span class="ok">一致</span></td></tr>
+<tr><td>log_doublecoding.csv</td><td>1320 × 4</td><td>1320 × 4</td><td><span class="ok">一致</span></td></tr>
+<tr><td>adjudication_log.csv</td><td>78 × 6</td><td>78 × 6</td><td><span class="part">一致，但备注口径有误（见问题 12）</span></td></tr>
+<tr><td>platform_log.csv</td><td>2391 × 8</td><td>2391 × 8</td><td><span class="ok">一致</span></td></tr>
+<tr><td>grades.csv / baseline.csv</td><td>125 × 6 / 125 × 5</td><td>同</td><td><span class="ok">一致</span></td></tr>
+<tr><td>task_scores.csv</td><td>1799 × 6</td><td>1799 × 6</td><td><span class="part">列结构与字典说明略有出入（见问题 13）</span></td></tr>
+<tr><td>sjt_responses(_post).csv</td><td>各 125 × 11</td><td>各 125 × 11</td><td><span class="ok">一致</span></td></tr>
+<tr><td>consent_ledger.csv</td><td>125 × 5</td><td>125 × 5</td><td><span class="ok">一致</span></td></tr>
+<tr><td>teacher_training / fidelity_checklist</td><td>6 × 5 / 48 × 6</td><td>—</td><td><span class="ok">3 教师 × 16 周完整</span></td></tr>
+<tr><td>对话日志原文</td><td>549 份</td><td>549 份</td><td><span class="ok">一致</span></td></tr>
+</tbody>
+</table>
+
+<h3>3.2 主键、关联与分组（全部通过）</h3>
+<ul>
+<li>主表 <code>pid</code>：125 行 / 125 唯一 / 取值域 1–125 连续，<b>无重复、无缺口</b>。</li>
+<li>11 张含 <code>pid</code> 的表：越界键 <b>0</b>。</li>
+<li>跨表 <code>group</code>：不一致 <b>0</b> 条（实验组 48 / 对照组 77）。</li>
+<li>实验组专属表 <code>logs_index</code>、<code>log_scores</code> 仅覆盖 48 名实验组学生，<b>未混入对照组</b>——符合设计。</li>
+</ul>
+
+<h3>3.3 取值合法性与缺失（通过，但需说明一处）</h3>
+<ul>
+<li>24 个量表题项 × 125 人 × 2 波次 = 6,000 个取值：越界/非法 <b>0</b>。</li>
+<li><b>缺失率 0.00%</b>（前测与后测均为 0/3000）。这是问卷平台"全部必答"设置的结果，与包内说明一致，<b>不是错误</b>；但含义需要写进论文：缺失模式筛查（如连答、跳答识别）不可用，只能依赖行为指标交叉验证。此项已写入论文 §6.1。</li>
+<li><code>log_score</code> 仅 48 人有值（对照组无人提交日志）——这是结构性的，不是缺失。已据此调整表 5（见问题 5）。</li>
+</ul>
+
+<h3>3.4 时间范围（1 处需说明）</h3>
+<ul>
+<li>平台日志：2026-03-02 至 <b>2026-06-20</b>；学期结束日为 2026-06-15。末尾 5 天应为导出或收尾行为，<b>不影响分析</b>，但若论文写"学期内记录"需精确表述（见问题 11）。</li>
+<li>知情同意台账签署日 2026-03-02（第 1 周，前测当日）<span class="ok">符合"批件先于数据收集"</span>。</li>
+<li>教师培训 2026-02-25 / 02-27，<b>早于首次数据接触</b><span class="ok">符合</span>。</li>
+</ul>
+
+<h3>3.5 量表与编码一致性（全部通过）</h3>
+<ul>
+<li>实验组教师 T1：12 个计分周（第 2–7、9–14 周），任务发放、分解要求、日志收集<b>均为 12/12 = 100%</b>。</li>
+<li>对照组教师 T2/T3：任务发放 12/12 = 100%，分解要求与日志收集 <b>0/12 = 0%</b>——<b>无污染</b>，符合设计。</li>
+<li>教师培训学时：T1 = 6 + 2 = 8 小时；T2 = 6 + 2 = 8 小时；T3 = 6 + 2 = 8 小时。<b>每名教师学时相等</b>；实验组额外主题为"评分量规与日志工作流"，对照组为"教学平台操作"，<b>内容分类正确</b>。</li>
+</ul>
+
+<h2 id="s4">四、论文与数据的匹配度评估</h2>
+
+<div class="card alert red">
+<p><b>核心发现：数据本身可用，但论文原稿对"研究场景、任务性质、样本规模、教师安排"四项的描述与实际数据不符。这四项若不改写即投稿，属于对研究事实的不实陈述，必须修正。</b>（已全部改写，见 §7）</p>
+</div>
+
+<table>
+<caption>表 3　论文原设想 vs 实际数据（匹配度逐项判定）</caption>
+<thead><tr><th style="width:5%">#</th><th style="width:29%">论文原稿表述</th><th style="width:38%">实际数据</th><th style="width:12%">匹配度</th><th style="width:16%">处置</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>"会计学与金融学专业的两门二年级本科课程"</td><td><b>一门运筹学课程</b>；实验组为创新人才实验班，对照组为大数据管理与应用专业两个平行班</td><td class="no">不匹配</td><td>已改写 §4</td></tr>
+<tr><td>2</td><td>任务为"估值备忘片段、审计程序、投资组合说明"等金融任务</td><td><b>运筹学建模任务</b>：设施选址与集合覆盖、排队系统配置、运输与转运、库存策略、最短路与网络设计、线性与整数规划</td><td class="no">不匹配</td><td>已改写 §4/§5.2</td></tr>
+<tr><td>3</td><td>"12 项每周任务"</td><td>12 个计分周，为第 <b>2–7 与 9–14</b> 周（第 8 周期中、第 15–16 周复习与后测）</td><td class="part">部分匹配</td><td>已精确化 §5.2</td></tr>
+<tr><td>4</td><td>16 周学期</td><td>2025–2026 学年第二学期，第 1 周 2026-03-02、第 16 周 2026-06-15</td><td class="ok">匹配</td><td>已补具体日期</td></tr>
+<tr><td>5</td><td>先验功效分析要求<b>每组约 100 人</b>（共约 200）</td><td>实际 <b>48 / 77，合计 125</b></td><td class="no">不匹配</td><td>已披露计划 vs 实际及后果，见 §5</td></tr>
+<tr><td>6</td><td>"由<b>同一批教师</b>任教，接受等量培训"</td><td>实验组 1 名教师（T1）、对照组 2 名教师（T2/T3）；<b>教师不同</b>。培训学时每人 8 小时相等</td><td class="no">不匹配</td><td>已改写 §5.2，明确承认教师效应无法分离</td></tr>
+<tr><td>7</td><td>AOC 量表 24 题、4 子域 × 6 题、6 点李克特</td><td>完全一致（<code>d1_1</code>…<code>d4_6</code> 与 <code>_post</code> 系列）</td><td class="ok">完全匹配</td><td>—</td></tr>
+<tr><td>8</td><td>对话日志 + 反思三问；四段结构</td><td>549 份日志，四段齐全；含分解步骤时间戳</td><td class="ok">完全匹配</td><td>—</td></tr>
+<tr><td>9</td><td>V1–V6 编码，20% 双编码，报告 κ</td><td>双编码 110/549 = <b>20.0%</b>；总体 κ = <b>.803</b></td><td class="ok">完全匹配</td><td>已填入 §5.3/§6.4</td></tr>
+<tr><td>10</td><td>限时论证任务，AI 禁用，五准则</td><td>5 准则 × 2 评分者 × 2 波次 × 125 人 = 2500 条；ICC(2,1) = .787–.806</td><td class="ok">完全匹配</td><td>已填入 §5.3</td></tr>
+<tr><td>11</td><td>情境判断测验（D4 行为指标）</td><td>8 题 × 0/1/2 分，前后测各 125 份，总分 0–16</td><td class="ok">匹配</td><td>已填入 §5.3/§6.3</td></tr>
+<tr><td>12</td><td>平台日志作为使用强度客观指标</td><td>2391 个会话、125 人、2026-03-02 起</td><td class="part">可用，但两指标不相关（见问题 9）</td><td>已改为双指标分别报告 §5.4/§6.4</td></tr>
+<tr><td>13</td><td>课程成绩作为结果变量</td><td>125 人齐全，无重修；日志环节分仅实验组有（M = 12.49/20）</td><td class="ok">匹配</td><td>已填入表 5</td></tr>
+<tr><td>14</td><td>伦理批件机构与编号</td><td><b>包内未见伦理批准文件</b></td><td class="no">缺失</td><td>保留待补标记</td></tr>
+<tr><td>15</td><td>资助信息、作者院系</td><td>包内无</td><td class="no">缺失</td><td>保留待补标记</td></tr>
+</tbody>
+</table>
+
+<h2 id="s5">五、我们发现的最关键问题：功效不足</h2>
+
+<p>论文 §5.1 的先验功效分析要求 <b>d = 0.40、每组约 100 人</b>。实际为 48 / 77。按实际分配复算：</p>
+
+<table>
+<caption>表 4　实际设计（n = 48 / 77，2 个协变量，α = .05）的统计功效</caption>
+<thead><tr><th style="width:26%">效应量 d</th><th style="width:22%">实际功效</th><th style="width:52%">解读</th></tr></thead>
+<tbody>
+<tr><td>0.20（小）</td><td class="no">.198</td><td>几乎不可检出</td></tr>
+<tr><td>0.30（小—中）</td><td class="no">.384</td><td>不可靠</td></tr>
+<tr><td>0.40（计划目标）</td><td class="part">.602</td><td><b>未达 .80 标准</b>——设计未达成自己的计划</td></tr>
+<tr><td>0.48（实测 CT 效应）</td><td class="part">.759</td><td>略低于 .80</td></tr>
+<tr><td>0.53（实测 AOC 总效应）</td><td class="ok">.836</td><td>可接受</td></tr>
+<tr><td>0.57（实测 D3 效应）</td><td class="ok">.885</td><td>良好</td></tr>
+</tbody>
+</table>
+
+<div class="card alert">
+<p><b>实测设计在 80% 功效下可检出的最小效应为 <b>d = 0.505</b>（中等偏大）。</b></p>
+<p><b>这一数字决定了三个结果该怎么写：</b></p>
+<ul>
+<li><b>已显著的结果（AOC 总 d=.53、D3 d=.57、D2 d=.48、CT d=.48）：</b>功效充足，可作确证性结论。</li>
+<li><b>D1（d=.39, p=.077）与 D4（d=.37, p=.116）：</b>功效仅约 .55，<b>属"不确定"而非"无效应"</b>——论文已明确写为 indeterminate rather than negative。</li>
+<li><b>课程成绩（d≈.00, p=.659）：</b>观测效应近于零，<b>是真正的零结果</b>，可如实报告为"未改善成绩"。</li>
+</ul>
+<p>若把 D1/D4 的未显著写成"改革对这两个子域无效"，将是统计学上的错误陈述，也是审稿人最可能抓的点。现稿已按上述三分法处理。</p>
+</div>
+
+<h2 id="s6">六、统计分析结果（用于论文的全部数值）</h2>
+
+<h3>6.1 表 4　描述统计与基线等价性</h3>
+<table>
+<thead><tr><th style="width:34%">变量</th><th style="width:22%">实验组 M (SD)</th><th style="width:22%">对照组 M (SD)</th><th style="width:7%">t</th><th style="width:8%">p</th><th style="width:7%">标准化差异</th></tr></thead>
+<tbody>
+<tr><td>先前平均绩点</td><td>74.76 (4.75)</td><td>74.88 (4.96)</td><td>−0.14</td><td>.891</td><td>−0.03</td></tr>
+<tr><td>AOC 前测（24–144）</td><td>91.25 (15.30)</td><td>87.16 (20.28)</td><td>1.28</td><td>.203</td><td>0.23</td></tr>
+<tr><td>批判性思维倾向前测</td><td>60.25 (4.06)</td><td>59.78 (5.21)</td><td>0.56</td><td>.574</td><td>0.10</td></tr>
+<tr><td>先前每周 AI 使用（小时）</td><td>6.93 (3.15)</td><td>7.84 (2.82)</td><td>−1.62</td><td>.108</td><td class="part">−0.30</td></tr>
+</tbody>
+</table>
+<p>标准化差异 &gt; 0.25 的仅"先前 AI 使用"一项（对照组反而更高），论文已作为局限性写明。</p>
+
+<h3>6.2 表 5　协方差分析（协变量＝先前绩点 + 基线 AOC）</h3>
+<table>
+<thead><tr><th style="width:30%">结果变量</th><th style="width:14%">实验组校正 M</th><th style="width:14%">对照组校正 M</th><th style="width:8%">F(1,120)</th><th style="width:8%">p</th><th style="width:8%">ηp²</th><th style="width:8%">Cohen's d</th></tr></thead>
+<tbody>
+<tr><td>AOC 总分</td><td>94.16</td><td>87.72</td><td>11.21</td><td>.001</td><td>.085</td><td>0.53</td></tr>
+<tr><td>D1 任务分解</td><td>23.41</td><td>22.20</td><td>3.19</td><td>.077</td><td>.026</td><td>0.39</td></tr>
+<tr><td>D2 上下文组织</td><td>23.51</td><td>21.66</td><td>5.89</td><td>.017</td><td>.046</td><td>0.48</td></tr>
+<tr><td><b>D3 结果验证与纠错</b></td><td><b>24.04</b></td><td><b>21.83</b></td><td><b>11.33</b></td><td><b>.001</b></td><td><b>.086</b></td><td><b>0.57</b></td></tr>
+<tr><td>D4 伦理与风险</td><td>23.20</td><td>22.03</td><td>2.50</td><td>.116</td><td>.020</td><td>0.37</td></tr>
+<tr><td>批判性思维倾向</td><td>62.39</td><td>59.84</td><td>6.79</td><td>.010</td><td>.053</td><td>0.48</td></tr>
+<tr><td><b>课程标准化学业成绩</b></td><td>−0.04</td><td>0.02</td><td>0.20</td><td>.659</td><td>.002</td><td class="no">≈0.00</td></tr>
+<tr><td>限时论证任务（AI 禁用）</td><td>16.19</td><td>15.40</td><td>—</td><td>.056</td><td>.030</td><td>—</td></tr>
+<tr><td>情境判断测验（伦理/风险）</td><td>9.31</td><td>8.05</td><td>—</td><td>.050</td><td>.031</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>6.3 测量模型（RQ1）<span style="color:#D4537E">　【已按 CFA 更正】</span></h3>
+<table>
+<thead><tr><th style="width:30%">指标</th><th style="width:70%">实测值（lavaan 0.7.3 / R 4.6.1，MLR）</th></tr></thead>
+<tbody>
+<tr><td>Cronbach α（分量表）</td><td>D1 .882　D2 .871　D3 .869　D4 .865　<span class="ok">全部 ≥ .70</span></td></tr>
+<tr><td><b>四因子模型拟合</b></td><td>χ²(246) = 254.65, p = .339；χ²/df = 1.04；<b>CFI = .994；TLI = .993；RMSEA = .017 [.000, .041]；SRMR = .047</b>　<span class="ok">优秀</span></td></tr>
+<tr><td><b>单因子模型拟合</b></td><td>χ²(252) = 574.31, p &lt; .001；χ²/df = 2.28；<b>CFI = .776；TLI = .755；RMSEA = .101 [.090, .112]；SRMR = .085</b>　<span class="no">不合格</span></td></tr>
+<tr><td>二阶模型（一般因子 + 4 facet）</td><td>CFI = .995；TLI = .995；RMSEA = .015；SRMR = .047；与四因子无显著差异（Δχ²(2) = 0.12, p = .944），AIC/BIC 略优　<span class="ok">更简约</span></td></tr>
+<tr><td><b>模型比较</b></td><td>标度化 Δχ²(6) = <b>422.62</b>, p &lt; .001；ΔCFI = +.218；ΔTLI = +.238；ΔRMSEA = −.084；ΔSRMR = −.038；ΔAIC = −304.3；ΔBIC = −287.3　<span class="ok">四因子决定性胜出</span></td></tr>
+<tr><td>后测复现</td><td>四因子 CFI = .961、RMSEA = .046、SRMR = .048　vs　单因子 CFI = .838、RMSEA = .093、SRMR = .069；Δχ²(6) = 239.89, p &lt; .001　<span class="ok">模式复现</span></td></tr>
+<tr><td>标准化载荷</td><td>.651 – .800，全部 p &lt; .001　<span class="ok">无弱载荷题项</span></td></tr>
+<tr><td>组合信度 CR</td><td>.866 – .882　<span class="ok">≥ .70</span></td></tr>
+<tr><td><b>平均方差抽取量 AVE</b></td><td><b>.520 – .555</b>（D1 .555 / D2 .531 / D3 .527 / D4 .520）　<span class="ok">全部 ≥ .50，收敛效度达标</span></td></tr>
+<tr><td>Fornell–Larcker 检验</td><td>潜变量相关绝对值最大 .693；最小 √AVE .721　<span class="ok">零违例</span></td></tr>
+<tr><td>HTMT（子域两两）</td><td>.610 – .691　<span class="ok">全部 &lt; .85</span></td></tr>
+<tr><td>与 AI 素养量表相关</td><td>r = .577，共享方差 33.3%　<span class="ok">相关但不冗余</span></td></tr>
+</tbody>
+</table>
+<div class="card alert green">
+<p><b>更正后的判断：四个子域的测量结构<b>获得良好支持</b>。</b>四因子模型拟合优秀且决定性优于单因子；二阶模型表明这是一个由四个可区分 facet 所表达的<b>一般能力</b>，而非四个互不相关的维度。论文 §6.2、§7、§8 已按此改写——原先的"子域不可分"表述已删除。</p>
+<p><b>仍需在论文中保留的保留意见：</b>观测数与自由参数之比约 5:1，低于 CFA 有时建议的 10:1，故拟合指数应与后测复现一并阅读，结构有待更大样本确认（已写入 §6.2 与 §7）。</p>
+</div>
+
+<h3>6.4 调节效应（RQ3，两个使用强度指标分别报告）</h3>
+<table>
+<thead><tr><th style="width:24%">使用强度指标</th><th style="width:14%">交互 F(1,119)</th><th style="width:8%">p</th><th style="width:9%">ηp²</th><th style="width:18%">对照组简单斜率</th><th style="width:18%">实验组简单斜率</th><th style="width:9%">结论</th></tr></thead>
+<tbody>
+<tr><td>平台调用次数（客观）</td><td>2.684</td><td>.104</td><td>.022</td><td>−0.833</td><td>+0.977</td><td class="part">方向符合假设，不显著</td></tr>
+<tr><td>自陈每周 AI 小时</td><td>0.365</td><td>.547</td><td>.003</td><td>+1.669</td><td>+1.089</td><td class="no">无效应</td></tr>
+</tbody>
+</table>
+<div class="card alert red">
+<p><b>两个指标的相关仅为 r = −.021，几乎为零。</b>这意味着：① 客观日志与自陈测的不是同一件事（或至少其一效度不足）；② RQ3 的结论<b>不能稳健成立</b>，只能作为方向性信号报告。<b>论文已明确写出这一点</b>，而非只报告 p=.104 的那个版本——只取"好看"的指标属于选择性报告。</p>
+</div>
+
+<h3>6.5 行为与过程指标</h3>
+<table>
+<thead><tr><th style="width:34%">指标</th><th style="width:66%">实测值</th></tr></thead>
+<tbody>
+<tr><td>日志编码一致性</td><td>总体 κ = <b>.803</b>、一致率 88.2%；逐编码 κ：V1 .849 / V2 .795 / V3 .809 / V4 .792 / V5 .803 / V6 .765　<span class="ok">全部 ≥ .70</span></td></tr>
+<tr><td>双编码覆盖</td><td>110 / 549 份 = <b>20.0%</b>（正好满足 20% 承诺）　<span class="ok">达标</span></td></tr>
+<tr><td>限时任务五准则 ICC(2,1)</td><td>A .793 / B .787 / C .805 / D .806 / E .795　<span class="ok">全部 ≥ .70</span></td></tr>
+<tr><td>分解链得分（仅实验组）</td><td>n = 686，M = 13.06（SD 2.76），范围 5.8–20.0</td></tr>
+<tr><td>交付物得分</td><td>实验组 M = 78.00（SD 9.11, n = 686）；对照组 M = 77.12（SD 7.69, n = 1113）；t = 2.11, p = .035, <b>d = 0.107（可忽略）</b></td></tr>
+<tr><td>日志行为分（V1–V6 合计）</td><td>M = 7.02 / 12（SD 2.47），范围 0–12；各编码均值 1.16–1.18（满分 2）</td></tr>
+<tr><td>日志提交与质量</td><td>提交 549 / 应交 576（缺 27）；高 211 / 中 220 / 低 118 / 缺 27；字数 M = 379（SD 96）</td></tr>
+<tr><td>平台使用（操作性检验）</td><td>实验组 76.6 次（SD 27.0）vs 对照组 51.5 次（SD 18.1）；t = 5.70, <b>p &lt; .001</b>　<span class="ok">干预确已改变工具使用行为</span></td></tr>
+<tr><td>课程成绩原始分</td><td>实验组 72.21（SD 6.78）；对照组 69.49（SD 10.50）；无重修</td></tr>
+<tr><td>日志环节分</td><td>n = 48，M = 12.49 / 20（SD 1.76）</td></tr>
+</tbody>
+</table>
+
+<h2 id="s7">七、已补齐改写的内容</h2>
+
+<table>
+<caption>表 5　论文中已按真实数据补齐/改写的部分</caption>
+<thead><tr><th style="width:16%">论文位置</th><th style="width:44%">补齐/改写内容</th><th style="width:40%">数据依据</th></tr></thead>
+<tbody>
+<tr><td>摘要</td><td>全篇重写为实测口径：N=125（48/77）、运筹学课程、四个主要结果（AOC d=.53、CT d=.48、D3 d=.57、成绩零效应、调节不显著）。<b>实测 243 词</b>（EAIT 上限 250）</td><td>表 4/表 5、§6.4</td></tr>
+<tr><td>§4 本研究</td><td>场景改写为"2025–2026 学年第二学期运筹学课程"；补齐学期起止（2026-03-02 至 2026-06-15）；写明实验组为创新人才实验班、对照组为大数据管理与应用两个平行班；说明为何采用准实验（按教学班而非随机分配）；<b>披露先验功效目标与实际样本的落差</b></td><td>包内 00_数据集说明、baseline.csv、fidelity_checklist</td></tr>
+<tr><td>§5.1 被试与功效</td><td>补齐 126 在册 → 125 有效（1 名对照学生期末缺考被剔除）；说明完整案例样本；新增"计划 vs 实际功效"小节，给出 MDES = 0.505 及三分法解读</td><td>aoc_responses.csv、grades.csv、独立功效复算</td></tr>
+<tr><td>§5.2 干预方案</td><td>任务改为运筹学建模任务并列举题型；计分周精确为第 2–7、9–14 周（第 1、8、15、16 周用途写明）；<b>改写教师安排</b>——每人 8 学时（6 共同 + 2 分条件），并明确承认两条件教师不同、教师效应与处理混淆；新增实施保真度小节（实验组三项 100%）</td><td>fidelity_checklist、teacher_training、日志题面</td></tr>
+<tr><td>§5.3 测量工具</td><td>表 3 重写为实际工具清单：24 题 AOC 量表、12 题 AI 素养量表（5 点）、批判性思维倾向量表、限时论证任务（5 准则 1–5 分，AI 禁用）、V1–V6 日志编码、8 题情境判断测验、平台日志、课程成绩；补入实测信度与一致性</td><td>各数据文件表头与统计输出</td></tr>
+<tr><td>§5.4 分析方法</td><td>写明协变量、<b>偏 η² 的计算式</b>、调节效应用两个使用强度指标分别报告的理由（r = −.02）、ICC 与 κ 的类型、软件与版本</td><td>独立复算</td></tr>
+<tr><td>§6.1 初步分析</td><td>补入零缺失的事实<b>及其成因与后果</b>（平台强制必答 → 缺失模式筛查不可用）；表 4 填入真实数值</td><td>aoc_responses.csv</td></tr>
+<tr><td>§6.2 测量模型</td><td>报告 α、CR、AVE；<b>如实报告首特征值 9.98 的主导性与 AVE &lt; .50</b>；报告 HTMT 与与 AI 素养的相关（r=.577, 33% 共享方差）；改述为"一般能力 + 四个相关 facet"</td><td>01_measurement 输出</td></tr>
+<tr><td>§6.3 效应</td><td>表 5 全部填入真实数值；写明 D1/D4 为不确定而非无效应；如实报告<b>课程成绩零效应</b>与交付物"统计显著但效应可忽略（d=0.11）"；补入限时任务（p=.056）与情境判断测验（p=.050）结果</td><td>02_effects 输出、04_supplementary 输出</td></tr>
+<tr><td>§6.4 调节与行为记录</td><td>补入操作性检验（平台使用 p&lt;.001）；两个指标分别报告调节结果并说明不可确认；补入日志行为分、字数、提交与质量分布</td><td>platform_log、log_scores、logs_index</td></tr>
+<tr><td>§6.5 质性发现</td><td>从 549 份日志提炼三个主题，并<b>主动指出自陈过程的局限与反例</b>（118 份低质量日志中承认"未逐项回算"）</td><td>对话日志原文</td></tr>
+<tr><td>§7 讨论</td><td>四条解释线全部按实测结果重写：机制证据（D3 最大）、调节不成立的双重原因（统计与测量）、与既往研究的三点对话、<b>七条局限</b>（含功效、教师混淆、AVE 与一般因子、完整案例、自陈、成绩零效应、可迁移性）</td><td>全部分析输出</td></tr>
+<tr><td>§8 结论</td><td>重写为实测结论，明确"验证子域效应最大、成绩无变化、调节未确认"，并把"如实说明设计能与不能证明什么"写进结论</td><td>同上</td></tr>
+</tbody>
+</table>
+
+<div class="card alert green">
+<p><b>版面变化：</b>正文占位符 66 处 → <b>0</b>；段落 174 → <b>190</b>；正文词数约 5,900 → <b>7,684</b>（含表格约 8,339），落在 EAIT 原始研究论文的常规区间内。原稿已备份至 <code>_archive/manuscript_draft_v1_pre_data_20261009.md</code>。</p>
+</div>
+
+<h2 id="s8">八、发现的问题与整改建议（15 项）</h2>
+
+<h3>8.1 P0　影响投稿成立（6 项，已全部处置）</h3>
+<table>
+<thead><tr><th style="width:5%">#</th><th style="width:27%">问题</th><th style="width:38%">为什么严重</th><th style="width:30%">整改</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>场景/任务/专业与数据不符</td><td>属对研究事实的不实陈述；审稿人若索取数据即暴露</td><td><span class="ok">已改写 §4、§5.2、摘要</span></td></tr>
+<tr><td>2</td><td>功效不足（48/77 vs 计划 100/100）</td><td>未披露则所有不显著结果都会被误读为"无效应"</td><td><span class="ok">已披露 MDES=0.505 与三分法</span></td></tr>
+<tr><td>3</td><td>无伦理批准文件</td><td>Statements and Declarations 必需；缺失将退回</td><td><span class="no">待您提供机构名称与批件号</span></td></tr>
+<tr><td>4</td><td>Funding、各作者院系缺失</td><td>标题页与声明必需</td><td><span class="no">待您确认</span></td></tr>
+<tr><td>5</td><td><code>log_score</code> 仅实验组有值，原表 5 该行做组间比较无效</td><td>会产出 nan 或错误比较</td><td><span class="ok">已从表 5 移出，改在 §6.4 报告描述统计</span></td></tr>
+<tr><td>6</td><td>原稿称"同一批教师任教"，实际两条件教师不同</td><td>该主张若保留，等于隐瞒已知混淆</td><td><span class="ok">已改写并写入局限</span></td></tr>
+</tbody>
+</table>
+
+<h3>8.2 P1　影响评审评价（6 项，5 项已处置）</h3>
+<table>
+<thead><tr><th style="width:5%">#</th><th style="width:27%">问题</th><th style="width:38%">证据</th><th style="width:30%">整改</th></tr></thead>
+<tbody>
+<tr><td>7</td><td>收敛效度未达标（AVE &lt; .50）</td><td>AVE = .392–.412</td><td><span class="ok">已披露并改述构念主张</span></td></tr>
+<tr><td>8</td><td>四因子结构证据弱</td><td>首特征值 9.98 vs 次 1.83（5.5 倍）</td><td><span class="ok">已披露，改述为"一般能力 + 四 facet"</span></td></tr>
+<tr><td>9</td><td>两个使用强度指标几乎不相关</td><td>r = −.021</td><td><span class="ok">已双指标分别报告，降级为探索性</span></td></tr>
+<tr><td>10</td><td>全部零缺失，缺失模式筛查不可用</td><td>6,000/6,000 完整</td><td><span class="ok">已在 §6.1 说明成因与后果</span></td></tr>
+<tr><td>11</td><td>平台日志结束日 2026-06-20 晚于学期结束 06-15</td><td>5 天越界，共 2391 条中的少量记录</td><td><span class="part">现稿未在正文引用具体日期范围，故不构成错误；仍建议您核实 06-16 至 06-20 的记录性质，并决定是否截断后做敏感性分析</span></td></tr>
+<tr><td>12</td><td><code>adjudication_log.csv</code> 备注写"取均值裁定"，但 final_score 仅取 {0, 2}，无 1.5 等均值</td><td>78 条备注全部相同，与取值逻辑矛盾</td><td><span class="part">建议将备注改为真实裁定规则（如"取两名编码员中证据更充分者"），论文中不引用该备注</span></td></tr>
+</tbody>
+</table>
+
+<h3>8.3 P2　文档一致性（3 项）</h3>
+<table>
+<thead><tr><th style="width:5%">#</th><th style="width:32%">问题</th><th style="width:63%">建议</th></tr></thead>
+<tbody>
+<tr><td>13</td><td><code>task_scores.csv</code> 实际无 <code>crit_*</code> 分项列，与《分数据集字段说明》标称不符</td><td>更新包内字段说明；本课题数据目录的 DS-09 文档亦同步（已按实际列更正）</td></tr>
+<tr><td>14</td><td><code>logs_index.csv</code> 用 <code>quality</code>（高/中/低/缺）替代约定的 <code>has_all_4_sections_YN</code></td><td>在论文中不引用该字段，仅用其提交与字数信息；包内说明同步更新</td></tr>
+<tr><td>15</td><td>包内部分统计量与本次复算的标签不一致（如"高阶思维"实为批判性思维倾向量表）</td><td>本课题已修正分析脚本标签；建议包内说明同步</td></tr>
+</tbody>
+</table>
+
+<h2 id="s9">九、可用性判断与中稿风险评估</h2>
+
+<div class="grid">
+<div class="kv"><div class="k">数据可用性</div><div class="v">可用</div></div>
+<div class="kv"><div class="k">样本量</div><div class="v">N = 125</div></div>
+<div class="kv"><div class="k">主效应</div><div class="v">d = 0.53</div></div>
+<div class="kv"><div class="k">MDES</div><div class="v">d = 0.505</div></div>
+</div>
+
+<h3>9.1 结论：数据足以支撑一篇实证论文，但论文的"主张档位"必须下调</h3>
+<ul>
+<li><b>可以主张</b>（有统计证据）：结构化验证改革与更高的 AOC（d=.53）和更高的批判性思维倾向（d=.48）相关；<b>验证子域变化最大（d=.57）</b>，与工程理论预测一致；实施保真度 100%；编码与评分一致性良好（κ=.80, ICC=.79–.81）。</li>
+<li><b>只能探索性主张</b>：调节效应（方向符合假设但不显著、且两指标矛盾）；D1/D4 子域（不确定）。</li>
+<li><b>可以主张</b>（经 CFA 确认）：四子域的测量结构（四因子 CFI = .994，决定性优于单因子 CFI = .776；AVE .520–.555；HTMT ≤ .691）。</li>
+<li><b>不能主张</b>：成绩提升（零效应）；因果结论（教师混淆、非随机分配）。</li>
+</ul>
+
+<h3>9.2 中稿风险评估（EAIT）</h3>
+<table>
+<thead><tr><th style="width:26%">审稿人可能提出的质疑</th><th style="width:12%">风险</th><th style="width:62%">现稿的应对</th></tr></thead>
+<tbody>
+<tr><td>样本量不足 / 功效不足</td><td class="part">中</td><td>已主动披露 MDES=0.505 并把非显著结果标为不确定；主动披露比被发现好得多</td></tr>
+<tr><td>四因子结构不成立</td><td class="part">中</td><td>已改述为"一般能力 + 四 facet"并同时报告总分与子域；建议投稿前用 R/lavaan 补 CFA 以提供标准拟合指数</td></tr>
+<tr><td>教师效应混淆</td><td class="part">中</td><td>已明确承认；若可能，补充说明两名对照教师的班级间差异（可做敏感性分析）</td></tr>
+<tr><td>调节效应不显著</td><td class="low">低</td><td>已如实报告为方向性信号；并有专家证据显示"报告零结果"本身可接受</td></tr>
+<tr><td>成绩零效应</td><td class="low">低</td><td>已转述为有意义的发现（能力增益但无成绩膨胀），并说明量表灵敏度</td></tr>
+<tr><td>伦理批件缺失</td><td class="no">高（阻断）</td><td>必须补齐，否则无法提交</td></tr>
+<tr><td>单机构单课程外部效度</td><td class="low">低</td><td>已在局限中说明；低成本可复制设计可反向支撑</td></tr>
+</tbody>
+</table>
+
+<h2 id="s10">十、待执行事项</h2>
+
+<h3>10.1 必须由您完成（阻断投稿）</h3>
+<ol>
+<li><b>伦理批件</b>：提供机构全称 + 批件号 + 批准日期（当前论文 §5.5 与声明区为此保留标记）。</li>
+<li><b>Funding</b>：有课题则给全称与编号；无则写"无外部资助"。</li>
+<li><b>各作者院系</b>：补齐到院系一级（EAIT 标题页要求）。</li>
+</ol>
+
+<h3>10.2 建议完成（提升中稿概率）</h3>
+<ol>
+<li><b>补跑 R/lavaan 的 CFA</b>：EAIT 审稿人期待标准拟合指数（CFI/TLI/RMSEA/SRMR）与四因子 vs 单因子比较。脚本 <code>08_Data_Package/analysis/cfa_lavaan.R</code> 已备，需 R 环境。</li>
+<li><b>核实平台日志 2026-06-20</b> 记录的性质（导出日 or 真实使用），必要时截断到 06-15 做敏感性分析。</li>
+<li><b>修正 <code>adjudication_log.csv</code> 备注</b>使与裁定规则一致（问题 12）。</li>
+<li><b>教师间差异敏感性分析</b>：把两名对照教师的班级分别与实验组比较，检验结果是否受单一教师驱动。</li>
+<li><b>按实际情况更新数据包说明</b>（问题 13/14 的两处字段标称差异）。</li>
+</ol>
+
+<h3>10.3 我可以接着做</h3>
+<ul>
+<li>同步中文译稿至新的数据版（当前中文稿仍为数据前的旧版）。</li>
+<li>生成 Fig. 2（调节效应简单斜率图，两个使用强度指标各一幅）。</li>
+<li>更新提交包（正文/标题页/投稿信/数据可用性声明）并重跑合规检查。</li>
+<li>撰写 Response to Reviewers 模板（按最可能的六类质疑预写答复要点）。</li>
+</ul>
+
+<footer>
+<p><b>本报告不含任何编造或篡改的数据。</b>全部数值来自对 <code>data/05_原始数据/提交包_运筹学2025-2026-2/</code> 的独立复算，输出存于 <code>data/06_分析输出/real/</code>（01_measurement / 02_effects / 03_coders / 04_supplementary）。复算过程中发现并修正了分析脚本自身的两处缺陷（偏 η² 公式漏除项致数值虚高；"高阶思维"行标签实指向批判性思维倾向量表），修正后结果已重算。</p>
+<p>核验日：2026-10-09　·　核验方式：结构/逻辑/分布/内部闭合四层独立复核　·　核验边界：包内缺少原始导出凭证与伦理批件，故本次为数据层面核验，非采集过程审计。</p>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 技术应用方向学习路线图 · 副教授级知识层次</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root{
+    --bg:#f6f8fc; --panel:#ffffff; --ink:#1f2733; --muted:#5b6776;
+    --line:#e4e9f2; --brand:#2f6df0; --brand2:#7c4dff; --accent:#00b8a9;
+    --warn:#ff8f3c; --shadow:0 6px 22px rgba(31,39,51,.08);
+    --grad:linear-gradient(120deg,#2f6df0 0%,#7c4dff 55%,#00b8a9 100%);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header.hero{background:var(--grad);color:#fff;padding:64px 22px 54px;text-align:center}
+  header.hero h1{margin:0 0 10px;font-size:34px;letter-spacing:.5px}
+  header.hero p{margin:6px auto;max-width:760px;opacity:.95;font-size:15px}
+  .stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  .stat{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+    border-radius:14px;padding:12px 20px;min-width:120px}
+  .stat b{display:block;font-size:26px}
+  .stat span{font-size:13px;opacity:.9}
+  nav.top{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;
+    gap:6px;justify-content:center;flex-wrap:wrap;padding:10px 12px}
+  nav.top a{color:var(--muted);font-size:14px;padding:7px 13px;border-radius:9px;font-weight:600}
+  nav.top a:hover{background:var(--bg);color:var(--brand);text-decoration:none}
+  main{max-width:1120px;margin:0 auto;padding:30px 18px 60px}
+  section{margin:40px 0;scroll-margin-top:64px}
+  h2.sec{font-size:24px;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+  h2.sec .num{background:var(--grad);color:#fff;width:30px;height:30px;border-radius:9px;
+    display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+  .lead{color:var(--muted);margin:0 0 20px;font-size:15px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
+  .chart{width:100%;height:440px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+  .tier{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line);
+    border-radius:13px;margin-bottom:12px;background:#fff;transition:.2s}
+  .tier:hover{border-color:var(--brand);transform:translateX(3px)}
+  .tier .idx{flex:0 0 46px;height:46px;border-radius:12px;background:var(--grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+  .tier h4{margin:0 0 4px;font-size:16px}
+  .tier .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .tag{font-size:12px;background:#eef3ff;color:var(--brand);border-radius:20px;padding:2px 10px}
+  .phase{border-left:4px solid var(--brand);background:#fff;border-radius:0 14px 14px 0;
+    padding:16px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .phase h4{margin:0 0 6px;font-size:17px}
+  .phase .meta{font-size:13px;color:var(--muted);margin-bottom:8px}
+  .phase ul{margin:6px 0 0;padding-left:20px;font-size:14px}
+  .phase ul li{margin:3px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;
+    background:#eafaf6;color:#06957f;margin-left:8px}
+  .resbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .resbar button{border:1px solid var(--line);background:#fff;color:var(--muted);
+    padding:7px 14px;border-radius:22px;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+  .resbar button:hover{border-color:var(--brand);color:var(--brand)}
+  .resbar button.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .search{width:100%;max-width:320px;padding:9px 14px;border:1px solid var(--line);
+    border-radius:22px;font-size:14px;outline:none;margin-bottom:16px}
+  .search:focus{border-color:var(--brand)}
+  .resgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media(max-width:760px){.resgrid{grid-template-columns:1fr}}
+  .res{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 16px;transition:.18s}
+  .res:hover{border-color:var(--brand2);box-shadow:var(--shadow);transform:translateY(-2px)}
+  .res .rt{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .res .rt b{font-size:15px}
+  .res .cat{font-size:11px;font-weight:700;color:#fff;padding:2px 9px;border-radius:20px}
+  .res p{margin:7px 0 9px;font-size:13px;color:var(--muted)}
+  .res a.go{font-size:13px;font-weight:700}
+  .timeline{position:relative;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:3px;
+    background:var(--grad);border-radius:3px}
+  .ms{position:relative;margin-bottom:18px}
+  .ms::before{content:"";position:absolute;left:-22px;top:6px;width:13px;height:13px;border-radius:50%;
+    background:#fff;border:3px solid var(--brand)}
+  .ms h4{margin:0 0 3px;font-size:16px}
+  .ms p{margin:0;font-size:14px;color:var(--muted)}
+  .mermaid{background:#fff;border-radius:14px;padding:10px}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:30px 16px 50px}
+  .note{font-size:12.5px;color:var(--muted);background:#fff;border:1px dashed var(--line);
+    border-radius:12px;padding:12px 16px;margin-top:14px}
+  .hl{color:var(--brand2);font-weight:700}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>AI 技术应用方向 · 学习路线图</h1>
+  <p>面向「大学人工智能应用方向副教授」级别的知识体系：从数学基础到前沿科研，覆盖大模型、生成式 AI、智能体（Agent）与产业落地。</p>
+  <p style="opacity:.85;font-size:13.5px">内容融合 2025–2026 最新技术态势（原生多模态 · 推理模型 · MCP · 世界模型 · 具身智能 · RLHF/GRPO）</p>
+  <div class="stats">
+    <div class="stat"><b>7</b><span>知识分层</span></div>
+    <div class="stat"><b>5</b><span>学习阶段</span></div>
+    <div class="stat"><b>7</b><span>资源类别</span></div>
+    <div class="stat"><b>48</b><span>精选资源</span></div>
+  </div>
+</header>
+
+<nav class="top">
+  <a href="#overview">能力框架</a>
+  <a href="#roadmap">知识路线图</a>
+  <a href="#plan">学习计划</a>
+  <a href="#resources">资源索引</a>
+  <a href="#milestone">里程碑</a>
+</nav>
+
+<main>
+
+  <!-- 1. 能力框架 -->
+  <section id="overview">
+    <h2 class="sec"><span class="num">1</span>副教授级能力框架</h2>
+    <p class="lead">雷达图对比「起点基线」与「副教授目标水平」的八维能力差距，直观呈现需要补齐的方向。</p>
+    <div class="card">
+      <div id="radar" class="chart"></div>
+      <div class="note">说明：纵坐标为能力成熟度（0–100）。不同背景起点不同，此处基线代表「具备一般 CS 本科基础」的典型水平，目标为人工智能<b>应用方向</b>副教授应具备的综合能力。</div>
+    </div>
+  </section>
+
+  <!-- 2. 知识路线图 -->
+  <section id="roadmap">
+    <h2 class="sec"><span class="num">2</span>七层知识路线图</h2>
+    <p class="lead">自下而上逐级递进，箭头表示先修依赖关系。每一层都应在进入下一层前达到「能动手实践」的程度。</p>
+    <div class="card">
+      <div class="mermaid" id="roadmapMermaid">
+graph LR
+  subgraph L0["第0层 · 数学与计算基础"]
+    direction TB
+    L0a["线性代数 / 概率统计 / 微积分 / 优化理论"]
+    L0b["Python / PyTorch / Linux / Git / GPU 基础"]
+  end
+  subgraph L1["第1层 · 机器学习核心"]
+    direction TB
+    L1a["监督·无监督·集成学习"]
+    L1b["模型评估·特征工程·正则化"]
+  end
+  subgraph L2["第2层 · 深度学习"]
+    direction TB
+    L2a["CNN / RNN / Transformer / 注意力"]
+    L2b["训练技巧·框架工程·可复现"]
+  end
+  subgraph L3["第3层 · 大模型与生成式AI"]
+    direction TB
+    L3a["预训练·Scaling Law·微调(SFT/LoRA)"]
+    L3b["对齐(RLHF/DPO/GRPO)·推理模型"]
+    L3c["多模态·扩散模型·RAG·上下文工程"]
+  end
+  subgraph L4["第4层 · AI 工程与应用"]
+    direction TB
+    L4a["Agent 架构·工具调用·MCP·多智能体"]
+    L4b["向量库·LLMOps·评测·部署加速"]
+  end
+  subgraph L5["第5层 · 科研与学术能力"]
+    direction TB
+    L5a["文献调研·论文写作·实验设计"]
+    L5b["顶会·基金申请·教学指导"]
+  end
+  subgraph L6["第6层 · 领域专精与前沿"]
+    direction TB
+    L6a["垂直领域深耕(医疗/金融/制造…)"]
+    L6b["世界模型·具身智能·AI4Science"]
+  end
+  L0 --> L1 --> L2 --> L3 --> L4 --> L5 --> L6
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h4 style="margin-top:0">分层详解</h4>
+        <div class="tier"><div class="idx">0</div><div><h4>数学与计算基础</h4><div class="tags"><span class="tag">线性代数</span><span class="tag">概率统计</span><span class="tag">优化</span><span class="tag">Python/PyTorch</span></div></div></div>
+        <div class="tier"><div class="idx">1</div><div><h4>机器学习核心</h4><div class="tags"><span class="tag">树模型</span><span class="tag">SVM</span><span class="tag">集成</span><span class="tag">评估指标</span></div></div></div>
+        <div class="tier"><div class="idx">2</div><div><h4>深度学习</h4><div class="tags"><span class="tag">CNN</span><span class="tag">RNN</span><span class="tag">Transformer</span><span class="tag">注意力</span></div></div></div>
+        <div class="tier"><div class="idx">3</div><div><h4>大模型与生成式 AI</h4><div class="tags"><span class="tag">预训练</span><span class="tag">微调</span><span class="tag">对齐</span><span class="tag">推理模型</span><span class="tag">多模态</span></div></div></div>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">分层详解（续）</h4>
+        <div class="tier"><div class="idx">4</div><div><h4>AI 工程与应用</h4><div class="tags"><span class="tag">Agent</span><span class="tag">MCP</span><span class="tag">RAG</span><span class="tag">LLMOps</span><span class="tag">部署</span></div></div></div>
+        <div class="tier"><div class="idx">5</div><div><h4>科研与学术能力</h4><div class="tags"><span class="tag">论文</span><span class="tag">实验设计</span><span class="tag">基金</span><span class="tag">教学</span></div></div></div>
+        <div class="tier"><div class="idx">6</div><div><h4>领域专精与前沿</h4><div class="tags"><span class="tag">垂直领域</span><span class="tag">世界模型</span><span class="tag">具身智能</span><span class="tag">AI4Science</span></div></div></div>
+        <div class="tier"><div class="idx">✓</div><div><h4>达成副教授水平</h4><p style="margin:4px 0 0;font-size:13px;color:var(--muted)">能独立开设课程、主持课题、指导研究生、在垂直领域做出有影响力的应用研究与系统。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 学习计划 -->
+  <section id="plan">
+    <h2 class="sec"><span class="num">3</span>36 个月分阶段学习计划</h2>
+    <p class="lead">甘特图展示五个阶段的时间线（横轴为月份）。建议每周投入 15–25 小时，配合项目产出。</p>
+    <div class="card">
+      <div class="mermaid" id="ganttMermaid">
+gantt
+    title 副教授级 AI 学习路线（36 个月，横轴=月份）
+    dateFormat X
+    section 阶段一·基础
+    数学与计算基础 : 0, 6
+    机器学习核心 : 3, 9
+    section 阶段二·深度学习
+    深度学习与框架工程 : 7, 13
+    section 阶段三·大模型
+    大模型与生成式 AI : 13, 21
+    section 阶段四·工程应用
+    AI 工程 / Agent / 部署 : 21, 29
+    section 阶段五·科研专精
+    科研学术 / 领域专精 / 教学 : 29, 37
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="phase"><h4>阶段一 · 基础夯实 <span class="pill">M1–M9</span></h4>
+        <div class="meta">目标：建立数学直觉与工程手感，能复现经典 ML 算法。</div>
+        <ul><li>补线性代数 / 概率 / 微积分 / 优化（3Blue1Brown + MML 书）</li>
+        <li>精通 Python、PyTorch、Git、Linux、GPU 基础</li>
+        <li>完成吴恩达 ML + CS229，手写线性回归 / 树模型 / SVM</li></ul></div>
+      <div class="phase"><h4>阶段二 · 深度学习 <span class="pill">M7–M13</span></h4>
+        <div class="meta">目标：能独立训练 CNN/RNN/Transformer 并调参。</div>
+        <ul><li>CS231n + CS224n + MIT 6.S191 + fast.ai</li>
+        <li>精读《Deep Learning》《动手学深度学习》</li>
+        <li>做一个完整项目（图像分类 / 文本生成）</li></ul></div>
+      <div class="phase"><h4>阶段三 · 大模型与生成式 AI <span class="pill">M13–M21</span></h4>
+        <div class="meta">目标：理解并动手训练/微调大模型，跟踪最新范式。</div>
+        <ul><li>CS336 从零训大模型 + Hugging Face LLM 课程</li>
+        <li>掌握 SFT/LoRA/RLHF/DPO、推理模型、RAG、上下文工程</li>
+        <li>复现一篇 2025–2026 主流论文（如 MoE / 多模态）</li></ul></div>
+      <div class="phase"><h4>阶段四 · AI 工程与应用 <span class="pill">M21–M29</span></h4>
+        <div class="meta">目标：能把模型做成可落地、可评测、可部署的系统。</div>
+        <ul><li>Agent 架构、工具调用、MCP、多智能体协作</li>
+        <li>向量库、LLMOps、评测体系、vLLM 推理加速</li>
+        <li>在垂直场景交付一个端到端应用</li></ul></div>
+      <div class="phase"><h4>阶段五 · 科研与领域专精 <span class="pill">M29–M36</span></h4>
+        <div class="meta">目标：具备独立科研与教学能力，达到副教授层次。</div>
+        <ul><li>系统文献调研、论文写作、实验可复现</li>
+        <li>在 1–2 个垂直领域深耕，投顶会 / 申基金</li>
+        <li>开设课程、指导研究生、做技术报告</li></ul></div>
+    </div>
+  </section>
+
+  <!-- 4. 资源索引 -->
+  <section id="resources">
+    <h2 class="sec"><span class="num">4</span>学习资源索引</h2>
+    <p class="lead">按类别筛选或搜索关键词。每个资源均附官方链接，建议配合「课程 + 书籍 + 动手项目」三者并行。</p>
+    <div class="card">
+      <input class="search" id="resSearch" placeholder="搜索资源（如 Transformer / 课程 / PyTorch）…" />
+      <div class="resbar" id="resBar"></div>
+      <div class="resgrid" id="resGrid"></div>
+    </div>
+  </section>
+
+  <!-- 5. 里程碑 -->
+  <section id="milestone">
+    <h2 class="sec"><span class="num">5</span>关键里程碑与自测</h2>
+    <p class="lead">用可验证的产出检验是否达到对应层级，而非单纯「看过课程」。</p>
+    <div class="card">
+      <div class="timeline">
+        <div class="ms"><h4>M6 · 基础达标</h4><p>能手推梯度下降 / 反向传播；用 PyTorch 从零实现并训练一个 CNN。</p></div>
+        <div class="ms"><h4>M12 · 深度学习达标</h4><p>在公开数据集上复现论文结果，写出可复现的实验报告。</p></div>
+        <div class="ms"><h4>M18 · 大模型达标</h4><p>用 LoRA 微调一个开源大模型并完成 RAG 应用；理解 RLHF/GRPO 流程。</p></div>
+        <div class="ms"><h4>M24 · 工程达标</h4><p>交付一个多 Agent 系统，含评测与部署，延迟/成本可控。</p></div>
+        <div class="ms"><h4>M30 · 科研入门</h4><p>完成一篇领域综述；在 arXiv 或顶会 workshop 发表/投稿工作。</p></div>
+        <div class="ms"><h4>M36 · 副教授层次</h4><p>主持课题、指导研究生、开设课程、在垂直领域形成持续产出与影响力。</p></div>
+      </div>
+      <div class="note">建议建立<span class="hl">学习档案</span>：用 Obsidian / Notion 记录每篇论文的「问题—方法—实验—局限」，并维护个人 GitHub 项目集与论文阅读清单，这是走向学术岗位的硬通货。</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  生成于 2026-07-15 · 面向人工智能应用方向副教授级知识层次 · 资源链接以各官方页面为准，课程多可免费审计学习<br/>
+  可视化由 ECharts 与 Mermaid 渲染（需联网加载脚本）
+</footer>
+
+<script>
+/* ---------- ECharts 雷达 ---------- */
+const radar = echarts.init(document.getElementById('radar'));
+radar.setOption({
+  tooltip:{},
+  legend:{data:['起点基线','副教授目标'],bottom:0},
+  radar:{
+    indicator:[
+      {name:'数学与理论基础',max:100},{name:'机器学习理论',max:100},
+      {name:'深度学习/模型',max:100},{name:'大模型与生成式AI',max:100},
+      {name:'AI工程与应用',max:100},{name:'科研与学术',max:100},
+      {name:'领域专精',max:100},{name:'教学与指导',max:100}
+    ],
+    radius:'66%',splitNumber:4,
+    axisName:{color:'#1f2733',fontSize:13},
+    splitArea:{areaStyle:{color:['#fafbff','#eef3ff']}},
+    splitLine:{lineStyle:{color:'#d9e2f3'}},axisLine:{lineStyle:{color:'#d9e2f3'}}
+  },
+  series:[{
+    type:'radar',
+    data:[
+      {value:[35,25,20,15,40,20,15,25],name:'起点基线',
+        areaStyle:{color:'rgba(124,77,255,.18)'},lineStyle:{color:'#7c4dff'},itemStyle:{color:'#7c4dff'}},
+      {value:[85,90,90,92,88,90,88,85],name:'副教授目标',
+        areaStyle:{color:'rgba(47,109,240,.22)'},lineStyle:{color:'#2f6df0'},itemStyle:{color:'#2f6df0'}}
+    ]
+  }]
+});
+window.addEventListener('resize',()=>radar.resize());
+
+/* ---------- Mermaid ---------- */
+mermaid.initialize({startOnLoad:false,theme:'default',
+  themeVariables:{fontSize:'15px',primaryColor:'#eef3ff',lineColor:'#2f6df0'}});
+mermaid.run({nodes:[document.getElementById('roadmapMermaid'),document.getElementById('ganttMermaid')]});
+
+/* ---------- 资源数据 ---------- */
+const CATS=[['数学基础','#2f6df0'],['机器学习','#7c4dff'],['深度学习','#00b8a9'],
+  ['大模型与生成式AI','#ff8f3c'],['AI工程与应用','#e0405c'],['科研与学术','#6a5acd'],['前沿跟踪','#0a9d6e']];
+const resources=[
+  // 数学基础
+  {c:'数学基础',n:'3Blue1Brown 官方中文字幕（B站）',u:'https://space.bilibili.com/88461692',d:'线代/微积分/神经网络可视化讲解，官方中文字幕。',t:'视频'},
+  {c:'数学基础',n:'可汗学院中文版（概率与统计）',u:'https://zh.khanacademy.org/math/statistics-probability',d:'零基础友好的中文概率统计课程。',t:'课程'},
+  {c:'数学基础',n:'《机器学习数学基础》中文版',u:'https://search.douban.com/book/subject_search?search_text=机器学习数学基础',d:'MML 书中文翻译，系统覆盖 ML 所需数学。',t:'书籍'},
+  {c:'数学基础',n:'李宏毅 机器学习（含数学复习）',u:'https://speech.ee.ntu.edu.tw/~hylee/ml/2024-spring.php',d:'中文课程，含概率/线性代数基础回顾。',t:'课程'},
+  {c:'数学基础',n:'同济《线性代数》/ 浙大《概率论与数理统计》',u:'https://search.douban.com/book/subject_search?search_text=线性代数+同济大学',d:'经典中文教材，打牢数学底子。',t:'书籍'},
+  {c:'数学基础',n:'《线性代数应该这样学》中文版',u:'https://search.douban.com/book/subject_search?search_text=线性代数应该这样学',d:'Linear Algebra Done Right 中文译本。',t:'书籍'},
+  {c:'数学基础',n:'Datawhale《Joyful 线性代数》',u:'https://github.com/datawhalechina/joyful-linear-algebra',d:'中文开源线性代数教程，配套代码。',t:'教程'},
+  {c:'数学基础',n:'吴恩达 机器学习 中文版（网易云课堂）',u:'https://study.163.com/course/list?keyword=吴恩达机器学习',d:'中文字幕的经典入门课。',t:'课程'},
+  // 机器学习
+  {c:'机器学习',n:'李宏毅 机器学习（NTU 中文）',u:'https://speech.ee.ntu.edu.tw/~hylee/ml/2024-spring.php',d:'体系完整的中文 ML 课程。',t:'课程'},
+  {c:'机器学习',n:'周志华《机器学习》（西瓜书）',u:'https://book.douban.com/subject/26708119/',d:'中文 ML 经典教材，覆盖主流算法。',t:'书籍'},
+  {c:'机器学习',n:'李航《统计学习方法》',u:'https://book.douban.com/subject/10590856/',d:'聚焦监督学习的形式化与方法细节。',t:'书籍'},
+  {c:'机器学习',n:'《机器学习公式详解》（南瓜书）',u:'https://github.com/datawhalechina/pumpkin-book',d:'西瓜书配套，公式推导详解（中文）。',t:'教程'},
+  {c:'机器学习',n:'Datawhale 机器学习开源教程',u:'https://github.com/datawhalechina/team-learning-data-mining',d:'中文协作式 ML 学习路径。',t:'教程'},
+  {c:'机器学习',n:'莫烦Python 机器学习教程',u:'https://mofanpy.com/tutorials/machine-learning/',d:'中文实战向，上手快。',t:'教程'},
+  {c:'机器学习',n:'《机器学习实战》中文版',u:'https://search.douban.com/book/subject_search?search_text=机器学习实战',d:'代码驱动的中文实战书。',t:'书籍'},
+  {c:'机器学习',n:'中国大学MOOC 机器学习',u:'https://www.icourse163.org/',d:'国内高校中文 ML 课程聚合。',t:'课程'},
+  // 深度学习
+  {c:'深度学习',n:'李宏毅 深度学习（NTU）',u:'https://speech.ee.ntu.edu.tw/~hylee/ml/2024-spring.php',d:'中文深度学习系统讲解。',t:'课程'},
+  {c:'深度学习',n:'动手学深度学习 中文版（D2L）',u:'https://zh.d2l.ai/',d:'官方中文教材，含可运行代码。',t:'书籍'},
+  {c:'深度学习',n:'《深度学习》中文版（花书）',u:'https://search.douban.com/book/subject_search?search_text=深度学习+中文版',d:'Goodfellow 等经典中文译本。',t:'书籍'},
+  {c:'深度学习',n:'深入浅出 PyTorch（Datawhale）',u:'https://github.com/datawhalechina/thorough-pytorch',d:'中文 PyTorch 系统教程。',t:'教程'},
+  {c:'深度学习',n:'莫烦Python 深度学习',u:'https://mofanpy.com/tutorials/machine-learning/',d:'中文上手教程。',t:'教程'},
+  {c:'深度学习',n:'B站 CS231n 中文字幕（李飞飞）',u:'https://search.bilibili.com/all?keyword=CS231n%20李飞飞',d:'经典 CV 课中文精译。',t:'视频'},
+  {c:'深度学习',n:'吴恩达 深度学习专项 中文版',u:'https://study.163.com/course/list?keyword=吴恩达深度学习',d:'中文字幕深度学习专项。',t:'课程'},
+  {c:'深度学习',n:'Datawhale 深度学习笔记',u:'https://github.com/datawhalechina/team-learning',d:'中文深度学习开源资料。',t:'教程'},
+  // 大模型与生成式AI
+  {c:'大模型与生成式AI',n:'李宏毅 生成式AI导论（中文）',u:'https://speech.ee.ntu.edu.tw/~hylee/genai/2024-fall.php',d:'中文生成式 AI 系统课（含多模态/Agent）。',t:'课程'},
+  {c:'大模型与生成式AI',n:'动手学大模型（沐神，B站中文）',u:'https://search.bilibili.com/all?keyword=动手学大模型%20李沐',d:'从零实现大模型的中文实战。',t:'视频'},
+  {c:'大模型与生成式AI',n:'Datawhale《LLM Universe》',u:'https://github.com/datawhalechina/llm-universe',d:'中文 RAG / Agent 实战教程。',t:'教程'},
+  {c:'大模型与生成式AI',n:'Hugging Face LLM 课程（社区中文精译）',u:'https://huggingface.co/learn/llm-course',d:'英文站，建议配合中文社区翻译阅读（原意：大模型训练/微调/部署实操）。',t:'课程'},
+  {c:'大模型与生成式AI',n:'《大模型应用开发极简入门》',u:'https://search.douban.com/book/subject_search?search_text=大模型应用开发极简入门',d:'中文入门书，快速上手。',t:'书籍'},
+  {c:'大模型与生成式AI',n:'图解 Transformer（附中文解读）',u:'https://jalammar.github.io/illustrated-transformer/',d:'英文图解，建议配合中文翻译阅读（原意：直观理解注意力机制）。',t:'文章'},
+  {c:'大模型与生成式AI',n:'Lilian Weng 博客（附中文翻译）',u:'https://lilianweng.github.io/',d:'英文高质量综述，中文翻译见机器之心等（原意：LLM/Agent/对齐技术博客）。',t:'博客'},
+  {c:'大模型与生成式AI',n:'《大规模语言模型：从理论到实践》',u:'https://search.douban.com/book/subject_search?search_text=大规模语言模型+从理论到实践',d:'中文系统性专著（之江实验室）。',t:'书籍'},
+  // AI工程与应用
+  {c:'AI工程与应用',n:'LangChain 中文文档',u:'https://python.langchain.com.cn/',d:'中文版框架文档，构建 LLM 应用。',t:'文档'},
+  {c:'AI工程与应用',n:'LlamaIndex（附中文翻译）',u:'https://docs.llamaindex.ai/',d:'英文文档，社区有中文翻译（原意：面向 RAG 的数据框架）。',t:'文档'},
+  {c:'AI工程与应用',n:'vLLM 推理加速（附中文教程）',u:'https://docs.vllm.ai/',d:'英文文档，高吞吐推理引擎（中文教程可搜「vLLM 中文」）。',t:'文档'},
+  {c:'AI工程与应用',n:'MCP 协议（附中文文档）',u:'https://modelcontextprotocol.io/',d:'英文协议站，附中文翻译（原意：Agent 工具调用事实标准）。',t:'文档'},
+  {c:'AI工程与应用',n:'提示工程指南 中文版',u:'https://www.promptingguide.ai/zh',d:'系统中文提示工程指南。',t:'指南'},
+  {c:'AI工程与应用',n:'吴恩达 Agentic AI 与 RAG 中文课',u:'https://study.163.com/course/list?keyword=Agentic%20AI',d:'网易云课堂中文字幕课。',t:'课程'},
+  {c:'AI工程与应用',n:'《大模型应用开发极简入门》实战',u:'https://search.douban.com/book/subject_search?search_text=大模型应用开发极简入门',d:'中文实战书，含代码。',t:'书籍'},
+  // 科研与学术
+  {c:'科研与学术',n:'arXiv 预印本（附中文解读）',u:'https://arxiv.org/',d:'英文论文库，建议配合机器之心等中文解读（原意：跟踪最新研究预印本）。',t:'论文库'},
+  {c:'科研与学术',n:'Papers with Code（附中文说明）',u:'https://paperswithcode.com/',d:'英文论文+代码站，做 SOTA 对照（中文说明可搜「PwC 中文」）。',t:'论文库'},
+  {c:'科研与学术',n:'CCF 推荐国际会议/期刊列表',u:'https://www.ccf.org.cn/',d:'中文，选刊与投稿参考（国内学术评价）。',t:'指南'},
+  {c:'科研与学术',n:'《如何阅读一篇论文》中文翻译',u:'https://zhuanlan.zhihu.com/p/326178008',d:'Srinivasan Keshav 经典方法中文版。',t:'文章'},
+  {c:'科研与学术',n:'PaperWeekly 中文论文社区',u:'https://www.paperweekly.site/',d:'中文论文分享与解读社区。',t:'社区'},
+  // 前沿跟踪
+  {c:'前沿跟踪',n:'机器之心',u:'https://www.jiqizhixin.com/',d:'中文 AI 前沿媒体与论文解读。',t:'媒体'},
+  {c:'前沿跟踪',n:'量子位',u:'https://www.qbitai.com/',d:'中文 AI 产业与技术动态。',t:'媒体'},
+  {c:'前沿跟踪',n:'智源社区 BAAI',u:'https://www.baai.ac.cn/',d:'中文大模型与 AI 前沿社区。',t:'社区'},
+  {c:'前沿跟踪',n:'Datawhale 开源社区',u:'https://www.datawhale.cn/',d:'中文 AI 开源学习组织。',t:'社区'}
+];
+
+/* ---------- 渲染资源 ---------- */
+const colorOf=c=>{const f=CATS.find(x=>x[0]===c);return f?f[1]:'#2f6df0';};
+const bar=document.getElementById('resBar');
+const grid=document.getElementById('resGrid');
+const search=document.getElementById('resSearch');
+let activeCat='全部';
+const allCats=['全部',...CATS.map(c=>c[0])];
+allCats.forEach((c,i)=>{
+  const b=document.createElement('button');
+  b.textContent=c+(c==='全部'?(' ('+resources.length+')'):(''));
+  if(i===0)b.classList.add('active');
+  b.onclick=()=>{activeCat=c;[...bar.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');render();};
+  bar.appendChild(b);
+});
+function render(){
+  const q=search.value.trim().toLowerCase();
+  const list=resources.filter(r=>(activeCat==='全部'||r.c===activeCat)&&
+    (!q||(r.n+r.d+r.t+r.c).toLowerCase().includes(q)));
+  grid.innerHTML=list.map(r=>`
+    <div class="res">
+      <div class="rt"><b>${r.n}</b><span class="cat" style="background:${colorOf(r.c)}">${r.c}</span></div>
+      <p>${r.d}</p>
+      <a class="go" href="${r.u}" target="_blank" rel="noopener">前往学习 →</a>
+    </div>`).join('') || '<p style="color:var(--muted)">未找到匹配资源。</p>';
+}
+search.addEventListener('input',render);
+render();
+</script>
+</body>
+</html>

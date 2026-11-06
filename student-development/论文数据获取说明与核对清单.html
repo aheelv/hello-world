@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>论文数据获取说明与核对清单｜Agent-Orchestration Competence Study</title>
+<style>
+:root{
+  --blue-900:#1B3D5E; --blue-800:#2E5C8A; --blue-600:#4A90D9; --blue-100:#E8F0F8;
+  --green-700:#1E8449; --green-100:#E7F4EC;
+  --orange-700:#C4651A; --orange-100:#FDF0E4;
+  --pink-700:#A83E60; --pink-100:#FBE9F0;
+  --purple-700:#6A63CC; --purple-100:#EEEDFB;
+  --red-700:#B03A3A; --red-100:#FBECEC;
+  --gray-900:#2C2C2A; --gray-700:#5F5E5A; --gray-500:#888780;
+  --gray-300:#D3D1C7; --gray-100:#F1EFE8; --page:#F7F7F5; --white:#FFFFFF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Microsoft YaHei","微软雅黑","PingFang SC",sans-serif;
+  background:var(--page);color:var(--gray-900);line-height:1.8;font-size:15px;}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 24px 72px;}
+header.doc{background:var(--white);border:1px solid var(--gray-300);
+  border-left:6px solid var(--blue-800);border-radius:8px;padding:30px 34px;margin-bottom:24px;}
+header.doc .kicker{font-size:13px;color:var(--blue-800);letter-spacing:2px;margin-bottom:8px;}
+header.doc h1{font-size:24px;font-weight:700;line-height:1.5;color:var(--blue-900);}
+header.doc .sub{font-size:14px;color:var(--gray-700);margin-top:10px;}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.meta span{font-size:12.5px;color:var(--gray-700);background:var(--gray-100);
+  border:1px solid var(--gray-300);border-radius:4px;padding:3px 10px;}
+nav.toc{background:var(--white);border:1px solid var(--gray-300);border-radius:8px;
+  padding:18px 26px;margin-bottom:24px;}
+nav.toc h2{font-size:15px;font-weight:700;color:var(--blue-900);margin-bottom:8px;}
+nav.toc ol{margin-left:20px;font-size:14px;}
+nav.toc li{margin:3px 0;color:var(--gray-700);}
+section{background:var(--white);border:1px solid var(--gray-300);border-radius:8px;
+  padding:26px 30px;margin-bottom:22px;}
+section > h2{font-size:19px;font-weight:700;color:var(--blue-900);
+  padding-bottom:9px;border-bottom:2px solid var(--blue-100);margin-bottom:14px;}
+section h3{font-size:15.5px;font-weight:700;color:var(--blue-800);margin:18px 0 6px;}
+p{margin:8px 0;font-size:14.5px;}
+ul,ol{margin:8px 0 8px 24px;font-size:14.5px;}
+li{margin:4px 0;}
+strong{color:var(--blue-900);}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+th,td{border:1px solid var(--gray-300);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:var(--blue-100);color:var(--blue-900);font-weight:700;}
+tbody tr:nth-child(even){background:#FBFBFA;}
+.box{border-radius:6px;padding:13px 17px;margin:13px 0;font-size:14px;border:1px solid;}
+.box .lbl{font-weight:700;display:block;margin-bottom:4px;font-size:14.5px;}
+.warn{background:var(--red-100);border-color:#E9BEBE;color:#5E1F1F;}
+.ok{background:var(--green-100);border-color:#B8DCC6;color:#14512F;}
+.note{background:var(--orange-100);border-color:#F0CFA8;color:#5E3310;}
+.info{background:var(--blue-100);border-color:#BBD3EA;color:#173A5C;}
+.purple{background:var(--purple-100);border-color:#CFCAF3;color:#2F2A6B;}
+.src{font-size:12.5px;color:var(--gray-500);margin-top:4px;}
+.dcard{border:1px solid var(--gray-300);border-radius:8px;padding:16px 20px;margin:14px 0;background:#FDFDFC;}
+.dcard.must{border-left:5px solid var(--red-700);}
+.dcard.opt{border-left:5px solid var(--gray-500);}
+.dhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:6px;}
+.did{background:var(--blue-800);color:#fff;font-size:12.5px;padding:2px 9px;border-radius:3px;}
+.dname{font-size:15.5px;font-weight:700;color:var(--blue-900);}
+.dtag{font-size:11.5px;padding:2px 8px;border-radius:3px;}
+.dtag.a{background:var(--green-100);color:#14512F;}
+.dtag.b{background:var(--orange-100);color:#5E3310;}
+table.kv{font-size:13px;margin:8px 0;}
+table.kv th{width:150px;background:var(--gray-100);}
+.ck{font-family:Consolas,monospace;}
+.deadline{display:inline-block;background:var(--pink-100);color:#5C2438;
+  font-size:12px;padding:1px 8px;border-radius:3px;margin-left:6px;}
+@media print{body{background:#fff;font-size:12pt;}
+  section,header.doc,nav.toc,.dcard{page-break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <div class="kicker">Data Acquisition Plan · 数据获取说明</div>
+  <h1>《From Using AI to Orchestrating It》论文数据获取说明与核对清单</h1>
+  <div class="sub">对应稿件：Manuscript_Draft_EAIT_v1.docx｜覆盖 12 项一手采集数据 + 7 项二手公开数据，逐项说明来源、步骤、粒度、字段、授权要求、限制与替代方案｜章节数字均指稿件实际章节号</div>
+  <div class="meta">
+    <span>编制日期：2026年10月4日</span>
+    <span>路径 A：完整干预研究（DBR 准实验）</span>
+    <span>路径 B：工具开发快速路径（横断调查）</span>
+    <span>核对清单：见第六节，共 19 项</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <h2>目录</h2>
+  <ol>
+    <li>数据需求总览：三类数据与两条路径的映射</li>
+    <li>第一部分　一手采集数据（D-01 至 D-12，逐项说明）</li>
+    <li>第二部分　二手公开数据（S-01 至 S-07，逐项说明）</li>
+    <li>第三部分　两条研究路径的数据需求差异</li>
+    <li>第四部分　数据管理：命名、去标识化、存储与合规</li>
+    <li>第五部分　常见获取障碍与替代方案汇总</li>
+    <li>第六部分　完整数据核对清单（19 项，供逐项打勾）</li>
+  </ol>
+</nav>
+
+<!-- ============ 1 ============ -->
+<section id="c1">
+<h2>一、数据需求总览</h2>
+
+<p>稿件的数据需求分三类：<b>A 类一手采集数据</b>（必须由研究团队从真实学生处采集，无法下载或生成）、<b>B 类二手公开数据</b>（可从官方机构或开放渠道获取，用于引言论证与理论定位）、<b>C 类支撑性文档</b>（伦理审批、授权书等，不进入分析但为投稿必需）。</p>
+
+<table>
+<thead><tr><th style="width:14%">类别</th><th style="width:30%">包含项</th><th style="width:14%">可否外部获取</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td><b>A 类<br>一手采集</b></td><td>D-01 至 D-11（量表、日志、任务评分、成绩、教师数据）</td><td><b style="color:var(--red-700)">否——必须自行采集</b></td><td>论文 §5.3 Table 3 列明的全部构念测量均属此类。这是论文的实证基础，无替代下载渠道</td></tr>
+<tr><td><b>B 类<br>二手公开</b></td><td>S-01 至 S-07（政策文本、统计公报、基准报告、参照文献与量表）</td><td>是——公开渠道</td><td>用于 §1 引言论证、§2 理论定位、§5.1 功效分析的效应量来源、判别效度比较</td></tr>
+<tr><td><b>C 类<br>支撑文档</b></td><td>D-12 伦理审批文件、知情同意书、数据授权书</td><td>否——自行办理</td><td>不进入分析，但 Declarations 节必需，且国际期刊可能要求提供审批号核验</td></tr>
+</tbody>
+</table>
+
+<div class="box info">
+<span class="lbl">与稿件章节的对应关系（速查）</span>
+<table style="margin-top:6px;">
+<thead><tr><th style="width:22%">稿件章节</th><th>所需数据</th></tr></thead>
+<tbody>
+<tr><td>§1 引言</td><td>S-01 统计公报、S-02 行动计划原文</td></tr>
+<tr><td>§2 文献综述与理论</td><td>S-03 Harness 基准数据、S-04 目标期刊近三年文献、S-06 既有 AI 素养量表</td></tr>
+<tr><td>§5.1 参与者与设置</td><td>D-08 基线数据、D-12 伦理审批、功效分析参照（S-05）</td></tr>
+<tr><td>§5.3 测量（Table 3）</td><td>D-01 至 D-11 全部一手数据</td></tr>
+<tr><td>§6.1 预备分析</td><td>D-08 基线等价性检验数据</td></tr>
+<tr><td>§6.2 测量模型（RQ1）</td><td>D-01 量表数据 + D-02 对照量表数据</td></tr>
+<tr><td>§6.3 主效应（RQ2）</td><td>D-01/D-03/D-04/D-07/D-09/D-10 前后测数据</td></tr>
+<tr><td>§6.4 调节效应（RQ3）</td><td>D-05/D-06 使用强度与验证行为 + D-03 批判性思维</td></tr>
+<tr><td>§6.5 质性发现</td><td>D-05 日志/反思的文本语料</td></tr>
+<tr><td>Appendix A/B</td><td>量表与编码方案的试测数据（用于修订）</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="c2">
+<h2>二、第一部分　一手采集数据（逐项说明）</h2>
+
+<div class="dcard must">
+<div class="dhead"><span class="did">D-01</span><span class="dname">智能体编排能力量表数据（AOC Scale）</span><span class="dtag a">路径 A、B 均必需</span><span class="deadline">最早启动</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>自编 24 题量表（4 子域 × 6 题，6 点 Likert），稿件 Appendix A 已给出全部题项。路径 A 需前测＋后测两次施测；路径 B 仅需一次施测（用于信效度验证）</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.3 Table 3、§6.2 测量模型（RQ1）、§6.3 主效应（RQ2）——论文的主结果变量</td></tr>
+<tr><th>数据来源</th><td>本校二三年级本科生。路径 A：会计学、金融学专业干预班与对照班；路径 B：同一院校 3—5 个自然班的混合样本</td></tr>
+<tr><th>获取方式与步骤</th><td>① 问卷星/腾讯问卷建卷（免费版即可）；② 经伦理审批后由任课教师课堂发放或推送链接，匿名作答；③ 导出 Excel/CSV；④ 前后测之间以学号哈希或自设编码匹配（匿名条件下建议用「手机后四位＋出生月」自编匹配码，并在知情同意书中说明）</td></tr>
+<tr><th>时间范围与粒度</th><td>路径 A：第 1—2 周（前测）、第 15—16 周（后测），<b>条目级粒度</b>（每题作答值需保留）；路径 B：单次横断</td></tr>
+<tr><th>期望格式与字段</th><td>CSV/Excel，一行一学生。字段：<span class="ck">resp_id, class_id, condition(1=干预/0=对照), wave(pre/post), time_stamp, D1_1…D1_6, D2_1…D2_6, D3_1…D3_6, D4_1…D4_6, duration_sec</span>。另保留作答时长字段用于剔除过快作答（&lt; 最短合理时间）</td></tr>
+<tr><th>注册/授权要求</th><td>伦理审批＋知情同意（匿名问卷通常可申请知情同意豁免或简易同意，以本校伦理委员会口径为准）；无需外部授权——量表为自编</td></tr>
+<tr><th>可获得性/限制/费用</th><td>完全可控，无费用。限制：<b>样本量</b>——CFA 要求每题 10—15 例，24 题至少需 240—360 份有效问卷；若走路径 B，建议目标 350 份（考虑 15% 无效率，发放约 420 份）。<b>共同方法偏差</b>：全部自报告，需程序性控制（匿名承诺、题项随机化、反向计分题）并在文中声明局限</td></tr>
+<tr><th>替代方案</th><td>若单校样本不足 240：① 合并两学期数据；② 联合 1—2 所同类民办院校协作施测（需与合作院校补签数据使用协议）；③ 降级为 EFA-only 论文（不报 CFA），但会削弱 RQ1 的说服力，不推荐</td></tr>
+</table>
+</div>
+
+<div class="dcard must">
+<div class="dhead"><span class="did">D-02</span><span class="dname">既有 AI 素养量表数据（判别效度对照组）</span><span class="dtag a">路径 A、B 均必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>一份已发表的 AI 素养量表（如 Wang 等的 AI literacy scale，或开放获取论文附录中的量表），用于证明 AOC 四因子结构与单一 AI 素养因子可区分——这是审稿人必然质询的一点，稿件 §3 概念界定与 §6.2 均依赖它</td></tr>
+<tr><th>对应章节 / RQ</th><td>§3 Table 2 概念区分、§6.2 判别效度（HTMT 或 Fornell–Larcker）</td></tr>
+<tr><th>数据来源</th><td>与 D-01 同一批被试同步施测（嵌入同一份问卷）</td></tr>
+<tr><th>获取方式与步骤</th><td>① 选定量表：优先选<b>开放获取论文附录中完整公开条目</b>的量表（Ng et al. 2021 为开放获取综述；Wang et al. 2023 量表条目需核实是否完整公开，<span class="ck">[verify]</span>）；② 若条目未完整公开，向通讯作者邮件索取研究使用许可（通常 1—2 周回复，留存邮件为凭）；③ 嵌入问卷尾部，控制在 15—20 题以内以避免问卷过长</td></tr>
+<tr><th>时间范围与粒度</th><td>与 D-01 同波次；条目级</td></tr>
+<tr><th>期望格式与字段</th><td>并入 D-01 数据文件，字段前缀 <span class="ck">AIL_1…AIL_n</span></td></tr>
+<tr><th>注册/授权要求</th><td>量表使用许可（多数量表研究使用仅需引用，但正式发表前建议取得作者书面许可）</td></tr>
+<tr><th>可获得性/限制/费用</th><td>免费。限制：量表版权；问卷总长度（与 D-01、D-03 叠加后建议 ≤ 70 题、≤ 15 分钟）</td></tr>
+<tr><th>替代方案</th><td>若授权不可得：改用 UNESCO《学生人工智能能力框架》（2024，公开文件）的维度做<b>内容效度对照</b>而非统计判别——说服力较弱，需在局限中说明；或自编 8—10 题「泛 AI 素养」短版并声明其仅作参考比较</td></tr>
+</table>
+</div>
+
+<div class="dcard must">
+<div class="dhead"><span class="did">D-03</span><span class="dname">批判性思维倾向量表 + 限时论证任务评分</span><span class="dtag a">路径 A 必需（B 可选）</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>两份测量：① 批判性思维倾向量表（自报告）；② <b>AI-free 限时论证任务</b>——给一段含逻辑漏洞的财经分析短文，30 分钟内书面作答，按 5 项评分量规打分（论点识别、证据评估、推理漏洞、反驳构建、结论限定）。任务版是 RQ3 的关键结果变量，且天然免疫「AI 代答」</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.3、§6.3（RQ2 结果之一）、<b>§6.4 调节效应（RQ3 的因变量）</b></td></tr>
+<tr><th>数据来源</th><td>本校学生。量表随问卷施测；论证任务随前测/后测课堂限时完成</td></tr>
+<tr><th>获取方式与步骤</th><td>量表：嵌入问卷；任务：统一印制或在线限时作答，双人按量规评分，20% 双评并报告 κ</td></tr>
+<tr><th>时间范围与粒度</th><td>前后测两次；量表条目级、任务分数为「学生×评次×评分维度」粒度</td></tr>
+<tr><th>期望格式与字段</th><td><span class="ck">resp_id, wave, CT_scale_1…n, task_score_total, task_s1…task_s5, scorer_1, scorer_2, kappa_reported</span></td></tr>
+<tr><th>注册/授权要求</th><td>注意：<b>知名批判性思维量表多为商业授权</b>（如 California CTDI 需向 Insight Assessment 付费，中文修订版 CTDI-CV 需联系修订者授权）<span class="ck">[verify 授权渠道与费用]</span></td></tr>
+<tr><th>可获得性/限制/费用</th><td>商业量表授权可能需数百至数千元且周期 2—4 周；任务评分免费但需人工（建议 2 名研究生助教，预留评分培训 2 学时）</td></tr>
+<tr><th>替代方案</th><td>若商业授权不可得：① 以限时论证任务为主测量（自编量规，论文中完整公开量规——审稿人反而欢迎）；② 使用开放获取的简版批判性思维量表并完整引用；③ 弱化 RQ3 为「高阶思维任务表现」而非「批判性思维倾向」，概念上更保守但更稳妥</td></tr>
+</table>
+</div>
+
+<div class="dcard must">
+<div class="dhead"><span class="did">D-04</span><span class="dname">限时论证任务的原始作答文本</span><span class="dtag a">路径 A 必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>D-03 任务的原始书面作答（纸质扫描或在线文本），用于评分存证、质性举例与审稿人质询时的证据回溯</td></tr>
+<tr><th>对应章节 / RQ</th><td>§6.3/§6.4 支撑数据；投稿后数据可得性声明的对象之一</td></tr>
+<tr><th>获取方式与步骤</th><td>在线作答系统导出，或纸质卷扫描为 PDF；命名 <span class="ck">resp_id_wave.pdf</span></td></tr>
+<tr><th>时间范围与粒度</th><td>前后测两次；单份文本级</td></tr>
+<tr><th>期望格式与字段</th><td>PDF/TXT，文件名含学生编码与波次，<b>不含姓名学号明文</b></td></tr>
+<tr><th>注册/授权要求</th><td>知情同意中写明作答文本将用于研究并去标识化</td></tr>
+<tr><th>可获得性/限制/费用</th><td>可控。限制：PIPL 下的个人信息处理——扫描件须去标识后才能进入分析环境</td></tr>
+<tr><th>替代方案</th><td>仅保留分数不留原文（不推荐——质性举例与复核会失去依据）</td></tr>
+</table>
+</div>
+
+<div class="dcard must">
+<div class="dhead"><span class="did">D-05</span><span class="dname">对话日志与反思报告（论文核心创新数据）</span><span class="dtag a">仅路径 A</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>干预班学生按周提交的结构化记录：提示词序列、获得的输出要点、执行的核查、发现的错误、所做的修改，以及三问反思（引导了什么/纠正了什么/自己贡献了什么）。这是 D3 子域的行为证据，也是论文「把日志当学习对象」主张的数据基础</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.2 干预核心环节、§6.4（验证行为作为调节变量）、§6.5 质性主题分析、Appendix B 编码方案</td></tr>
+<tr><th>数据来源</th><td>干预班学生按周通过课程平台（超星/腾讯文档/问卷）提交</td></tr>
+<tr><th>获取方式与步骤</th><td>① 提供统一模板（Word/在线表单），字段固定：周次、使用的工具、提示词原文（可截断）、输出要点、发现的错误、修改说明、反思三问；② 每周截止提交；③ 导出后按 <span class="ck">resp_id_week</span> 命名；④ 两名编码者按 Appendix B 方案（V1—V6，各 0—2 分）独立编码，20% 双评报告 κ</td></tr>
+<tr><th>时间范围与粒度</th><td>12 个教学周 × 每生每周 1 份；事件级（提示词轮次）与周级（编码分数）双粒度</td></tr>
+<tr><th>期望格式与字段</th><td>结构化表：<span class="ck">resp_id, week, tool, n_prompts, V1…V6_scores, original_contribution_flag</span>；原始文本另存语料库（TXT/CSV）</td></tr>
+<tr><th>注册/授权要求</th><td>知情同意中单独列明「对话记录将用于研究分析并去标识化」；提示词中若出现个人信息，编码前须脱敏</td></tr>
+<tr><th>可获得性/限制/费用</th><td>完全可控（学生自报式日志，不依赖任何平台 API）。限制：① <b>真实性</b>——日志可事后补编；对策：与提交的作业成品交叉比对一致性，不一致按缺失处理（Appendix B 已写明）；② 提交率衰减——对策：计入平时分但额度小（5%），并在第 4 周做一次提交率检查</td></tr>
+<tr><th>替代方案</th><td>若某周学生使用的是不可导出对话的 App：允许截图拼接上传；若整体日志质量过差（补编嫌疑高），退守为「关键事件日志」（仅记录 3 次最重要的 AI 协作事件），粒度变粗但真实性更可核查</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">D-06</span><span class="dname">AI 使用行为日志（平台侧）</span><span class="dtag a">仅路径 A；获取受阻时降级</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>使用强度与行为的客观测量：对话轮次、工具调用类型、修正性提问占比。稿件 §5.3 明言优先用日志、自报告仅作三角验证</td></tr>
+<tr><th>对应章节 / RQ</th><td>§6.4 RQ3 的自变量（使用强度）</td></tr>
+<tr><th>数据来源</th><td>三档可选：① 课程指定平台（如超星学习通内置 AI 助手、学校部署的智能体）——可向平台管理员申请脱敏导出；② 学生自用商业工具（DeepSeek/豆包/ChatGPT 等）——<b>无法获得平台日志</b>；③ D-05 学生自报日志中的轮次计数</td></tr>
+<tr><th>获取方式与步骤</th><td>路径①：向信息中心/平台管理员提交数据申请（说明研究目的、字段、脱敏方案），走校内数据审批；路径③：从 D-05 结构化表中直接统计</td></tr>
+<tr><th>时间范围与粒度</th><td>12 周；事件级或周级汇总</td></tr>
+<tr><th>期望格式与字段</th><td><span class="ck">resp_id, week, tool, n_turns, n_verification_prompts, session_minutes</span></td></tr>
+<tr><th>注册/授权要求</th><td>路径①需校内数据审批＋平台方书面同意；商业工具数据<b>不可获取也不应索要</b>（学生私人账户）</td></tr>
+<tr><th>可获得性/限制/费用</th><td>路径①取决于本校平台部署情况（<b>这是本研究对校内条件的最大依赖项，需最先核实</b>）；路径③零成本但为自报告</td></tr>
+<tr><th>替代方案</th><td><b>预判：多数民办院校难以导出平台日志。</b>替代组合：① 自报周频次（嵌入每周日志模板头部，3 题）＋ ② 每周 1 次随机截图抽检（5% 学生，用于核验自报量级）＋ ③ D-05 的轮次计数。论文中如实将「使用强度」标注为 self-reported measure with spot-check triangulation——完全可发表，只是结论强度需相应措辞</td></tr>
+</table>
+</div>
+
+<div class="dcard must">
+<div class="dhead"><span class="did">D-07</span><span class="dname">学业成绩与重修数据</span><span class="dtag a">路径 A 必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>课程期末成绩（条件内标准化）、补考/重修标记、prior GPA（作协变量）</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.1（GPA 协变量）、§6.3（标准化成绩为结果之一）、Table 4/5</td></tr>
+<tr><th>数据来源</th><td>教务系统；由开课学院教学秘书或任课教师导出</td></tr>
+<tr><th>获取方式与步骤</th><td>① 研究者（若为任课教师）直接导出所授班级成绩；② 对照班成绩通过学院协调获取，需学院盖章的数据使用证明；③ 与问卷匹配码关联后立即去标识</td></tr>
+<tr><th>时间范围与粒度</th><td>本学期 + 前一学期（prior GPA）；学生×课程粒度</td></tr>
+<tr><th>期望格式与字段</th><td><span class="ck">resp_id, course_id, term, raw_score, z_score_within_condition, retake(0/1), prior_gpa</span></td></tr>
+<tr><th>注册/授权要求</th><td><b>成绩属敏感个人信息</b>：PIPL 要求单独同意；教务数据导出需教务处/学院审批。匹配码方案须在知情同意与伦理申请中写明</td></tr>
+<tr><th>可获得性/限制/费用</th><td>可控但行政流程 1—3 周。限制：不得在论文中报告可识别个人的原始分数；效应分析用条件内 z 分数</td></tr>
+<tr><th>替代方案</th><td>成绩授权受阻：以「标准化任务成绩」（D-09/D-10 的任务分数）替代课程成绩作为学业表现指标，并说明局限</td></tr>
+</table>
+</div>
+
+<div class="dcard must">
+<div class="dhead"><span class="did">D-08</span><span class="dname">基线人口学与学业特征数据</span><span class="dtag a">路径 A、B 均必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>性别、年龄、年级、专业、 prior GPA、每周 AI 使用时长（自报）、是否上过 AI 通识课、设备与网络条件（民办院校学生差异点，审稿人会问数字鸿沟）</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.1 Participants、§6.1 基线等价性检验（Table 4）</td></tr>
+<tr><th>数据来源</th><td>问卷头部自报（GPA 可让学生自报区间或授权后从教务系统补齐）</td></tr>
+<tr><th>获取方式与步骤</th><td>嵌入 D-01 问卷前 10 题；GPA 用 5 档区间自报即可满足基线检验（精确值仅路径 A 的 ANCOVA 需要）</td></tr>
+<tr><th>时间范围与粒度</th><td>前测一次；学生级</td></tr>
+<tr><th>期望格式与字段</th><td><span class="ck">resp_id, gender, age, major, year, gpa_band, ai_hours_week, prior_aicourse(0/1), device, network</span></td></tr>
+<tr><th>注册/授权要求</th><td>随伦理审批；匿名问卷下人口学自报通常豁免单独同意</td></tr>
+<tr><th>可获得性/限制/费用</th><td>可控。限制：自报 GPA 有噪声——路径 A 的 ANCOVA 若需精确 GPA，走 D-07 授权渠道</td></tr>
+<tr><th>替代方案</th><td>无重大风险项</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">D-09</span><span class="dname">情境判断测试（SJT，D4 子域表现测量）</span><span class="dtag a">路径 A 必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>8—10 个 AI 使用伦理/风险情境（如「组会前夜发现 AI 给的参考文献查不到」「队友把含客户信息的数据表粘给了公开 AI」），每情境 4 个选项，按「最优—可接受—差—不可接受」计 3/2/1/0 分</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.3 Table 3 的 D4 表现行、§6.3</td></tr>
+<tr><th>数据来源</th><td>自编（情境素材取自财经业务场景）；前后测需平行版本</td></tr>
+<tr><th>获取方式与步骤</th><td>编写情境 → 请 2—3 名专业教师评定情境真实性与选项区分度 → 小样本试测（30 人）检查区分度 → 定版。前后测平行卷：同结构不同表面情境</td></tr>
+<tr><th>时间范围与粒度</th><td>前后测；情境×学生粒度</td></tr>
+<tr><th>期望格式与字段</th><td><span class="ck">resp_id, wave, sjt_item_1…n, sjt_total</span></td></tr>
+<tr><th>注册/授权要求</th><td>伦理审批（含在整体方案中）</td></tr>
+<tr><th>可获得性/限制/费用</th><td>可控；主要成本是编写与试测时间（约 1—2 周）</td></tr>
+<tr><th>替代方案</th><td>时间不足：砍至 6 情境，或仅后测（在局限中说明无增益证据，仅报描述）</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">D-10</span><span class="dname">任务分解链（D1）与错误取证任务（D2）评分</span><span class="dtag a">路径 A 必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>D1：学生提交的「任务分解链」（ delegated 前的计划文档），按完整性、假设识别、排序合理性计分；D2：给一段<b>埋入已知错误</b>的 AI 输出（数据幻觉、逻辑断裂、过时引用），学生定位并归因，按检出数、归因正确率计分。前后测需平行版本（同结构、不同题材）</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.3 Table 3 的 D1/D2 表现行、§6.3</td></tr>
+<tr><th>数据来源</th><td>课程任务体系内嵌（不额外增加作业负担）；错误取证任务的「埋错清单」由研究团队制作并留存底稿</td></tr>
+<tr><th>获取方式与步骤</th><td>① 前测版与后测版各制作一套（财经题材轮换：估值/审计/投组）；② 平行版本需经小样本等值性检查（两版难度差 &lt; 0.2 SD，否则报告并在分析中调整）；③ 双评 20%</td></tr>
+<tr><th>时间范围与粒度</th><td>前后测；学生×评分维度粒度</td></tr>
+<tr><th>期望格式与字段</th><td><span class="ck">resp_id, wave, d1_decomp_score, d1_assumption_hits, d2_detected_k, d2_attr_correct, d2_total</span></td></tr>
+<tr><th>注册/授权要求</th><td>随伦理审批</td></tr>
+<tr><th>可获得性/限制/费用</th><td>可控。限制：平行版本等值性是弱点，务必留存制作底稿备审稿人问</td></tr>
+<tr><th>替代方案</th><td>若前后测等值性做不严：改用「单组多波次增长曲线」叙述（弱推断），或只报后测组间比较＋基线协变量控制</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">D-11</span><span class="dname">教师侧数据（培训时数、教师智能素养、教学日志）</span><span class="dtag a">路径 A 必需（作为调节/控制变量）</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>两类教师的：AI 培训接触时数（设计上两组等时长——这一事实本身是数据）、教师 AI 素养自评（简版 8—10 题）、干预班教师的教学实施日志（每周 3—5 条，记录任务执行偏差）</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.2 教师准备段、§5.3 Table 3「教师智能素养」行——用于把「教学设计效应」与「教师能力效应」分离，回应 Fang et al. (2026) 指出的机制</td></tr>
+<tr><th>数据来源</th><td>参与教师（建议 4—8 名）；培训签到记录（教务/师资科存档）</td></tr>
+<tr><th>获取方式与步骤</th><td>教师知情同意后自填；实施日志用固定模板每周提交。样本极小，<b>只作描述与调节检验的协变量，不做教师层推断</b></td></tr>
+<tr><th>时间范围与粒度</th><td>一学期；教师×周粒度（日志）</td></tr>
+<tr><th>期望格式与字段</th><td><span class="ck">teacher_id, condition, training_hours, tcomp_1…n; tlog_week, fidelity_notes, deviation_flag</span></td></tr>
+<tr><th>注册/授权要求</th><td>教师知情同意（同事关系下尤须写明自愿与不影响考核）</td></tr>
+<tr><th>可获得性/限制/费用</th><td>可控。限制：n 极小，无法做教师层统计——论文措辞须是「实施保真度描述」而非「教师效应检验」</td></tr>
+<tr><th>替代方案</th><td>教师不愿参与：至少保留培训时数记录（客观行政数据）＋ 实施保真度核查表（研究者每周自填）</td></tr>
+</table>
+</div>
+
+<div class="dcard must">
+<div class="dhead"><span class="did">D-12</span><span class="dname">伦理审批文件与知情同意材料（C 类支撑文档）</span><span class="dtag a">投稿必需</span><span class="deadline">周期最长，最先启动</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>伦理审查批准文件（含批件号）、知情同意书（学生版/教师版）、未成年人处理预案（如有）、数据脱敏与保存方案说明</td></tr>
+<tr><th>对应章节 / RQ</th><td>§5.5 Ethics、Declarations 节的 approval 占位符；Cover letter 中的声明</td></tr>
+<tr><th>数据来源</th><td>本校学术委员会/伦理审查委员会（或科研处指定渠道）</td></tr>
+<tr><th>获取方式与步骤</th><td>① 向科研处确认受理渠道与申报表；② 提交研究方案、问卷全文（含 Appendix A 量表）、知情同意书、数据管理说明；③ 批件号填入稿件 Declarations。周期通常 2—6 周，<b>务必与其他准备并行</b></td></tr>
+<tr><th>时间范围与粒度</th><td>申报一次；若中途修改量表/方案需备案</td></tr>
+<tr><th>期望格式与字段</th><td>批件 PDF（编号、有效期、批准范围）；同意书签署记录（留存备查，不上传论文）</td></tr>
+<tr><th>注册/授权要求</th><td>——（本身即是授权文件）</td></tr>
+<tr><th>可获得性/限制/费用</th><td>校内免费。限制：若本校无教育研究伦理委员会，委托有资质的委员会审查或出具豁免说明，并在论文中如实描述</td></tr>
+<tr><th>替代方案</th><td>伦理批件缺失<b>不可投稿</b>——多数 SSCI 期刊 desk reject。无校内渠道时的过渡方案：申请省级学会/合作高校伦理委员会代审，并在投稿信中说明</td></tr>
+</table>
+</div>
+
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="c3">
+<h2>三、第二部分　二手公开数据（逐项说明）</h2>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">S-01</span><span class="dname">教育部《2024 年全国教育事业发展统计公报》</span><span class="dtag b">引言数据源</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>民办高校 803 所（占 25.75%）、民办本专科在校生 1052.24 万人（占 27.04%）——§1 引言中论证研究对象体量的两个硬数字</td></tr>
+<tr><th>对应章节</th><td>§1 Introduction 第二段</td></tr>
+<tr><th>数据来源</th><td>教育部政府门户网站（moe.gov.cn）公开发布；人民日报客户端、中国青年报等权威转载可交叉核对</td></tr>
+<tr><th>获取方式与步骤</th><td>moe.gov.cn 检索「2024 年全国教育事业发展统计公报」→ 下载原文 PDF/网页存档 → 引用时注明「Ministry of Education (2025)」并核对英文译名</td></tr>
+<tr><th>时间范围与粒度</th><td>2024 学年；全国汇总级（如需分省/分类型明细，统计公报不提供，需查《中国教育统计年鉴》）</td></tr>
+<tr><th>期望格式与字段</th><td>引用即可，无需数据表；若审稿人要细分数据（如民办本科 vs 高职构成），另查年鉴或注明不可得</td></tr>
+<tr><th>注册/授权要求</th><td>无——政府公开信息</td></tr>
+<tr><th>可获得性/限制/费用</th><td>免费、无限制。<b>已完成核实</b>（前轮评估中已对照两个独立转载源）</td></tr>
+<tr><th>替代方案</th><td>如需民办细分（本科/高职构成 388/390 所），公报本身含该数据，直接引用即可</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">S-02</span><span class="dname">《"人工智能+教育"行动计划》全文及答记者问</span><span class="dtag b">政策论证核心</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>2026-04-10 五部门文件：优化培养方案、AI 公共基础课、教师智能素养标准、防范"惰化思维/过度依赖"、"避免重复建设和一哄而上"等条款——§1 引言第一层论证与 §7 讨论的政策落点</td></tr>
+<tr><th>对应章节</th><td>§1 第一段、§7 Discussion 第四任务、§8 Conclusion</td></tr>
+<tr><th>数据来源</th><td>教育部官网（moe.gov.cn，t20260410_1433240）；新华网转载的科技司答记者问</td></tr>
+<tr><th>获取方式与步骤</th><td>下载原文 + 答记者问全文 → <b>完整通读</b>（前轮仅摘要性引用，投稿前须逐条核对所引条款的原文表述）→ 确认官方英文译名（若无官方英译，自行翻译并在文中注明 author's translation）</td></tr>
+<tr><th>时间范围与粒度</th><td>2026 年发布；政策条款级</td></tr>
+<tr><th>期望格式与字段</th><td>引用文本；建议制作「政策条款 ↔ 论文主张」对照表备投稿信使用</td></tr>
+<tr><th>注册/授权要求</th><td>无</td></tr>
+<tr><th>可获得性/限制/费用</th><td>免费。限制：英文期刊引用中国政策需给读者足够背景（稿件已处理）</td></tr>
+<tr><th>替代方案</th><td>无需要</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">S-03</span><span class="dname">Harness 层实证数据（工程社区基准报告）</span><span class="dtag b">理论论证用</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>Composio (2026)：同一 Kimi K3 模型、8 个 harness、25 任务、通过率 68%–88%；Pachaar (2026)：LangChain 仅改 harness 从 52.8%→66.5%——§2.2 的核心论据</td></tr>
+<tr><th>对应章节</th><td>§1 引言第三段、§2.2、Abstract 首句背景</td></tr>
+<tr><th>数据来源</th><td>composio.dev、53ai 中文综述、besthub.dev、nxcode 指南——<b>均为工程社区/行业报告，非同行评审</b></td></tr>
+<tr><th>获取方式与步骤</th><td>访问原报告 → 截图存档（防链接失效）→ 引用时在文中<b>明确标注其性质为 industry benchmarking report</b>（稿件已如此处理）</td></tr>
+<tr><th>时间范围与粒度</th><td>2026 年；任务级通过率</td></tr>
+<tr><th>期望格式与字段</th><td>引用 + 存档 PDF</td></tr>
+<tr><th>注册/授权要求</th><td>无</td></tr>
+<tr><th>可获得性/限制/费用</th><td>免费。限制：<b>审稿人可能质疑非学术来源</b>——对策已内置：正文定位为"practice offers an underused explanation"，不作因果论断；若被要求补充学术支撑，可引用 Knoth et al. (2024, EAIT) 关于 prompt engineering 的研究作学术侧呼应 <span class="ck">[verify]</span></td></tr>
+<tr><th>替代方案</th><td>若审稿坚决要求学术来源：弱化具体百分比，改为引用已发表的有关 LLM 输出变异性与验证循环的学术文献（需补充检索）；或自行做一个 mini-benchmark（2 个工具 × 5 个财经任务，10 名学生实测），工作量约 1 周，可彻底免疫该质疑——<b>推荐作为备选预案</b></td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">S-04</span><span class="dname">目标期刊近三年文献池（EAIT 2024—2026）</span><span class="dtag b">投稿必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>EAIT 近三年关于 GenAI、AI literacy、AI overreliance/dependency、curriculum reform 的论文 40—60 篇，其中已锁定的关键文献：Xie et al. (2026) 青少年 AI 素养量表、Yin et al. (2026) GenAI 依赖与批判性思维、Abdelhadi (2026) AI 过度依赖与认知耐力、Fang et al. (2026, JECR) 教师支持与高阶思维、Jou & Kao (2026, JCHE) 人机协同、Zhang & Deng (2026, IHE) 中国高校 AI 依赖</td></tr>
+<tr><th>对应章节</th><td>§2 全节、§7 对话定位、投稿信</td></tr>
+<tr><th>数据来源</th><td>Springer Link（link.springer.com/journal/10639）＋ 学校图书馆订阅；开放获取部分可直接下载（该刊 OA 文章已超 1000 篇）</td></tr>
+<tr><th>获取方式与步骤</th><td>① 确认本校图书馆是否订阅 Springer（民办院校需核实——<b>若未订阅是最大障碍</b>）；② 未订阅时：用 DOI 逐篇向作者索取（ResearchGate/邮件），或使用开放获取版本；③ 建立文献库（Zotero 免费）并按主题分组</td></tr>
+<tr><th>时间范围与粒度</th><td>2024—2026；篇级</td></tr>
+<tr><th>期望格式与字段</th><td>PDF＋BibTeX；标注「已在稿件中引用/待对话」两栏</td></tr>
+<tr><th>注册/授权要求</th><td>个人订阅或机构权限；OA 文章免费</td></tr>
+<tr><th>可获得性/限制/费用</th><td>机构订阅免费（若有）；无权限时 OA 占比高，非 OA 论文可邮件索要，一般 1—2 周</td></tr>
+<tr><th>替代方案</th><td>全文不可得时至少获取摘要＋图表（Springer 页面公开），对话定位仍可完成</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">S-05</span><span class="dname">功效分析所需的效应量参照（同类干预研究）</span><span class="dtag a">路径 A 必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>至少 2—3 篇与本研究设计相近（GenAI/教育干预/准实验）的报告了效应量的实证研究，作为 d = 0.40 预期的依据——§5.1 功效分析的合法性来源</td></tr>
+<tr><th>对应章节</th><td>§5.1 Participants（功效分析占位符）</td></tr>
+<tr><th>数据来源</th><td>Web of Science/Scopus/ERIC 检索「generative AI intervention higher education effect size」「AI literacy training quasi-experiment」；优先元分析（如有 GenAI 教学干预元分析可直接取平均 d）</td></tr>
+<tr><th>获取方式与步骤</th><td>检索 → 筛选报告了 Cohen's d / η² 的研究 3—5 篇 → 记录其效应量与样本特征 → 写入功效分析段落</td></tr>
+<tr><th>时间范围与粒度</th><td>2022—2026；研究级</td></tr>
+<tr><th>期望格式与字段</th><td>小表：作者、年份、N、设计、d 或 η²——可直接成为论文附录</td></tr>
+<tr><th>注册/授权要求</th><td>数据库权限（WoS 需机构订阅；ERIC 免费）</td></tr>
+<tr><th>可获得性/限制/费用</th><td>ERIC 与 Google Scholar 免费；费用风险低</td></tr>
+<tr><th>替代方案</th><td>找不到相近研究：引用教育技术领域通用的中等效应量惯例（d = 0.4—0.5）并明确标注为 conventional benchmark，同时把功效分析做保守版（d = 0.30 → 所需样本更大，约 175/组）</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">S-06</span><span class="dname">对照用 AI 素养量表的条目与授权</span><span class="dtag a">判别效度必需</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>与 D-02 对应的「量表条目本身」：确认目标量表条目完整公开、 psychometric 参数可引用、获得使用许可</td></tr>
+<tr><th>对应章节</th><td>§6.2 判别效度、§3 Table 2</td></tr>
+<tr><th>数据来源</th><td>开放获取论文附录（Ng et al. 2021 为 CEAI 开放获取综述；Wang et al. 2023 量表发表于 Behaviour &amp; Information Technology，条目公开情况需核实 <span class="ck">[verify]</span>）；UNESCO 2024 学生 AI 能力框架（免费公开 PDF）</td></tr>
+<tr><th>获取方式与步骤</th><td>下载 OA 论文 → 抄录条目 → 邮件联系通讯作者确认「academic use with citation」惯例适用性 → 存档许可邮件</td></tr>
+<tr><th>时间范围与粒度</th><td>——（文献性）</td></tr>
+<tr><th>期望格式与字段</th><td>条目清单 + 许可邮件存档</td></tr>
+<tr><th>注册/授权要求</th><td>视量表版权而定；多数作者对学术使用免费放行</td></tr>
+<tr><th>可获得性/限制/费用</th><td>免费为主。限制：个别量表明确要求商业授权</td></tr>
+<tr><th>替代方案</th><td>见 D-02 替代方案</td></tr>
+</table>
+</div>
+
+<div class="dcard opt">
+<div class="dhead"><span class="did">S-07</span><span class="dname">Chinese-context 背景文献（民办高校、中国 AI 教育研究）</span><span class="dtag b">可选增强</span></div>
+<table class="kv">
+<tr><th>内容描述</th><td>供国际审稿人理解中国民办高校语境：民办高教研究英文文献（如 International Journal of Educational Development 上的中国民办高教论文）、中国高校 GenAI 依赖研究（Zhang & Deng 2026 已锁定）</td></tr>
+<tr><th>对应章节</th><td>§1 引言第二段（民办院校处境）、§7 局限讨论</td></tr>
+<tr><th>数据来源</th><td>Scopus/ERIC 检索「private higher education China」「minban university」</td></tr>
+<tr><th>获取方式与步骤</th><td>检索 5—8 篇即可，不必深挖</td></tr>
+<tr><th>时间范围与粒度</th><td>2018—2026</td></tr>
+<tr><th>期望格式与字段</th><td>引用</td></tr>
+<tr><th>注册/授权要求</th><td>无特殊</td></tr>
+<tr><th>可获得性/限制/费用</th><td>低风险</td></tr>
+<tr><th>替代方案</th><td>——</td></tr>
+</table>
+</div>
+
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="c4">
+<h2>四、第三部分　两条研究路径的数据需求差异</h2>
+
+<table>
+<thead><tr><th style="width:20%">数据项</th><th style="width:7%">路径 A<br>完整干预</th><th style="width:7%">路径 B<br>工具开发</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>D-01 AOC 量表</td><td>前后测</td><td><b>单次横断</b></td><td>路径 B 只做信效度（EFA+CFA），目标 n≥350；是<b>最快可达的论文形态</b></td></tr>
+<tr><td>D-02 AI 素养对照</td><td>必需</td><td>必需</td><td>判别效度是路径 B 的核心卖点</td></tr>
+<tr><td>D-03/D-04 批判性思维</td><td>必需</td><td>可选</td><td>路径 B 可只做「AOC 与批判性思维的横断相关」作为初步效度证据</td></tr>
+<tr><td>D-05 对话日志</td><td>核心</td><td>不需要</td><td>——</td></tr>
+<tr><td>D-06 平台日志</td><td>可降级</td><td>不需要</td><td>——</td></tr>
+<tr><td>D-07 成绩</td><td>必需</td><td>不需要</td><td>——</td></tr>
+<tr><td>D-08 基线</td><td>必需</td><td>必需（简化）</td><td>——</td></tr>
+<tr><td>D-09/D-10 任务测量</td><td>必需</td><td>小样本试测即可</td><td>路径 B 中作为「量表效度的新效标」小规模呈现反而加分</td></tr>
+<tr><td>D-11 教师数据</td><td>必需</td><td>不需要</td><td>——</td></tr>
+<tr><td>D-12 伦理审批</td><td>必需</td><td>必需（流程更短）</td><td>匿名横断问卷审批更快</td></tr>
+<tr><td><b>数据采集周期</b></td><td><b>16 周＋</b></td><td><b>2—3 周</b></td><td>路径 B 完全来得及支撑 2027 年上半年投稿</td></tr>
+<tr><td><b>论文改写量</b></td><td>零（现稿即此形态）</td><td><b>§4—§6 需改写</b>为 scale-development 范式（约 1 周）</td><td>——</td></tr>
+</tbody>
+</table>
+
+<div class="box ok">
+<span class="lbl">建议</span>
+<p>若 2027 年 3 月前投稿仍是硬目标：<b>走路径 B</b>。现稿的 §1—§3、§7、Appendix A 全部复用，仅 §4—§6 改写；量表（Appendix A）与对照量表（S-06）本周即可定稿，伦理走简易程序，11 月中旬拿到数据，12 月完成分析改写与润色，12 月底投稿——时间线成立。路径 A 作为第二篇论文（本研究的完整版）随后推进，两篇形成系列。</p>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="c5">
+<h2>五、第四部分　数据管理：命名、去标识化、存储与合规</h2>
+
+<h3>5.1 匹配与去标识化方案</h3>
+<ul>
+<li><b>匹配码</b>：学生自设「手机后四位＋出生月」六位码（如 <span class="ck">6688**12**</span>），前后测与成绩关联全靠此码；明文对照表由研究者单独加密保存，不进入分析文件</li>
+<li><b>分析数据集</b>：只含 <span class="ck">resp_id</span> 及研究变量；任何含姓名/学号/手机号的原始导出件在完成关联后移出分析目录</li>
+<li><b>日志文本</b>：编码前扫描提示词中的姓名、手机号、身份证号模式并替换为 <span class="ck">[REDACTED]</span></li>
+</ul>
+
+<h3>5.2 存储与保留</h3>
+<ul>
+<li>原始数据：加密盘/校内网盘，访问限研究者本人；分析数据：本地+一份异地备份</li>
+<li>保留期：论文发表后 5 年（或按学校规定）；数据可得性声明写「available on reasonable request」即可，<b>不承诺公开原始日志</b>（含学生写作内容，公开有伦理风险）</li>
+</ul>
+
+<h3>5.3 合规要点</h3>
+<ul>
+<li>《个人信息保护法》：成绩属敏感个人信息→单独同意；其他教育数据→知情同意＋最小必要</li>
+<li>教育系统数据管理要求：不经审批不得将学生数据上传至校外商业平台（问卷星导出的本地副本即视为合规处理对象）</li>
+<li>知情同意书三要素：目的、数据用途与去标识化说明、退出权与退出后果（退出者数据删除）</li>
+</ul>
+
+<h3>5.4 文件命名规范</h3>
+<p><span class="ck">{项目码}_{数据项ID}_{波次}_{日期}.{扩展名}</span>，例如 <span class="ck">AOC_D01_post_20270115.csv</span>；每份数据配同名字典文件（字段名、取值范围、缺失值约定 <span class="ck">-99</span>）。</p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="c6">
+<h2>六、第五部分　常见获取障碍与替代方案汇总</h2>
+
+<table>
+<thead><tr><th style="width:24%">障碍</th><th style="width:8%">概率</th><th style="width:30%">影响的数据项</th><th>替代方案与代价</th></tr></thead>
+<tbody>
+<tr><td>本校无法导出平台侧 AI 使用日志</td><td><b style="color:var(--red-700)">高</b></td><td>D-06</td><td>自报周频次＋截图抽检三角验证（§D-06 替代组合）；论文措辞改为 self-reported；代价：结论强度降半级</td></tr>
+<tr><td>批判性思维商业量表授权不可得/费用高</td><td>中</td><td>D-03</td><td>以自编限时论证任务为主测量并公开量规；量表改用开放获取简版；代价：与既有文献可比性下降</td></tr>
+<tr><td>对照班教师等时长培训难以落实</td><td>中</td><td>D-11、内部效度</td><td>改为「单组前后测＋倾向匹配」弱推断设计，并在局限中如实声明；或把对照班换成「上学期同课程历史班」（引入时间混杂，更弱）</td></tr>
+<tr><td>样本量不足（CFA 要求 240+）</td><td>中</td><td>D-01/D-02</td><td>跨校协作（补数据协议）／两学期合并／降级为 EFA-only（不推荐）</td></tr>
+<tr><td>成绩数据授权拖延</td><td>中</td><td>D-07</td><td>以任务标准化分数替代课程成绩；GPA 用自报区间协变量</td></tr>
+<tr><td>Harness 工程数据被质疑非学术来源</td><td>中</td><td>S-03</td><td>预案：自行 mini-benchmark（2 工具×5 财经任务×10 学生，约 1 周），彻底免疫质疑且可写进论文增色</td></tr>
+<tr><td>学校图书馆无 Springer 订阅</td><td>中</td><td>S-04</td><td>OA 版本＋邮件向作者索要；至少摘要级对话定位仍可完成</td></tr>
+<tr><td>伦理审批周期超预期</td><td>中</td><td>D-12（全部一手数据的前置）</td><td>匿名横断问卷申请简易/豁免程序；先交后测修改稿</td></tr>
+<tr><td>学生日志补编嫌疑（真实性）</td><td>中</td><td>D-05</td><td>与作业成品交叉比对（Appendix B 已内置）；改「关键事件日志」制</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="c7">
+<h2>六、完整数据核对清单（19 项）</h2>
+
+<p>使用方法：每完成一项在「状态」栏标记 ✔，并填写负责人与目标日期。<b>带 ★ 的为关键路径项——任一项延误即阻塞投稿。</b></p>
+
+<table>
+<thead><tr><th style="width:4%">#</th><th style="width:6%">ID</th><th style="width:22%">数据项</th><th style="width:8%">路径A</th><th style="width:8%">路径B</th><th style="width:14%">对应稿件位置</th><th style="width:14%">关键动作</th><th style="width:8%">负责人</th><th style="width:8%">目标日期</th><th>状态</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>D-12★</td><td>伦理审批＋知情同意材料</td><td>✔</td><td>✔</td><td>§5.5 / Declarations</td><td>本周提交申请</td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td>D-01★</td><td>AOC 量表施测数据</td><td>前后测</td><td>单次</td><td>§6.2/6.3 主结果</td><td>Appendix A 定稿→建卷</td><td></td><td></td><td></td></tr>
+<tr><td>3</td><td>D-02★</td><td>对照 AI 素养量表数据</td><td>✔</td><td>✔</td><td>§6.2 判别效度</td><td>选定量表＋取得许可</td><td></td><td></td><td></td></tr>
+<tr><td>4</td><td>D-03★</td><td>批判性思维（量表＋任务）</td><td>✔</td><td>可选</td><td>§6.3/6.4 RQ3 因变量</td><td>确认量表授权渠道</td><td></td><td></td><td></td></tr>
+<tr><td>5</td><td>D-04</td><td>论证任务原始作答文本</td><td>✔</td><td>—</td><td>支撑证据</td><td>随 D-03 一并采集</td><td></td><td></td><td></td></tr>
+<tr><td>6</td><td>D-05★</td><td>对话日志与反思报告</td><td>核心</td><td>—</td><td>§6.4/6.5、App. B</td><td>模板定稿＋周提交机制</td><td></td><td></td><td></td></tr>
+<tr><td>7</td><td>D-06</td><td>平台使用日志</td><td>可降级</td><td>—</td><td>§6.4 自变量</td><td>向信息中心申请；备好降级方案</td><td></td><td></td><td></td></tr>
+<tr><td>8</td><td>D-07</td><td>成绩与 prior GPA</td><td>✔</td><td>—</td><td>§5.1/6.3</td><td>学院/教务授权</td><td></td><td></td><td></td></tr>
+<tr><td>9</td><td>D-08★</td><td>基线人口学数据</td><td>✔</td><td>✔</td><td>§6.1 Table 4</td><td>嵌入问卷头部</td><td></td><td></td><td></td></tr>
+<tr><td>10</td><td>D-09</td><td>伦理情境判断测试</td><td>✔</td><td>试测</td><td>§6.3 D4 行</td><td>编写 8—10 情境＋试测</td><td></td><td></td><td></td></tr>
+<tr><td>11</td><td>D-10</td><td>分解链/取证任务评分</td><td>✔</td><td>试测</td><td>§6.3 D1/D2 行</td><td>制作埋错底稿＋平行卷</td><td></td><td></td><td></td></tr>
+<tr><td>12</td><td>D-11</td><td>教师培训与素养数据</td><td>✔</td><td>—</td><td>§5.2</td><td>教师知情同意＋日志模板</td><td></td><td></td><td></td></tr>
+<tr><td>13</td><td>S-01</td><td>教育部 2024 统计公报</td><td>✔</td><td>✔</td><td>§1</td><td>已核实，直接引用</td><td></td><td></td><td></td></tr>
+<tr><td>14</td><td>S-02★</td><td>行动计划全文＋答记者问</td><td>✔</td><td>✔</td><td>§1/§7</td><td>下载＋通读＋条款对照表</td><td></td><td></td><td></td></tr>
+<tr><td>15</td><td>S-03</td><td>Harness 基准报告存档</td><td>✔</td><td>✔</td><td>§2.2</td><td>截图存档防失效；备 mini-benchmark 预案</td><td></td><td></td><td></td></tr>
+<tr><td>16</td><td>S-04★</td><td>EAIT 近三年文献池 40—60 篇</td><td>✔</td><td>✔</td><td>§2/§7/投稿信</td><td>确认图书馆订阅；建 Zotero 库</td><td></td><td></td><td></td></tr>
+<tr><td>17</td><td>S-05★</td><td>功效分析效应量参照 3—5 篇</td><td>✔</td><td>—</td><td>§5.1</td><td>检索并制成小表</td><td></td><td></td><td></td></tr>
+<tr><td>18</td><td>S-06</td><td>对照量表条目与许可存档</td><td>✔</td><td>✔</td><td>§3/§6.2</td><td>邮件许可留痕</td><td></td><td></td><td></td></tr>
+<tr><td>19</td><td>S-07</td><td>中国民办高教背景文献</td><td>✔</td><td>✔</td><td>§1/§7</td><td>检索 5—8 篇</td><td></td><td></td><td></td></tr>
+</tbody>
+</table>
+
+<div class="box warn">
+<span class="lbl">关键路径提醒（按依赖顺序）</span>
+<p><b>D-12 伦理审批</b> → <b>D-01/02/03/08 问卷定稿与施测</b> → <b>数据分析</b> → <b>占位符回填</b> → <b>润色</b> → <b>投稿</b>。伦理审批与量表定稿是仅有的两个「不动则全线不动」项；平台日志（D-06）与成绩（D-07）虽有行政依赖，但均有降级方案，不阻塞关键路径。</p>
+</div>
+
+<div class="box info">
+<span class="lbl">已完成与待办状态（截至本说明编制时）</span>
+<p><b>已完成</b>：S-01（数据已核实）、S-02（条款已摘引，待通读全文）、S-03（数据已检索并存档于前轮报告）、Appendix A 量表初稿、Appendix B 编码方案初稿、Cover letter 草稿。<br>
+<b>未启动且需立即行动</b>：D-12 伦理申请、S-04 图书馆订阅确认、S-06 量表授权邮件、S-05 效应量检索、量表定稿试测。</p>
+</div>
+
+<hr>
+<p style="font-size:13px;color:var(--gray-500);">说明：本清单与稿件 Manuscript_Draft_EAIT_v1 的章节号一一对应；两处 <span class="ck">[verify]</span> 标记（Wang et al. 2023 量表条目公开情况、CTDI 类量表授权渠道）需在执行时确认。所有「替代方案」均已评估过对论文说服力的影响并在正文标明代价，执行时可按实际情况选择。</p>
+</section>
+</div>
+</body>
+</html>

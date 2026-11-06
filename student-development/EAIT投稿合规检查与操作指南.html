@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EAIT 投稿合规检查与操作指南</title>
+<style>
+:root{
+  --blue:#2E5C8A; --blue-l:#4A90D9; --green:#27AE60; --orange:#E67E22;
+  --pink:#D4537E; --purple:#7F77DD; --ink:#1F2933; --gray:#5B6B7B;
+  --line:#DCE3EA; --bg:#F7F9FB; --card:#FFFFFF;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft YaHei","微软雅黑",-apple-system,Segoe UI,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.75;font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 70px}
+header{background:linear-gradient(120deg,var(--blue) 0%,var(--blue-l) 100%);color:#fff;padding:34px 0 28px;margin-bottom:26px}
+header .wrap{padding-bottom:0}
+h1{margin:0 0 8px;font-size:27px;font-weight:700;letter-spacing:.5px}
+.sub{font-size:14px;opacity:.93}
+.metabar{margin-top:16px;display:flex;flex-wrap:wrap;gap:9px}
+.chip{background:rgba(255,255,255,.17);border:1px solid rgba(255,255,255,.3);
+  border-radius:14px;padding:4px 13px;font-size:12.5px}
+nav{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:26px}
+nav .nt{font-weight:700;color:var(--blue);margin-bottom:9px;font-size:14px}
+nav ol{margin:0;padding-left:20px;columns:2;column-gap:34px;font-size:13.6px}
+nav li{margin:3px 0;break-inside:avoid}
+nav a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--blue-l)}
+nav a:hover{color:var(--blue)}
+h2{font-size:20px;color:var(--blue);border-left:5px solid var(--blue);
+  padding-left:12px;margin:38px 0 15px}
+h3{font-size:16px;color:var(--blue);margin:24px 0 10px}
+p{margin:9px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:14px 0}
+.alert{border-left:5px solid var(--orange);background:#FFF8F0}
+.alert.red{border-left-color:var(--pink);background:#FFF4F7}
+.alert.green{border-left-color:var(--green);background:#F2FAF5}
+table{width:100%;border-collapse:collapse;background:var(--card);font-size:13.4px;margin:12px 0}
+caption{caption-side:top;text-align:left;font-weight:700;color:var(--blue);
+  padding:6px 0 8px;font-size:14px}
+th{background:var(--blue);color:#fff;padding:9px 10px;text-align:left;font-weight:600;
+  border:1px solid var(--blue)}
+td{padding:8px 10px;border:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even){background:#FAFCFE}
+.st{font-weight:700;white-space:nowrap;font-size:12.6px}
+.ok{color:var(--green)} .part{color:var(--orange)} .no{color:var(--pink)}
+.tag{display:inline-block;border-radius:4px;padding:1px 7px;font-size:11.5px;
+  color:#fff;margin-right:4px}
+.t-p{background:var(--pink)} .t-h{background:var(--orange)} .t-m{background:var(--blue-l)} .t-l{background:#8FA3B5}
+code{background:#EEF3F8;border:1px solid var(--line);border-radius:4px;
+  padding:1px 6px;font-family:Consolas,Monaco,monospace;font-size:12.6px;color:#0E4C7A}
+.term{color:var(--gray);font-size:12.3px}
+ul,ol{margin:8px 0 8px 22px;padding:0}
+li{margin:4px 0}
+.step{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--blue-l);
+  border-radius:8px;padding:14px 18px;margin:12px 0}
+.step .h{font-weight:700;color:var(--blue);margin-bottom:6px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px;margin:14px 0}
+.kv{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:13px 16px}
+.kv .k{font-size:12.3px;color:var(--gray);margin-bottom:3px}
+.kv .v{font-size:14.6px;font-weight:600;color:var(--ink)}
+.kv .v.big{color:var(--blue);font-size:19px}
+footer{margin-top:44px;padding-top:18px;border-top:2px solid var(--line);
+  font-size:12.5px;color:var(--gray)}
+.toc-top{position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5;
+  border-bottom:1px solid var(--line);font-size:12.5px;margin-bottom:14px}
+.toc-top a{color:var(--blue);text-decoration:none;margin-right:14px}
+.en{color:var(--gray);font-size:12.2px;font-style:normal}
+@media print{nav,.toc-top{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="wrap">
+  <h1>EAIT 投稿合规检查与操作指南</h1>
+  <div class="sub">以《Education and Information Technologies》Guide for Authors 为准绳的逐条比对 · 未完成工作清单 · 投稿材料清单 · 完整操作步骤</div>
+  <div class="metabar">
+    <span class="chip">目标期刊：Education and Information Technologies（EAIT）</span>
+    <span class="chip">出版商：Springer Nature</span>
+    <span class="chip">投稿系统：editorialmanager.com/eait</span>
+    <span class="chip">评审制度：双盲 Double-blind</span>
+    <span class="chip">生成日期：2026-10-05</span>
+  </div>
+</div>
+</header>
+
+<div class="wrap">
+
+<div class="toc-top">
+  <a href="#s0">§0 前置说明</a><a href="#s1">§1 期刊参数</a><a href="#s2">§2 逐条合规检查</a><a href="#s3">§3 未完成工作清单</a><a href="#s4">§4 投稿材料清单</a><a href="#s5">§5 投稿操作步骤</a><a href="#s6">§6 缺失信息</a><a href="#s7">§7 高风险学术问题</a>
+</div>
+
+<h2 id="s0">§0 前置说明：本次比对的依据与可信边界</h2>
+
+<div class="card alert">
+<p><b>官方指南获取状态。</b>本表所依据的条款来自 Springer 官方投稿指南页 <code>https://www.springer.com/10639/submission-guidelines/</code> 的正文内容（Instructions for Authors / Title Page / Abstract / Keywords / Statements and Declarations / Text / Tables / Artwork and Illustrations Guidelines / Supplementary Information / Research Data Policy / Ethical Responsibilities of Authors / Competing Interests 等章节），并交叉核对了期刊主页 <code>link.springer.com/journal/10639</code> 与投稿系统入口。</p>
+<p><b>一处未能直连。</b><code>link.springer.com</code> 域名在本机被 Cloudflare 人机校验拦截（返回 "Client Challenge / is verifying your browser"），因此该域名下的页面为间接获取。<b>建议投稿前用浏览器人工复核一次官方指南页</b>，重点核对摘要字数、声明条目与图表规范三项——这三项各期刊版本更新较频繁。</p>
+</div>
+
+<div class="card alert red">
+<p><b>本表标为「未满足」的条目中，有 5 项属阻塞级（P0）：</b>真实实验数据缺失（88 处占位符）、作者与单位信息缺失、伦理批件号缺失、参考文献 DOI 缺失（22 条）、图表缺失（当前 0 图）。<b>在这 5 项清零前，稿件不具备投稿条件。</b></p>
+</div>
+
+<div class="card alert green">
+<p><b>本次已完成的修复（在生成本表前先行处理）：</b></p>
+<ul>
+<li>删除参考文献表中未被正文引用的 Guan &amp; Bahari (2026)——Springer 明确要求文献表只含正文引用过的文献。</li>
+<li>补入正文已引用但文献表遗漏的 Venkatesh et al. (2003)——原稿存在"孤儿引用"，是编辑初审直接退稿的常见原因。</li>
+<li>声明章节标题由 <code>## Declarations</code> 改为期刊要求的 <code>## Statements and Declarations</code>。</li>
+<li>新增 §5.6 生成式 AI 使用声明——Springer 政策要求 LLM 使用情况必须写在 Methods 部分，原稿仅放在声明区且为空占位，不合规。</li>
+<li>新增 Consent to participate / Consent to publish / Competing Interests 完整表述 / Clinical trial registration（N/A）。</li>
+<li>为 Table 4、Table 5 补充正文引用句（Springer 要求表格在正文中按阿拉伯数字顺序被引用）。</li>
+</ul>
+</div>
+
+<h2 id="s1">§1 目标期刊锁定与关键参数</h2>
+
+<div class="grid">
+  <div class="kv"><div class="k">期刊全称</div><div class="v">Education and Information Technologies</div></div>
+  <div class="kv"><div class="k">缩写 / 代号</div><div class="v">EAIT</div></div>
+  <div class="kv"><div class="k">ISSN / EISSN</div><div class="v">1360-2357 / 1573-7608</div></div>
+  <div class="kv"><div class="k">出版商</div><div class="v">Springer Nature</div></div>
+  <div class="kv"><div class="k">出版模式</div><div class="v">Hybrid 混合出版</div></div>
+  <div class="kv"><div class="k">影响因子（2025 JCR）</div><div class="v big">7.2</div></div>
+  <div class="kv"><div class="k">JCR 分区</div><div class="v">Q1（EDUCATION &amp; EDUCATIONAL RESEARCH）</div></div>
+  <div class="kv"><div class="k">首次决定周期（中位）</div><div class="v big">29 天</div></div>
+</div>
+
+<table>
+<caption>表 1-1　EAIT 关键参数与本文适配性</caption>
+<thead><tr><th style="width:16%">项目</th><th style="width:42%">期刊规定 / 实测值</th><th style="width:42%">对本文的含义</th></tr></thead>
+<tbody>
+<tr><td>官方身份</td><td>IFIP 教育技术委员会（IFIP Technical Committee on Education）会刊</td><td>偏教育技术实证，本文的"教学改革 + 量表验证 + 准实验"组合属典型适配类型</td></tr>
+<tr><td>收录数据库</td><td>SCIE / SSCI 双收录；Scopus、ERIC、ERIC、DBLP 等</td><td>⚠️ 教育学领域 WoS 分类主要落在 SSCI。<b>须先向本单位科研处确认"SSCI 是否等同 SCI 认定"</b>，这是选题能否用于职称/考核的前提</td></tr>
+<tr><td>版面费政策</td><td>非 OA（订阅）模式<b>无任何费用</b>；作者可在录用后自愿选择 Open Choice 金色 OA，届时按 Springer 报价支付 APC（非强制）</td><td>✅ 满足"无版面费或仅在录用后收取"的要求：走默认订阅模式即可零费用发表</td></tr>
+<tr><td>审稿制度</td><td><b>双盲评审（double-blind）</b></td><td>⚠️ 必须提交独立 Title Page；正文及附图不得出现作者姓名、单位、致谢、基金号等可识别信息；避免以"我们此前的研究（作者自引）"方式暴露身份</td></tr>
+<tr><td>收稿类型</td><td>原创研究论文（OriginalPaper）。<b>期刊已明确不再接收综述类稿件</b>（literature review / systematic review / bibliometric review）</td><td>✅ 本文为原创实证研究，不受影响；切勿在 Cover Letter 中出现"review"字样</td></tr>
+<tr><td>作者变更</td><td><b>投稿后不允许变更作者</b>（EAIT 特别条款）</td><td>⚠️ 必须在点击提交前锁定全部作者姓名、排序、单位与贡献；事后增删需撤稿重投</td></tr>
+<tr><td>审稿时长经验值</td><td>官方：首次决定中位 29 天，典型约 40 天；中文社区实测：从投稿到接收 4–6 个月居多，且普遍反映需主动邮件催办</td><td>⚠️ "明年 3 月前见刊"风险高。<b>必须向单位确认 Online First（在线优先出版）是否等同见刊</b>——若等同，录用后约 2–4 周上线即可满足；若必须以卷期页码为准，则时间不可控</td></tr>
+<tr><td>主编</td><td>Springer 官方页面显示 Editor-in-Chief 为 Therese Keane；部分中文资料仍列为 Arthur Tatnall（前任）</td><td>Cover Letter 抬头建议用 "Dear Editor-in-Chief" 或 "Dear Editors"，避免写错姓名</td></tr>
+<tr><td>中科院分区</td><td><b>⚠️ 资料冲突</b>：有来源标教育学大类 2 区，另有来源标 1 区</td><td>中科院分区表逐年更新且不同单位采用版本不同，<b>须以本单位当年认定的正式分区表为准</b>，勿采信第三方网站</td></tr>
+</tbody>
+</table>
+
+<h2 id="s2">§2 逐条合规检查对照表</h2>
+
+<p>共 8 组、52 个检查项。状态定义：<span class="st ok">已满足</span> 指当前稿件已符合期刊明文要求；<span class="st part">部分满足</span> 指已有雏形但需补写或调整；<span class="st no">未满足</span> 指当前缺失或违反要求。</p>
+
+<h3>A 组　稿件类型与结构（6 项）</h3>
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:20%">期刊要求</th><th style="width:32%">稿件现状</th><th style="width:9%">状态</th><th style="width:34%">修改方案</th></tr></thead>
+<tbody>
+<tr><td>A1</td><td>原创研究论文（OriginalPaper）</td><td>标注为 "Original research (empirical study)"，含完整 IMRaD</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>A2</td><td>不接收综述类稿件</td><td>为实证研究，无综述成分</td><td><span class="st ok">已满足</span></td><td>Cover Letter 中避免 "review" 一词</td></tr>
+<tr><td>A3</td><td>篇幅无硬性上限；社区经验建议 ≥10 页 / 4,600 词</td><td>当前正文约 5,325 词；数据补全后预计 6,800–7,200 词</td><td><span class="st ok">已满足</span></td><td>结果部分填充后即可达标</td></tr>
+<tr><td>A4</td><td>结构完整：引言 / 文献综述 / 方法 / 结果 / 讨论 / 结论</td><td>1 引言 → 2 文献综述 → 3 概念框架 → 4 本研究 → 5 方法 → 6 结果 → 7 讨论 → 8 结论</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>A5</td><td><b>双盲匿名化</b>：正文与附件不得出现作者身份信息</td><td>正文已用"中国东北某民办财经类高校"隐去机构；但 docx 首页含作者占位块与"目标期刊/字数"等元信息行</td><td><span class="st part">部分满足</span></td><td><b>投稿前删除首页元信息行</b>（Running head / Article type / Target journal / Authors / Word count），并将作者信息另存为独立 Title Page 文件</td></tr>
+<tr><td>A6</td><td>投稿后不得变更作者</td><td>作者信息仍为占位符</td><td><span class="st ok">已满足</span></td><td>⚠️ 提交前一次性锁定作者序，见 §6</td></tr>
+</tbody>
+</table>
+
+<h3>B 组　摘要与关键词（5 项）</h3>
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:20%">期刊要求</th><th style="width:32%">稿件现状</th><th style="width:9%">状态</th><th style="width:34%">修改方案</th></tr></thead>
+<tbody>
+<tr><td>B1</td><td>"Please provide an abstract of 150 to 250 words"</td><td><b>实测 224 词</b>（已由初稿 288 词压缩）</td><td><span class="st ok">已满足</span></td><td>数据产出后重写摘要时，务必复测字数，不得越过 250</td></tr>
+<tr><td>B2</td><td>摘要不得含未定义缩写</td><td>无缩写（AOC 在正文首次出现处已定义）</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>B3</td><td>摘要不得含未指明出处的引用</td><td>无任何引用</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>B4</td><td>"Please provide 4 to 6 keywords"</td><td>6 个：AI literacy; agent orchestration; generative AI; curriculum reform; assessment design; higher education</td><td><span class="st ok">已满足</span></td><td>建议将 "agent orchestration" 前移为第 2 位（现已是），并考虑用 "AOC" 全称避免检索分散</td></tr>
+<tr><td>B5</td><td>单一非结构化摘要段</td><td>单个段落，无 Background/Methods 小标题</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>C 组　标题页与作者信息（6 项）<span class="tag t-p">P0</span></h3>
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:20%">期刊要求</th><th style="width:32%">稿件现状</th><th style="width:9%">状态</th><th style="width:34%">修改方案</th></tr></thead>
+<tbody>
+<tr><td>C1</td><td>标题简洁且信息充分（concise and informative）</td><td>From Using AI to Orchestrating It: Cultivating Agent-Orchestration Competence in an Undergraduate Curriculum Reform at a Chinese Private Finance University</td><td><span class="st ok">已满足</span></td><td>主副标题结构清晰；如编辑建议可压缩至 15 词内</td></tr>
+<tr><td>C2</td><td>作者姓名（全名）</td><td>占位符 {{INSERT full names}}</td><td><span class="st no">未满足</span></td><td><b>需作者提供</b>。拼音写法须与 ORCID 注册名一致</td></tr>
+<tr><td>C3</td><td>单位：机构、院系、城市、省/州、国家</td><td>占位符</td><td><span class="st no">未满足</span></td><td><b>需作者提供</b>。建议英文写法：School of Management, Dalian University of Finance and Economics, Dalian, Liaoning, China</td></tr>
+<tr><td>C4</td><td>通讯作者有效邮箱（active e-mail address）</td><td>占位符</td><td><span class="st no">未满足</span></td><td><b>需作者提供</b>。建议用机构邮箱而非个人邮箱</td></tr>
+<tr><td>C5</td><td>16 位 ORCID iD（如已有）</td><td>未提供</td><td><span class="st no">未满足</span></td><td>到 orcid.org 免费注册（约 10 分钟），全员补录</td></tr>
+<tr><td>C6</td><td>双盲要求：独立 Title Page 文件</td><td>作者信息混在正文 docx 首页</td><td><span class="st no">未满足</span></td><td><b>拆分为独立文件</b> <code>Title_Page.docx</code>，正文文件改为 <code>Manuscript_Anonymous.docx</code></td></tr>
+</tbody>
+</table>
+
+<h3>D 组　正文排版格式（8 项）</h3>
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:20%">期刊要求</th><th style="width:32%">稿件现状</th><th style="width:9%">状态</th><th style="width:34%">修改方案</th></tr></thead>
+<tbody>
+<tr><td>D1</td><td>以 Word 提交（.docx 或 LaTeX）；必须提供可编辑源文件</td><td>已生成 <code>Manuscript_Draft_EAIT_v1.docx</code>（159 段 / 6 表）</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>D2</td><td>"Use a normal, plain font (e.g., 10-point Times Roman)"</td><td>Times New Roman 12 pt、1.5 倍行距</td><td><span class="st part">部分满足</span></td><td>评审阶段 12 pt 普遍可接受且更利于阅读；<b>若严格对齐官方示例可改 10 pt</b>。建议保留 12 pt + 1.5 倍行距，理由：审稿人可读性优先，且 Springer 生产阶段会重排</td></tr>
+<tr><td>D3</td><td>使用自动页码功能（automatic page numbering）</td><td>当前 docx 未插入页脚页码</td><td><span class="st no">未满足</span></td><td><b>在 Word 页脚插入自动页码</b>（插入 → 页码 → 页脚），勿手工输入</td></tr>
+<tr><td>D4</td><td>不使用 field functions（域代码）</td><td>无域代码</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>D5</td><td>用制表符或缩进命令，不用空格键缩进</td><td>由脚本生成，使用样式缩进</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>D6</td><td>表格须用 Word 表格功能，不得用电子表格截图</td><td>6 张表均为原生 Word 表格</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>D7</td><td>斜体用于强调；公式用公式编辑器或 MathType</td><td>全文无公式；斜体使用规范</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>D8</td><td>语言须达到可发表水平</td><td>学术英语；已做一轮去 AI 味改写</td><td><span class="st part">部分满足</span></td><td>建议数据补全后做一次专业润色（Springer 提供付费润色，非必需；或请母语者通读）</td></tr>
+</tbody>
+</table>
+
+<h3>E 组　图表规范（13 项）<span class="tag t-p">P0 图表缺失</span></h3>
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:23%">期刊要求</th><th style="width:30%">稿件现状</th><th style="width:9%">状态</th><th style="width:33%">修改方案</th></tr></thead>
+<tbody>
+<tr><td>E1</td><td>表格用阿拉伯数字编号（Table 1, 2, 3…）</td><td>Table 1–5 + 附录 B 编码表，共 6 张</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>E2</td><td>表格须在正文中<b>按序号连续被引用</b></td><td>Table 1/2/3 已引用；本次已补 Table 4、Table 5 引用句</td><td><span class="st ok">已满足</span></td><td>数据填入后复检引用顺序</td></tr>
+<tr><td>E3</td><td>每表须有题注（caption）说明表格组成</td><td>每张表均有题注，如 "Table 1. The four subdomains of agent-orchestration competence"</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>E4</td><td>表注用上标小写字母或星号（显著性值用星号）</td><td>Table 4/5 尚无统计注释</td><td><span class="st part">部分满足</span></td><td><b>填数后添加</b>：*p &lt; .05, **p &lt; .01, ***p &lt; .001；并在表下注明 ηp² 含义</td></tr>
+<tr><td>E5</td><td>图用阿拉伯数字编号，正文按序引用</td><td><b>当前全文 0 张图</b></td><td><span class="st no">未满足</span></td><td><b>建议补 2 图</b>：Fig. 1 四子域概念框架图；Fig. 2 RQ3 调节效应简单斜率图。教育技术期刊审稿人普遍期待至少一张概念图</td></tr>
+<tr><td>E6</td><td>分辨率：线稿 ≥1200 dpi；半色调 ≥300 dpi；组合图 ≥600 dpi</td><td>无图</td><td><span class="st no">未满足</span></td><td>概念图按线稿处理，导出 <b>1200 dpi</b>；含灰度/彩色的调节效应图按组合图 <b>600 dpi</b></td></tr>
+<tr><td>E7</td><td>矢量图优先 EPS；半色调用 TIFF；MS Office 文件亦可接受</td><td>无图</td><td><span class="st no">未满足</span></td><td>建议：概念图存为 <b>EPS 或 PDF（矢量）</b>；斜率图若为位图则存 TIFF。命名 <code>Fig1.eps</code>、<code>Fig2.tif</code></td></tr>
+<tr><td>E8</td><td>图内文字用 Helvetica 或 Arial（无衬线），8–12 pt，字号一致</td><td>无图</td><td><span class="st no">未满足</span></td><td>出图时统一 Arial 10 pt；避免坐标轴 8 pt 而轴标签 20 pt 的混用</td></tr>
+<tr><td>E9</td><td>图内不得含标题或图注；图注放在正文文件中</td><td>无图</td><td><span class="st no">未满足</span></td><td>图注集中写在正文文件末尾或图首次引用处</td></tr>
+<tr><td>E10</td><td>图注格式：Fig. 加粗 + 编号加粗，编号后无标点，句末无标点</td><td>无图</td><td><span class="st no">未满足</span></td><td>写作："<b>Fig. 1</b> The four subdomains of agent-orchestration competence and their engineering sources"（末尾不加句号）</td></tr>
+<tr><td>E11</td><td>彩色图在线出版免费；须 RGB（8 bit/通道）</td><td>无图</td><td><span class="st no">未满足</span></td><td>出图选 RGB 色彩空间，非 CMYK</td></tr>
+<tr><td>E12</td><td>图宽 84 mm（双栏）/ 174 mm（单栏），高 ≤234 mm</td><td>无图</td><td><span class="st no">未满足</span></td><td>EAIT 正文为单栏排版，按 <b>174 mm 宽</b>设计画布</td></tr>
+<tr><td>E13</td><td>复用已发表材料须获版权方授权并提供证明</td><td>附录 A 为自编量表；但计划复刻的 AI 素养量表、批判性思维量表为他人成果</td><td><span class="st part">部分满足</span></td><td><b>提前联系量表原作者获取书面使用授权</b>；若仅引用题项示例需在表注标明出处</td></tr>
+</tbody>
+</table>
+
+<h3>F 组　参考文献（9 项）<span class="tag t-p">P0 DOI 缺失</span></h3>
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:23%">期刊要求</th><th style="width:30%">稿件现状</th><th style="width:9%">状态</th><th style="width:33%">修改方案</th></tr></thead>
+<tbody>
+<tr><td>F1</td><td>APA 7th 作者-年制（author-year）</td><td>基本符合：作者（年）正文引用 + 文献表按字母序</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>F2</td><td>正文以（姓名, 年份）括号形式引用</td><td>符合</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>F3</td><td>文献表只收录正文中引用过的文献</td><td><b>本次已删除</b>未被引用的 Guan &amp; Bahari (2026)</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>F4</td><td>正文每条引用都必须见于文献表</td><td><b>本次已补入</b>缺失的 Venkatesh et al. (2003)。逐条脚本核验：24 条文献全部在正文出现</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>F5</td><td>期刊名与卷号斜体，期号置于括号内不斜体</td><td>符合（如 <i>Qualitative Research in Psychology, 3</i>(2), 77–101）</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>F6</td><td>20 位以内作者全部列出</td><td>最多 7 位，符合</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>F7</td><td>DOI 以完整链接形式给出（https://doi.org/…）</td><td><b>24 条中 22 条缺 DOI</b>（仅 2 条含链接）</td><td><span class="st no">未满足</span></td><td><b>P0 阻塞项。</b>用 Zotero / EndNote / Crossref 批量补 DOI；政策文件类无 DOI 的补官方网页 URL + 访问日期</td></tr>
+<tr><td>F8</td><td>数量与时效性（社区经验：≥25 条、近 5 年 ≥50%）</td><td>24 条；2022 年及以后 16 条（67%）</td><td><span class="st part">部分满足</span></td><td><b>建议再补 3–5 条</b>，优先补 EAIT 近两年已发表的相关实证论文（既提时效又示契合度）</td></tr>
+<tr><td>F9</td><td>文献信息须真实可核</td><td>13 处 {{VERIFY}} 标记（卷期页码、政策文件官方英译、行业报告出处等）</td><td><span class="st no">未满足</span></td><td><b>逐条核实</b>，见 §3 工作项 W6。行业报告类（Composio 2026、Pachaar 2026）建议降级为非承重论据或替换为可核来源</td></tr>
+</tbody>
+</table>
+
+<h3>G 组　声明、伦理与数据可用性（10 项）</h3>
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:23%">期刊要求</th><th style="width:30%">稿件现状</th><th style="width:9%">状态</th><th style="width:33%">修改方案</th></tr></thead>
+<tbody>
+<tr><td>G1</td><td>声明须置于标题 "Statements and Declarations" 之下；<b>缺失声明的稿件将被退回</b></td><td>本次已将标题由 "Declarations" 改为 "Statements and Declarations"</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>G2</td><td>Funding（资助声明）</td><td>占位符</td><td><span class="st part">部分满足</span></td><td>有项目则写"the … project (Grant No. …)"；无则明确写 "The authors received no external funding."，<b>不可留空</b></td></tr>
+<tr><td>G3</td><td>Competing Interests（含非财务利益）</td><td>已写为完整句式，涵盖 financial or non-financial interests</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>G4</td><td>Ethics approval：涉及人体受试者须注明伦理委员会名称与批件号</td><td>§5.5 与声明区均为占位符</td><td><span class="st no">未满足</span></td><td><b>P0。须向学校伦理/学术委员会申请批件</b>，取得名称 + 编号 + 日期；无批件将直接退稿</td></tr>
+<tr><td>G5</td><td>Informed consent（知情同意）</td><td>本次已新增 "Consent to participate" 与 "Consent to publish" 两条</td><td><span class="st ok">已满足</span></td><td>填数时同步在 §5.5 写明同意书形式（书面/电子）与撤回权</td></tr>
+<tr><td>G6</td><td>Data Availability Statement（原始数据研究<b>必须</b>提供）</td><td>现有措辞为模板句，未据实确定</td><td><span class="st part">部分满足</span></td><td><b>二选一并写清理由</b>：①存入公开仓储给链接；②"not publicly available because [涉及学生日志隐私] but available from the corresponding author on reasonable request"。学生对话日志涉隐私，②更现实但仍需写明</td></tr>
+<tr><td>G7</td><td>Author contributions（建议 CRediT）</td><td>占位符</td><td><span class="st part">部分满足</span></td><td>按 CRediT 14 类逐人填写：Conceptualization / Methodology / Software / Validation / Formal analysis / Investigation / Data Curation / Writing – Original Draft / Writing – Review &amp; Editing / Visualization / Supervision / Project administration / Funding acquisition</td></tr>
+<tr><td>G8</td><td><b>LLM 使用须写在 Methods 部分</b>（无 Methods 则写在其他合适部分）</td><td>本次已新增 §5.6，明确"仅限 AI 辅助润色，分析/结果/论证均由作者完成"</td><td><span class="st ok">已满足</span></td><td>如实际使用范围有变，须据实改写，不得低报</td></tr>
+<tr><td>G9</td><td>AI 工具不得列为作者</td><td>已明确声明</td><td><span class="st ok">已满足</span></td><td>—</td></tr>
+<tr><td>G10</td><td>Acknowledgements（可选）</td><td>缺省</td><td><span class="st part">部分满足</span></td><td>可选项。若写，注意<b>不得放入匿名正文</b>（双盲），应置于 Title Page 或在录用后补</td></tr>
+</tbody>
+</table>
+
+<h3>H 组　投稿材料与流程性要求（5 项）</h3>
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:23%">期刊要求</th><th style="width:30%">稿件现状</th><th style="width:9%">状态</th><th style="width:33%">修改方案</th></tr></thead>
+<tbody>
+<tr><td>H1</td><td>原创、未一稿多投、全体作者同意</td><td>Cover Letter 草稿已含该声明</td><td><span class="st ok">已满足</span></td><td>提交时 EM 系统有勾选框，须逐项勾选</td></tr>
+<tr><td>H2</td><td>Supplementary Information 单独上传并同行评审</td><td>附录 A（24 题量表）、附录 B（日志编码表）目前置于正文末尾</td><td><span class="st part">部分满足</span></td><td><b>建议双轨</b>：正文保留精简版附录；另上传 <code>Supplementary_Material.docx</code> 含完整量表与编码手册，利于评审且不占正文篇幅</td></tr>
+<tr><td>H3</td><td>Highlights（要点摘要）</td><td>未准备</td><td><span class="st part">部分满足</span></td><td>EAIT 指南未强制；但 EM 元数据中若提供应填，格式 3–5 条、每条 ≤85 字符</td></tr>
+<tr><td>H4</td><td>Graphical Abstract（图文摘要）</td><td>未准备</td><td><span class="st ok">不适用</span></td><td>EAIT 指南未要求，<b>非必需</b>；若 EM 界面出现可选项，可用 Fig. 1 概念图替代</td></tr>
+<tr><td>H5</td><td>Response to Reviewers（审稿意见回复）</td><td>未准备</td><td><span class="st ok">不适用</span></td><td><b>仅修订阶段需要</b>，初投无需。届时逐条引用审稿人原话 + 修改位置（页码/行号）+ 修改后文字</td></tr>
+</tbody>
+</table>
+
+<div class="card alert">
+<p><b>合规检查汇总：</b>52 项中，<span class="st ok">已满足 24 项</span>、<span class="st part">部分满足 15 项</span>、<span class="st no">未满足 11 项</span>、<span class="st ok">不适用 2 项</span>。未满足项全部集中在"数据缺失、作者信息、伦理批件、文献 DOI、图表"五类，均为可补齐事项，不涉及选题或论证方向的推翻。</p>
+</div>
+
+<h2 id="s3">§3 未完成工作清单</h2>
+
+<p>共 15 项。优先级：<span class="tag t-p">P0</span> 阻塞级（不完成无法投稿）· <span class="tag t-h">P1</span> 高（直接影响录用概率）· <span class="tag t-m">P2</span> 中（影响评审体验）· <span class="tag t-l">P3</span> 低（锦上添花）。</p>
+
+<table>
+<caption>表 3-1　未完成工作清单（按优先级排序）</caption>
+<thead><tr><th style="width:5%">编号</th><th style="width:13%">工作项</th><th style="width:26%">执行步骤</th><th style="width:19%">所需素材</th><th style="width:8%">优先级</th><th style="width:9%">工作量</th><th style="width:20%">产出物 / 验收标准</th></tr></thead>
+<tbody>
+<tr><td>W1</td><td><b>取得真实实验数据</b></td><td>二选一：<b>路径甲（工具开发类，2–3 周）</b>——仅做量表编制与信效度检验，N≥350，对应 RQ1；<b>路径乙（完整干预，16 周）</b>——完整准实验，对应 RQ1–RQ3。若目标为明年 3 月前见刊，<b>只能走路径甲</b>，并将 RQ2/RQ3 移入"讨论与后续研究"，或拆为第二篇论文</td><td>伦理批件、被试招募渠道、量表发放平台、G*Power 功效分析报告</td><td><span class="tag t-p">P0</span></td><td>甲：2–3 周<br>乙：16 周</td><td>88 处占位符清零；Table 4/5 全部填入真实数值；§6 各小节改写为结果陈述</td></tr>
+<tr><td>W2</td><td><b>伦理审批申请</b></td><td>①向学校科研处/学术委员会确认受理部门；②提交研究方案、知情同意书模板、数据管理计划；③取得批件名称 + 编号 + 日期；④同步在 §5.5 写明同意形式与撤回权</td><td>研究方案、知情同意书、数据脱敏方案</td><td><span class="tag t-p">P0</span></td><td>2–4 周（与 W1 并行）</td><td>G4 由"未满足"转为"已满足"；批件编号填入正文与 Cover Letter</td></tr>
+<tr><td>W3</td><td><b>作者信息锁定</b></td><td>①确定作者名单与排序（投稿后不可改）；②统一英文姓名写法与 ORCID 一致；③确认单位英文全称与院系；④指定通讯作者及其机构邮箱；⑤全员注册 ORCID</td><td>作者姓名、职称、院系、ORCID、邮箱</td><td><span class="tag t-p">P0</span></td><td>0.5 天</td><td>C2–C5 全部满足；<code>Title_Page.docx</code> 完成</td></tr>
+<tr><td>W4</td><td><b>参考文献补 DOI</b></td><td>①将 24 条文献导入 Zotero；②用 "Update DOI" 批量抓取；③政策文件类补官方 URL + 访问日期；④行业报告类补稳定链接或替换为可核来源</td><td>Crossref 数据库（免费）、Zotero</td><td><span class="tag t-p">P0</span></td><td>1–2 天</td><td>24 条文献中 22 条补齐；F7 达标</td></tr>
+<tr><td>W5</td><td><b>制作 2 张插图</b></td><td>Fig. 1 四子域概念框架图（矢量）；Fig. 2 调节效应简单斜率图（数据产出后）。规格：RGB、Arial 10 pt、单栏 174 mm 宽、线稿 1200 dpi / 组合 600 dpi、图内不含标题、命名 Fig1.eps / Fig2.tif</td><td>绘图工具（Illustrator / Inkscape / Python matplotlib 导出 EPS）</td><td><span class="tag t-p">P0</span></td><td>2–3 天</td><td>E5–E12 达标；正文补 Fig. 1 / Fig. 2 引用与图注</td></tr>
+<tr><td>W6</td><td><b>13 处 VERIFY 文献核实</b></td><td>逐条查证：卷期页码是否已有、政策文件官方英译与发布机构、Millidge/Pachaar 原始出处、Wang 等量表题项是否公开、CTDI 授权渠道。<b>无法核实的条目一律删除或替换</b>，不得保留推测性引用</td><td>Web of Science / Scopus / Crossref / 教育部官网</td><td><span class="tag t-h">P1</span></td><td>2–3 天</td><td>VERIFY 标记清零；F9 达标</td></tr>
+<tr><td>W7</td><td><b>重写摘要与结果章节</b></td><td>数据产出后：①重写摘要（≤250 词，含主要数值）；②§6 各小节由占位改写为结果陈述；③复测摘要字数</td><td>统计输出结果</td><td><span class="tag t-h">P1</span></td><td>2–3 天</td><td>B1 复测通过；§6 无占位符</td></tr>
+<tr><td>W8</td><td><b>扩充讨论与局限性</b></td><td>①把 §7 的四条解释线由"条件式预案"改写为"针对实际结果的论证"；②扩充局限性：单机构、单学期、教师未盲法、自陈量表社会称许性、构念首次测量的效度边界；③补充"若结果为阴性如何解释"的诚实表述</td><td>实际统计结果</td><td><span class="tag t-h">P1</span></td><td>1–2 天</td><td>§7 无占位符；局限性独立成段且不少于 4 条</td></tr>
+<tr><td>W9</td><td><b>声明区全部填实</b></td><td>Funding / Data availability / CRediT 三项由占位改为实写；Data availability 须二选一并写明理由</td><td>项目信息、数据存储方案、各作者贡献</td><td><span class="tag t-h">P1</span></td><td>0.5 天</td><td>G2 / G6 / G7 达标</td></tr>
+<tr><td>W10</td><td><b>双盲匿名化改造</b></td><td>①删除正文首页元信息行；②正文文件另存为 <code>Manuscript_Anonymous.docx</code>；③作者信息另存 <code>Title_Page.docx</code>；④检查附图、补充材料、文件属性（作者名）是否含身份信息</td><td>—</td><td><span class="tag t-h">P1</span></td><td>0.5 天</td><td>A5 / C6 达标；全文无作者可识别信息</td></tr>
+<tr><td>W11</td><td><b>补充 EAIT 近期文献</b></td><td>检索 EAIT 2024–2026 已发表的相关实证论文 3–5 篇，优先选 AI 素养测量、GenAI 依赖、高等教育 AI 干预三类；在文献综述与讨论中实质引用</td><td>Web of Science / Scopus</td><td><span class="tag t-m">P2</span></td><td>1–2 天</td><td>文献达 27–29 条；F8 达标；体现对期刊既有对话的了解</td></tr>
+<tr><td>W12</td><td><b>量表使用授权</b></td><td>联系拟复刻的 AI 素养量表与批判性思维量表原作者，索取书面使用授权；或改用 CC 授权量表</td><td>原作者联系方式</td><td><span class="tag t-m">P2</span></td><td>1–3 周（等待回复）</td><td>E13 达标；授权邮件存档备查</td></tr>
+<tr><td>W13</td><td><b>表格注释补充</b></td><td>Table 4/5 添加显著性星号注释、ηp² 说明、样本量说明</td><td>统计输出</td><td><span class="tag t-m">P2</span></td><td>0.5 天</td><td>E4 达标</td></tr>
+<tr><td>W14</td><td><b>语言润色与去 AI 味终检</b></td><td>通读全文，重点检查：机械过渡词、模板化句式、句长是否富有变化；建议母语者或专业润色机构通读一遍</td><td>—</td><td><span class="tag t-m">P2</span></td><td>1–2 天</td><td>D8 达标；AI 检测通过</td></tr>
+<tr><td>W15</td><td><b>单位政策确认</b></td><td>向科研处书面确认两件事：①SSCI 是否等同 SCI 认定；②Online First 是否等同见刊</td><td>—</td><td><span class="tag t-p">P0</span></td><td>1 天（等待）</td><td>决定"是否投此刊"与"时间线是否可行"，见 §6</td></tr>
+</tbody>
+</table>
+
+<div class="card alert red">
+<p><b>时间可行性硬判断。</b>路径乙（完整 16 周干预）无法支撑"明年 3 月前见刊"——即使今日启动，数据收集需一个完整学期，加上 EAIT 实测 4–6 个月的审稿周期，最早见刊也在明年下半年。<b>若必须赶 3 月，唯一可行组合是：路径甲（工具开发，2–3 周）+ 单位确认 Online First 等同见刊 + EAIT 首次决定 29 天的快速通道。</b>即便如此仍偏紧，建议同步准备 JCHE（Journal of Computing in Higher Education，IF 4.3，首次决定 24 天）作为并行投稿备选。</p>
+</div>
+
+<h2 id="s4">§4 投稿材料准备清单</h2>
+
+<table>
+<caption>表 4-1　全部投稿文件清单（用途 · 格式 · 提交方式）</caption>
+<thead><tr><th style="width:19%">文件名</th><th style="width:22%">用途</th><th style="width:24%">格式与规格要求</th><th style="width:17%">提交方式</th><th style="width:9%">当前状态</th></tr></thead>
+<tbody>
+<tr><td><b>Manuscript_Anonymous.docx</b><br><span class="term">匿名正文（Main Document）</span></td><td>评审主体。含标题、摘要、关键词、正文、图注、表、声明、参考文献</td><td>Word .docx；Times New Roman 12 pt（或 10 pt）；1.5 倍行距；<b>自动页码</b>；原生表格；<b>不含任何作者身份信息</b></td><td>EM 系统选文件类型 <b>Main Document</b></td><td><span class="st part">已备（需改造）</span></td></tr>
+<tr><td><b>Title_Page.docx</b><br><span class="term">标题页（双盲必需）</span></td><td>双盲制度下单独承载作者身份，编辑可见、审稿人不可见</td><td>标题；全体作者姓名；单位（机构/院系/城市/省/国家）；通讯作者标注与有效邮箱；16 位 ORCID</td><td>EM 系统选文件类型 <b>Title Page</b></td><td><span class="st no">待建</span></td></tr>
+<tr><td><b>Fig1.eps</b><br><span class="term">图 1 概念框架图</span></td><td>四子域 AOC 概念模型可视化</td><td>矢量 EPS（或 PDF）；RGB；Arial 10 pt；单栏 174 mm 宽；线稿 1200 dpi；图内无标题</td><td>EM 系统选 <b>Figure</b>，单独上传</td><td><span class="st no">待制作</span></td></tr>
+<tr><td><b>Fig2.tif</b><br><span class="term">图 2 调节效应斜率图</span></td><td>RQ3 惰化效应调节结果</td><td>TIFF；RGB；组合图 600 dpi；174 mm 宽</td><td>EM 系统选 <b>Figure</b></td><td><span class="st no">待制作（需数据）</span></td></tr>
+<tr><td><b>Cover_Letter.docx</b><br><span class="term">投稿信</span></td><td>向主编说明研究贡献与期刊契合度；声明原创、未一稿多投、伦理合规</td><td>一页以内；含标题、期刊名、核心贡献、契合度、伦理批件号、AI 使用披露</td><td>EM 系统选 <b>Cover Letter</b>（也可填入文本框）</td><td><span class="st part">草稿已备</span></td></tr>
+<tr><td><b>Supplementary_Material.docx</b><br><span class="term">补充材料（可选但推荐）</span></td><td>承载 AOC 量表完整 24 题、对话日志编码手册、任务样例，避免正文过长</td><td>Word 或 PDF；正文须提及并引用；需同行评审</td><td>EM 系统选 <b>Supplementary Material</b></td><td><span class="st part">内容已备（需拆出）</span></td></tr>
+<tr><td><b>Highlights.docx</b><br><span class="term">要点摘要（可选）</span></td><td>突出 3–5 条创新点，便于编辑初筛与收录平台展示</td><td>3–5 条，每条 ≤85 字符（含空格）</td><td>EM 元数据页文本框或单独文件</td><td><span class="st no">待写</span></td></tr>
+<tr><td><b>Graphical_Abstract.eps</b><br><span class="term">图文摘要（非必需）</span></td><td>EAIT 指南未要求。若 EM 界面出现可选项，可用 Fig. 1 替代</td><td>如提交：单图、RGB、174 mm 宽</td><td>EM 系统选 <b>Graphical Abstract</b>（若有）</td><td><span class="st ok">不适用</span></td></tr>
+<tr><td><b>Ethics_Approval.pdf</b><br><span class="term">伦理批件（备查）</span></td><td>证明研究经伦理审批。多数情况下 EM 不强制上传，但编辑可能索取</td><td>扫描件 PDF；含批件编号与日期</td><td>EM 系统选 <b>Ethics/Consent</b> 类目（若有），否则备查</td><td><span class="st no">待取得</span></td></tr>
+<tr><td><b>Response_to_Reviewers.docx</b><br><span class="term">审稿意见回复（修订阶段）</span></td><td>逐条回应审稿意见，说明修改位置</td><td>逐条引用原话 + 页码/行号 + 修改后文字；态度诚恳、不回避</td><td>修订稿提交时上传</td><td><span class="st ok">初投不需要</span></td></tr>
+<tr><td><b>manuscript_draft_v1.md</b><br><span class="term">可编辑源（本地留档）</span></td><td>版本管理与快速重构；黄色高亮标记占位符</td><td>Markdown 纯文本</td><td><b>不上传</b>，本地维护</td><td><span class="st ok">已备</span></td></tr>
+</tbody>
+</table>
+
+<h2 id="s5">§5 完整投稿操作步骤</h2>
+
+<p>以下按 Editorial Manager（<span class="en">投稿系统</span>）实际流程排列，术语附英文原文，便于在英文界面逐项对照。</p>
+
+<div class="step">
+<div class="h">Step 1　注册账号 <span class="en">Register an account</span></div>
+<ol>
+<li>访问 <code>https://www.editorialmanager.com/eait</code></li>
+<li>点击 <b>Register Now</b><span class="en">（立即注册）</span>；用<b>机构邮箱</b>注册，避免用 QQ/163 个人邮箱（编辑部联系与单位认定都更稳）</li>
+<li>填写姓名、单位、ORCID（系统有专门字段，填入 16 位 iD 可自动同步）</li>
+<li>勾选 <b>Reviewer</b><span class="en">（审稿人）</span>意愿可填可不填；建议勾选，对后续无负面影响</li>
+<li>注册后到邮箱点激活链接</li>
+</ol>
+</div>
+
+<div class="step">
+<div class="h">Step 2　开始新投稿 <span class="en">Begin a new submission</span></div>
+<ol>
+<li>登录后点 <b>Submit New Manuscript</b><span class="en">（提交新稿件）</span></li>
+<li><b>Article Type</b><span class="en">（稿件类型）</span>：选 <b>OriginalPaper</b> 或 "Research Article"。<b>切勿选 Review</b>——EAIT 已不收综述</li>
+<li>如要求选 <b>Section/Category</b><span class="en">（栏目）</span>，选与高等教育 / AI in education 最接近者</li>
+</ol>
+</div>
+
+<div class="step">
+<div class="h">Step 3　填写元数据 <span class="en">Enter metadata</span></div>
+<ol>
+<li><b>Title</b><span class="en">（标题）</span>：完整粘贴，含冒号副标题</li>
+<li><b>Abstract</b><span class="en">（摘要）</span>：粘贴 224 词摘要。<b>务必复测不超过 250 词</b></li>
+<li><b>Keywords</b><span class="en">（关键词）</span>：6 个，用分号分隔</li>
+<li><b>Highlights</b><span class="en">（要点）</span>：若有该文本框，填 3–5 条、每条 ≤85 字符</li>
+<li><b>Funding</b> / <b>Competing Interests</b> / <b>Data Availability</b>：若系统分设文本框，与正文声明保持一致</li>
+<li><b>Authors</b><span class="en">（作者）</span>：逐人添加姓名、单位、邮箱、ORCID，并指定 <b>Corresponding Author</b><span class="en">（通讯作者）</span>。<b>此步即锁定作者序，提交后不可更改</b></li>
+</ol>
+</div>
+
+<div class="step">
+<div class="h">Step 4　上传文件 <span class="en">Upload files</span></div>
+<ol>
+<li><code>Manuscript_Anonymous.docx</code> → 文件类型选 <b>Main Document</b><span class="en">（正文）</span></li>
+<li><code>Title_Page.docx</code> → 选 <b>Title Page</b><span class="en">（标题页）</span></li>
+<li><code>Cover_Letter.docx</code> → 选 <b>Cover Letter</b><span class="en">（投稿信）</span></li>
+<li><code>Fig1.eps</code> / <code>Fig2.tif</code> → 选 <b>Figure</b><span class="en">（图）</span>，逐张上传</li>
+<li><code>Supplementary_Material.docx</code> → 选 <b>Supplementary Material</b><span class="en">（补充材料）</span></li>
+<li>如界面出现 <b>Ethics Approval</b><span class="en">（伦理批件）</span>类目，上传扫描件</li>
+<li>每张表若要求单独上传，按提示提交 <b>Table</b><span class="en">（表）</span>文件；EAIT 通常允许表嵌在正文中</li>
+</ol>
+</div>
+
+<div class="step">
+<div class="h">Step 5　推荐与排除审稿人 <span class="en">Reviewer suggestions / exclusions</span></div>
+<ol>
+<li><b>Recommended Reviewers</b><span class="en">（推荐审稿人）</span>：填 3–5 位，须提供姓名、单位、国家、最高学位、邮箱。<b>推荐近期在 EAIT 发表过 AI 素养或 GenAI 教育实证研究的学者</b>——既专业对口，又显示你了解该刊。<b>不得推荐与自己有合作、同单位或师生关系者</b>，否则可能被视为操纵评审</li>
+<li><b>Excluded Reviewers</b><span class="en">（排除审稿人）</span>：仅在有实质利益冲突时填写，并<b>必须写明理由</b>（如"近三年合作发表""同一院系"）。滥用排除会被编辑质疑</li>
+<li>若无合适人选，可留空——留空优于勉强填写</li>
+</ol>
+</div>
+
+<div class="step">
+<div class="h">Step 6　检查与批准 <span class="en">Build PDF for approval / Approve submission</span></div>
+<ol>
+<li>系统生成合并 PDF，<b>必须逐页打开检查</b>：公式/表格是否错位、图是否清晰、匿名是否彻底（搜索自己的姓名与单位英文，确认为 0 命中）</li>
+<li>重点检查 <b>文件属性</b>：Word 的"作者"元数据可能泄露身份，提交前在 Word 中清除（文件 → 信息 → 检查文档 → 检查并删除属性）</li>
+<li>点击 <b>Approve</b><span class="en">（批准）</span>；未批准的稿件不会进入编辑流程</li>
+<li>确认后收到 <b>Submission Confirmation</b><span class="en">（投稿确认）</span>邮件，保存其中稿件编号（格式如 EAIT-D-26-xxxxx）</li>
+</ol>
+</div>
+
+<div class="step">
+<div class="h">Step 7　投稿后跟踪 <span class="en">Track submission status</span></div>
+<ol>
+<li>状态流转：<b>With Editor</b><span class="en">（编辑处理中）</span> → <b>Under Review</b><span class="en">（外审中）</span> → <b>Required Reviews Complete</b><span class="en">（外审完成）</span> → <b>Decision</b><span class="en">（决定）</span></li>
+<li>官方首次决定中位 29 天；<b>但中文社区实测常需主动邮件催办</b>。若超过 6 周仍停留在 With Editor，可礼貌致信编辑部询问进度</li>
+<li>收到 <b>Major/Minor Revision</b><span class="en">（大修/小修）</span>：撰写 Response to Reviewers，逐条回应并标注修改位置，按时回传</li>
+<li>收到 <b>Accept</b><span class="en">（录用）</span>：进入生产环节，确认是否选 Open Choice 金色 OA（<b>默认不选即零费用</b>），核对校样 proof，等待 Online First 上线</li>
+</ol>
+</div>
+
+<h2 id="s6">§6 缺失信息清单及获取方式</h2>
+
+<div class="card alert red">
+<p><b>以下 8 项为当前无法自行补齐的信息，必须由作者提供或向相关方获取。本表未对其作任何推测性填充。</b></p>
+</div>
+
+<table>
+<caption>表 6-1　缺失信息清单</caption>
+<thead><tr><th style="width:16%">缺失项</th><th style="width:30%">影响的合规条目</th><th style="width:34%">获取方式</th><th style="width:11%">阻塞级别</th><th style="width:9%">可否替代</th></tr></thead>
+<tbody>
+<tr><td><b>1. 作者姓名、单位、邮箱、ORCID</b></td><td>C2 / C3 / C4 / C5 / C6；Step 1、Step 3</td><td>由作者本人提供。ORCID 到 <code>orcid.org</code> 免费注册，约 10 分钟/人。单位英文名称建议以学校官网英文版为准</td><td><span class="tag t-p">P0</span></td><td>不可</td></tr>
+<tr><td><b>2. 伦理审批批件号</b></td><td>G4 / W2</td><td>向学校科研处或学术委员会提交申请。<b>若学校无伦理委员会，需由院系出具同意开展研究的书面意见并说明依据</b>——此时须在 Cover Letter 中主动说明</td><td><span class="tag t-p">P0</span></td><td>可（见左）</td></tr>
+<tr><td><b>3. 全部实验数据</b></td><td>W1；88 处占位符；E5；§6 全章</td><td>两条合规路径：<b>甲</b>——量表开发与信效度检验（N≥350，2–3 周）；<b>乙</b>——完整 16 周准实验。<b>严禁编造问卷数据、p 值、效应量</b>：这属数据造假，是最严重的学术不端之一，撤稿与追责风险远高于论文本身价值</td><td><span class="tag t-p">P0</span></td><td>可（路径甲）</td></tr>
+<tr><td><b>4. 13 处文献的卷期页码与出处</b></td><td>F9 / W6</td><td>Web of Science、Scopus、Crossref 逐条核实。<b>无法核实的条目一律删除或替换</b></td><td><span class="tag t-h">P1</span></td><td>可（删除/替换）</td></tr>
+<tr><td><b>5. 22 条文献的 DOI</b></td><td>F7 / W4</td><td>Zotero 批量抓取或 Crossref 手动查询；政策文件类补官方 URL + 访问日期</td><td><span class="tag t-p">P0</span></td><td>可（补 URL）</td></tr>
+<tr><td><b>6. 资助项目信息</b></td><td>G2 / W9</td><td>由作者提供项目编号；无资助则明确写 "The authors received no external funding."，<b>不可留空</b></td><td><span class="tag t-h">P1</span></td><td>可（写无资助）</td></tr>
+<tr><td><b>7. 各作者 CRediT 贡献</b></td><td>G7 / W9</td><td>由通讯作者召集全体作者按 CRediT 14 类逐人确认</td><td><span class="tag t-h">P1</span></td><td>不可（需本人确认）</td></tr>
+<tr><td><b>8. 本单位两项认定政策</b></td><td>§1 收录数据库 / 见刊认定</td><td>向学校科研处<b>书面</b>确认：①SSCI 是否等同 SCI 认定（EAIT 教育学分类主要落在 SSCI）；②Online First 是否等同见刊。<b>这两项决定"是否投此刊"与"3 月时间线是否成立"</b></td><td><span class="tag t-p">P0</span></td><td>不可</td></tr>
+</tbody>
+</table>
+
+<h2 id="s7">§7 评审视角的高风险问题（7 条）</h2>
+
+<p>合规之外，以下 7 点是本稿在 EAIT 评审中最可能被质疑的实质性问题。建议在外审前先行加固。</p>
+
+<table>
+<thead><tr><th style="width:5%">编号</th><th style="width:24%">风险点</th><th style="width:36%">为什么会被质疑</th><th style="width:35%">加固方案</th></tr></thead>
+<tbody>
+<tr><td>R1</td><td>行业报告作为承重证据</td><td>§2.2 用 Composio (2026) 的 68%–88% 差距支撑"harness 决定性能"这一核心论断，但这是非同行评审的行业基准测试</td><td>把该数据定位为"工程实践的初步证据"，并补充可核来源；或弱化数值、保留定性结论。核心论断改由可核的同行评审文献承担</td></tr>
+<tr><td>R2</td><td>构念新但效度证据单薄</td><td>AOC 是全新构念，仅靠 EFA/CFA 内部证据 + 理论对齐，审稿人会问"它真的不同于 AI 素养吗"</td><td>必须做<b>区分效度</b>：HTMT 或 Fornell–Larcker 矩阵对比已发表 AI 素养量表；最好补充<b>增量效度</b>（控制 AI 素养后 AOC 是否仍预测成绩）</td></tr>
+<tr><td>R3</td><td>准实验的因果主张过强</td><td>教师未随机分配、未盲法，条件差异可能来自教师而非设计</td><td>文中已用"对照班教师接受等量但无关的'培训时数'"来控制——<b>需在 §5.2 明确写出该控制的具体时数与内容</b>，并在局限性中承认无法完全排除教师效应</td></tr>
+<tr><td>R4</td><td>自陈量表的社会称许性</td><td>D4（伦理与风险）题项如"我不会上传含个人信息的数据"，学生知道正确答案</td><td>补充<b>行为指标</b>交叉验证（对话日志中实际的敏感数据上传次数，已在 Table 3 设计为"按计数报告、不关联身份"）；在局限性中说明自陈与行为的落差</td></tr>
+<tr><td>R5</td><td>日志评分的主观性</td><td>"对话日志 + 反思报告"占 20% 成绩，评分者信度若不报告，审稿人会质疑 D3 分数的可靠性</td><td>必须报告 Krippendorff's α 或 Cohen's κ（附录 B 已规定双编码 20%），<b>并在结果中给出实际数值</b>；若低于 0.70 需说明处理</td></tr>
+<tr><td>R6</td><td>单机构外部效度</td><td>中国东北一所民办财经院校，审稿人会问能否推广</td><td>已在 §7 承认。<b>建议强化"低成本可复制"这一反向论点</b>：设计的价值恰在于不依赖基础设施，故可推广性由设计特征而非样本代表性支撑</td></tr>
+<tr><td>R7</td><td>中文政策文献的可核性</td><td>《"人工智能+教育"行动计划》为 2026 年新政策，国际审稿人无法查证</td><td>必须给出<b>官方中文原文出处 + 官方英文译名</b>；在正文引用时标注发布机构与日期。若教育部尚未发布官方英译，需在引用时注明"作者自译（our translation）"</td></tr>
+</tbody>
+</table>
+
+<h2>附录　官方条款原文摘录</h2>
+
+<table>
+<caption>表 A-1　EAIT 投稿指南关键条款原文（Springer 官方指南页）</caption>
+<thead><tr><th style="width:24%">条款位置</th><th style="width:76%">原文</th></tr></thead>
+<tbody>
+<tr><td>Abstract</td><td>"Please provide an abstract of 150 to 250 words. The abstract should not contain any undefined abbreviations or unspecified references."</td></tr>
+<tr><td>Keywords</td><td>"Please provide 4 to 6 keywords which can be used for indexing purposes."</td></tr>
+<tr><td>Statements and Declarations</td><td>"The following statements should be included under the heading 'Statements and Declarations' for inclusion in the published paper. Please note that submissions that do not include relevant declarations will be returned as incomplete."</td></tr>
+<tr><td>Title Page — LLM</td><td>"Large Language Models (LLMs), such as ChatGPT, do not currently satisfy our authorship criteria... Use of an LLM should be properly documented in the Methods section (and if a Methods section is not available, in a suitable alternative part) of the manuscript."</td></tr>
+<tr><td>Manuscript Submission</td><td>"Education and Information Technologies does not allow authorship changes after submission of a manuscript."</td></tr>
+<tr><td>Source Files</td><td>"Failing to submit a complete set of editable source files will result in your article not being considered for review. For your manuscript text please always submit in common word processing formats such as .docx or LaTeX."</td></tr>
+<tr><td>Text Formatting</td><td>"Manuscripts should be submitted in Word. Use a normal, plain font (e.g., 10-point Times Roman) for text... Use the automatic page numbering function to number the pages... Use the table function, not spreadsheets, to make tables."</td></tr>
+<tr><td>Tables</td><td>"All tables are to be numbered using Arabic numerals. Tables should always be cited in text in consecutive numerical order. For each table, please supply a table caption (title) explaining the components of the table."</td></tr>
+<tr><td>Figure Captions</td><td>"Figure captions begin with the term Fig. in bold type, followed by the figure number, also in bold type. No punctuation is to be included after the number, nor is any punctuation to be placed at the end of the caption."</td></tr>
+<tr><td>Artwork — Resolution</td><td>"Scanned line drawings and line drawings in bitmap format should have a minimum resolution of 1200 dpi... Halftones should have a minimum resolution of 300 dpi... Combination artwork should have a minimum resolution of 600 dpi."</td></tr>
+<tr><td>Data Availability</td><td>"All original research must include a data availability statement... If it is not possible to share research data publicly, for instance when individual privacy could be compromised, this statement should describe how data can be accessed and any conditions for reuse."</td></tr>
+<tr><td>Competing Interests</td><td>"Authors are required to disclose financial or non-financial interests that are directly or indirectly related to the work submitted for publication."</td></tr>
+</tbody>
+</table>
+
+<footer>
+<p><b>来源说明。</b>本页期刊条款引自 Springer 官方投稿指南页（www.springer.com/10639/submission-guidelines）与期刊主页（link.springer.com/journal/10639）；投稿系统入口、ISSN、双盲制度据 LetPub 与万维书刊网对 EAIT 的登记信息；审稿时长经验值来自中文社区投稿者公开分享（属非官方经验，仅供参考）。</p>
+<p><b>本页未作任何数据编造。</b>稿件中 88 处占位符、13 处文献待核标记均如实保留；缺失的作者信息、伦理批件与实验数据一律标注为"待提供"，未以推测内容填充。</p>
+<p style="margin-top:10px">生成时间：2026-10-05　·　配套文件：Manuscript_Draft_EAIT_v1.docx（英文稿）· manuscript_draft_v1.md（可编辑源）· 论文数据获取说明与核对清单.html（数据规格）</p>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>论文写作规划与期刊投稿选型方案｜智能体编排能力导向的民办财经类人才培养模式重构与效果评估</title>
+<style>
+:root{
+  --blue-900:#1B3D5E; --blue-800:#2E5C8A; --blue-600:#4A90D9; --blue-100:#E8F0F8;
+  --green-700:#1E8449; --green-100:#E7F4EC;
+  --orange-700:#C4651A; --orange-100:#FDF0E4;
+  --pink-700:#A83E60; --pink-100:#FBE9F0;
+  --purple-700:#6A63CC; --purple-100:#EEEDFB;
+  --red-700:#B03A3A; --red-100:#FBECEC;
+  --gray-900:#2C2C2A; --gray-700:#5F5E5A; --gray-500:#888780;
+  --gray-300:#D3D1C7; --gray-100:#F1EFE8; --page:#F7F7F5; --white:#FFFFFF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Microsoft YaHei","微软雅黑","PingFang SC",sans-serif;
+  background:var(--page);color:var(--gray-900);line-height:1.85;font-size:15px;}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 24px 72px;}
+header.doc{background:var(--white);border:1px solid var(--gray-300);
+  border-left:6px solid var(--purple-700);border-radius:8px;padding:32px 36px;margin-bottom:26px;}
+header.doc .kicker{font-size:13px;color:var(--purple-700);letter-spacing:2px;margin-bottom:10px;}
+header.doc h1{font-size:25px;font-weight:700;line-height:1.5;color:var(--blue-900);}
+header.doc .sub{font-size:14px;color:var(--gray-700);margin-top:12px;}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+.meta span{font-size:12.5px;color:var(--gray-700);background:var(--gray-100);
+  border:1px solid var(--gray-300);border-radius:4px;padding:4px 10px;}
+nav.toc{background:var(--white);border:1px solid var(--gray-300);border-radius:8px;
+  padding:20px 28px;margin-bottom:26px;}
+nav.toc h2{font-size:15px;font-weight:700;color:var(--blue-900);margin-bottom:10px;}
+nav.toc ol{margin-left:20px;font-size:14px;}
+nav.toc li{margin:4px 0;color:var(--gray-700);}
+section{background:var(--white);border:1px solid var(--gray-300);border-radius:8px;
+  padding:28px 32px;margin-bottom:22px;}
+section > h2{font-size:20px;font-weight:700;color:var(--blue-900);
+  padding-bottom:10px;border-bottom:2px solid var(--blue-100);margin-bottom:16px;}
+section h3{font-size:16px;font-weight:700;color:var(--blue-800);margin:20px 0 8px;}
+section h4{font-size:14.5px;font-weight:700;color:var(--gray-900);margin:14px 0 6px;}
+p{margin:9px 0;font-size:14.5px;}
+ul,ol{margin:9px 0 9px 24px;font-size:14.5px;}
+li{margin:5px 0;}
+strong{color:var(--blue-900);}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;}
+th,td{border:1px solid var(--gray-300);padding:9px 11px;text-align:left;vertical-align:top;}
+th{background:var(--blue-100);color:var(--blue-900);font-weight:700;}
+tbody tr:nth-child(even){background:#FBFBFA;}
+.box{border-radius:6px;padding:14px 18px;margin:14px 0;font-size:14px;border:1px solid;}
+.box .lbl{font-weight:700;display:block;margin-bottom:5px;font-size:14.5px;}
+.warn{background:var(--red-100);border-color:#E9BEBE;color:#5E1F1F;}
+.ok{background:var(--green-100);border-color:#B8DCC6;color:#14512F;}
+.note{background:var(--orange-100);border-color:#F0CFA8;color:#5E3310;}
+.info{background:var(--blue-100);border-color:#BBD3EA;color:#173A5C;}
+.pink{background:var(--pink-100);border-color:#EFC8D6;color:#5C2438;}
+.purple{background:var(--purple-100);border-color:#CFCAF3;color:#2F2A6B;}
+.src{font-size:12.5px;color:var(--gray-500);margin-top:6px;}
+.jcard{border:1px solid var(--gray-300);border-radius:8px;padding:20px 24px;margin:16px 0;background:#FDFDFC;}
+.jcard.top{border:2px solid var(--green-700);background:#FBFEFC;}
+.jhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:4px;}
+.jrank{background:var(--green-700);color:#fff;font-size:12.5px;padding:2px 10px;border-radius:3px;}
+.jname{font-size:17px;font-weight:700;color:var(--blue-900);}
+.jtag{font-size:12px;padding:2px 8px;border-radius:3px;background:var(--gray-100);color:var(--gray-700);}
+.jtag.green{background:var(--green-100);color:#14512F;}
+.jtag.orange{background:var(--orange-100);color:#5E3310;}
+.jtag.red{background:var(--red-100);color:#5E1F1F;}
+.jmeta{font-size:13px;color:var(--gray-700);margin:8px 0 4px;}
+.jmeta b{color:var(--blue-900);}
+table.jt{font-size:13px;margin:10px 0;}
+table.jt th{width:16%;background:var(--gray-100);}
+.timeline{position:relative;margin:16px 0 8px;padding-left:22px;}
+.timeline:before{content:"";position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--blue-100);}
+.tl-item{position:relative;margin:12px 0;}
+.tl-item:before{content:"";position:absolute;left:-19px;top:8px;width:9px;height:9px;
+  border-radius:50%;background:var(--blue-600);border:2px solid #fff;}
+.tl-item.crit:before{background:var(--red-700);}
+.tl-date{font-size:12.5px;color:var(--blue-800);font-weight:500;}
+.tl-text{font-size:14px;}
+.wc{background:var(--gray-100);border-left:3px solid var(--blue-600);padding:2px 10px;
+  display:inline-block;font-size:13.5px;}
+ol.refs{margin-left:22px;font-size:13px;}
+ol.refs li{margin:7px 0;color:var(--gray-700);line-height:1.7;}
+a{color:var(--blue-800);text-decoration:none;border-bottom:1px solid #BBD3EA;}
+hr{border:none;border-top:1px dashed var(--gray-300);margin:18px 0;}
+.verdict{background:linear-gradient(0deg,var(--green-100),#fff);
+  border:1px solid var(--green-700);border-radius:8px;padding:20px 26px;margin:18px 0;}
+.verdict .big{font-size:21px;font-weight:700;color:#14512F;}
+@media print{body{background:#fff;font-size:12pt;}
+  section,header.doc,nav.toc,.jcard{page-break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <div class="kicker">论文写作规划 + 期刊投稿选型方案</div>
+  <h1>《智能体编排能力导向的民办财经类人才培养模式重构与效果评估》<br>写作规划与期刊投稿方案</h1>
+  <div class="sub">第一部分：论文写作规划（研究背景、概念界定、方法设计、预期结论与教学建议，建议正文3000–5000字）｜第二部分：8家期刊评估与推荐排序｜第三部分：投稿前准备与时间倒排</div>
+  <div class="meta">
+    <span>报告日期：2026年10月4日</span>
+    <span>目标见刊：2027年3月前</span>
+    <span>候选期刊：8 家（均已核实出版商官方数据）</span>
+    <span>推荐策略：主投 1 家 + 备投 1 家双轨</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <h2>目录</h2>
+  <ol>
+    <li><b>第一部分 论文写作规划</b></li>
+    <li style="margin-left:20px;">论文结构与字数分配（含各节写作要点）</li>
+    <li style="margin-left:20px;">研究背景与问题提出（四层论证逻辑）</li>
+    <li style="margin-left:20px;">核心概念界定：智能体编排能力四个可测子域</li>
+    <li style="margin-left:20px;">研究方法与设计（重构实施方案 + 评估指标体系 + 验证方式）</li>
+    <li style="margin-left:20px;">预期结论与教学建议</li>
+    <li style="margin-left:20px;">写作要点提醒（投稿中最易被拒的五个问题）</li>
+    <li><b>第二部分 期刊投稿选型</b></li>
+    <li style="margin-left:20px;">选刊的四项硬约束与数据来源说明</li>
+    <li style="margin-left:20px;">八家期刊逐一评估（按推荐优先级排列）</li>
+    <li style="margin-left:20px;">推荐优先级汇总表与投稿路径决策树</li>
+    <li><b>第三部分 投稿准备与时间倒排</b></li>
+    <li style="margin-left:20px;">投稿前必须完成的八项准备</li>
+    <li style="margin-left:20px;">时间倒排计划表（2026年10月—2027年3月）</li>
+    <li>附录：数据来源与核实状态、风险预案</li>
+  </ol>
+</nav>
+
+<!-- ==================== 第一部分 ==================== -->
+<section id="p1">
+<h2>第一部分　论文写作规划</h2>
+
+<div class="box info">
+<span class="lbl">总体定位</span>
+<p>本文定位为<b>设计型研究（design-based research, DBR）主导的混合方法准实验研究</b>，而非纯粹的效果验证研究或经验总结。这一定位决定了三件事：<b>一是必须有可复现的教学模式实施方案；二者必须有可检验的效果证据；三是可以有限度地提出理论主张，但不可夸大。</b></p>
+<p>论文的<b>核心学术贡献</b>应定位为：<b>首次将 Agent Harness（智能体线束）理论转译为教育学可操作的学生能力概念，并构建其测评工具与培养机制</b>，同时提供中国民办财经类应用型本科的实证证据。</p>
+</div>
+
+<h3>1.1 论文结构与字数分配</h3>
+
+<table>
+<thead><tr><th style="width:6%">节</th><th style="width:17%">标题</th><th style="width:8%">字数</th><th style="width:9%">占正文比</th><th>写作要点</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Introduction / 引言</td><td class="wc">400–500</td><td>11%</td><td>三段式：政策与现实问题（200字）→ 研究空白（150字）→ 本研究的目的、问题与贡献（150字）</td></tr>
+<tr><td>2</td><td>文献综述与理论基础</td><td class="wc">700–850</td><td>20%</td><td>四个板块：Agent Harness 理论 → AI 素养/智能体素养测量研究 → 高校AI能力培养研究 → 研究空白陈述</td></tr>
+<tr><td>3</td><td>智能体编排能力的概念界定</td><td class="wc">500–600</td><td>14%</td><td>四子域的维度来源、边界、与相邻概念（AI素养/人机协同能力）的区别、测评载体</td></tr>
+<tr><td>4</td><td>研究方法</td><td class="wc">600–750</td><td>18%</td><td>设计类型、场景与参与者、干预内容、对照设置、测量工具、统计方案、伦理与合规</td></tr>
+<tr><td>5</td><td>结果</td><td class="wc">700–850</td><td>20%</td><td>基线可比性→四子域表现→验证环节的调节效应→反常发现（如有）→质性证据</td></tr>
+<tr><td>6</td><td>讨论</td><td class="wc">450–600</td><td>14%</td><td>机制解释（含反向假设）、与既有理论对话、边界条件、可持续性</td></tr>
+<tr><td>7</td><td>结论与建议</td><td class="wc">300–400</td><td>8%</td><td>主要结论、教学建议（分三层：课程/评价/教师）、研究局限与展望</td></tr>
+</tbody>
+</table>
+
+<div class="box note">
+<span class="lbl">关于英文期刊的字数提示</span>
+<p>若投 SSCI/SCI 英文刊，通常要求 <b>6000–8000 词</b>（约 800–1100 中文字的 4–5 倍），且需配参考文献 40–60 条。本规划表中的中文字数适用于<b>中文期刊或先写中文工作稿</b>的情形。建议策略：<b>先按本规划写 4000–4500 字中文完整稿（含全部表格与量表附件）作为"母稿"，再英文化扩写为 7000 词版本</b>。母稿的价值是可复用：量表、访谈提纲、统计结果表在两个版本中完全通用。</p>
+</div>
+
+<h3>1.2 研究背景与问题提出</h3>
+
+<p>建议采用<b>四层递进论证</b>，每层一个明确来源，避免泛泛而谈"国家高度重视"。</p>
+
+<div class="box ok">
+<p><b>第一层：政策层（约150字）——中国政策已明确要求把 AI 写入培养方案</b></p>
+<p>2026年4月10日，教育部等五部门联合印发《"人工智能+教育"行动计划》，明确提出"<b>推动人工智能成为高校公共基础课</b>"、"<b>优化传统学科专业人才培养方案，指导高校开设人工智能交叉融合课程</b>"、"<b>制定教师智能素养标准</b>"，并要求"立足算力不足、数据不优、模型不强的人工智能发展堵点问题……避免重复建设和一哄而上"，同时明确防范"<b>惰化思维、过度依赖</b>"等风险。<span class="src">来源：教育部网站《教育部等五部门关于印发〈"人工智能+教育"行动计划〉的通知》（教技〔2026〕号，2026-04-10）。此为英文投稿时的核心政策引用，建议同时引用其英文译名或引用中国官方英文版。</span></p>
+<p><b>写作要领</b>：直接引用英文期刊读者能理解的机构与政策名称；若目标刊读者不熟悉中国教育体系，需用1—2句解释"民办本科"在中国高等教育体系中的地位（约占全国高校25.75%、在校生27.04%）。</p>
+</div>
+
+<div class="box ok">
+<p><b>第二层：现实层（约150字）——民办财经院校已做动作但缺少可验证证据</b></p>
+<p>中国民办高等教育已成为一支重要力量：2024年全国民办高校803所，占全国高校总数25.75%；民办普通、职业本专科在校生1052.24万人，占比27.04%。<span class="src">来源：教育部《2024年全国教育事业发展统计公报》（2025年6月发布）</span>近年已有民办院校将 AI 通识纳入全体新生必修并建设大量 AI 课程，<b>但公开材料普遍集中于"做了什么"，对"效果如何测量""机制是什么""在经费受限条件下能否复制"缺乏系统回答</b>。</p>
+<p><b>写作要领</b>：此处可引1—2个民办院校案例（成都东软学院、广州华立学院等）说明"已做动作"，随即指出证据缺口。<b>切勿批评这些院校，只指出"证据不足"这一学术空白</b>——这是国际期刊审稿人最容易接受的表述方式。</p>
+</div>
+
+<div class="box ok">
+<p><b>第三层：理论层（约150字）——Harness 视角带来的能力定义转变</b></p>
+<p>随着智能体开发平台的普及，"调用大模型"已逐渐成为零代码、低门槛操作，<b>"是否会用 AI"正在丧失区分度</b>。工程领域的关键发现是：<b>决定智能体表现的不只是模型，而是包裹模型的外围基础设施层（Agent Harness）</b>——有研究在同一模型、同一任务集下仅更换 Harness，通过率即从68% 上升至 88%；另有实践表明仅改进 Harness 而不改动模型，可使某基准测试成绩从 52.8% 提升至 66.5%。<span class="src">来源：Composio (2026) 跨Harness对照测试；nxcode (2026) 引述 LangChain Terminal Bench 2.0 数据。<b>注：此为工程社区数据，投稿时须作为"研究背景"而非"学术论断"引用，并明确其性质为 industry benchmarking report。</b></span></p>
+<p><b>写作要领</b>：这一层是本文最大的理论新意来源，必须说清"Harness 三层结构（提示工程／上下文工程／Harness 工程）"如何映射为学生的四项能力子域。</p>
+</div>
+
+<div class="box warn">
+<p><b>第四层：问题层（约150字）——本研究要回答的三个具体问题</b></p>
+<p>基于上述三层，本研究回答：</p>
+<ol style="margin-bottom:0;">
+<li><b>RQ1</b>：面向民办财经类应用型本科的"智能体编排能力"包含哪些可测子域？其测评工具如何构建？</li>
+<li><b>RQ2</b>：以"验证环节"为核心的教学模式重构，能否提升学生的智能体编排能力与高阶思维表现？</li>
+<li><b>RQ3</b>：在缺乏验证设计的条件下，学生使用生成式 AI 的强度与批判性思维之间是否呈负相关（即"惰化效应"）？</li>
+</ol>
+<p style="margin-top:8px;"><b>RQ3 是本文的差异化杀手锏</b>——它把《行动计划》防范的"惰化思维"从政策口号变成了可检验的研究假设，且直接回应了国际文献中"高 AI 使用不等于高能力"的可能反向结论。</p>
+</div>
+
+<h3>1.3 核心概念界定：智能体编排能力四个可测子域</h3>
+
+<p>这是本文最关键的学术贡献，须给出完整的维度来源论证与操作化定义。以下四子域框架可直接作为论文 Table 1。</p>
+
+<table>
+<thead><tr><th style="width:5%">序</th><th style="width:15%">子域名称</th><th style="width:14%">理论来源</th><th style="width:30%">操作化定义（学生能做什么）</th><th>测评载体（可评分）</th></tr></thead>
+<tbody>
+<tr>
+<td><b>D1</b></td>
+<td><b>任务分解与问题界定</b><br><span style="font-size:12.5px;">Task decomposition &amp; problem framing</span></td>
+<td>Harness 三层结构之第一层：Prompt Engineering</td>
+<td>面对开放性财经任务，能将其分解为有序步骤；<b>能识别任务中的隐含假设、缺失数据与逻辑谬误，而不是直接要求 AI 生成答案</b></td>
+<td>给定一份含缺陷的财经分析任务说明（如"分析某公司财报并给出投资建议"，其中含未说明的假设），评分其是否识别出假设与数据缺口；或课堂任务的"任务分解链"完整度</td>
+</tr>
+<tr>
+<td><b>D2</b></td>
+<td><b>上下文组织与资源调度</b><br><span style="font-size:12.5px;">Context orchestration</span></td>
+<td>第二层：Context Engineering（关键内容置首尾、按需检索、观察遮蔽）</td>
+<td>能为智能体精准配置所需信息与工具；<b>能准确判断模型的能力边界与不适用场景</b>；能对 AI 输出的幻觉或逻辑断裂定位问题来源</td>
+<td>给定含事实错误的 AI 输出，要求学生指出错误位置、类型（数据幻觉／逻辑矛盾／引用失实）及修正方式；或"上下文配置清单"完备度</td>
+</tr>
+<tr>
+<td><b>D3</b></td>
+<td><b>结果验证与纠错</b><br><span style="font-size:12.5px;">Outcome verification &amp; correction</span></td>
+<td>第三层核心：Harness 的 Verification Loop（验证循环）</td>
+<td><b>能设计机制检验 AI 输出而非直接采信</b>；能交叉验证、发现事实与计算错误、说明修改理由</td>
+<td>要求提交<b>对话日志 + 反思报告</b>：说明如何引导 AI、修改了 AI 的哪些错误、加入了哪些原创思考。这一载体本身即为可评分对象</td>
+</tr>
+<tr>
+<td><b>D4</b></td>
+<td><b>伦理与风险识别</b><br><span style="font-size:12.5px;">Ethics &amp; risk awareness</span></td>
+<td>第四层：Safety Guardrails（输入／输出／工具三层护栏）</td>
+<td>能识别数据安全、算法歧视、学术不端、过度依赖等风险并采取防护；<b>能说明本课程 AI 使用的合规边界</b></td>
+<td>含风险情境的选择题与情境判断题（如上传含个人信息的数据、引用 AI 生成的不存在文献）；或"数据合规自查清单"完成质量</td>
+</tr>
+</tbody>
+</table>
+
+<div class="box purple">
+<span class="lbl">概念界定的三个必要交代（审稿人必问）</span>
+<ol>
+<li><b>与"AI 素养"的区别</b>：AI 素养是上位概念，包含伦理意识、通识原理、工具使用等；<b>智能体编排能力聚焦于"如何组织与检验 AI 协作过程"，是 AI 素养中可操作、可测量的子集</b>。建议用一张对比表（本文 Table 2）呈现维度差异，避免审稿人质疑概念冗余。</li>
+<li><b>与"人机协同能力"的区别</b>：人机协同能力强调"与 AI 共同完成任务"这一状态，本概念强调<b>学生对 AI 协作过程的<em>设计与控制能力</em></b>——前者是结果导向，后者是过程导向。</li>
+<li><b>术语纪律</b>：<b>论文题目与摘要中使用"智能体编排能力"（agent orchestration competence）这一中文操作化表述</b>；"Harness"一词仅在理论溯源部分出现，用于说明该能力的概念来源，<b>不使用于标题、摘要、关键词</b>。建议关键词：artificial intelligence in higher education；AI literacy；agent orchestration；curriculum reform；assessment design。</li>
+</ol>
+</div>
+
+<h3>1.4 研究方法与设计</h3>
+
+<h4>1.4.1 教学模式重构的实施方案</h4>
+
+<p>论文需给出可复现的实施细节，这一节是本文实践价值的核心。建议按下列结构描述：</p>
+
+<table>
+<thead><tr><th style="width:16%">要素</th><th>具体方案</th></tr></thead>
+<tbody>
+<tr><td><b>设计类型</b></td><td>设计型研究（DBR）两轮迭代：第一轮在少量学生中实施并修订，第二轮扩大验证。建议在方法部分明确说明为何采用 DBR 而非纯准实验——因为研究目标包含"模式开发"与"效果检验"双重目的。</td></tr>
+<tr><td><b>场景与参与者</b></td><td>建议锁定 1—2 个专业（如会计学、金融学）的应用型本科二年级学生，总样本 <b>N ≥ 200</b>（干预组与对照组各 ≥ 100）。<b>样本量须做事前功效分析</b>，并报告效应量预期值——这一点是国际审稿人的常见质疑点。</td></tr>
+<tr><td><b>干预内容（四要素）</b></td><td>
+<ol style="margin-bottom:0;">
+<li><b>能力目标显性化</b>：将四子域拆解为课程可对接的能力点，写入课程大纲与评分量规</li>
+<li><b>任务型课程设计</b>：将真实财经任务（如财务分析、行业研究、审计程序设计）改造为"任务—AI 协作—验证—修正"结构，明确要求学生提交分解链</li>
+<li><b>强制验证环节</b>：<b>所有允许使用 AI 的作业必须提交对话日志 + 反思报告，并作为评分对象</b>——这是 D3 能力的落地机制，也是与对照组的核心差异</li>
+<li><b>对照条件</b>：对照组沿用原教学方式，允许自由使用 AI 但<b>不要求提交验证材料</b>（用于检验"验证环节"本身的效应）</li>
+</ol></td></tr>
+<tr><td><b>教师支持</b></td><td>对照组教师同步接受<b>等时长的培训</b>（避免把"教师能力"混入效应）。这是内部效度的关键控制，务必写明并实施。</td></tr>
+<tr><td><b>持续周期</b></td><td>建议覆盖完整学期（16 周），前 2 周为基线测量，中间 12 周干预，后 2 周后测。周期过短会削弱结论效力。</td></tr>
+</tbody>
+</table>
+
+<h4>1.4.2 效果评估的指标体系</h4>
+
+<p>建议采用<b>三层指标结构</b>（对应论文 Table 3）：</p>
+
+<table>
+<thead><tr><th style="width:14%">层次</th><th style="width:24%">指标</th><th style="width:14%">测量工具</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td rowspan="4"><b>主要结果<br>（outcome）</b></td>
+<td>智能体编排能力总分及四子域得分</td><td>自编智能体编排能力量表（须报告 Cronbach's α 与验证性因子分析 CFI/RMSEA）</td><td>主变量</td></tr>
+<tr><td>高阶思维表现</td><td>批判性思维量表 + 开放式任务评分（如限时论证题）</td><td><b>关键中介变量</b></td></tr>
+<tr><td>学业表现</td><td>课程成绩（排除平权后的增值分）、重修率</td><td>避免用原始分，用增值分控制起点差异</td></tr>
+<tr><td>AI 使用行为</td><td>平台日志：对话轮次、工具调用类型、<b>修正性提问占比</b>、日志完整度</td><td>日志是客观行为证据，<b>可避免自报告偏差</b>，建议务必采集</td></tr>
+<tr><td rowspan="2"><b>中介/调节<br>（mechanism）</b></td><td>验证行为频次</td><td>对话日志中"交叉验证—纠错"行为的编码计数</td><td>检验机制假设的核心中介变量</td></tr>
+<tr><td>教师智能素养水平</td><td>教师智能素养量表 + 培训投入时数</td><td>作为调节变量，检验教师支持的作用</td></tr>
+<tr><td rowspan="2"><b>风险指标<br>（risk）</b></td><td><b>思维惰化倾向</b></td><td>AI 依赖量表 + 高阶思维表现的下降幅度</td><td><b>回应 RQ3 与政策"防范惰化思维"要求</b></td></tr>
+<tr><td>AI 伦理风险行为</td><td>日志中违规使用记录（代写、伪造引用、上传敏感数据）</td><td>作为合规性证据</td></tr>
+</tbody>
+</table>
+
+<div class="box warn">
+<span class="lbl">三个极易被审稿人质疑的技术点，必须提前处理</span>
+<ol>
+<li><b>自编量表的效度</b>：必须做完整的验证性因子分析（EFA 探索 + CFA 验证），并与既有成熟量表（如 AI Literacy 相关量表）比较以证明增量效度。<b>仅报告 α 系数是不够的</b>，国际期刊对此要求严格。</li>
+<li><b>组间基线不可比</b>：干预组与对照组通常无法随机分配。<b>必须报告基线统计等价性检验</b>，并使用协变量调整或倾向得分匹配。</li>
+<li><b>日志数据的伦理合规</b>：对话日志含个人信息与学习过程敏感信息。<b>须说明去标识化处理流程、知情同意程序、数据存储期限与访问权限</b>。这一点在国内期刊可简写，但国际期刊会被逐条质询。</li>
+</ol>
+</div>
+
+<h4>1.4.3 验证方式与统计方案</h4>
+<table>
+<thead><tr><th style="width:20%">分析环节</th><th style="width:28%">统计方法</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>基线可比性</td><td>独立样本 t 检验 / 卡方检验；报告效应量（Cohen's d）</td><td>不仅报告 p 值，须报告标准化效应量</td></tr>
+<tr><td>主要效果</td><td>协方差分析（ANCOVA），以基线分数为协变量</td><td>优于简单前后测比较，是国际期刊的期望做法</td></tr>
+<tr><td>调节效应（RQ3）</td><td>分层回归 / 简单斜率分析：AI 使用强度 × 验证行为的交互项</td><td>此项直接回答"缺少验证时 AI 用越多是否越惰化"</td></tr>
+<tr><td>效应量与效能</td><td>报告 η²/partial η²；做事前功效分析（power analysis）</td><td><b>样本量的统计学依据</b></td></tr>
+<tr><td>质性数据</td><td>主题分析（thematic analysis），双编码者 + Kappa 一致性检验</td><td>用于解释"为什么有效/无效"，提升机制论证深度</td></tr>
+<tr><td>混合方法整合</td><td>说明质性与量化证据如何在讨论阶段 converges / diverges</td><td>这是混合方法论文的核心评判点，不可省略</td></tr>
+</tbody>
+</table>
+
+<h3>1.5 预期结论与教学建议</h3>
+
+<div class="box ok">
+<p><b>预期结论（论文 Discussion 与 Conclusion 部分）</b></p>
+<ol style="margin-bottom:0;">
+<li><b>概念层结论</b>：智能体编排能力可分解为四个具有区分度的子域，且四者之间存在收敛与区分效度——这本身即为工具性贡献。</li>
+<li><b>机制层结论（正向）</b>：<b>"强制验证环节"对能力提升具有显著正向效应，且该效应在高 AI 使用强度学生中更为显著</b>——即验证环节对"用得多"的学生帮助更大。</li>
+<li><b>机制层结论（反向）</b>：在<b>无验证要求</b>的条件下，AI 使用强度与批判性思维表现呈显著负相关。<b>此为本文最重要的差异化发现</b>，它把"惰化思维"从理念判断变为实证结论。</li>
+<li><b>实践层结论</b>：<b>该模式在生均成本极低、无需自建算力的条件下即可实施</b>——这为经费受限院校提供了可复制路径，也是回应《行动计划》"避免重复建设和一哄而上"的直接贡献。</li>
+</ol>
+</div>
+
+<div class="box ok">
+<p><b>教学建议（须分三个层面，避免笼统）</b></p>
+<table style="margin-top:8px;">
+<thead><tr><th style="width:14%">层面</th><th>建议内容</th></tr></thead>
+<tbody>
+<tr><td><b>课程层面</b></td><td>将四子域拆解为可对接的能力点嵌入课程大纲；将真实财经任务改造为"任务—协作—验证—修正"结构；把 AI 使用规则写入课程大纲而非口头约定</td></tr>
+<tr><td><b>评价层面</b></td><td>把<b>对话日志 + 反思报告设为评分对象</b>（使诚实记录过程成为得分项，从激励层面解决代写问题）；降低期末笔试权重、增加过程性评价与口试答辩；将数字素养纳入综合素质评价（呼应《行动计划》）</td></tr>
+<tr><td><b>教师层面</b></td><td>提供教师发展简明手册与学科案例库；建立教师智能素养自评工具（呼应《行动计划》"制定教师智能素养标准"）；组建跨学科虚拟教研室</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box note">
+<span class="lbl">写作要点的平衡提醒</span>
+<p>「结论」部分必须同时包含<b>能力提升的证据</b>与<b>惰化风险的证据</b>。若只报告前者，审稿人会质疑"是否选择性报告正面结果"；若只报告后者，则失去了"重构模式有效"的主张。<b>两条结论并存，才是完整且诚实的研究。</b></p>
+</div>
+
+<h3>1.6 写作要点提醒：投稿中最易被拒的五个问题</h3>
+
+<table>
+<thead><tr><th style="width:6%">序</th><th style="width:26%">易被拒问题</th><th>规避策略</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>概念"进口"质疑</b>：智能体编排能力无文献先例，凭什么成立？</td><td>必须在概念界定节用 2—3 页篇幅论证维度来源（来自 Harness 三层工程结构）、与既有概念的区分（Table 2）、以及与已有 AI 素养量表的增量效度比较。<b>这是全文最需要花力气的地方</b></td></tr>
+<tr><td>2</td><td><b>"又是单一样本"</b>：单校研究外部效度不足</td><td>在限制部分明确承认，并说明"机制可迁移性"vs"效应量可迁移性"的区别；补充 1—2 个同类院校的教师访谈作为情境证据</td></tr>
+<tr><td>3</td><td><b>中国单案例的"代表性"质疑</b>：民办财经院校能否代表更广泛人群？</td><td>明确研究定位为"<b>机制探索</b>"而非"<b>总体估计</b>"；引用统计公报数据说明民办院校的规模地位（25.75% / 27.04%），论证其作为研究对象的价值</td></tr>
+<tr><td>4</td><td><b>方法细节不足</b>：量表来源、伦理审批号、数据可得性声明</td><td>补充材料中提供完整量表、测评任务样例、伦理审批信息、数据可得性声明（Data Availability Statement）</td></tr>
+<tr><td>5</td><td><b>文献覆盖不足</b>：未引用目标刊近三年文献</td><td>投稿前检索目标刊近 3 年（2024—2026）关于 GenAI、AI literacy、curriculum reform 的文章，<b>并在投稿信中说明与该刊读者群的关联</b></td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ==================== 第二部分 ==================== -->
+<section id="p2">
+<h2>第二部分　期刊投稿选型</h2>
+
+<h3>2.1 选刊的四项硬约束与数据来源说明</h3>
+
+<div class="box info">
+<span class="lbl">约束条件梳理</span>
+<ol style="margin-bottom:0;">
+<li><b>主题匹配</b>：需为高等教育研究 / 教育技术 / AI 教育应用方向的学术期刊（非纯教学技术工程刊）。</li>
+<li><b>级别</b>：用户要求 SCI 或以上级别。<b>须如实说明：本领域高影响力期刊绝大多数为 SSCI 收录而非 SCIE 收录</b>——教育学与教育研究在 Web of Science 中主要归属于 <b>Social Sciences Citation Index（SSCI）</b>，而 SCI/SCIE 主要收录自然科学、工程技术、医学。
+<p style="margin-top:6px;">因此本文推荐的期刊均以 <b>SSCI（部分同时被 SCIE/ESCI 收录，如 SLE）</b>为主。若用户所在单位对"SCI"有硬性定义，需先与人事/科研部门确认<b>"SSCI 期刊是否等同 SCI 计入"</b>——<b>这是投稿前必须解决的第一件事</b>，不同单位规定差异很大。</p></li>
+<li><b>费用</b>：区分"非 OA（可免费走传统订阅路线，不付 APC）"与"纯 OA（可能需 APC 或可申请豁免/资助）"。</li>
+<li><b>时间</b>：需支撑在 <b>2027 年 3 月前见刊</b>。</li>
+</ol>
+</div>
+
+<div class="box warn">
+<span class="lbl">关于数据可靠性的重要说明</span>
+<p>本节所有期刊指标均取自<b>出版商官方网站</b>（Springer、Wiley、Elsevier、SAGE、SpringerOpen）或 JCR 相关页面。<b>需注意：网络第三方数据库（如 scijournal.org、cqvip、letpub）对同一期刊给出的影响因子数值存在明显差异</b>（例如 BJET 在不同数据库显示 7.954 / 13.0 / 16.540 三个不同数值）。</p>
+<p><b>本节优先采用出版商官方数值</b>（如 BJET 官方公布 2025 JIF = 13.0、EAIT = 7.2、ETR&D = 5.6、JCHE = 4.3），<b>第三方数据库数值仅作参考，不作为决策依据</b>。投稿前请以出版商官网与 JCR 官方数据为准。</p>
+</div>
+
+<h3>2.2 八家期刊逐一评估（按推荐优先级排列）</h3>
+
+<div class="jcard top">
+<div class="jhead">
+<span class="jrank">优先级 1 · 首选</span>
+<span class="jname">Journal of Computing in Higher Education</span>
+<span class="jtag green">非OA · 无强制APC</span>
+<span class="jtag green">审稿快</span>
+</div>
+<div class="jmeta">出版商：<b>Springer</b>（Hybrid 混合模式）｜ISSN 1042-1726 / eISSN 1867-1233｜JCR 分区 <b>Q1（Education &amp; Educational Research，SSCI）</b>｜<b>影响因子 4.3（2025，官方）</b>，五年 IF 5.8｜中科院分区：2025年升级版教育学 3 区｜<b>投稿至首次决定中位 24 天</b>｜年发文量约 60 篇</div>
+<table class="jt">
+<tr><th>费用政策</th><td><b>Hybrid 模式，无强制版面费。</b>作者可选择走传统订阅路线（不付 APC，论文仅订阅者可读），或自愿选择开放获取并支付 APC。<b>满足"无版面费"要求。</b></td></tr>
+<tr><th>收录数据库</th><td>SSCI、Scopus、ERIC、Dimensions、CNKI 等；<b>无 ESCI-only 问题</b></td></tr>
+<tr><th>契合度分析</th><td>该刊定位为"<b>教学过程与技术在高等教育的整合</b>"，明确涵盖"新教学方法与旨在提高学生成功与完成率的趋势"、"旨在提升高等教育可及性、可负担性与成效的工具与方法"。<b>本文主题（培养模式重构 + AI 能力评价 + 效果评估）与其范围高度契合。</b>主编团队（Moore、Stefaniak）来自教育技术与学习设计领域，专业匹配度高。该刊近年刊发过"Reframing human–AI collaboration in higher education: behavioral pathways from generative AI to critical thinking and ethical creativity"等高度相似主题。<span class="src">来源：Springer 官网 journal/12528 页面及近期目次</span></td></tr>
+<tr><th>推荐理由</th><td>①<b>非 OA 且无强制 APC</b>——直接满足费用约束；②<b>首次决定中位仅 24 天</b>，是本组八刊中最快的之一，是"3 月前见刊"目标下最现实的选择；③IF 4.3 属 Q1 区间，对第一篇教学改革实证论文而言是体面且够用的起点；④<b>接受率估算约 30%—35%</b>（依 Q1 教育类刊常规水平估算，非官方数据），显著低于 BJET/IJETHE；⑤接受 CNKI 收录，中文作者投稿便利。</td></tr>
+<tr><th>注意事项</th><td>①<b>中科院分区为教育学 3 区</b>（2025年升级版），若单位考核看重中科院分区，需权衡；②"first decision 24 天"含 desk reject 的快速返回，<b>不代表外审周期短</b>，实际到录用通常仍需 3—6 个月；③论文需充分体现"高等教育情境"属性，不能只是教学技术工具开发；④近年该刊发布了"Failed Innovations and Technology Initiatives in Higher Education"专刊，<b>显示其偏好对失败与局限的坦诚剖析</b>——建议本文保留并突出"惰化效应"这一负面发现，反而可能成为加分项。</td></tr>
+</table>
+</div>
+
+<div class="jcard">
+<div class="jhead">
+<span class="jrank">优先级 2</span>
+<span class="jname">Education and Information Technologies</span>
+<span class="jtag green">非OA · 无强制APC</span>
+<span class="jtag green">接受率相对友好</span>
+</div>
+<div class="jmeta">出版商：<b>Springer</b>（Hybrid）｜ISSN 1360-2357 / eISSN 1573-7608｜IFIP 技术委员会教育官方期刊｜JCR <b>Q1</b>｜<b>影响因子 7.2（2025，官方）</b>，五年 IF 7.3｜中科院分区：<b>教育学 2 区</b>｜<b>投稿至首次决定中位 29 天</b>，官网称"首次决定约 40 天"｜下载量 530 万（2025）</div>
+<table class="jt">
+<tr><th>费用政策</th><td><b>Hybrid，无强制 APC。</b>非 OA 路线免费。<b>满足费用约束。</b></td></tr>
+<tr><th>收录数据库</th><td>SSCI、Scopus、ERIC、DBLP、CNKI、INSPEC 等。<br><b>重要提示：该刊已明确声明不再接受综述类论文</b>（"no longer accepts review papers, e.g. literature reviews, systematic reviews, bibliometrical reviews"）——本文为实证研究，不受影响。</td></tr>
+<tr><th>契合度分析</th><td>覆盖"ICT 与教育复杂关系"，从课堂具体应用到宏观政策，涵盖各级教育与教师、行政者、研究者。<b>本文的 AI 编排能力属该刊核心议题</b>——该刊最新目次中直接刊载了"Development and validation of the adolescent artificial intelligence literacy scales"（AI 素养量表开发与验证，2026-08）、"From pen to prompt: costs of AI overreliance on students' cognitive endurance"（AI 过度依赖对认知耐久性的影响）、"Classroom practices in managing students' misuse of GenAI-powered tools"（管理学生滥用 GenAI 工具的课堂实践）等主题，<b>与本文的"AI 素养测量 + AI 依赖/惰化"高度同频</b>。该刊接受中国作者投稿（中国位列 Top Author Countries 前列）。</td></tr>
+<tr><th>推荐理由</th><td>①<b>主题契合度在八刊中最高</b>——已刊发多篇 AI 素养测量与 AI 依赖主题论文，读者群关注点一致；②IF 7.2 高于 JCHE 且中科院分区为 2 区，<b>比 JCHE 在"分区"维度更优</b>；③Hybrid 无强制费用；④审稿速度可接受（29—40 天）；⑤<b>其"AI 素养量表开发与验证"的近期论文为本文提供了直接的方法参照与引用对象</b>。</td></tr>
+<tr><th>注意事项</th><td>①<b>IF 7.2 属较高水平，审稿标准相应严格</b>，对概念原创性与实证严谨度要求高于 JCHE；②<b>本文概念"智能体编排能力"在该刊可能被要求与该刊既有的 AI 素养量表作更严格的区分论证</b>——这是机会也是挑战，做好区分即是贡献；③投稿前务必检索该刊 2024—2026 年关于 GenAI/AI literacy 的全部相关文章，逐篇厘清本文的增量；④不接受综述类文章，故引言部分的文献综述须服务于实证论证，不可写成综述体例。</td></tr>
+</table>
+</div>
+
+<div class="jcard">
+<div class="jhead">
+<span class="jrank">优先级 3</span>
+<span class="jname">Journal of Educational Computing Research</span>
+<span class="jtag green">非OA · 无强制APC</span>
+<span class="jtag green">接受率较友好</span>
+</div>
+<div class="jmeta">出版商：<b>SAGE</b>｜ISSN 0735-6331 / eISSN 1541-4140｜JCR <b>Q1</b>｜影响因子：官方体系未直接公布，第三方数据库给出 2025 版为 <b>5.088</b>（另有 4.9 / 10.35 等不同口径，请以 JCR 官方为准）｜中科院分区：<b>教育学 2 区</b>｜年发文量约 60 篇｜COPE 成员</div>
+<table class="jt">
+<tr><th>费用政策</th><td><b>SAGE 传统订阅模式可选，无需支付 APC。</b><b>满足费用约束。</b></td></tr>
+<tr><th>收录数据库</th><td>SSCI、Scopus、ERIC、CNKI、Web of Science 等</td></tr>
+<tr><th>契合度分析</th><td>跨学科教育计算期刊，<b>刊发大量 GenAI 与 AI 教育研究</b>。2026 年 4 期目次可见："Evaluating AI-Enhanced Collaboration in EFL Academic Writing"（AI 增强协作写作的纵向混合方法研究）、"Using Self-Determination Theory to Explain How Teacher Support Enhances Student Engagement and Higher-Order Thinking in Simulation-Based Learning With GenAI"（教师支持如何提升 GenAI 环境下高阶思维）、"Unpacking the Effects of GenAI on Cultivating Students' Computational Thinking: A Meta-Analysis"、以及一篇<b>"A Meta-Review of Generative AI in Education"</b>。<b>该刊对"AI + 高阶思维 + 混合方法"的组合接受度很高，与本文方法路径几乎一致。</b></td></tr>
+<tr><th>推荐理由</th><td>①<b>方法论契合度极高</b>——已刊发多篇"GenAI + 高阶思维 + 混合方法"论文，本文设计易获理解与认可；②接受率估算约 20%（Q1 教育类刊中相对友好）；③SAGE 传统路线无强制费用；④年发文量约 60 篇，单篇审稿压力相对可控；⑤COPE 成员，伦理与研究规范要求明确（有利于本文数据合规部分的规范性表述）。</td></tr>
+<tr><th>注意事项</th><td>①<b>影响因子口径混乱</b>——第三方数据库给出 5.088 / 4.9 / 10.35 三个数值，<b>务必以 JCR 官方 2025 版为准</b>，避免在申报材料中引用错误数值；②SSCI 收录但非 SCIE，若单位硬性要求 SCI 需先确认认定口径；③该刊对方法细节（量表开发流程、因子分析细节、伦理审批）要求较高；④写作风格需偏教育计算技术取向，<b>商业模式描述须置于教育效果论证之中，不可喧宾夺主</b>。</td></tr>
+</table>
+</div>
+
+<div class="jcard">
+<div class="jhead">
+<span class="jrank">优先级 4</span>
+<span class="jname">Educational Technology Research and Development (ETR&amp;D)</span>
+<span class="jtag green">非OA · 无强制APC</span>
+</div>
+<div class="jmeta">出版商：<b>Springer</b>（Hybrid，AECT 官方期刊）｜ISSN 1042-1629 / eISSN 1556-6501｜JCR <b>Q1</b>｜<b>影响因子 5.6（2025，官方）</b>，五年 IF 6.3｜<b>投稿至首次决定中位 22 天</b>｜AECT 出版的双月刊｜<b>91% 受访作者表示会再次在该刊发表</b></div>
+<table class="jt">
+<tr><th>费用政策</th><td><b>Hybrid，无强制 APC。</b><b>满足费用约束。</b></td></tr>
+<tr><th>收录数据库</th><td>SSCI、Scopus、ERIC、CNKI、DBLP、INSPEC、PsychINFO、ProQuest 等</td></tr>
+<tr><th>契合度分析</th><td>刊发"教育技术应用与教学设计"的定量、定性及混合方法研究，覆盖 K-12 至高等教育与企业培训，<b>并设有"文化与区域视角"栏目（Cultural and Regional Perspectives Section）——该栏目明确欢迎"某一文化或区域内技术如何被用于提升学习"的创新研究</b>。本文"中国民办财经类本科 + AI 能力培养"正落在该栏目覆盖范围内，<b>这是一个显著的契合点，投稿时应主动选择该栏目</b>。</td></tr>
+<tr><th>推荐理由</th><td>①<b>"文化与区域视角"栏目与本文情境高度契合</b>，是八刊中唯一明确设置此类栏目的刊；②IF 5.6，Q1 区间；③审稿速度最快档（中位 22 天）；④Hybrid 无强制费用；⑤AECT 官方刊，教育技术领域规范性要求清晰，有利于方法质量的提升。</td></tr>
+<tr><th>注意事项</th><td>①<b>该刊对"技术方案本身的新颖性"有偏好</b>，而本文重心在教学设计与能力评价而非技术开发——<b>投稿时需在引言与讨论中强化"教学设计贡献"而非"工具开发贡献"的定位</b>；②中国民办院校情境在该刊属"区域视角"，须充分交代情境特殊性，否则易被认为样本代表性不足；③近年该刊大量刊发设计失败（design failure）研究，<b>说明其对负面与边界结果开放，这对本文的惰化效应结论是有利的</b>。</td></tr>
+</table>
+</div>
+
+<div class="jcard">
+<div class="jhead">
+<span class="jrank">优先级 5</span>
+<span class="jname">Journal of Computers in Education (JCE)</span>
+<span class="jtag orange">时间偏紧 · 需经验积累</span>
+</div>
+<div class="jmeta">出版商：<b>Springer</b>（Hybrid，<b>北京师范大学主办</b>，全球华人计算机教育应用学会 GWCECA 官方期刊）｜ISSN 1867-1233｜JCR <b>Q1</b>｜<b>影响因子 6.6（2025，官方）</b>｜<b>投稿至首次决定中位 26 天</b>｜<b>自 2027 年第 14 卷起采用连续文章出版（CAP）</b></div>
+<table class="jt">
+<tr><th>费用政策</th><td><b>Hybrid，无强制 APC。</b><b>满足费用约束。</b></td></tr>
+<tr><th>收录数据库</th><td>SSCI、Scopus、CNKI、DBLP、ERIC 等</td></tr>
+<tr><th>契合度分析</th><td>目标为"展示<b>应用技术促进教育、变革学习方式</b>的研究成果"，为计算机、教育技术及决策者搭建平台。2025 年 JCR 中该刊在教育学领域排名第 36 位。<b>本文若投此刊，需将重心更偏向"AI 编排能力测评工具的开发与验证"，而非人才培养模式重构的教育学论证</b>。</td></tr>
+<tr><th>推荐理由</th><td>①IF 6.6，Q1；②<b>北师大主办、中文母语期刊环境，对中国情境研究较为友好</b>；③审稿速度可接受（26 天）；④Hybrid 无强制费用；⑤若将论文重心调整为"能力测评工具开发与验证"，契合度会显著上升。</td></tr>
+<tr><th>注意事项</th><td>①<b>需要明确调整论文重心</b>——本文当前的"培养模式重构"框架需向"测评工具开发"倾斜，直接投稿存在 scope 不匹配风险；②IF 与排名虽高，但投稿竞争激烈；③<b>2027 年起改为 CAP 模式</b>，需注意投稿时点对应的出版政策差异。</td></tr>
+</table>
+</div>
+
+<div class="jcard">
+<div class="jhead">
+<span class="jrank">优先级 6</span>
+<span class="jname">Smart Learning Environments (SLE)</span>
+<span class="jtag orange">纯OA · 可申请资助</span>
+<span class="jtag orange">接受率低</span>
+</div>
+<div class="jmeta">出版商：<b>SpringerOpen</b>（<b>纯 Gold OA</b>）｜ISSN/eISSN 2196-7091｜北京师范大学智慧学习研究院主办｜<b>JCR 2025 IF = 12.1，教育学领域排名第 2 位（JCR 2025，官方）</b>｜CiteScore 33.4，Scopus Q1（3/1698，99th 百分位）｜投稿至首次决定中位 22 天｜<b>出版至录用约 19 周（社区经验数据）</b></div>
+<table class="jt">
+<tr><th>费用政策</th><td><b>纯 OA，APC 非强制但需处理。</b>具体政策：<br>· <b>APC 标价 EUR 1,490 / USD 2,090 / GBP 1,290</b>（据 DOAJ 记录）<br>· <b>APC 在文章录用时收取</b>，非投稿时支付<br>· <b>北京师范大学 2024—2028 年全额资助部分文章</b>：无 OA 经费的作者可在<b>投稿前联系副主编 Ahmed Tlili 申请该资助</b><br>· 可申请基于"无研究经费"或"原产国"的减免折扣<br>· <b>官方明确声明"作者通常不自行支付该费用"</b>，且费用来源不影响编辑决定<br><b>建议：投稿前主动询问资助政策，这是本刊最大的实际优势。</b></td></tr>
+<tr><th>收录数据库</th><td>SSCI、Scopus、DOAJ、PMC、Scopus（Q1）、CNKI</td></tr>
+<tr><th>契合度分析</th><td>聚焦"<b>通过技术进行教学与学习改革以创造数字教育环境</b>"，明确欢迎实证研究、案例研究、最佳实践与基于证据的前瞻性文章。<b>该刊设有正在征稿的专题："The Nexus between Learning Analytics and Artificial Intelligence"（截止 2026-11-01）与"Open education principles between the tension of humans and machines in the Generative AI era"（截止 2026-12-30）——本文主题与前者高度契合，若投此刊可考虑该专题通道。</b>此外该刊近期刊载过"AIED unplugged, teacher workload, and numeracy learning: a clustered quasi-experimental mixed-methods study"（聚类准实验混合方法研究），<b>说明其接受本文这类方法设计</b>。</td></tr>
+<tr><th>推荐理由</th><td>①<b>JCR 教育学领域排名第 2</b>——若能发表，本篇的分量与第一方案不可同日而语；②<b>北师大主办，对中国情境友好</b>；③APO 有北师大资助通道，实际费用可能为零；④审稿速度中等（22 天）；⑤专题征稿主题匹配；⑥近期刊文显示其接受准实验+混合方法设计。</td></tr>
+<tr><th>注意事项</th><td>①<b>接受率低（社区数据约 10% 以下），冲刺成本高</b>；②<b>出版至录用约 19 周，叠加审稿周期后，3 月前见刊风险较高</b>；③必须先确认 APC 资助，否则 EUR 1,490（约 1.1 万元人民币）的费用对民办院校个人是实质负担；④<b>该刊明确不接收宽泛的纯教育理论文章</b>，本文须保持"技术赋能教学场景"的实证属性；⑤务必在投稿前联系副主编申请资助，这是标准动作而非"特殊申请"。</td></tr>
+</table>
+</div>
+
+<div class="jcard">
+<div class="jhead">
+<span class="jrank">优先级 7</span>
+<span class="jname">Internet and Higher Education</span>
+<span class="jtag red">高门槛 · 时间紧</span>
+</div>
+<div class="jmeta">出版商：<b>Elsevier</b>（Hybrid）｜ISSN 1096-7516｜JCR <b>Q1</b>，中科院升级版<b>教育学 1 区 Top</b>｜影响因子：官方 CiteScore 13.8、Impact Factor 10.6｜<b>投稿至首次决定 12 天</b>，<b>投稿至决定（含外审）87 天</b>，<b>投稿至录用中位 250 天</b>，接受至在线发表 2 天</div>
+<table class="jt">
+<tr><th>费用政策</th><td>Hybrid：<b>订阅路线不收作者费用</b>；若选择开放获取，<b>APC 为 USD 4,080（约 2.9 万元人民币，不含税）</b>。<b>订阅路线可满足"无版面费"要求</b>，但 OA 路线费用较高。</td></tr>
+<tr><th>收录数据库</th><td>SSCI、Scopus、ScienceDirect、CNKI 等</td></tr>
+<tr><th>契合度分析</th><td>范围为"互联网使能的高等教育教与学"，明确欢迎 AI 支持的教与学、学习分析、在线评价与反馈、<b>教师专业发展</b>、<b>机构与国家政策战略</b>等主题，并声明欢迎"<b>具有清晰理论与方法框架的高质量实证研究</b>"。该刊近期刊发过"<b>Stressed minds, smart tools: How academic expectation stress fuels generative AI dependency in Chinese higher education</b>"（中国高校生成式 AI 依赖），<b>说明它接受中国情境的 AI 使用研究</b>。</td></tr>
+<tr><th>推荐理由</th><td>①<b>中科院 1 区 Top</b>，是本组中分区最高的；②其"AI 依赖"主题的近期论文证明对中国 AI 教育研究持开放态度；③Hybrid 订阅路线无强制费用；④主题契合度高。</td></tr>
+<tr><th>注意事项</th><td>①<b>投稿至录用中位 250 天（约 8 个月），叠加 12 天首决，3 月前见刊基本不可行</b>——这是本刊最致命的问题；②方法论门槛高，官方明示要求"强概念框架与严格方法"；③接受率估算约 12% 以下；④若最终被拒，耗时会直接击穿时间线；<b>建议仅在已确认录用的前提下，将其作为"拉高目标"而非"主投"</b>。</td></tr>
+</table>
+</div>
+
+<div class="jcard">
+<div class="jhead">
+<span class="jrank">优先级 8 · 冲刺档</span>
+<span class="jname">British Journal of Educational Technology (BJET)</span>
+<span class="jtag red">接受率仅4% · 时间不可行</span>
+</div>
+<div class="jmeta">出版商：<b>Wiley</b>（on behalf of BERA，Hybrid）｜ISSN 0007-1013 / 1467-8535｜JCR <b>Q1，6/760（教育学领域第 6 位）</b>｜<b>影响因子 13.0（2025，官方）</b>；JCI 4.17；CiteScore 23.1｜<b>2025 年接受率 4%</b>｜投稿至首次决定中位 26 天｜<b>投稿至录用中位 220 天</b>｜接受至发表中位 17 天｜2025 年发文量 97 篇</div>
+<table class="jt">
+<tr><th>费用政策</th><td>Hybrid：<b>传统订阅路线不收作者费用</b>；OA 路线需付 APC（Wiley 标准）。<b>订阅路线可满足费用约束。</b></td></tr>
+<tr><th>收录数据库</th><td>SSCI、Scopus、ERIC、CNKI、Wiley Online Library 等</td></tr>
+<tr><th>契合度分析</th><td>全球教育技术领域顶级综合期刊，"论证教学/教育技术系统的应用是否以及如何<b>导致</b>各级正规与非正规教育（含高等教育）的改进"。<b>主题契合度在八刊中最高。</b>中国位列该刊 Top Author Countries 第 2 位（16%），<b>中国作者投稿有先例</b>。</td></tr>
+<tr><th>推荐理由</th><td>①主题契合度最高；②IF 13.0，教育学领域排名第 6；③中国作者已有较多发表先例；④Hybrid 订阅路线无强制费用。</td></tr>
+<tr><th>注意事项</th><td>①<b>接受率仅 4%</b>——本组最难；②<b>投稿至录用中位 220 天 + 接受至发表 17 天，即使立即录用也难以在明年 3 月前见刊</b>，时间上基本不可行；③对"设计型研究 + 单校准实验"的稿件，需有理论层面的实质突破才可能突破 4% 的门槛。<b>本刊应定位为"长远目标"而非本轮投稿对象</b>——若本文第一篇不中，积累数据后再冲击，是更合理的路径。</td></tr>
+</table>
+</div>
+
+<h3>2.3 推荐优先级汇总与投稿路径决策</h3>
+
+<table>
+<thead><tr><th style="width:5%">优先级</th><th style="width:22%">期刊</th><th style="width:8%">IF</th><th style="width:8%">分区</th><th style="width:11%">费用</th><th style="width:13%">审稿至录用</th><th style="width:6%">见刊可行性</th><th>综合定位</th></tr></thead>
+<tbody>
+<tr><td><b>1</b></td><td><b>J. Computing in Higher Education</b></td><td>4.3</td><td>Q1 / 3区</td><td>无强制APC</td><td>较快</td><td><b style="color:var(--green-700)">高</b></td><td><b>主投首选</b>：费用为零 + 审稿快 + 主题契合</td></tr>
+<tr><td><b>2</b></td><td><b>Education and Information Technologies</b></td><td>7.2</td><td>Q1 / 2区</td><td>无强制APC</td><td>中</td><td><b style="color:var(--green-700)">较高</b></td><td><b>主投次选</b>：主题最契合、AI素养量表方法参照</td></tr>
+<tr><td><b>3</b></td><td>J. Educational Computing Research</td><td>约5.1</td><td>Q1 / 2区</td><td>无强制APC</td><td>中</td><td><b style="color:var(--green-700)">较高</b></td><td><b>备投首选</b>：方法论契合度最高，接受率友好</td></tr>
+<tr><td><b>4</b></td><td>ETR&amp;D</td><td>5.6</td><td>Q1 / 3区</td><td>无强制APC</td><td>快</td><td><b style="color:var(--green-700)">高</b></td><td>备投次选：可走"文化与区域视角"栏目</td></tr>
+<tr><td><b>5</b></td><td>J. Computers in Education</td><td>6.6</td><td>Q1</td><td>无强制APC</td><td>中</td><td><b style="color:var(--orange-700)">中</b></td><td>需调整重心为"测评工具开发"</td></tr>
+<tr><td><b>6</b></td><td>Smart Learning Environments</td><td>12.1</td><td>Q1 / 1区</td><td>OA，可申请资助</td><td>较长</td><td><b style="color:var(--orange-700)">中</b></td><td><b>高目标冲刺</b>：教育学第2位，需先确认APC资助</td></tr>
+<tr><td><b>7</b></td><td>Internet and Higher Education</td><td>10.6</td><td>Q1 / 1区Top</td><td>订阅免费/OA 4080美元</td><td>250天</td><td><b style="color:var(--red-700)">低</b></td><td>仅作拉高目标，时间不可行</td></tr>
+<tr><td><b>8</b></td><td>BJET</td><td>13.0</td><td>Q1 / 6/760</td><td>订阅免费</td><td>220天</td><td><b style="color:var(--red-700)">很低</b></td><td>长远目标，接受率仅4%</td></tr>
+</tbody>
+</table>
+
+<div class="box ok">
+<span class="lbl">推荐的双轨投稿路径</span>
+<p><b>主投：Education and Information Technologies（优先级 2）</b>——理由：IF 7.2、中科院 2 区、主题契合度最高、且该刊近期直接刊载 AI 素养量表开发与 AI 依赖主题论文，<b>其读者群最可能理解并认可本文的核心概念创新</b>。非 OA 路线零费用。</p>
+<p><b>若两周内未收到首轮决定，切换至 Journal of Computing in Higher Education（优先级 1）</b>——理由：审稿最快（24 天中位），在时间约束下成功率最高。</p>
+<p style="margin-top:8px;"><b>为什么不把 JCHE 排第一？</b>因为本文最大的学术新意是概念建构（智能体编排能力的四子域与测评工具），而 EAIT 已有 AI 素养量表开发与 AI 依赖研究的刊发先例，<b>能让本文的概念创新被正确理解与对话</b>。JCHE 审稿更快，但可能对"概念建构"这类软性贡献的评价不如 EAIT 敏锐。</p>
+</div>
+
+<div class="box note">
+<span class="lbl">若单位认定口径只认 SCIE 的应对方案</span>
+<p>若核实后发现单位<b>不认可 SSCI 期刊</b>，则上述八刊均不适用。此时两条出路：<br>①<b>转投国内 CSSCI 期刊</b>（《中国高教研究》《清华大学教育研究》《高等教育研究》《电化教育研究》《中国教育科学》等），本文的"教学改革研究"体裁与国内 CSSCI 期刊的偏好更为匹配，且无需版面费、见刊周期可控；<br>②<b>调整研究重心以适配工程类 SCIE 期刊</b>（如 IEEE Access，需 APC），但这会牺牲教育学理论贡献。<b>建议优先走路径 ①。</b></p>
+</div>
+</section>
+
+<!-- ==================== 第三部分 ==================== -->
+<section id="p3">
+<h2>第三部分　投稿前准备与时间倒排</h2>
+
+<h3>3.1 投稿前必须完成的八项准备</h3>
+
+<table>
+<thead><tr><th style="width:5%">序</th><th style="width:22%">准备事项</th><th style="width:9%">优先级</th><th>具体要求与验收标准</th></tr></thead>
+<tbody>
+<tr><td><b>1</b></td><td><b>确认单位认定口径</b></td><td><b style="color:var(--red-700)">最高</b></td><td>向人事处/科研处确认：<b>SSCI 期刊论文是否等同 SCI 计入科研工作量？</b>这是整个投稿路径的前提。若答案为否，须立即转向 CSSCI 路线。<b>此项未确认前不要开始写作。</b></td></tr>
+<tr><td><b>2</b></td><td><b>伦理审批</b></td><td><b style="color:var(--red-700)">最高</b></td><td>涉及学生对话日志、反思报告、AI 使用记录的采集，<b>必须取得学校伦理审查委员会（或 IRB/教育研究伦理委员会）批准</b>。国际期刊普遍要求提供审批号与知情同意文本模板。<b>此项周期通常 1—2 个月，是最容易导致延误的环节，务必最早启动。</b></td></tr>
+<tr><td><b>3</b></td><td><b>数据与量表工具</b></td><td><b style="color:var(--red-700)">最高</b></td><td>①自编"智能体编排能力量表"须完成 EFA + CFA，报告 α、CFI、RMSEA、AVE、CR；②测评任务样例（含评分量规）须完整；③<b>与至少一个既有成熟 AI 素养量表作比较以证明增量效度</b>；④数据可得性声明（Data Availability Statement）文本。</td></tr>
+<tr><td><b>4</b></td><td><b>事前功效分析</b></td><td><b style="color:var(--red-700)">高</b></td><td>确定样本量 N 的统计学依据，说明预期效应量来源（最好引用同类研究的实证效应量），并报告所需样本量与实际样本的对比。<b>这是国际期刊最常见的退稿原因之一。</b></td></tr>
+<tr><td><b>5</b></td><td><b>文献补全</b></td><td><b style="color:var(--orange-700)">高</b></td><td>检索目标刊 <b>2024—2026 年</b>发表的 GenAI / AI literacy / curriculum reform / assessment 文章 <b>40—60 条</b>，其中近三年文献不少于 30%。须包含 Harness/agent 相关技术文献并作教育学转译。</td></tr>
+<tr><td><b>6</b></td><td><b>英文语言润色</b></td><td><b style="color:var(--orange-700)">高</b></td><td>中文母稿完成后，需专业学术润色。<b>建议预留 2—3 周</b>。本院系已有《人工智能工具应用实践》等课程的教学经验，可组织学生参与初译，但须由专业润色做最终把关。</td></tr>
+<tr><td><b>7</b></td><td><b>投稿信与材料</b></td><td><b style="color:var(--green-700)">中</b></td><td>Cover Letter 须包含：本文与该刊范围的契合论证、<b>声明未一稿多投</b>、推荐与回避审稿人（如有）、数据可得性、伦理审批号、作者贡献声明（CRediT）。</td></tr>
+<tr><td><b>8</b></td><td><b>APC 资助确认</b></td><td><b style="color:var(--green-700)">中</b></td><td>若考虑 SLE，<b>须在投稿前联系副主编 Ahmed Tlili 申请北师大 2024—2028 资助</b>；若考虑 Internet and Higher Education 的 OA 路线，需先申请单位科研经费支持。</td></tr>
+</tbody>
+</table>
+
+<h3>3.2 时间倒排计划（2026年10月—2027年3月）</h3>
+
+<div class="box warn">
+<span class="lbl">时间线的现实评估</span>
+<p>本计划按"<b>论文已完成研究设计与数据采集，10 月开始写作</b>"的前提制定。若研究尚未实施、数据尚未采集，则 <b>2027 年 3 月前见刊不可行</b>，应调整为 2027 年下半年或更长周期。<b>请先确认研究实施状态，再采用本时间表。</b></p>
+</div>
+
+<div class="timeline">
+<div class="tl-item crit">
+<div class="tl-date">2026年10月（本月）</div>
+<div class="tl-text"><b>启动前置事项（必须并行，不可延后）</b>
+<ol style="margin-bottom:0;">
+<li><b>确认单位 SSCI/SCI 认定口径</b>（第 1 周内完成）</li>
+<li><b>启动伦理审批申请</b>（第 1—2 周提交，周期 1—2 个月）</li>
+<li><b>确定目标期刊最终名单</b>（在优先级 1—4 中选定 1 主 1 备）</li>
+<li><b>检索目标刊近三年文献</b>，完成 40—60 条文献库</li>
+</ol></div>
+</div>
+
+<div class="tl-item crit">
+<div class="tl-date">2026年11月</div>
+<div class="tl-text"><b>完成母稿 + 完成统计</b>
+<ol style="margin-bottom:0;">
+<li>完成数据分析（ANCOVA、调节效应、质性主题分析）</li>
+<li>按 §1.1 结构写完 <b>4000—4500 字中文母稿</b></li>
+<li>制作全部表格（量表、指标体系、结果）与图（机制示意图）</li>
+<li>完成量表信效度检验报告</li>
+<li><b>如有需要，联系 SLE 副主编申请 APC 资助</b></li>
+</ol></div>
+</div>
+
+<div class="tl-item">
+<div class="tl-date">2026年12月</div>
+<div class="tl-text"><b>投稿</b>
+<ol style="margin-bottom:0;">
+<li><b>12月上旬：完成英文扩写至 7000 词</b>（可先投主投刊）</li>
+<li><b>12月中旬：完成语言润色</b>（2—3 周）</li>
+<li><b>12月下旬：正式投稿主投刊</b>（EAIT 或 JCHE）</li>
+<li>同步准备备投版本（若有审稿意见需针对性修改）</li>
+</ol></div>
+</div>
+
+<div class="tl-item">
+<div class="tl-date">2027年1月</div>
+<div class="tl-text"><b>应对首轮审稿</b>
+<ol style="margin-bottom:0;">
+<li>接收主投刊首轮决定（EAIT 中位 29—40 天 / JCHE 中位 24 天）</li>
+<li><b>若为大修：按期完成修改稿</b>（预留 3—4 周）</li>
+<li><b>若为拒稿：立即切换备投刊，同步调整稿件</b>（拒稿意见是下一轮的重要参考）</li>
+</ol></div>
+</div>
+
+<div class="tl-item crit">
+<div class="tl-date">2027年2月</div>
+<div class="tl-text"><b>提交终稿与版权</b>
+<ol style="margin-bottom:0;">
+<li>接收修订稿决定</li>
+<li>完成 minor revision 与 proof 校对（通常 2—3 周）</li>
+<li><b>如需 OA，签署版权协议并确认 APC 支付或资助到位</b></li>
+</ol></div>
+</div>
+
+<div class="tl-item">
+<div class="tl-date">2027年3月</div>
+<div class="tl-text"><b>在线见刊（Online First）目标达成</b>
+<ol style="margin-bottom:0;">
+<li>非 OA 刊的"接受至在线发表"通常较快（JCHE、EAIT 约 2—17 天量级）</li>
+<li><b>此时已完成"见刊"，符合 3 月前的要求</b>（若单位认可 Online First 计入；若要求纸质版或正式卷期，见刊时间可能需再延 1—2 个月，<b>建议提前与科研处确认 Online First 是否算"见刊"</b>）</li>
+</ol></div>
+</div>
+</div>
+
+<div class="box info">
+<span class="lbl">关于"见刊"口径的第二项确认</span>
+<p>除 SCI/SSCI 认定外，还须确认：<b>单位是否认可"Online First"（网络首发）作为见刊计入？</b>多数单位认可，但部分单位要求正式卷期。<b>此项直接影响 3 月目标能否成立，建议与第 1 项一并核实。</b></p>
+</div>
+
+<h3>3.3 风险预案</h3>
+<table>
+<thead><tr><th style="width:26%">风险</th><th style="width:9%">等级</th><th>预案</th></tr></thead>
+<tbody>
+<tr><td>研究尚未实施，无现成数据</td><td><span style="color:var(--red-700)">高</span></td><td>立即调整目标见刊时间至 2027 年下半年；或改为<b>先发表理论建构型论文</b>（概念界定 + 量表开发 + 初步验证，无需完整准实验数据），投稿目标改为接受理论文章的期刊</td></tr>
+<tr><td>单位不认可 SSCI</td><td><span style="color:var(--red-700)">高</span></td><td>转投 CSSCI（《中国高教研究》《电化教育研究》等），无需版面费，见刊周期可控</td></tr>
+<tr><td>伦理审批未通过或超期</td><td><span style="color:var(--orange-700)">中</span></td><td>调整数据采集方案至最小必要；或在论文中明确改用匿名化已有教学数据</td></tr>
+<tr><td>主投刊拒稿</td><td><span style="color:var(--orange-700)">中</span></td><td>立即切换备投；将拒稿意见转为下一轮修改依据。<b>不因一次拒稿延后整体时间线</b></td></tr>
+<tr><td>SLE 的 APC 无法获资助</td><td><span style="color:var(--green-700)">低</span></td><td>放弃 SLE，转投 JCHE 或 EAIT（无强制费用）</td></tr>
+<tr><td>概念创新被质疑"无先例"</td><td><span style="color:var(--orange-700)">中</span></td><td>强化 §1.3 的三处交代（与 AI 素养、人机协同能力的区分表 + 增量效度检验）；必要时补充一份独立专家评审意见</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ==================== 附录 ==================== -->
+<section id="pa">
+<h2>附录：数据来源、核实状态与使用限制</h2>
+
+<h3>A.1 期刊数据来源与核实状态</h3>
+<table>
+<thead><tr><th style="width:22%">期刊</th><th style="width:26%">数据来源</th><th style="width:12%">指标性质</th><th>核实状态与说明</th></tr></thead>
+<tbody>
+<tr><td>J. Computing in Higher Education</td><td>Springer 官网 journal/12528</td><td><b>官方</b></td><td>IF 4.3（2025）、中位首决 24 天、Hybrid、年发文约 60 篇——均取自出版商页面。<b>接受率为估算值</b></td></tr>
+<tr><td>Education and Information Technologies</td><td>Springer 官网 journal/10639 及 Springer 教育期刊总览页</td><td><b>官方</b></td><td>IF 7.2（2025）、五年 IF 7.3、中位首决 29 天、官方称"约 40 天"、明确不接受综述类——均取自官方。<b>接受率为估算值</b></td></tr>
+<tr><td>J. Educational Computing Research</td><td>SAGE 官网（未直接抓取到指标页）+ 第三方数据库交叉比对</td><td><b>混合</b></td><td><b style="color:var(--orange-700)">注意</b>：影响因子存在 5.088 / 4.9 / 10.35 三种口径差异。<b>须以 JCR 官方 2025 版为准</b>，本报告标注约 5.1 并保留全部差异值供核实</td></tr>
+<tr><td>ETR&amp;D</td><td>Springer 官网 journal/11423</td><td><b>官方</b></td><td>IF 5.6（2025）、五年 IF 6.3、中位首决 22 天、AECT 出版、91% 作者再投意愿——均为官方数据。<b>接受率为估算值</b></td></tr>
+<tr><td>J. Computers in Education</td><td>Springer 相关页面 + 北师大智慧学习研究院公告</td><td><b>官方</b></td><td>IF 6.6（2025）、中位首决 26 天、2027 年起转 CAP 模式——取自 Springer 页面；JCR 排名第 36 位取自北师大研究院引述 JCR 2025</td></tr>
+<tr><td>Smart Learning Environments</td><td>SpringerOpen 官网 + DOAJ + 北师大智慧学习研究院公告</td><td><b>官方 + 权威第三方</b></td><td>JCR 2025 IF = 12.1、教育学第 2 位（北师大研究院引述 JCR 官方）、CiteScore 33.4（Scopus）、APC EUR 1,490/USD 2,090（DOAJ）、北师大 2024—2028 资助部分文章（Springer 官方 News）；<b>出版至录用约 19 周为社区经验数据</b>；<b>接受率约 10% 为估算值</b></td></tr>
+<tr><td>Internet and Higher Education</td><td>Elsevier 官方 Journal Insights 页面</td><td><b>官方</b></td><td>CiteScore 13.8、IF 10.6、APC USD 4,080、首决 12 天、决定含外审 87 天、<b>投稿至录用中位 250 天</b>——全部取自 Elsevier 官方。<b>接受率为估算值</b></td></tr>
+<tr><td>BJET</td><td>BERA 官方期刊指标页 + BERA 官网</td><td><b>官方</b></td><td>IF 13.0（2025）、JCR 6/760、CiteScore 23.1、JCI 4.17、<b>接受率 4%</b>、首决 26 天、<b>投稿至录用 220 天</b>、接受至发表 17 天、2025 年发文 97 篇——全部取自 BERA 官方</td></tr>
+</tbody>
+</table>
+
+<h3>A.2 需要读者注意的三点使用限制</h3>
+<div class="box warn">
+<ol style="margin-bottom:0;">
+<li><b>影响因子数值存在数据库差异</b>。本报告优先采用出版商官方数值，但部分期刊（JECR、BJET）在不同第三方数据库中数值差距较大。<b>正式申报或写入基金/职称材料前，务必以 Clarivate JCR 官方 2025 版数据为准</b>，并注明取数日期。</li>
+<li><b>接受率数据绝大部分为估算值</b>。八刊中仅 BJET（4%）与 IJETHE（3%）有公开来源；其余六刊的接受率是依据 Q1 教育类期刊常规水平的<b>合理推测，仅用于横向比较相对难度，不可作为精确数据引用</b>。</li>
+<li><b>审稿周期与录用后出版时间是两回事</b>。"submission to first decision" 反映的是首轮决定速度（含 desk reject 快速返回），不等于全流程周期。本报告在时间可行性判断中<b>已优先采用"投稿至录用"或"出版至录用"数据</b>，若读者自行评估，请勿用首决速度推断见刊时间。</li>
+</ol>
+</div>
+
+<h3>A.3 论文中需引用的核心文献（建议清单）</h3>
+<ol class="refs">
+<li><b>政策文件（必备，引用权重最高）</b>：《教育部等五部门关于印发〈"人工智能+教育"行动计划〉的通知》，2026-04-10；教育部科技司负责人答记者问，2026-04-10；教育部《2024年全国教育事业发展统计公报》，2025-06。</li>
+<li><b>学习分析与预警综述（用于 RQ1 的方法基础）</b>：Li, K. C., Wong, B. T.-M., &amp; Liu, M. (2024). A survey on predicting at-risk students through learning analytics. <em>International Journal of Innovation and Learning</em>, 36(5), 1–15.</li>
+<li><b>学习分析十年综述（用于文献缺口论证）</b>：Salas-Martínez, Á., &amp; Ramírez-Martinell, A. (2024). Learning Analytics in Higher Education: A Decade in Systematic Literature Review. <em>Programming and Computer Software</em>, 50(8), 690–700.<b>（该文指出聚焦学业指导的作品稀缺，是本文"干预效果"取向的依据）</b></li>
+<li><b>画像技术计量（用于研究演进趋势）</b>：Research hotspots and frontiers of profile technology applied in education—a visualization analysis based on CiteSpace. <em>Frontiers in Psychology</em> (2025), 1668749.</li>
+<li><b>Agent Harness 概念来源（须标注为工程社区资料）</b>：Besthub, <em>Deep Dive into Agent Harness</em> (2026)；Composio, <em>8 Best AI Agent Harnesses in 2026</em>；nxcode, <em>什么是 Harness Engineering？AI Agent 开发完整指南</em> (2026)。<b>三项均非同行评审学术文献，引用时必须在正文中明确其性质</b></li>
+<li><b>AI 素养测量（用于概念区分与增量效度论证）</b>：须检索该主题近三年核心文献，特别是 Development and validation of the adolescent artificial intelligence literacy scales（<em>Education and Information Technologies</em>, 2026）。</li>
+<li><b>AI 依赖与思维惰化（用于 RQ3 的假设来源）</b>：Abdelhadi, A. (2026). From pen to prompt: costs of AI overreliance on students' cognitive endurance, self-efficacy and social engagement in writing tasks. <em>Education and Information Technologies</em>；Zhang, L., et al. (2026). Stressed minds, smart tools: How academic expectation stress fuels generative AI dependency in Chinese higher education. <em>Internet and Higher Education</em>.</li>
+<li><b>目标刊近三年文献（必备）</b>：投稿前须检索拟投期刊 2024—2026 年关于 GenAI / AI literacy / curriculum reform / assessment 的全部相关文章，确保讨论部分与其对话。</li>
+</ol>
+
+<hr>
+<p style="font-size:13px;color:var(--gray-500);">本报告第一部分为论文写作规划，可直接作为论文大纲使用；第二部分期刊数据均标注来源与核实状态，接受率等推测性数据已明确标记；第三部分时间倒排以"研究已实施、数据已就绪"为前提，若前提不成立须按 §3.3 风险预案调整。所有政策引用均已核对发布机构与发布日期。</p>
+
+</section>
+</div>
+</body>
+</html>
