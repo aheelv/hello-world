@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f2">
+<title>AI 读书笔记 · 思维导图与全篇索引</title>
+<style>
+:root{
+  --ink:#111827; --ink-2:#374151; --ink-3:#6b7280;
+  --line:#e5e7eb; --line-2:#d1d5db;
+  --bg:#f6f5f2; --paper:#ffffff;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.14);
+  --accent:#6d28d9;
+  --c-philosophy:#6d28d9; --c-practice:#0f766e; --c-methods:#b45309; --c-overview:#334155;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+
+/* ---------- 顶栏 ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(246,245,242,.9);
+  backdrop-filter:saturate(160%) blur(12px);-webkit-backdrop-filter:saturate(160%) blur(12px);
+  border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.topbar .inner{max-width:1560px;margin:0 auto;padding:0 clamp(14px,2.4vw,28px);
+  display:flex;align-items:center;gap:14px;min-height:58px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:16px;letter-spacing:.01em;white-space:nowrap}
+.brand small{display:block;font-weight:500;font-size:11.5px;color:var(--ink-3);letter-spacing:.04em}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);
+  border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 13px;white-space:nowrap}
+.back:hover{border-color:var(--accent);color:var(--accent)}
+.searchbox{margin-left:auto;display:flex;align-items:center;gap:8px;flex:1 1 260px;max-width:420px}
+.searchbox input{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:10px;
+  padding:8px 12px;font-size:13.5px;outline:none}
+.searchbox input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(109,40,217,.09)}
+.sbtn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:8px 13px;font-size:13px;white-space:nowrap}
+.sbtn:hover{filter:brightness(1.08)}
+.sbtn[disabled]{opacity:.6;cursor:progress}
+
+/* ---------- 概览条 ---------- */
+.hero{max-width:1560px;margin:0 auto;padding:24px clamp(14px,2.4vw,28px) 10px}
+.hero h1{margin:0 0 6px;font-size:clamp(22px,3vw,30px);letter-spacing:-.02em}
+.hero p{margin:0;color:var(--ink-3);font-size:13.8px;max-width:82ch;line-height:1.7}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:7px 13px;font-size:12.5px;color:var(--ink-2)}
+.stat b{font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;margin-right:3px}
+
+/* ---------- 三栏 ---------- */
+.layout{max-width:1560px;margin:0 auto;padding:12px clamp(14px,2.4vw,28px) 36px;
+  display:grid;grid-template-columns:236px minmax(0,1fr) 364px;gap:14px;align-items:start}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.side{position:sticky;top:70px;max-height:calc(100vh - 86px);overflow:auto;padding:14px}
+.work{min-height:620px;padding:0;overflow:hidden}
+.detail{position:sticky;top:70px;max-height:calc(100vh - 86px);overflow:auto;padding:0}
+.ph{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin:0 0 10px}
+
+/* 书目 */
+.books{display:grid;gap:8px;margin-bottom:18px}
+.book{border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:#fcfcfd}
+.book.on{border-color:var(--accent);background:linear-gradient(180deg,rgba(109,40,217,.06),#fff 70%)}
+.book b{display:block;font-size:13.5px}
+.book span{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.55;margin-top:2px}
+.book.plan{opacity:.72;border-style:dashed}
+.book.plan b{font-size:12.5px}
+
+/* 导航树 */
+.tree details{border-bottom:1px solid var(--line)}
+.tree details:last-child{border-bottom:0}
+.tree summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;
+  padding:8px 6px;font-size:13px;font-weight:600;border-radius:8px}
+.tree summary::-webkit-details-marker{display:none}
+.tree summary:hover{background:#f7f6f3}
+.tree summary::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dot,#6b7280);flex:0 0 auto}
+.tree .children{padding:0 0 8px 12px;border-left:1px dashed var(--line-2);margin-left:9px}
+.tnode{display:block;width:100%;text-align:left;background:none;border:0;border-radius:7px;
+  padding:5px 8px;font-size:12.3px;color:var(--ink-2);line-height:1.45}
+.tnode:hover{background:#f4f2ef;color:var(--ink)}
+.tnode.sel{background:rgba(109,40,217,.09);color:var(--accent);font-weight:700}
+.tnode.root{font-weight:700;color:var(--ink);font-size:13px}
+.tnode.root.sel{color:var(--accent)}
+
+/* 视图标签 */
+.tabs{display:flex;gap:2px;padding:10px 12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:9px 14px 11px;
+  font-size:13.2px;color:var(--ink-3);font-weight:600}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.view{padding:16px 18px 22px;display:none}
+.view.on{display:block}
+.hint{font-size:12.3px;color:var(--ink-3);margin:0 0 12px;line-height:1.65}
+
+/* 思维导图 SVG */
+.mindwrap{border:1px solid var(--line);border-radius:12px;background:
+  radial-gradient(circle at 50% 40%,#fff 0%,#fbfaf8 100%);overflow:auto}
+.mindwrap svg{display:block;width:100%;min-width:760px;height:auto}
+.node{cursor:pointer}
+.node rect{transition:fill .16s,stroke-width .16s,filter .16s}
+.node:hover rect{filter:brightness(.975)}
+.node.sel rect{stroke-width:2.6}
+.node text{pointer-events:none;font-family:inherit}
+.link{fill:none;stroke:#d8d5d0;stroke-width:1.6}
+.mindlegend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11.8px;color:var(--ink-3)}
+.mindlegend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* 筛选与索引 */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.filters select,.filters input{background:#fcfcfd;border:1px solid var(--line);border-radius:9px;
+  padding:7px 10px;font-size:12.6px;outline:none;max-width:100%}
+.filters input{flex:1 1 200px;min-width:150px}
+.filters select:focus,.filters input:focus{border-color:var(--accent)}
+.filters .count{align-self:center;font-size:12px;color:var(--ink-3);margin-left:auto}
+.volgrp{margin-bottom:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.volgrp>h3{margin:0;padding:10px 14px;background:#faf9f7;border-bottom:1px solid var(--line);
+  font-size:13.2px;display:flex;align-items:center;gap:8px}
+.volgrp>h3 span{font-weight:400;color:var(--ink-3);font-size:11.8px;margin-left:auto}
+.arow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;
+  padding:9px 14px;border-bottom:1px solid #f1f0ed;cursor:pointer}
+.arow:last-child{border-bottom:0}
+.arow:hover{background:#faf8fd}
+.arow .no{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.arow .nm{font-size:13.2px;font-weight:600;line-height:1.45}
+.arow .nm small{display:block;font-weight:400;color:var(--ink-3);font-size:11.6px;margin-top:2px}
+.arow .lv{font-size:10.8px;color:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.arow.lv-core .nm{color:var(--accent)}
+.empty{padding:26px 14px;text-align:center;color:var(--ink-3);font-size:13px}
+
+/* 详情面板 */
+.dhead{padding:16px 17px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--paper);z-index:2}
+.dhead .kind{font-size:10.8px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.dhead h2{margin:5px 0 0;font-size:17px;line-height:1.4;letter-spacing:-.01em}
+.dhead .sub{font-size:11.8px;color:var(--ink-3);margin-top:4px;line-height:1.55}
+.dbody{padding:14px 17px 24px;font-size:13.2px;line-height:1.78;color:var(--ink-2)}
+.dbody h4{margin:18px 0 8px;font-size:12.4px;color:var(--ink);letter-spacing:.02em;
+  padding-bottom:5px;border-bottom:1px solid var(--line)}
+.dbody h4:first-child{margin-top:0}
+.dbody p{margin:0 0 10px}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.key{background:#f4f1fa;color:#5b21b6;border:1px solid #e9e2f8;border-radius:999px;padding:3px 10px;font-size:11.6px}
+.tag{background:#f5f5f4;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:11.4px;color:var(--ink-2)}
+.linklist{display:grid;gap:6px}
+.linklist button{display:flex;gap:8px;align-items:baseline;text-align:left;background:#fcfcfd;
+  border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12.4px;width:100%}
+.linklist button:hover{border-color:var(--accent);color:var(--accent)}
+.linklist button i{font-style:normal;font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.olist{margin:0;padding-left:0;list-style:none;counter-reset:o}
+.olist li{position:relative;padding:6px 0 6px 32px;border-bottom:1px dashed #eeece8;font-size:12.6px;line-height:1.65}
+.olist li:last-child{border-bottom:0}
+.olist li::before{counter-increment:o;content:counter(o);position:absolute;left:2px;top:7px;
+  width:21px;height:21px;border-radius:6px;background:#f3f1ee;color:var(--ink-3);
+  font-size:10.8px;text-align:center;line-height:21px;font-variant-numeric:tabular-nums}
+.olist li.sec{font-weight:700;color:var(--accent);padding-left:8px}
+.olist li.sec::before{content:"§";background:#ede9f8;color:var(--accent)}
+.quote{border-left:3px solid var(--accent);background:#faf9fd;padding:9px 12px;margin:0 0 10px;
+  border-radius:0 8px 8px 0;font-size:12.7px;line-height:1.75}
+.quote .qm{display:block;font-size:10.8px;color:var(--ink-3);margin-top:5px;font-variant-numeric:tabular-nums}
+.foldbtn{background:#f7f6f3;border:1px solid var(--line);border-radius:9px;padding:7px 12px;
+  font-size:12.2px;color:var(--ink-2);margin:4px 0 12px;width:100%;text-align:left}
+.foldbtn:hover{border-color:var(--accent);color:var(--accent)}
+.fold{display:none}
+.fold.open{display:block}
+.para{display:grid;grid-template-columns:34px minmax(0,1fr);gap:9px;padding:7px 0;
+  border-bottom:1px dashed #eeece8;font-size:12.9px;line-height:1.85}
+.para .pn{font-size:10.8px;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums;padding-top:4px}
+.para.sec{font-weight:700;color:var(--accent);grid-template-columns:1fr}
+.para.note{color:var(--ink-3);font-size:12px}
+.extlink{display:inline-flex;align-items:center;gap:5px;font-size:12.2px;color:var(--accent);
+  border:1px solid #e4dcfa;background:#faf8ff;border-radius:9px;padding:7px 11px;margin:2px 6px 8px 0}
+.extlink:hover{background:#f1ebff}
+.meta-line{font-size:11.8px;color:var(--ink-3);margin:0 0 12px;line-height:1.7}
+.status{font-size:12.2px;color:var(--ink-3);padding:8px 0}
+
+/* 全文阅读 */
+.readbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.readbar select{flex:1 1 240px;background:#fcfcfd;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12.6px}
+.navbtn{background:#f7f6f3;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:12.3px}
+.navbtn:hover{border-color:var(--accent);color:var(--accent)}
+.readtitle{font-size:18px;font-weight:700;margin:8px 0 2px}
+.readmeta{font-size:12px;color:var(--ink-3);margin:0 0 14px}
+.readbody{border-top:1px solid var(--line);padding-top:8px}
+.searchres{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.srhit{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px;background:#fcfcfd}
+.srhit b{font-size:12.6px}
+.srhit p{margin:5px 0 0;font-size:12.1px;color:var(--ink-2);line-height:1.7}
+.srhit mark{background:#fde68a;color:inherit;padding:0 1px}
+
+/* 页脚 */
+.foot{border-top:1px solid var(--line);background:#fbfaf8}
+.foot .inner{max-width:1560px;margin:0 auto;padding:20px clamp(14px,2.4vw,28px) 30px;
+  font-size:11.9px;color:var(--ink-3);line-height:1.8}
+.foot b{color:var(--ink-2)}
+.foot code{background:#efeeeb;border-radius:4px;padding:1px 5px;font-size:11px}
+.foot a{color:var(--accent)}
+
+@media(max-width:1250px){
+  .layout{grid-template-columns:214px minmax(0,1fr)}
+  .detail{grid-column:1/-1;position:static;max-height:none}
+  .side{position:static;max-height:none}
+}
+@media(max-width:760px){
+  .layout{grid-template-columns:1fr;padding:10px 12px 28px}
+  .side{order:2}.work{order:1;min-height:0}.detail{order:3;grid-column:1}
+  .topbar .inner{gap:8px;min-height:0;padding-top:8px;padding-bottom:8px}
+  .searchbox{order:3;flex-basis:100%;max-width:none}
+  .hero{padding-top:16px}
+  .view{padding:13px 12px 18px}
+  .dbody{padding:12px 13px 20px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <div class="brand">AI 读书笔记<small>MIND MAP &amp; FULL INDEX</small></div>
+    <a class="back" href="../">← 返回资源中心</a>
+    <div class="searchbox">
+      <input id="q" type="search" placeholder="搜索篇名 / 编号 / 主题 / 标签…" autocomplete="off" aria-label="搜索篇目">
+      <button class="sbtn" id="btn-full" type="button">检索全文</button>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>把一本书，读成一棵可检索的树</h1>
+  <p id="hero-desc">按问题域重组全书的哲学理论、实践应用与方法工具；每一节点都有详解，每一篇都可回溯到原文。首册为《毛泽东选集》。</p>
+  <div class="stats" id="stats"></div>
+</div>
+
+<div class="layout">
+  <!-- 左：书目 + 导图导航 -->
+  <aside class="panel side">
+    <div class="ph">书目 / BOOKS</div>
+    <div class="books" id="books"></div>
+    <div class="ph">思维导图导航</div>
+    <div class="tree" id="tree"></div>
+  </aside>
+
+  <!-- 中：三视图 -->
+  <section class="panel work">
+    <div class="tabs">
+      <button class="tab on" data-view="mind" type="button">思维导图</button>
+      <button class="tab" data-view="index" type="button">篇目索引</button>
+      <button class="tab" data-view="read" type="button">全文阅读</button>
+    </div>
+    <div class="view on" id="v-mind">
+      <p class="hint">点击任一节点，右侧显示该节点的详细解释；点击主题可下钻到关联篇目。导图按问题域组织，不按卷次平铺。</p>
+      <div class="mindwrap" id="mind"></div>
+      <div class="mindlegend">
+        <span><i style="background:#6d28d9"></i>哲学理论</span>
+        <span><i style="background:#0f766e"></i>实践应用</span>
+        <span><i style="background:#b45309"></i>方法工具</span>
+        <span><i style="background:#334155"></i>全书总览</span>
+      </div>
+    </div>
+    <div class="view" id="v-index">
+      <p class="hint">按原书卷次保全全部 229 篇，编号与导图一一对应。筛选仅作用于本视图。</p>
+      <div class="filters">
+        <input id="f-q" type="search" placeholder="篇名 / 编号 / 标签" autocomplete="off" aria-label="筛选篇目">
+        <select id="f-vol" aria-label="按卷筛选"><option value="">全部卷次</option></select>
+        <select id="f-theme" aria-label="按主题筛选"><option value="">全部主题</option></select>
+        <select id="f-level" aria-label="按层级筛选"><option value="">全部层级</option><option value="core">核心篇目</option><option value="related">关联篇目</option><option value="context">背景篇目</option></select>
+        <span class="count" id="f-count"></span>
+      </div>
+      <div id="index-list"></div>
+    </div>
+    <div class="view" id="v-read">
+      <p class="hint">全文按卷在选中时加载，正文逐段完整呈现，尾注独立成列；切换篇目时同一卷内不重复请求。</p>
+      <div class="readbar">
+        <select id="r-select" aria-label="选择篇目"></select>
+        <button class="navbtn" id="r-prev" type="button">← 上一篇</button>
+        <button class="navbtn" id="r-next" type="button">下一篇 →</button>
+      </div>
+      <div id="read-area"></div>
+      <div class="searchres" id="searchres"></div>
+    </div>
+  </section>
+
+  <!-- 右：节点详解 -->
+  <aside class="panel detail" id="detail"></aside>
+</div>
+
+<div class="foot">
+  <div class="inner">
+    <p><b>数据性质</b>：本站为结构化读书笔记，不转载原文全文；正文段落取自开源整理项目用于逐段核对与脉络标注，每篇均附原文核对链接。篇目、题解、写作年代与章节结构以 <a id="src-link" href="#" target="_blank" rel="noopener">上游全文整理项目</a> 为准。</p>
+    <p><b>覆盖口径</b>：五卷全部 229 篇，逐篇含题解、章节结构、逐段落论述脉络、覆盖全文各区段的代表性论述、完整正文段落与尾注。导图按问题域重组，索引按原书卷次保全，两者通过三位编号对应。</p>
+    <p><b>扩展方式</b>：页面为纯静态、数据驱动。新增书目只需在 <code>data/books.js</code> 增加一条配置，并放入对应索引文件（<code>window.MAO_NOTES</code> 同构）与卷数据文件（<code>window.MAO_VOL[n]</code>），无需改动 <code>index.html</code>。首屏仅加载书目表与索引，卷级全文按需加载。</p>
+    <p id="foot-compiled"></p>
+  </div>
+</div>
+
+<script src="data/books.js"></script>
+<script src="data/mao-notes.js"></script>
+<script>
+(function(){
+"use strict";
+var BOOKS = window.BOOKS || [];
+var N = window.MAO_NOTES;
+var $ = function(s,r){return (r||document).querySelector(s);};
+var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+var esc = function(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});};
+var volCache = {}, volPending = {};
+var state = {view:"mind", node:{type:"root",id:null}, article:null, indexDone:false};
+
+if(!N){
+  $("#detail").innerHTML = '<div class="dhead"><div class="kind">加载失败</div><h2>数据文件未能载入</h2></div>'
+    + '<div class="dbody">请确认 <code>data/mao-notes.js</code> 与页面位于同一目录。</div>';
+  return;
+}
+var A = N.articles, M = N.meta;
+var themeById = {}; N.themes.forEach(function(t){themeById[t.id]=t;});
+var branchById = {}; N.branches.forEach(function(b){branchById[b.id]=b;});
+var byNo = {}; A.forEach(function(a){byNo[a.no]=a;});
+var COLORS = {philosophy:"#6d28d9",practice:"#0f766e",methods:"#b45309",overview:"#334155"};
+var VOL_ERA = {1:"第一卷 · 国内革命战争时期",2:"第二卷 · 抗日战争时期（上）",3:"第三卷 · 抗日战争时期（下）",4:"第四卷 · 解放战争时期",5:"第五卷 · 社会主义革命和建设时期"};
+var LV = {core:"核心",related:"关联",context:"背景"};
+
+/* ---------- 数据加载 ---------- */
+function loadVol(v,cb){
+  if(volCache[v]){cb(volCache[v]);return;}
+  if(volPending[v]){volPending[v].push(cb);return;}
+  volPending[v]=[cb];
+  var s=document.createElement("script");
+  s.src = "data/mao-vol-"+v+".js";
+  s.onload=function(){
+    var d=(window.MAO_VOL||{})[v]||{articles:{}};
+    volCache[v]=d;
+    var q=volPending[v];delete volPending[v];
+    q.forEach(function(f){f(d);});
+  };
+  s.onerror=function(){
+    var q=volPending[v]||[];delete volPending[v];
+    q.forEach(function(f){f({articles:{}});});
+  };
+  document.head.appendChild(s);
+}
+function loadVolP(v){return new Promise(function(res){loadVol(v,res);});}
+function detailOf(no,cb){loadVol(byNo[no].vol,function(d){cb(d.articles[no]||{});});}
+
+/* ---------- 顶部概览 ---------- */
+function fmt(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,",");}
+$("#hero-desc").textContent = "按问题域重组《"+M.book+"》的哲学理论、实践应用与方法工具；每一节点都有详解，每一篇都可回溯到原文。"+M.notice;
+$("#stats").innerHTML = [
+  ["篇目",M.articles+" 篇"],["正文段落",fmt(M.paras)+" 段"],["尾注段落",fmt(M.notes)+" 段"],
+  ["正文字符",fmt(M.chars)+" 字"],["导图主题",N.themes.length+" 个"],["方法条目",N.methods.length+" 条"]
+].map(function(x){return '<span class="stat"><b>'+esc(x[1])+'</b></span>';}).join("");
+$("#f-vol").innerHTML += [1,2,3,4,5].map(function(v){
+  return '<option value="'+v+'">第 '+v+' 卷（'+A.filter(function(a){return a.vol===v;}).length+' 篇）</option>';}).join("");
+$("#f-theme").innerHTML += N.themes.map(function(t){
+  return '<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>';}).join("");
+$("#r-select").innerHTML = [1,2,3,4,5].map(function(v){
+  return '<optgroup label="第 '+v+' 卷">'+A.filter(function(a){return a.vol===v;}).map(function(a){
+    return '<option value="'+a.no+'">'+a.no+" · "+esc(a.title)+"</option>";}).join("")+'</optgroup>';}).join("");
+$("#src-link").href = M.sourceUrl;
+$("#foot-compiled").textContent = "数据来源："+M.source+" · 整理日期 "+M.compiled;
+
+/* ---------- 书目 ---------- */
+$("#books").innerHTML = BOOKS.map(function(b){
+  var on = b.status==="ready"?" on":" plan";
+  return '<div class="book'+on+'"><b>'+esc(b.name)+(b.status==="ready"?' · '+b.count+" 篇":"")+'</b>'
+    +'<span>'+esc(b.sub||"")+"</span><span>"+esc(b.desc||"")+"</span></div>";
+}).join("");
+
+/* ---------- 左侧导航树 ---------- */
+var treeHtml = '<button class="tnode root" data-node="root" type="button">'+esc(N.root.name)+"</button>";
+N.branches.forEach(function(b,bi){
+  var kids = "";
+  if(b.themes.length){
+    kids = b.themes.map(function(tid){
+      var t=themeById[tid];
+      return '<button class="tnode" data-node="theme" data-id="'+esc(tid)+'" type="button">'+esc(t.name)+"</button>";
+    }).join("");
+  }else if(b.id==="methods"){
+    kids = N.methods.map(function(m,i){
+      return '<button class="tnode" data-node="method" data-id="'+i+'" type="button">'+esc(m.name)+"</button>";
+    }).join("");
+  }else{
+    kids = [1,2,3,4,5].map(function(v){
+      return '<button class="tnode" data-node="volume" data-id="'+v+'" type="button">第 '+v+' 卷 · '+A.filter(function(a){return a.vol===v;}).length+' 篇</button>';
+    }).join("");
+  }
+  treeHtml += '<details '+(bi<2?"open":"")+'><summary style="--dot:'+COLORS[b.id]+'">'+esc(b.name)+'</summary>'
+    +'<div class="children">'+kids+"</div></details>";
+});
+$("#tree").innerHTML = treeHtml;
+
+/* ---------- SVG 思维导图 ---------- */
+var MIND = {
+  W:1180,H:660,
+  root:{x:470,y:298,w:240,h:64,label:N.root.name},
+  branches:{
+    philosophy:{x:250,y:108,w:190,h:48,label:"哲学理论分支"},
+    practice:{x:740,y:108,w:190,h:48,label:"实践应用分支"},
+    methods:{x:250,y:512,w:190,h:48,label:"方法工具箱"},
+    overview:{x:740,y:512,w:190,h:48,label:"全书总览与篇目索引"}
+  },
+  phThemes:N.themes.filter(function(t){return t.branch==="philosophy";}).map(function(t,i){
+    return {id:t.id,label:t.name,x:36,y:26+i*62,w:192,h:42};}),
+  prThemes:N.themes.filter(function(t){return t.branch==="practice";}).map(function(t,i){
+    return {id:t.id,label:t.name,x:952,y:8+i*62,w:202,h:42};}),
+  extras:[
+    {type:"branch",id:"methods",label:"10 条可迁移方法",x:36,y:508,w:192,h:42,color:COLORS.methods},
+    {type:"volume",id:"1",label:"五卷 · 229 篇索引",x:952,y:508,w:202,h:42,color:COLORS.overview}
+  ]
+};
+function curve(x1,y1,x2,y2){
+  var mx=(x1+x2)/2;
+  return "M"+x1+","+y1+" C"+mx+","+y1+" "+mx+","+y2+" "+x2+","+y2;
+}
+function nodeSvg(o,type,id,fill,stroke,fs,tc){
+  var cx=o.x+o.w/2, cy=o.y+o.h/2+5;
+  var lines = o.label.length>11 ? [o.label.slice(0,11),o.label.slice(11)] : [o.label];
+  var ty = o.y+o.h/2 - (lines.length-1)*8 + 5;
+  var txt = lines.map(function(s,i){return '<text x="'+cx+'" y="'+(ty+i*16)+'" text-anchor="middle" font-size="'+fs+'" fill="'+tc+'" font-weight="'+(type==="root"?700:600)+'">'+esc(s)+"</text>";}).join("");
+  return '<g class="node" data-node="'+type+'" data-id="'+esc(id==null?"":id)+'" role="button" tabindex="0" aria-label="'+esc(o.label)+'">'
+    +'<rect x="'+o.x+'" y="'+o.y+'" width="'+o.w+'" height="'+o.h+'" rx="11" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.5"/>'
+    +txt+"</g>";
+}
+function renderMind(){
+  var p=[], links=[];
+  var r=MIND.root, rcx=r.x+r.w/2, rcy=r.y+r.h/2;
+  Object.keys(MIND.branches).forEach(function(k){
+    var b=MIND.branches[k];
+    links.push(curve(rcx,rcy,b.x+b.w/2,b.y+b.h/2));
+  });
+  function branchLink(b,items,side){
+    items.forEach(function(t){
+      var tx = side==="left" ? t.x+t.w : t.x;
+      links.push(curve(b.x+b.w/2,b.y+b.h/2,tx,t.y+t.h/2));
+    });
+  }
+  branchLink(MIND.branches.philosophy,MIND.phThemes,"left");
+  branchLink(MIND.branches.practice,MIND.prThemes,"right");
+  MIND.extras.forEach(function(e){
+    var right = e.type==="volume";
+    var b=MIND.branches[right?"overview":"methods"];
+    links.push(curve(right?b.x+b.w:b.x,b.y+b.h/2,right?e.x:e.x+e.w,e.y+e.h/2));
+  });
+  p.push('<svg viewBox="0 0 '+MIND.W+" "+MIND.H+'" xmlns="http://www.w3.org/2000/svg" aria-label="思维导图">');
+  p.push(links.map(function(d){return '<path class="link" d="'+d+'"/>';}).join(""));
+  Object.keys(MIND.branches).forEach(function(k){
+    var b=MIND.branches[k],c=COLORS[k];
+    p.push(nodeSvg(b,"branch",k,"#fff",c,14,c));
+  });
+  MIND.phThemes.forEach(function(t){p.push(nodeSvg(t,"theme",t.id,"#faf8ff","#ddd2f2",12.6,"#4c1d95"));});
+  MIND.prThemes.forEach(function(t){p.push(nodeSvg(t,"theme",t.id,"#f5fbfa","#cbe6e2",12.6,"#115e59"));});
+  MIND.extras.forEach(function(e){
+    p.push(nodeSvg(e,e.type,e.id,e.type==="volume"?"#f8f9fa":"#fffbf4",e.color,12.4,e.color));
+  });
+  p.push(nodeSvg(r,"root",null,"#6d28d9","#5b21b6",16.5,"#ffffff"));
+  p.push("</svg>");
+  $("#mind").innerHTML=p.join("");
+  markSel();
+}
+function markSel(){
+  $$("[data-node]").forEach(function(el){
+    var ok = el.getAttribute("data-node")===state.node.type &&
+      String(el.getAttribute("data-id")||"")===String(state.node.id==null?"":state.node.id);
+    el.classList.toggle("sel",ok);
+  });
+}
+
+/* ---------- 视图切换 ---------- */
+function setView(v,skipHash){
+  state.view=v;
+  $$(".tab").forEach(function(t){t.classList.toggle("on",t.getAttribute("data-view")===v);});
+  $$(".view").forEach(function(e){e.classList.toggle("on",e.id==="v-"+v);});
+  if(v==="index"&&!state.indexDone){renderIndex();state.indexDone=true;}
+  if(v==="read"&&!state.article){state.article=A[0].no;$("#r-select").value=A[0].no;renderRead();}
+  if(!skipHash&&typeof history!=="undefined"&&history.replaceState){
+    try{history.replaceState(null,"","#"+v);}catch(e){}
+  }
+}
+
+/* ---------- 篇目索引 ---------- */
+function renderIndex(){
+  var q=$("#f-q").value.trim().toLowerCase(), fv=$("#f-vol").value,
+      ft=$("#f-theme").value, fl=$("#f-level").value;
+  var hit=A.filter(function(a){
+    if(fv&&String(a.vol)!==fv)return false;
+    if(ft&&a.theme!==ft)return false;
+    if(fl&&a.level!==fl)return false;
+    if(q){
+      var hay=(a.no+" "+a.title+" "+a.era+" "+a.tags.join(" ")+" "+(themeById[a.theme]?themeById[a.theme].name:"")).toLowerCase();
+      if(hay.indexOf(q)<0)return false;
+    }
+    return true;
+  });
+  $("#f-count").textContent="共 "+hit.length+" / "+A.length+" 篇";
+  if(!hit.length){$("#index-list").innerHTML='<div class="empty">没有匹配的篇目，试试清空筛选条件。</div>';return;}
+  var out=[1,2,3,4,5].map(function(v){
+    var g=hit.filter(function(a){return a.vol===v;});
+    if(!g.length)return "";
+    return '<div class="volgrp"><h3>第 '+v+' 卷 · '+esc(VOL_ERA[v].split("· ")[1]||"")+'<span>'+g.length+" 篇</span></h3>"
+      +g.map(function(a){
+        return '<div class="arow lv-'+a.level+'" data-article="'+a.no+'" role="button" tabindex="0">'
+          +'<span class="no">'+a.no+'</span><span class="nm">'+esc(a.title)
+          +'<small>'+esc(a.date||a.era)+" · "+esc(themeById[a.theme]?themeById[a.theme].name:a.theme)+" · "+a.paras+" 段</small></span>"
+          +'<span class="lv">'+LV[a.level]+"</span></div>";
+      }).join("")+"</div>";
+  }).join("");
+  $("#index-list").innerHTML=out;
+}
+
+/* ---------- 全文阅读 ---------- */
+function renderRead(){
+  var no=state.article; if(!no)return;
+  var a=byNo[no]; $("#r-select").value=no;
+  detailOf(no,function(d){
+    if(state.article!==no)return;
+    var body=d.body||[], notes=d.notes||[];
+    var h='<h2 class="readtitle">'+a.no+" · "+esc(a.title)+"</h2>"
+      +'<p class="readmeta">第 '+a.vol+" 卷 · "+esc(a.era)+" · "+esc(a.date||"")+" · "+a.chars+" 字 · "+a.paras+" 段 · 尾注 "+a.notes+" 段</p>";
+    if(d.note)h+='<div class="quote">'+esc(d.note)+'<span class="qm">题解（原文）</span></div>';
+    h+='<div class="readbody">'+body.map(function(x){
+      if(x.k==="节")return '<div class="para sec">'+esc(x.t)+"</div>";
+      return '<div class="para"><span class="pn">'+(x.n||"")+"</span><span>"+esc(x.t)+"</span></div>";
+    }).join("")+"</div>";
+    if(notes.length){
+      h+='<h4 style="margin-top:20px">注释 · '+notes.length+' 条</h4>'
+        +notes.map(function(t,i){return '<div class="para note"><span class="pn">'+(i+1)+"</span><span>"+esc(t)+"</span></div>";}).join("");
+    }
+    h+='<p style="margin-top:18px"><a class="extlink" href="'+esc(a.src)+'" target="_blank" rel="noopener">在 GitHub 核对本篇原文 ↗</a></p>';
+    $("#read-area").innerHTML=h;
+    $("#r-prev").disabled=(a.id<=0); $("#r-next").disabled=(a.id>=A.length-1);
+  });
+}
+
+/* ---------- 详情面板 ---------- */
+function dh(kind,title,sub){
+  return '<div class="dhead"><div class="kind">'+esc(kind)+'</div><h2>'+esc(title)+"</h2>"
+    +(sub?'<div class="sub">'+esc(sub)+"</div>":"")+"</div>";
+}
+function articleList(list,limit){
+  return '<div class="linklist">'+list.slice(0,limit||40).map(function(a){
+    return '<button type="button" data-article="'+a.no+'"><i>'+a.no+"</i><span>"+esc(a.title)
+      +" <small style='color:var(--ink-3)'>· "+LV[a.level]+"</small></span></button>";
+  }).join("")+"</div>"+(list.length>(limit||40)
+    ?'<p class="meta-line">另有 '+(list.length-(limit||40))+' 篇，可在「篇目索引」按主题筛选查看。</p>':"");
+}
+function dRoot(){
+  var h=dh("全书总览 · ROOT",N.root.name,M.book+" · "+M.edition);
+  h+='<div class="dbody"><h4>总览说明</h4><p>'+esc(N.root.desc)+"</p>";
+  h+='<h4>四个分支</h4><div class="linklist">'+N.branches.map(function(b){
+    return '<button type="button" data-node="branch" data-id="'+b.id+'"><i>▸</i><span>'+esc(b.name)+"</span></button>";
+  }).join("")+"</div>";
+  h+='<h4>收录口径</h4><p>'+esc(M.notice)+"</p>";
+  h+='<p class="meta-line">'+M.articles+" 篇 · "+fmt(M.paras)+" 正文段 · "+fmt(M.notes)+" 尾注段 · "+fmt(M.chars)+" 字</p>";
+  h+='<a class="extlink" href="'+esc(M.sourceUrl)+'" target="_blank" rel="noopener">上游全文整理项目 ↗</a></div>';
+  return h;
+}
+function dBranch(id){
+  var b=branchById[id]; if(!b)return dRoot();
+  var h=dh("思维导图 · 分支",b.name,M.book+" · "+b.themes.length+" 个主题");
+  h+='<div class="dbody"><h4>分支说明</h4><p>'+esc(b.desc)+"</p>";
+  if(b.themes.length){
+    h+='<h4>下钻主题</h4><div class="linklist">'+b.themes.map(function(tid){
+      return '<button type="button" data-node="theme" data-id="'+tid+'"><i>▸</i><span>'+esc(themeById[tid].name)+"</span></button>";
+    }).join("")+"</div>";
+    var all=b.themes.reduce(function(s,t){return s.concat(A.filter(function(a){return a.theme===t;}));},[]);
+    h+='<h4>本分支篇目 · '+all.length+' 篇</h4>'+articleList(all,12);
+  }else if(id==="methods"){
+    h+='<h4>方法清单 · '+N.methods.length+' 条</h4><div class="linklist">'+N.methods.map(function(m,i){
+      return '<button type="button" data-node="method" data-id="'+i+'"><i>'+(i+1)+"</i><span>"+esc(m.name)+"</span></button>";
+    }).join("")+"</div>";
+    h+='<p class="meta-line">工具箱是阅读后的二次抽象，请回到来源篇目核对语境。</p>';
+  }else{
+    h+='<h4>按卷核查</h4><div class="linklist">'+[1,2,3,4,5].map(function(v){
+      return '<button type="button" data-node="volume" data-id="'+v+'"><i>卷'+v+"</i><span>"+esc(VOL_ERA[v])+" · "+A.filter(function(a){return a.vol===v;}).length+" 篇</span></button>";
+    }).join("")+"</div>";
+    h+='<p>'+esc(b.desc)+"</p>";
+  }
+  h+="</div>";return h;
+}
+function dTheme(id){
+  var t=themeById[id]; if(!t)return dRoot();
+  var list=A.filter(function(a){return a.theme===id;}).sort(function(x,y){
+    var o={core:0,related:1,context:2};return o[x.level]-o[y.level]||x.id-y.id;});
+  var h=dh("思维导图 · 主题",t.name,branchById[t.branch].name+" · 关联 "+list.length+" 篇");
+  h+='<div class="dbody"><h4>主题详解</h4><p>'+esc(t.desc)+"</p>";
+  h+='<h4>关键概念</h4><div class="keys">'+t.key.map(function(k){return '<span class="key">'+esc(k)+"</span>";}).join("")+"</div>";
+  h+='<h4>关联篇目 · '+list.length+' 篇</h4>'+articleList(list,30);
+  h+='<h4>回到分支</h4><div class="linklist"><button type="button" data-node="branch" data-id="'+t.branch+'"><i>↑</i><span>'+esc(branchById[t.branch].name)+"</span></button></div>";
+  h+="</div>";return h;
+}
+function dMethod(i){
+  var m=N.methods[i]; if(!m)return dBranch("methods");
+  var h=dh("方法工具箱 · "+(i+1)+"/"+N.methods.length,m.name,"可迁移操作清单");
+  h+='<div class="dbody"><h4>操作步骤</h4><ol class="olist">'+m.steps.map(function(s){return "<li>"+esc(s)+"</li>";}).join("")+"</ol>";
+  h+='<h4>常见误用 / 前提</h4><div class="quote">'+esc(m.caveat)+"</div>";
+  h+='<h4>来源篇目</h4>'+articleList(m.sources.map(function(id){return byNo[String(id).padStart(3,"0")];}).filter(Boolean),20);
+  h+='<h4>同组方法</h4><div class="linklist">'+N.methods.map(function(x,j){
+    if(j===i)return "";return '<button type="button" data-node="method" data-id="'+j+'"><i>'+(j+1)+"</i><span>"+esc(x.name)+"</span></button>";
+  }).join("")+"</div></div>";
+  return h;
+}
+function dVolume(v){
+  v=Number(v); var list=A.filter(function(a){return a.vol===v;});
+  var h=dh("全书总览 · 第 "+v+" 卷",VOL_ERA[v],list.length+" 篇 · 编号 "+list[0].no+" – "+list[list.length-1].no);
+  h+='<div class="dbody"><h4>本卷说明</h4><p>'+esc(branchById.overview.desc)+"</p>";
+  h+='<h4>篇目清单 · '+list.length+' 篇</h4>'+articleList(list,80)+"</div>";
+  return h;
+}
+function dArticle(no){
+  var a=byNo[no]; if(!a)return dRoot();
+  state.article=no;
+  var h=dh("篇目 · "+a.no,a.title,"第 "+a.vol+" 卷 · "+a.era+" · "+a.date);
+  h+='<div class="dbody"><div class="meta-line">'+a.chars+' 字 · '+a.paras+' 正文段 · '+a.notes+' 尾注段 · '
+    +LV[a.level]+"篇目</div>";
+  h+='<div class="keys"><span class="key">'+esc(themeById[a.theme]?themeById[a.theme].name:a.theme)+"</span>"
+    +a.tags.map(function(t){return '<span class="tag">'+esc(t)+"</span>";}).join("")+"</div>";
+  h+='<h4>加载篇目数据…</h4><p class="status">正在按需载入第 '+a.vol+" 卷。</p></div>";
+  $("#detail").innerHTML=h;
+  detailOf(no,function(d){
+    if(state.node.type!=="article"||String(state.node.id)!==String(no))return;
+    var x='<h4>题解（原文）</h4>'+(d.note?'<div class="quote">'+esc(d.note)+"</div>":'<p class="meta-line">该篇无题解。</p>');
+    var ol=d.outline||[];
+    x+='<h4>论述脉络 · 逐段 '+ol.filter(function(o){return o.k==="段";}).length+' 条</h4>'
+      +'<button class="foldbtn" type="button" data-fold="outline">展开 / 收起完整脉络（含章节标题）</button>'
+      +'<div class="fold" id="fold-outline"><ol class="olist">'+ol.map(function(o){
+        return o.k==="节"?'<li class="sec">'+esc(o.t)+"</li>":'<li>'+esc(o.t)+"</li>";
+      }).join("")+"</ol></div>";
+    var ps=d.passages||[];
+    x+='<h4>覆盖全文的代表性论述 · '+ps.length+' 区段</h4>'
+      +'<p class="meta-line">按全文等分区间各取一条，覆盖首段至末段；下方「全文逐段」可核对完整原文。</p>'
+      +ps.map(function(p){return '<div class="quote">'+esc(p.t)+'<span class="qm">第 '+p.n+" 段 · 全文 "+p.zone+" 区段</span></div>";}).join("");
+    if(a.sections&&a.sections.length){
+      x+='<h4>原书章节 · '+a.sections.length+' 个</h4><ol class="olist">'
+        +a.sections.map(function(s){return '<li class="sec">'+esc(s)+"</li>";}).join("")+"</ol>";
+    }
+    var body=d.body||[], notes=d.notes||[];
+    x+='<h4>全文逐段 · '+body.filter(function(b){return b.k==="段";}).length+' 段</h4>'
+      +'<button class="foldbtn" type="button" data-fold="body">展开 / 收起全文（按需加载，已缓存）</button>'
+      +'<div class="fold" id="fold-body">'+body.map(function(b){
+        if(b.k==="节")return '<div class="para sec">'+esc(b.t)+"</div>";
+        return '<div class="para"><span class="pn">'+b.n+"</span><span>"+esc(b.t)+"</span></div>";
+      }).join("")
+      +(notes.length
+        ? '<h4 style="margin-top:16px">注释 · '+notes.length+' 条</h4>'
+          +notes.map(function(t,i){
+            return '<div class="para note"><span class="pn">'+(i+1)+"</span><span>"+esc(t)+"</span></div>";
+          }).join("")
+        : "")
+      +"</div>";
+    x+='<h4>核对与跳转</h4><a class="extlink" href="'+esc(a.src)+'" target="_blank" rel="noopener">GitHub 原文核对 ↗</a>'
+      +'<button class="foldbtn" type="button" data-openread="'+a.no+'" style="width:auto;display:inline-block">在「全文阅读」中打开 →</button>';
+    var box=$("#detail .dbody");
+    if(box)box.innerHTML=x;
+  });
+  return null;
+}
+function showNode(type,id){
+  state.node={type:type,id:(id==null?null:(type==="method"||type==="volume"?Number(id):id))};
+  markSel();
+  var h;
+  if(type==="root")h=dRoot();
+  else if(type==="branch")h=dBranch(id);
+  else if(type==="theme")h=dTheme(id);
+  else if(type==="method")h=dMethod(Number(id));
+  else if(type==="volume")h=dVolume(id);
+  else if(type==="article")return dArticle(id);
+  else h=dRoot();
+  $("#detail").innerHTML=h;
+  $("#detail").scrollTop=0;
+}
+
+/* ---------- 全文检索 ---------- */
+function fullSearch(){
+  var q=$("#q").value.trim();
+  if(!q){setView("read");$("#searchres").innerHTML='<p class="status">请输入检索词。</p>';return;}
+  var btn=$("#btn-full");btn.disabled=true;btn.textContent="载入中…";
+  setView("read");
+  $("#searchres").innerHTML='<p class="status">正在按需载入五卷全文并检索「'+esc(q)+'」…</p>';
+  Promise.all([1,2,3,4,5].map(loadVolP)).then(function(){
+    var res=[];
+    A.forEach(function(a){
+      var d=(volCache[a.vol].articles||{})[a.no]||{};
+      (d.body||[]).forEach(function(b){
+        if(b.k!=="段")return;
+        var i=b.t.indexOf(q);
+        if(i<0)return;
+        if(res.filter(function(r){return r.no===a.no;}).length>=2)return;
+        var s=Math.max(0,i-38),e=Math.min(b.t.length,i+q.length+52);
+        res.push({no:a.no,title:a.title,n:b.n,txt:(s>0?"…":"")+b.t.slice(s,e)+(e<b.t.length?"…":"")});
+      });
+    });
+    btn.disabled=false;btn.textContent="检索全文";
+    var h='<h4 style="margin:0 0 10px">全文检索「'+esc(q)+'」· '+res.length+' 处命中（每篇最多 2 处）</h4>';
+    if(!res.length)h+='<p class="status">未找到匹配段落。可换用更短的关键词。</p>';
+    else h+=res.map(function(r){
+      var pre=r.txt.split(q);
+      var marked=esc(pre[0])+"<mark>"+esc(q)+"</mark>"+esc(pre.slice(1).join(q));
+      return '<div class="srhit"><b>'+r.no+" · "+esc(r.title)+' <small style="font-weight:400;color:var(--ink-3)">第 '+r.n+' 段</small></b>'
+        +'<p>'+marked+'</p><button class="navbtn" type="button" data-openread="'+r.no+'" style="margin-top:6px">打开全文 →</button></div>';
+    }).join("");
+    $("#searchres").innerHTML=h;
+  });
+}
+
+/* ---------- 事件 ---------- */
+document.addEventListener("click",function(e){
+  var t=e.target;
+  var node=t.closest?t.closest("[data-node]"):null;
+  if(node){showNode(node.getAttribute("data-node"),node.getAttribute("data-id"));return;}
+  var ar=t.closest?t.closest("[data-article]"):null;
+  if(ar){showNode("article",ar.getAttribute("data-article"));return;}
+  var tab=t.closest?t.closest(".tab"):null;
+  if(tab){setView(tab.getAttribute("data-view"));return;}
+  var fold=t.closest?t.closest("[data-fold]"):null;
+  if(fold){var f=$("#fold-"+fold.getAttribute("data-fold"));if(f)f.classList.toggle("open");return;}
+  var op=t.closest?t.closest("[data-openread]"):null;
+  if(op){state.article=op.getAttribute("data-openread");setView("read");renderRead();
+    $("#searchres").innerHTML="";return;}
+});
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  var t=e.target;
+  if(t.classList&&(t.classList.contains("node")||t.classList.contains("arow"))){
+    e.preventDefault();t.dispatchEvent(new MouseEvent("click",{bubbles:true}));
+  }
+});
+var timer;
+function syncQ(v){$("#f-q").value=v;if(state.indexDone)renderIndex();setView("index");}
+$("#q").addEventListener("input",function(){
+  var v=this.value;clearTimeout(timer);
+  timer=setTimeout(function(){syncQ(v);},180);
+});
+$("#f-q").addEventListener("input",function(){clearTimeout(timer);timer=setTimeout(renderIndex,120);});
+["#f-vol","#f-theme","#f-level"].forEach(function(s){$(s).addEventListener("change",renderIndex);});
+$("#btn-full").addEventListener("click",fullSearch);
+$("#q").addEventListener("keydown",function(e){if(e.key==="Enter"){clearTimeout(timer);fullSearch();}});
+$("#r-select").addEventListener("change",function(){state.article=this.value;renderRead();});
+$("#r-prev").addEventListener("click",function(){var a=byNo[state.article];if(a&&a.id>0){state.article=A[a.id-1].no;renderRead();}});
+$("#r-next").addEventListener("click",function(){var a=byNo[state.article];if(a&&a.id<A.length-1){state.article=A[a.id+1].no;renderRead();}});
+
+renderMind();
+showNode("root",null);
+var hv=(typeof location!=="undefined"?(location.hash||""):"").replace(/^#/,"");
+if(hv==="index"||hv==="read")setView(hv,true);
+})();
+</script>
+</body>
+</html>
