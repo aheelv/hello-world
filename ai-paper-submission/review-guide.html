@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI 智能体集成平台与系统工程融合：综述与投稿评估（万方核对版）</title><style>
+:root{--bg:#fff;--fg:#1f2328;--muted:#5b6570;--line:#d8dee4;--accent:#1a5fb4;--soft:#f4f7fb;--code:#f2f4f7}
+*{box-sizing:border-box}
+body{margin:0;background:#eef1f5;color:var(--fg);font-family:"Source Han Serif SC","Songti SC","Noto Serif CJK SC",Georgia,"Microsoft YaHei",serif;font-size:16px;line-height:1.85}
+.wrap{max-width:1000px;margin:32px auto;background:#fff;padding:56px 64px 80px;box-shadow:0 2px 18px rgba(20,40,80,.10);border-radius:6px}
+h1{font-size:28px;line-height:1.45;text-align:center;margin:0 0 8px;color:#12233d;letter-spacing:.4px}
+h2{font-size:21px;margin:44px 0 16px;padding-bottom:8px;border-bottom:2px solid var(--accent);color:#12233d}
+h3{font-size:17.5px;margin:30px 0 12px;color:#1a3c68}
+h4{font-size:16px;margin:22px 0 10px;color:#33475f}
+p{margin:10px 0;text-align:justify}
+strong{color:#12233d}
+a{color:var(--accent);text-decoration:none;overflow-wrap:anywhere}a:hover{text-decoration:underline}
+ul,ol{margin:10px 0;padding-left:28px}li{margin:6px 0}
+blockquote{margin:16px 0;padding:12px 18px;background:var(--soft);border-left:4px solid var(--accent);color:var(--muted);font-size:14.5px;border-radius:0 4px 4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:3px;font-family:Consolas,"Courier New",monospace;font-size:13.5px}
+pre{background:var(--code);padding:14px;overflow:auto;border-radius:5px}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.4px;line-height:1.65}
+th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}
+th{background:#eaf0f8;color:#12233d;font-weight:600}
+tbody tr:nth-child(even){background:#fafbfd}
+.toc{background:var(--soft);border:1px solid var(--line);border-radius:5px;padding:16px 22px;margin:26px 0 34px}
+.toc h2{border:0;margin:0 0 10px;padding:0;font-size:17px}
+.toc ul{list-style:none;padding-left:0;margin:0;columns:2;column-gap:32px}
+.toc li{break-inside:avoid;margin:4px 0;font-size:14px}
+.toc li.lv3{padding-left:16px;color:var(--muted);font-size:13.2px}
+.meta{text-align:center;color:var(--muted);font-size:13.5px;margin-bottom:26px}
+.upd{background:#fff8e8;border:1px solid #edd9a8;color:#6b4c12;border-radius:5px;padding:10px 16px;margin:0 0 22px;font-size:14px;text-align:center}
+@media print{body{background:#fff;font-size:11pt}.wrap{box-shadow:none;margin:0;max-width:none;padding:0}h2{page-break-after:avoid}table{page-break-inside:avoid}.toc{page-break-after:always}}
+@media(max-width:760px){.wrap{padding:26px 20px;margin:0}.toc ul{columns:1}table{display:block;overflow-x:auto}}
+</style></head><body><div class="wrap"><div class="meta">综述论文结构 · 初稿 2026 年 11 月 · 2026-11-09 万方中文文献核对更新</div><div class="upd">本版已用万方数据库补检中文文献：新增 25 条可核实来源（[W-1]—[W-25]），并新增第 6 章「新旧结论并列与依据」。核心判断总体成立，三处表述已收窄修正。</div><nav class="toc"><h2>目录</h2><ul><li class="lv2"><a href="#sec-2">摘要</a></li><li class="lv2"><a href="#sec-3">1 引言</a></li><li class="lv3"><a href="#sec-4">1.1 问题背景</a></li><li class="lv3"><a href="#sec-5">1.2 概念界定</a></li><li class="lv3"><a href="#sec-6">1.3 研究问题与综述范围</a></li><li class="lv3"><a href="#sec-7">1.4 主要贡献</a></li><li class="lv2"><a href="#sec-8">2 分类梳理</a></li><li class="lv3"><a href="#sec-9">2.1 主流智能体集成平台架构与核心能力</a></li><li class="lv3"><a href="#sec-14">2.2 系统工程理论与方法在智能体设计、部署、运维中的应用</a></li><li class="lv3"><a href="#sec-22">2.3 二者结合的最新研究方向</a></li><li class="lv2"><a href="#sec-28">3 对比分析</a></li><li class="lv3"><a href="#sec-29">3.1 代表性平台/框架多维对比</a></li><li class="lv3"><a href="#sec-30">3.2 三级融合深度模型</a></li><li class="lv3"><a href="#sec-31">3.3 生命周期模型适配性对比</a></li><li class="lv3"><a href="#sec-32">3.4 证据强度与偏倚分析</a></li><li class="lv3"><a href="#sec-33">3.5 四组结构性矛盾</a></li><li class="lv2"><a href="#sec-34">4 总结与展望</a></li><li class="lv3"><a href="#sec-35">4.1 主要结论</a></li><li class="lv3"><a href="#sec-36">4.2 未来研究趋势（2—3 年）</a></li><li class="lv3"><a href="#sec-37">4.3 关键挑战</a></li><li class="lv3"><a href="#sec-38">4.4 一个可操作的研究议程</a></li><li class="lv2"><a href="#sec-39">5 投稿潜力评估与投稿指南</a></li><li class="lv3"><a href="#sec-40">5.1 总体判断</a></li><li class="lv3"><a href="#sec-41">5.2 六个可投稿的具体选题</a></li><li class="lv3"><a href="#sec-42">5.3 目标期刊与会议清单</a></li><li class="lv3"><a href="#sec-43">5.4 论文结构模板（以选题 A 为例）</a></li><li class="lv3"><a href="#sec-44">5.5 评估设计与可复现性清单</a></li><li class="lv3"><a href="#sec-45">5.6 常见拒稿理由与规避</a></li><li class="lv3"><a href="#sec-46">5.7 12—18 个月执行时间线</a></li><li class="lv3"><a href="#sec-47">5.8 合规与写作规范提示</a></li><li class="lv2"><a href="#sec-48">6 万方中文文献核对：新旧结论并列与依据</a></li><li class="lv3"><a href="#sec-49">6.0 检索执行、命中情况与差异总览</a></li><li class="lv3"><a href="#sec-50">6.1 核心判断一：瓶颈从模型能力迁移到系统性工程问题</a></li><li class="lv3"><a href="#sec-51">6.2 多智能体失效分类：MAST 三分类与中文四层异常分类并列</a></li><li class="lv3"><a href="#sec-52">6.3 MBSE 与架构描述空白：从"无人问津"收窄为"治理语义与可验证性缺位"</a></li><li class="lv3"><a href="#sec-53">6.4 接口协议与最小权限：从"官方建议"升级为有样本量的实测问题</a></li><li class="lv3"><a href="#sec-54">6.5 治理骨架：从"标准缺位"修正为"国际标准缺位、中国标准体系在建"</a></li><li class="lv3"><a href="#sec-55">6.6 L2→L3 断层与准入不变量：从"无人完成"收窄为"缺生产级受控实证"</a></li><li class="lv3"><a href="#sec-56">6.7 可观测性：三流程框架与术语歧义</a></li><li class="lv3"><a href="#sec-57">6.8 投稿选题划界：中文先行工作带来的重复性风险</a></li><li class="lv3"><a href="#sec-58">6.9 低代码平台与落地生态：中文实证补强表 4</a></li><li class="lv3"><a href="#sec-59">6.10 三级融合深度模型与证据强度：收窄后的空白更可操作</a></li><li class="lv3"><a href="#sec-60">6.11 检索局限、失败记录与未核实清单（须随稿保留）</a></li><li class="lv3"><a href="#sec-61">6.12 中文发表阵地与"SCI 以上"判断的关系</a></li><li class="lv2"><a href="#sec-62">参考文献</a></li><li class="lv3"><a href="#sec-63">A. 同行评议论文与学术专著</a></li><li class="lv3"><a href="#sec-64">B. 产业与二级资料（标注为 [R-n]，非同行评议）</a></li><li class="lv3"><a href="#sec-65">C. 万方核对新增中文文献（编号 [W-n]，检索日 2026-11-09）</a></li><li class="lv3"><a href="#sec-66">D. 文献诚信说明</a></li><li class="lv2"><a href="#sec-67">附录：术语对照</a></li></ul></nav><h1 id="sec-1">AI 智能体集成平台与系统工程理论实践的融合：研究综述与投稿评估</h1>
+<blockquote>文献调研时点：2026 年 11 月；覆盖范围以 2023—2026 年公开发表的同行评议论文、预印本、国际标准与官方技术文档为主。</blockquote>
+<p>&gt;</p>
+<blockquote><strong>2026-11-09 万方中文文献核对更新</strong>：已通过万方数据知识服务平台补检中文文献，新增 25 条可核实来源（[W-1]—[W-25]）。第 6 章逐条给出新旧结论并列、各自依据与完整来源信息。核心判断总体成立，但「L2/L3 断层」「标准缺位」「MBSE 架构描述空白」三处表述已收窄修正，投稿指南的选题划界同步调整。</blockquote>
+<hr>
+<h2 id="sec-2">摘要</h2>
+<p>大语言模型驱动的智能体正从"单体能力演示"转向"系统级生产部署"，瓶颈随之由模型推理能力迁移到组合、交付、验证与治理等系统性问题。与此同时，"Harness"一词在文献与产业中呈现出三层含义：作为软件交付平台的 Harness、作为智能体运行时脚手架的 agent harness，以及作为一般性集成基础设施的智能体集成平台。本文对这三层含义作出界定，并提出一个七层参考架构；进而梳理系统工程（Systems Engineering, SE）理论与方法在智能体设计、部署、运维中的映射路径，包括 ISO/IEC/IEEE 15288 生命周期过程、需求与架构描述、接口契约、验证与确认（V&amp;V）、配置与状态治理、可靠性工程及 AI 治理标准。在此基础上，归纳智能体编排、CI/CD 自动化、可观测性与治理四条交叉研究主线，对比八类代表性平台/框架在十一个维度上的能力分布，指出当前工业实践多处于"流程级融合"、学术研究多处于"理论级倡议"，二者之间缺乏可检验的桥接方法这一核心缺口。最后评估该方向的论文投稿潜力，给出六个可操作选题、目标期刊/会议清单、研究设计与写作模板及常见拒稿风险。本文认为：单纯的描述性综述已难以进入 SCI 一区/CCF A 类期刊，但以系统化文献综述（SLR）为证据基础、以"接口契约—运行时状态治理"为理论切口、并辅以可复现实证或工业多案例研究的工作，具备明确的 SCI Q1 / CCF A 类投稿潜力。经万方中文文献补检（第 6 章），"产业在 L2、学术在 L3"的断层判断收窄为"已有中文桥接雏形但缺少真实平台上的受控验证"，并补充了中国智能体专项政策与中文同行评议实证，标准缺位的表述相应调整。</p>
+<p><strong>关键词</strong>：智能体集成平台；Harness；系统工程；智能体编排；CI/CD；可观测性；AI 治理；系统智能</p>
+<hr>
+<h2 id="sec-3">1 引言</h2>
+<h3 id="sec-4">1.1 问题背景</h3>
+<p>2023 年以来，基于大语言模型（LLM）的智能体研究经历了从"统一架构框架"[10] 到"多智能体协同"再到"系统智能"的范式演进。Feng 等人把这一演进链概括为：模型智能（预训练/后训练）→ 模型能力激发（提示工程、上下文工程）→ 个体智能（<strong>Harness Engineering</strong> 与 Loop Engineering，即 Agent = Loop(LLM + Harness)）→ <strong>系统智能</strong>（Graph Engineering，用显式图结构组织任务、智能体与运行时状态）[6]。这一划分的关键判断是：个体智能体存在结构性上限——单循环被迫将可并行的子任务串行化、把异质专业判断挤入同一上下文、错误沿轨迹传播而难以定位；单纯增加智能体数量并不解决问题，因为"智能必须在系统层面被组织"[6]。</p>
+<p>产业侧给出了同一问题的另一个证据。Harness 在 2025 年融资公告中援引其客户数据指出，工程团队仅有 30%—40% 的时间用于编写与迭代代码，其余 60%—70% 消耗在测试、部署、安全、合规与优化的"外环（outer loop）"；AI 生成代码量以约 4 倍速度增长，进一步放大了"写得快、交得慢"的剪刀差[1]。换言之，智能体规模化之后，约束条件不再是模型能力，而是<strong>交付系统的吞吐、可靠性与可审计性</strong>——这恰是系统工程自 20 世纪中叶以来处理的核心问题。</p>
+<p>学术界对此已有明确回应。IBM Research 的立场论文《Agentic AI Needs a Systems Theory》主张：当前 AI 开发过度聚焦单一模型能力，忽视由智能体—环境—智能体交互产生的涌现行为，因而系统性低估了能力上限与风险；该文把智能体系统形式化为由人类团队、智能体集合、环境、工具集、策略集、结果模型集与适应机制构成的多元组，并强调"功能性能动性（functional agency）"是在系统层面涌现、而非存在于任何单个智能体内部的属性[5]。Beheshti 等人进一步指出，智能体生态正在"临时地（ad hoc）"重造服务计算社区研究了二十余年的组合、互操作、QoS、生命周期管理、治理与信任问题，并提出 Agentic Service-Oriented Computing（ASOC）六项基础原则：harness-ability、composability、lifecycle engineering、trustworthiness by design、goal-driven orchestration、observability/accountability[7]。</p>
+<p>中文学界给出了同向且更直接的判断。《软件学报》2026 年综述把代码生成智能体的第三大特征概括为"工程实践性的增强"——研究重心从模型算法创新转向流程管理、系统可靠性与工具集成[W-1]；CCF 会刊《计算》则明确指出 LLM 在复杂软件生成中受限于规模化、可信性与稳定性三重挑战，"并非银弹"，须与传统软件工程方法深度融合[W-15]。这与"瓶颈已迁移到系统性工程问题"的判断一致，且把证据基础从厂商数据扩展到中文同行评议文献（详见 6.1）。</p>
+<h3 id="sec-5">1.2 概念界定</h3>
+<p>"Harness"在当前语境下有三种互不替代的用法，若不先行区分，极易造成综述对象错位：</p>
+<table><thead><tr><th>层面</th><th>指称</th><th>代表</th><th>本文用法</th></tr></thead><tbody>
+<tr><td>(a) 专有平台</td><td>Harness Inc. 的 AI 软件交付平台</td><td>Harness AI / Software Delivery Knowledge Graph / Delegate[1][2]</td><td>"Harness 平台"</td></tr>
+<tr><td>(b) 技术术语</td><td>智能体运行时脚手架，包裹模型、工具、状态与控制回路</td><td>SWE-agent 的 Agent-Computer Interface (ACI)[11]、OpenHands 的事件流架构[12]、LangChain <code>create_agent</code> 的 "highly configurable harness"[27]</td><td>"agent harness / 运行时框架"</td></tr>
+<tr><td>(c) 一般类别</td><td>把模型、工具、数据、策略、执行、观测与交付集成为可治理系统的基础设施</td><td>LangGraph、Microsoft Agent Framework、Google ADK、Bedrock AgentCore、Dify 等</td><td>"智能体集成平台"</td></tr>
+</tbody></table>
+<p>值得强调的是，(a) 与 (b) 在词源上同源：二者都指"为智能能力套上可控制、可观测、可复现的外部结构"。SWE-agent 的核心发现即是：暴露给模型的编辑工具与 shell 工具本身就是<strong>可设计的接口</strong>——把编辑窗口收窄、每次编辑后返回 linter 输出、加入显式 submit 动作，能在同一模型上显著改变任务成功率[11]。这一"接口决定系统行为"的结论，与系统工程中的接口管理、与 Harness 平台"每个动作都在策略边界内执行"的设计[2] 是同构的。本文因此在 (c) 的意义上使用"智能体集成平台"，并以 Harness 平台作为产业侧的代表性案例解剖对象。</p>
+<h3 id="sec-6">1.3 研究问题与综述范围</h3>
+<p>本文围绕四个问题展开：</p>
+<ul><li><strong>RQ1</strong>：主流智能体集成平台的架构分层与核心能力是什么？Harness 代表了哪一种架构取向？</li><li><strong>RQ2</strong>：系统工程的哪些理论与方法可映射到智能体的设计、部署与运维？映射的成熟度如何？</li><li><strong>RQ3</strong>：二者结合形成了哪些可辨识的研究方向？各自的证据强度与空白是什么？</li><li><strong>RQ4</strong>：该方向是否具备 SCI 及以上级别论文投稿潜力？若有，应如何设计选题与投稿策略？</li></ul>
+<p><strong>检索方法与局限（2026-11-09 更新）</strong>：初稿检索以公开可获取的同行评议论文（IEEE/ACM/Springer/Elsevier）、arXiv 预印本、ISO/NIST/EU 标准文本及厂商官方技术文档为来源，通过主题检索与引文回溯获取。<strong>本次更新已通过万方数据知识服务平台（中文期刊 / 学位论文 / 会议 / 法规等资源库）完成 8 组 PQ 表达式主题检索</strong>，命中并核实 25 条来源（编号 [W-n]，著录见参考文献 C 组，逐条核对见第 6 章）；其中 [W-10] 另经万方全文接口核验正文关键段落。局限须如实保留：(1) 检索在"综合集成法理论源流"与"法规库"两组因预付费调用次数用尽而中止，[31] 及综合集成研讨厅中文原始文献仍未核实，[W-24] 政策原文改由中央网信办官网核实；(2) CNKI 未检索；(3) 万方元数据仅返回出版年，多数条目无卷期页码，精确著录须以 DOI 落地页/期刊官网复核。厂商资料（新闻稿、产品页、博客）仍一律标注为产业资料，仅用于描述平台能力与案例，不作为学术结论的证据。所有期刊影响因子/分区数据取自第三方汇总[36]，须以最新 Clarivate JCR 与中科院分区表复核。</p>
+<h3 id="sec-7">1.4 主要贡献</h3>
+<p>(1) 给出"Harness"三重含义的清晰界定与统一七层参考架构；(2) 建立 SE 方法—智能体工程问题—平台机制的三元映射表，并标注各环节成熟度；(3) 提出"工具级 / 流程级 / 理论级"三级融合深度模型，用于定位现有工作并解释产业与学术的脱节；(4) 给出面向 SCI Q1 / CCF A 的可执行投稿路线图。</p>
+<hr>
+<h2 id="sec-8">2 分类梳理</h2>
+<h3 id="sec-9">2.1 主流智能体集成平台架构与核心能力</h3>
+<h4 id="sec-10">2.1.1 七层参考架构</h4>
+<p>综合 ASOC 六原则[7]、图工程三张图[6]、Agent Platform Engineering 的七层划分及 Harness 的三层结构[1][2]，可归纳出一个与具体产品无关的参考架构：</p>
+<ol><li><strong>上下文与知识层</strong>：代码、服务、部署、测试、事件、策略、成本信号的统一语义模型；代表为 Harness Software Delivery Knowledge Graph[1][2]、RAG/向量库、企业本体。</li><li><strong>推理与编排层</strong>：任务分解、规划、路由、专家智能体与工作者智能体的分工、人在回路节点；图引擎或状态机实现确定性控制[6][27]。</li><li><strong>工具与互操作层</strong>：工具注册、schema 管理、权限分级；MCP 负责"智能体—工具/数据"，A2A 负责"智能体—智能体"[24][25]。</li><li><strong>运行时与隔离层</strong>：沙箱/容器、Delegate 或 VPC 内执行、密钥本地化、身份与工作负载凭证、幂等与重试[2][12]。</li><li><strong>状态与记忆层</strong>：短期工作记忆、情节记忆、检查点与可恢复执行、共享状态的并发控制[6][27]。</li><li><strong>治理与策略层</strong>：策略即代码（OPA/Rego）、RBAC、审批门、变更窗口、自治度分档、签名审计与证据链[2][16]。</li><li><strong>可观测性、评估与交付层</strong>：全链路 trace、评估门禁、DORA 类交付指标、持续验证与自动回滚[3][4][16][26]。</li></ol>
+<p>这七层并非堆叠，而是两条贯穿线：<strong>控制面</strong>（需求→契约→策略→证据）与<strong>数据面</strong>（上下文→推理→工具→状态→遥测）。系统工程的价值主要体现在控制面，而当前多数开发框架的能力集中在数据面——这正是后文 3.2 节要讨论的结构性失衡。</p>
+<h4 id="sec-11">2.1.2 平台形态分类</h4>
+<p>按"主要交付物"可分为四类（企业视角的概念化工作亦已出现：Li 等区分了单体智能体与协作式智能体系统，归纳现代智能体系统的六项核心能力，并提出覆盖设计、治理、人机协作与平台生态的研究议程[15]）：</p>
+<ul><li><strong>开发框架型</strong>：LangGraph（图/状态机、检查点、中断恢复、LangSmith 追踪）[27][R-1]、Microsoft Agent Framework（合并 AutoGen 与 Semantic Kernel，会话式多智能体 + 企业身份）[R-1]、CrewAI（角色/任务驱动，快速原型）、Google ADK（结构化多智能体工程）、Dify / Coze（低代码可视化）。优势是表达力与社区，弱项是治理与交付闭环多为外挂。</li><li><strong>云托管运行时型</strong>：Azure AI Foundry Agent Service（Entra Agent ID、VNet、OpenTelemetry）、AWS Bedrock AgentCore（VPC 隔离、托管运行时）、Vertex AI Agent Engine（评估与部署一体化）[R-1][28][29][30]。优势是身份、网络、审计开箱即用，弱项是与特定云强绑定。</li><li><strong>软件交付/DevOps 平台型</strong>：以 Harness AI 为代表，把智能体嵌入既有 CI/CD、测试、安全、成本与 GitOps 流水线[1]—[4]；GitHub Copilot coding agent 则把智能体原生嵌入 issue/PR 工作流[R-2]。优势是天然承接变更管理、审批与回滚，弱项是智能体编排的学术表达力有限。</li><li><strong>研究型 harness</strong>：SWE-agent[11]、mini-SWE-agent、OpenHands[12]、Agentless[14]，围绕 SWE-bench[13] 等基准，把"接口设计"本身作为研究对象，提供可复现的实验台。</li></ul>
+<blockquote>说明：上标 [R-1][R-2] 指产业与二级资料，见文末 B 组，非同行评议来源。</blockquote>
+<h4 id="sec-12">2.1.3 案例解剖：Harness 平台的架构取向</h4>
+<p>Harness 自 2025 年起把自身定位为"AI for Everything After Code"的 AI 软件交付平台，其公开架构包含三个基础层[1]：</p>
+<ul><li><strong>面向交付的专用智能体库</strong>：覆盖交付、测试、验证、安全、治理与运维任务；产品页进一步区分为 <strong>Expert Agents</strong>（推理、调查、解释、建议）与 <strong>Worker Agents</strong>（执行构建、触发测试、管理回滚、扩缩容）[2]。</li><li><strong>Software Delivery Knowledge Graph</strong>：统一映射代码变更、服务、部署、测试、环境、事件、策略与成本信号，作为所有智能体的共享上下文[1][2]。这一层在方法论上等价于 MBSE 的"单一事实源/数字线程"，是平台区别于普通编排框架的核心。</li><li><strong>企业级编排引擎</strong>：把 AI 判断转化为跨流水线、跨环境的一致自动化，并保证决策以可预测方式落地[1]。</li></ul>
+<p>治理设计尤其值得注意：所有智能体动作在客户 VPC/集群内经 Harness Delegate 执行，密钥不出边界；OPA 策略、RBAC、审批与变更窗口对智能体与人类"同一套身份、同一套策略、同一套执行、同一套证据"；每个动作被归因、记录、签名，输出为可供审计的 scorecard 与审计轨迹；验证失败自动回滚；自治度按任务、环境、团队分档（Autonomous / Human-in-the-loop / Deterministic）[2]。2025 年公布的能力还包括：Autonomous Code Maintenance（意图驱动的依赖升级、陈旧 feature flag 清理、CI 自愈 Autofix、单测补全）、AI Verification and Rollback（自动发现观测指标、构建健康画像、异常回滚）、Architect Mode（对话式生成符合组织标准的流水线）、IDP Knowledge Agent[3]；2025 年 11 月又加入基于知识图谱与 Harness MCP Server（暴露 160+ 工具）的 AI 数据库迁移生成、流水线 Error Analyzer、以及按任务动态选模与护栏回退[4]。</p>
+<p>从 SE 视角看，Harness 的实质是<strong>把智能体当作"变更主体"纳入既有配置管理与变更控制体系</strong>，而不是另建一套智能体治理体系。这一取向的优点是合规成本低、可审计性天然具备；代价是智能体自主性的表达受限于流水线模型，对开放环境下的涌现行为缺乏刻画。</p>
+<h4 id="sec-13">2.1.4 核心能力清单</h4>
+<p><strong>表 1　智能体集成平台核心能力与对应 SE 关切</strong></p>
+<table><thead><tr><th>能力</th><th>具体机制</th><th>对应 SE 关切</th><th>当前成熟度</th></tr></thead><tbody>
+<tr><td>统一上下文</td><td>知识图谱、UID 索引、RAG、个性化记忆</td><td>需求可追溯性、单一事实源</td><td>中（语义一致性未解决）</td></tr>
+<tr><td>编排与调度</td><td>图/状态机、会话编排、动态任务 DAG、监督者节点</td><td>功能分解、接口控制</td><td>中高</td></tr>
+<tr><td>工具互操作</td><td>MCP、A2A、工具注册表、schema 版本</td><td>接口定义与接口控制</td><td>中（协议层快、语义层弱）</td></tr>
+<tr><td>状态治理</td><td>检查点、恢复、回放/回滚/补偿、并发隔离</td><td>配置管理、变更控制</td><td>低—中（最薄弱）</td></tr>
+<tr><td>隔离与身份</td><td>沙箱、Delegate、工作负载身份、最小权限</td><td>安全边界、失效域隔离</td><td>中高（云侧）</td></tr>
+<tr><td>策略与审批</td><td>策略即代码、RBAC、审批门、自治分档</td><td>治理、人的因素</td><td>中高</td></tr>
+<tr><td>可观测性</td><td>OpenTelemetry GenAI spans、全链路 trace、证据捆绑</td><td>度量与测量、验证</td><td>中（标准尚处 Development）</td></tr>
+<tr><td>评估门禁</td><td>离线评估、LLM-as-a-judge、回归基线、冻结配置</td><td>V&amp;V、确认</td><td>低</td></tr>
+<tr><td>持续交付</td><td>自愈 CI、渐进式发布、AI 验证与回滚、DORA</td><td>生命周期过程、运行与维护</td><td>中高（DevOps 平台型）</td></tr>
+<tr><td>成本与 QoS</td><td>令牌/成本预算、模型路由、延迟 SLO</td><td>性能与资源权衡</td><td>中</td></tr>
+</tbody></table>
+<hr>
+<h3 id="sec-14">2.2 系统工程理论与方法在智能体设计、部署、运维中的应用</h3>
+<h4 id="sec-15">2.2.1 理论支点：涌现、边界与系统层属性</h4>
+<p>系统工程的经典命题是"整体大于部分之和"，其工程含义是：系统层属性不可由组件属性线性推出，因此必须为涌现行为单独设立观测与控制机制。Miehling 等人把这一命题引入智能体 AI，指出简单智能体仅凭与环境及其他智能体的交互即可涌现出增强认知、因果推理与元认知意识，故风险评估不能以单模型评测代替[5]。这一论点在实证侧得到呼应：Cemri 等人用扎根理论分析 7 个框架的执行轨迹，提出 MAST 分类法（14 种失效模式，归为规格与系统设计、智能体间错位、任务验证与终止三类），并发现改进角色规格或调整拓扑虽能提升成功率，却无法消除失效，说明需要<strong>结构性重新设计</strong>而非提示修补[9]；不同二手资料对三类占比的报告存在差异（约 41%/37%/21% 与 44%/32%/24%），引用时须回到原始版本核对，不宜作为确定常数。另有立场性工作指出，相当一部分所谓"协调失败"本质是并发控制问题（陈旧读、丢失更新），应引入冲突检测、隔离保证与结构化共享资源访问[6]。</p>
+<p><strong>万方核对新增（6.2）</strong>：张珑耀等的特邀综述[W-2] 以 7 个代表性 MAS、13 418 段运行轨迹、LLM 初筛加专家人工校验，构建了与 MAST 不同的四层异常分类（模型理解感知、智能体交互、任务执行、外部环境），报告智能体交互异常 16.8%、任务执行异常 27.1%、外部环境异常 18.3%，并指出模型理解感知异常为根源性诱因。两套分类法的层级划分与占比口径不同，<strong>不可混用为同一组常数</strong>；MAST 三分类与 [W-2] 四分类应并列呈现。</p>
+<h4 id="sec-16">2.2.2 生命周期过程：ISO/IEC/IEEE 15288 与 ISO/IEC 42001</h4>
+<p>ISO/IEC/IEEE 15288:2023（第 2 版）建立了覆盖构思、开发、生产、使用、支持与退役的通用生命周期过程框架，明确不规定具体生命周期模型或方法，可递归、迭代、并发地应用于系统及其元素，并适用于体系（system of systems）[17]。这一"不绑定方法"的特性使其可直接映射到智能体系统：</p>
+<table><thead><tr><th>15288 过程组</th><th>智能体系统对应活动</th><th>现状</th></tr></thead><tbody>
+<tr><td>协议过程（获取/供应）</td><td>模型与工具供应商选择、SLA 与数据边界、第三方 MCP Server 准入</td><td>实践零散</td></tr>
+<tr><td>组织级项目使能</td><td>智能体资产清单、能力基线、复用与技能库、人员角色</td><td>早期</td></tr>
+<tr><td>技术管理过程</td><td>智能体项目规划、风险评估、配置管理、决策管理、质量保证</td><td>部分被 MLOps/LLMOps 覆盖</td></tr>
+<tr><td>技术过程</td><td>业务需求→智能体需求、架构定义、设计、实现、集成、验证、确认、运行、维护、处置</td><td>概念映射尚不完整</td></tr>
+</tbody></table>
+<p>ISO/IEC 42001:2023 是首个可认证的 AI 管理体系标准，以 PDCA 循环组织 AI 方针、风险评估、全生命周期控制、数据治理、绩效评价与持续改进，覆盖设计、开发、测试、部署、运行与退出[18]。它补上了 15288 缺少的"组织级治理"维度（配套风险管理指南见 ISO/IEC 23894:2023[19]）；在智能体场景中，其"AI 系统清单—风险分层—控制措施—审计证据"的结构与 NIST AI RMF 的 GOVERN/MAP/MEASURE/MANAGE 四职能[20]、生成式 AI 画像 NIST AI 600-1[21] 共同构成治理骨架。EU AI Act（Regulation (EU) 2024/1689）第 12 条要求高风险 AI 系统在全生命周期自动记录事件日志、第 15 条要求对对抗性输入具备韧性[22]；OWASP Top 10 for LLM Applications 2025 中 LLM06 "Excessive Agency"（过度代理）则直接指向智能体的权限边界[23]。这些条款把"可观测性"与"最小权限"从工程最佳实践提升为合规义务。</p>
+<h4 id="sec-17">2.2.3 需求、架构与可追溯性：MBSE 与智能体的双向关系</h4>
+<p>MBSE 工具链的智能化是当前"SE 吸收智能体"最实质的方向。以 GenAI Workbench 与 Intelligent Design 4.0 为代表的工作，把智能体作为<strong>数字线程中的一等参与者</strong>：以基于开源 PLM/CAD 内核的数据主干、文档/几何/图谱的模块化存储、UID 索引的跨模态 API 接入智能体编排层；由无状态微智能体（需求抽取、架构综合）经 Agentic Orchestrator 与事件驱动消息总线协调；在标准化 SysML 产物（需求、模块图、参数图、V&amp;V 报告）之上叠加阶段级与功能级智能体，通过发布/订阅总线与 XMI、FMI 等交换格式运作[R-3]。输入端则用 OCR 与视觉-LLM 处理文档、BERT+CRF 抽取需求、STEP/B-Rep 解析几何、XMI 转图谱，最终以 UID 索引统一[R-3]。</p>
+<p><strong>万方核对补充（6.3）</strong>：原稿此处主要依赖二级资料 [R-3]，现可用中文一手文献替换与补强。毛寅轩等[W-3] 系统论述 LLM 使 AI 从"点状分析工具"转变为"贯穿生命周期的生成式智能协作助手"，覆盖需求分析、系统设计、验证确认、知识管理四环节；鲁金直等[W-4] 提出 KARMA 多架构统一建模语言与 LLM、计算机视觉、三维建模融合的"空间智能"MBSE 框架，并以 3 个场景验证；殷泰晖等[W-6] 实现领域术语增强 Prompt + 规则驱动 SysML 生成 + 多维语义一致性分析，开发原型系统并在真实航天任务中工程验证；吴文瑞[W-7] 给出系统级 SysML 模型分层、依赖、归档与版本控制方案；葛楚妍等[W-5] 的 SmartGen-AADL 用三阶段多智能体把自然语言需求转为 AADL 架构模型，在 15 个场景、4 个主流 LLM 上取得组件错误行占比平均降低 34.37%、结构匹配度提升超 20% 的结果，并做了消融实验。</p>
+<p>但必须指出：这类工作主要是<strong>MBSE 的智能体化增强</strong>（智能体扮演需求工程师、架构师），而非系统工程理论本身的更新。<strong>万方核对修正（6.3）</strong>：原稿"几乎没有工作回答如何用 SysML v2 / ISO/IEC/IEEE 42010 架构描述[40] 表达智能体的行为边界、自治等级与治理约束"[R-3][R-4] 的判断需限定——中文研究已给出三条替代建模路径（KARMA[W-4]、AADL[W-5]、SysML 需求建模与一致性分析[W-6][W-7]），说明"用形式化架构模型承载 LLM 生成结果"已不空白；但检索到的中文工作均以<strong>生成需求/架构模型</strong>为目标，未见把自治等级、工具权限与治理约束作为一等建模元素并编译为可执行策略的工作。空白应从"架构描述无人问津"收窄为"<strong>架构描述中的治理语义与可验证性缺位</strong>"，投稿选题 E 相应调整（见 6.8）。反向的关系——用 SE 理论约束智能体系统——在概念上被反复呼吁[5][7][8]，却缺少可操作建模构件。这一空白正是 3.2、5.4 节要展开的投稿切口。</p>
+<h4 id="sec-18">2.2.4 接口与契约</h4>
+<p>系统工程把接口视为独立管理对象（接口定义、接口控制、变更影响分析）。在智能体系统中，接口有三类：</p>
+<ul><li><strong>智能体—工具接口</strong>：MCP 以 JSON-RPC 2.0、host/client/server 角色标准化连接[24]；但官方明确协议兼容不等于授权，需 OAuth 资源指示与受众校验、禁止令牌向下游透传、最小权限与增量同意[R-5]。<strong>万方核对（6.4）</strong>：张泉等[W-8] 收集 1 609 个 MCP Server 并细析 200 个，发现平均每个 Server 调用 40.74 个权限接口，52% 的权限验证依赖 API Token 与账号密码、未遵循最小权限原则——把上述"官方建议"升级为有样本量的实测问题。郭帅帅等[W-9] 提出把 MCP 作为"语义控制平面"、用 "Context→QoS/Sec 编译器"把高层任务意图映射为底层 QoS 与安全参数，是"协议解决语法、契约解决语义"论断的具体化方向。</li><li><strong>智能体—智能体接口</strong>：A2A 处理不透明智能体应用之间的发现、任务生命周期与委派；接收方必须对每次操作按本地策略重新授权，不得继承发起方权限[R-5]。</li><li><strong>智能体—任务状态接口</strong>：Agent-Integrated Software 提出的 Intent-Level Interaction Abstraction 与"交互契约"，用任务绑定、角色化权限、控制转移与结果证据约束智能体执行与任务状态之间的对应关系，并配套"持续保障"[R-4]。</li></ul>
+<p>这三类接口的共同点是：协议解决<strong>语法互操作</strong>，契约解决<strong>语义与责任</strong>。当前 MCP/A2A 快速标准化了语法层，契约层仍以各平台私有实现为主[6][7][R-5]，是理论增量最大的位置。</p>
+<h4 id="sec-19">2.2.5 验证与确认（V&amp;V）</h4>
+<p>SE 区分"验证（是否按规格建造）"与"确认（是否建造了正确的系统）"。智能体系统使这一区分变得困难：输出是概率性的、轨迹是路径依赖的、规格常以自然语言意图给出。现有做法分三层：</p>
+<ol><li><strong>组件级</strong>：单元测试、工具 schema 校验、结构化输出约束；</li><li><strong>任务级</strong>：SWE-bench 系列基准（真实 GitHub issue + fail-to-pass/pass-to-pass 测试）[13]、AgentBench 类评测，以及 SWE-agent/OpenHands/Agentless 的可比实验[11][12][14]；</li><li><strong>系统级</strong>：轨迹级失效归因（MAST[9]）、LLM-as-a-judge 管道、全链路 trace 与证据捆绑[26]、持续验证与自动回滚[3]。</li></ol>
+<p>系统级 V&amp;V 的突出问题是<strong>评估无法区分"模型能力提升"与"编排质量提升"</strong>：同一框架换模型、同一模型换提示版本、不同日期调用同一 API，结果都不可比。已有综述建议冻结模型标识、提示版本、工具 schema 与随机种子，并记录确切评估日期[R-4]；JSS 等期刊亦要求以实证、仿真或形式化证明支撑论断，并鼓励开放科学工件[35]。把"评估配置"本身作为受配置管理的对象，是 SE 可直接贡献的方法论。</p>
+<h4 id="sec-20">2.2.6 配置管理、状态治理与可靠性</h4>
+<p>图工程提出的<strong>运行时状态图</strong>记录每次状态变更的来源与版本，故障时定位最早失效状态，并选择回放、回滚、分支切换或补偿动作作为恢复边界[6]——这与配置管理中的基线、版本、变更控制几乎逐项对应。工程侧与之配套的模式包括：幂等键与重试安全、编排层去重、断路器与背压、模型回退链与降级模式、按租户/工作流的失效域隔离与爆炸半径控制[R-6]。</p>
+<p>可靠性方面有一个被低估的定量事实：若每步可靠性为 0.95，20 步串联的端到端成功率仅约 36%；多智能体系统在生产中报告的失败率区间约为 41%—87%（不同基准与配置差异大，不宜作为单一确定结论）[R-7]。这提示 SE 的可靠性分配、冗余与故障树方法在智能体编排中有直接用武之地，也解释了为何"集中式编排"往往优于自由协商结构[R-7]。</p>
+<h4 id="sec-21">2.2.7 治理、标准与成熟度</h4>
+<p>把上述治理要求整理为一条可审计链条：AI 资产清单 → 风险分层（数据敏感度 × 自主度 × 爆炸半径）→ 策略即代码 → 运行时执行与审批 → 签名审计与证据 → 持续监控与事件响应 → 管理评审与改进。这条链条同时满足 ISO/IEC 42001 的 PDCA[18]、NIST AI RMF 的四职能[20] 与 EU AI Act 的日志/韧性条款[22]。产业侧已出现借用 CMMI 式五级成熟度的智能体系统工程评估模型（初始级/可重复级/已定义级/可量化级/优化级）[R-4]，但尚未形成可验证的评估工具与跨组织效度证据——这是一个明确的研究空白。</p>
+<p><strong>万方核对新增维度（6.5）</strong>：原稿治理骨架只覆盖 ISO/NIST/EU/OWASP，遗漏中国监管侧。2026 年 5 月 8 日，国家网信办、国家发展改革委、工业和信息化部联合印发《智能体规范应用与创新发展实施意见》[W-24]，部署夯实发展基础（构建标准协议、建立智能体标准体系、完善智能体工具链）、守牢安全底线（明确决策权限、加强行为管控、构建分类分级治理框架）、强化应用牵引（19 个典型场景，其中"研发辅助"明确要求发展软件开发智能体、提升需求分析/架构设计/代码生成/测试全流程能力）与建设创新生态，并要求建立智能体发展评价指标体系。这使"标准缺位"须改为"<strong>国际标准缺位、中国标准体系正在建设</strong>"，同时提升"成熟度模型/分类分级治理"选题的政策相关性。</p>
+<p><strong>表 2　SE 方法 ↔ 智能体工程问题 ↔ 平台机制映射</strong></p>
+<table><thead><tr><th>SE 方法/标准</th><th>智能体工程问题</th><th>平台机制</th><th>映射成熟度</th></tr></thead><tbody>
+<tr><td>ISO/IEC/IEEE 15288 技术过程[17]</td><td>需求→实现→验证→运行→退役全链路</td><td>交付流水线 + 资产清单</td><td>概念映射，缺规范</td></tr>
+<tr><td>ISO/IEC/IEEE 42010 架构描述[40]</td><td>多视角刻画自治边界与治理约束</td><td>无成熟对应</td><td><strong>空白</strong></td></tr>
+<tr><td>MBSE / SysML / 数字线程[R-3]</td><td>跨模态需求与可追溯性</td><td>知识图谱、UID 索引</td><td>中（单向增强）</td></tr>
+<tr><td>接口管理 / 交互契约[R-4]</td><td>工具误用、权限继承、状态错配</td><td>MCP/A2A + 工具契约</td><td>低—中（语法强、语义弱）</td></tr>
+<tr><td>V&amp;V / 确认</td><td>概率性输出、轨迹级失效</td><td>评估门禁、MAST、持续验证</td><td>低</td></tr>
+<tr><td>配置管理 / 变更控制</td><td>状态丢失、并发异常、不可复现</td><td>运行时状态图、检查点、回滚</td><td>低</td></tr>
+<tr><td>可靠性与韧性工程</td><td>串联复合失效、级联传播</td><td>熔断、降级、失效域、回滚</td><td>中（经验性）</td></tr>
+<tr><td>ISO/IEC 42001 / NIST AI RMF[18][20]</td><td>问责、审计、合规</td><td>策略即代码、签名审计、自治分档</td><td>中高（大厂）</td></tr>
+<tr><td>DORA / 度量</td><td>交付效能与 AI 增量归因</td><td>DORA + AI 特有指标[16]</td><td>中（指标未标准化）</td></tr>
+</tbody></table>
+<hr>
+<h3 id="sec-22">2.3 二者结合的最新研究方向</h3>
+<h4 id="sec-23">2.3.1 智能体编排：从设计时保证到运行时组织</h4>
+<p>编排是当前最活跃的交汇点，可沿"确定性—涌现性"轴排列：</p>
+<ul><li><strong>确定性编排</strong>：LangGraph 式有向图、显式状态 reducer、检查点与人在回路中断[27]；适合合规敏感的交付流程。</li><li><strong>会话式/协商式编排</strong>：AutoGen 式多智能体对话与群聊管理[R-1]；表达力强但执行顺序不可预测。</li><li><strong>图工程/系统智能</strong>：显式构造任务组织图、智能体协调图、运行时状态图，把智能体、技能、工具、模型建模为类型化节点，边记录能力归属、资源访问、权限与可靠性；高风险步骤把人类审核者作为显式节点[6]。</li><li><strong>动态运行时调度</strong>：把任务分解为依赖感知 DAG 并跨并行智能体调度、按语义分发共享上下文，报告约 21%—33% 的执行时间下降与近线性扩展[39][R-8]。</li><li><strong>软编排（soft orchestration）</strong>：MCP + 推理模型使编排从"显式编码"转向"运行时推断"，架构纪律由设计时保证转移到运行时行为、可观测性与控制[R-4]。这对 V 模型"先设计、后实现"的传统构成实质挑战，也直接催生了"运行时验证"研究需求。</li></ul>
+<p>Di Ruscio 等人的分类学研究给出了冷静的评估：智能体、工具、记忆等架构原语已相当成熟，而监控、评估、反馈整合与持续演化能力普遍缺位；治理机制存在灵活性与可控性的固有权衡，需要混合式"灵活编排 + 显式监督"[8]。</p>
+<h4 id="sec-24">2.3.2 CI/CD 自动化：从"交付代码"到"交付智能体"</h4>
+<p>Harness 的产业实践[1]—[4] 与 Baqar 等人的学术框架[16] 在这一方向形成互补。后者提出：把智能体决策点嵌入 CI/CD 的参考架构、决策分类法与策略即代码护栏模式、<strong>信任分级（trust tiers）</strong> 的渐进自治框架、以 DORA 指标加 AI 特有指标（干预准确率、人工接管率等）的评估方法，以及工业风格案例研究[16]。产业侧对应的具体机制包括自愈 CI（构建失败→根因分析→生成修复分支→重跑流水线）、AI 验证与回滚（自动发现指标、构建健康画像、异常回滚）、Architect Mode（对话式流水线生成并内嵌组织标准）、AI 数据库迁移（向后兼容、策略校验、Git 版本化、回滚脚本、DBA 审批）[3][4]。</p>
+<p>更具研究价值的是"智能体自身的交付流水线"：传统 CI/CD 的对象是确定性代码，而智能体的行为由模型版本、提示、工具 schema、记忆内容与策略共同决定。因此门禁必须从"测试通过"扩展为"评估通过"，并把上述配置全部纳入版本控制与可复现性契约。Harness 已在内部实践"按任务基准评测并动态选模 + 护栏回退"[4]。<strong>万方核对修正（6.6）</strong>：原稿"公开文献中尚缺少把这一流程形式化为<strong>准入不变量（admission invariants）</strong> 与运行时验证标准的工作"[R-4] 过于绝对。郭子昌等[W-10] 已在兵棋推演运维场景提出"观测—研判—决策—执行—复盘"Loop，以证据卡片、L0—L3 分级授权、<strong>工具契约</strong>、结构化动作单、可回滚原子动作、配置基线与交付环境漂移闭环约束执行边界；经万方全文接口核验，其正文还要求"已注册工具、权限策略、系统版本与知识条目版本应纳入同一发布管理""未经审核、参数范围失效或回滚路径不可用的工具，应自动从智能体可用清单中下线"。严亚伟、汪东升[W-11] 则给出五元组形式化模型 S=〈T,A,F,M,Π〉与 BayesSchedule 调度算法，在 Pegasus 基准上做 5 组仿真、对比 3 个在线学习基线。二者已构成 L2→L3 的<strong>桥接雏形</strong>；但 [W-10] 作者自述为"原型应用和场景走查"，并明确声明不作普适性能外推、后续才做量化验证，[W-11] 为仿真而非生产平台轨迹。准确表述应是：<strong>已有方法框架与形式化雏形，仍缺在真实交付平台上、经配置冻结的受控实证与可推广的准入不变量标准</strong>。</p>
+<h4 id="sec-25">2.3.3 可观测性：从日志到证据</h4>
+<p>OpenTelemetry 的 GenAI 语义约定已覆盖 LLM 调用与智能体 span（<code>invoke_agent</code>、<code>execute_tool</code>），但截至调研时点仍标记为 Development 而非 Stable，需在生产配置中固定语义约定版本[R-5][26]。一条完整的智能体 trace 应串联模型调用 span、检索 span、MCP 工具 span、A2A 任务 span、护栏决策、人工审批与最终工件，目标是"一条连贯的运行轨迹"而非散落日志[R-9]。Harness 的做法更进一步：把每个动作的归因、日志与签名回传为 scorecard 与审计轨迹，供审计方按需调取[2]。<strong>万方核对（6.7）</strong>：《软件学报》根因分析综述[W-12] 把智能体运维归纳为"信息获取—根因定位—效果评估"三流程，并指出该方向仍处早期。需注意中文文献中"可观测智能体"存在术语歧义——高坤[W-21] 的"云网可观测智能体"指<strong>用于观测云网的智能体</strong>，而非<strong>对智能体自身的可观测性</strong>；SLR 检索式须显式排除此类用法，本次万方检索中此类误命中占相当比例。</p>
+<p>方法论上必须区分两件事：<strong>trace 上下文只是关联数据，不是授权凭证</strong>；跨信任边界必须重新认证与授权[R-5]。此外，输入/输出内容属性默认应关闭，仅在隐私与留存审批后启用，且不得把密钥或原始提示写入状态文本[R-5]。把"可观测性"直接等同于"合规证据"是常见误用。</p>
+<h4 id="sec-26">2.3.4 治理与保障：从原则到可认证能力</h4>
+<p>ASOC 把 observability/accountability 列为六项基础原则之一，并把"评估、认证与 Agentic QoS"列为五维研究议程之一[7]；AgentOps 则把智能体纳入云原生治理体系，形成可操作的运营模型[R-6]。综合来看，治理研究正从"列原则"走向三个可检验问题：</p>
+<ol><li><strong>自治度如何分级并验证</strong>？按任务/环境/团队分档已在产业实现[2][16]，但缺乏跨组织的分级标准与越界检测。</li><li><strong>证据链如何自动生成并抵住审计</strong>？签名动作、策略版本、评估配置三者需时间对齐[R-5]。</li><li><strong>Agentic QoS 如何定义与度量</strong>？除延迟/成本外，需纳入干预率、回滚率、失效归因分布等系统级指标[7][9]。</li></ol>
+<h4 id="sec-27">2.3.5 其余值得关注的方向</h4>
+<ul><li><strong>混合符号—神经架构</strong>：ENGINES 项目以 BDI 智能体架构为基座吸收 LLM，用符号侧的确定性、规则执行与可解释性对冲纯 LLM 智能体的可靠性不足[R-10]；呼应安全关键场景对符号方法的偏好。</li><li><strong>人在回路与组织设计</strong>：把人类审核者作为图的一等节点[6]，以及"人机结合、以人为主"的综合集成研讨厅传统[R-4]，与西方"显式图结构 + 运行时状态治理"路径问题意识重合但语汇不同，二者尚未形成有效对话——中文语境下的低竞争高价值选题。</li><li><strong>自动化综述与知识生产</strong>：多智能体框架用于文献综述生成已显示出组织与综合质量提升[38]，可作为"智能体承担 SE 知识工作"的元层面案例，但也带来引用准确性风险。</li><li><strong>平台理论与协议生态</strong>：Agentic AI Platform Networks 识别孤立架构、中介式集成与基于协议的网络化三种集成模式，并以 MCP/A2A 为网络编排基础[R-4]；协议快速标准化而语义层与治理层理论薄弱，是"本体工程"提法的动因[6]。</li></ul>
+<p><strong>表 3　四条研究主线对比</strong></p>
+<table><thead><tr><th>主线</th><th>核心问题</th><th>代表工作</th><th>证据强度</th><th>主要空白</th></tr></thead><tbody>
+<tr><td>智能体编排</td><td>如何在系统层组织异质智能体与状态</td><td>图工程[6]、分类法[8]、动态 DAG[R-8]</td><td>中（综述/框架为主，缺统一基准）</td><td>自演化图、图原生运行时、并发隔离</td></tr>
+<tr><td>CI/CD 自动化</td><td>如何把智能体动作纳入受控交付</td><td>Harness[1]—[4]、FLLM 2025[16]</td><td>低—中（多为案例/厂商报告）</td><td>准入不变量、评估门禁标准化、反事实回放</td></tr>
+<tr><td>可观测性</td><td>如何形成可审计的端到端证据</td><td>OTel GenAI[26]、证据捆绑[R-5]</td><td>中（标准尚不稳定）</td><td>语义约定版本化、隐私默认、trace≠授权</td></tr>
+<tr><td>治理与保障</td><td>如何分级自治、认证与问责</td><td>ASOC[7]、ISO 42001[18]、NIST RMF[20]</td><td>中高（标准成熟，落地弱）</td><td>Agentic QoS、跨组织成熟度效度、责任归属</td></tr>
+</tbody></table>
+<hr>
+<h2 id="sec-28">3 对比分析</h2>
+<h3 id="sec-29">3.1 代表性平台/框架多维对比</h3>
+<p><strong>表 4　八类平台/框架的架构与 SE 能力对比</strong>（基于公开文档与产业对比资料[1]—[4][R-1][R-2][27]—[30]，评分为定性判断，非实测基准）</p>
+<table><thead><tr><th>平台/框架</th><th>抽象范式</th><th>状态/检查点</th><th>编排确定性</th><th>工具互操作</th><th>隔离与身份</th><th>策略与审批</th><th>可观测性</th><th>交付闭环</th><th>许可形态</th><th>SE 覆盖侧重</th></tr></thead><tbody>
+<tr><td><strong>Harness AI</strong></td><td>知识图谱 + Expert/Worker Agents + 编排引擎</td><td>流水线状态 + 知识图谱</td><td>高（受治理执行）</td><td>MCP Server（160+ 工具）</td><td>Delegate / VPC 内执行，密钥本地</td><td>OPA、RBAC、审批、变更窗口、自治分档、签名审计</td><td>内置 DORA、交付洞察、审计轨迹</td><td><strong>强</strong>（CI/CD、验证、回滚原生）</td><td>商业</td><td>变更控制、V&amp;V、治理</td></tr>
+<tr><td><strong>LangGraph / LangChain</strong></td><td>有向图 + 状态 reducer</td><td>强（持久化、断点恢复）</td><td>高</td><td>MCP 适配</td><td>依赖部署环境</td><td>人在回路中断，策略外挂</td><td>LangSmith 追踪较强</td><td>弱（需外接）</td><td>开源</td><td>功能分解、状态治理</td></tr>
+<tr><td><strong>Microsoft Agent Framework</strong>（AutoGen + SK）</td><td>会话式多智能体 + 企业 SDK</td><td>中</td><td>中（LLM 决定发言顺序）</td><td>MCP + A2A</td><td>Entra Agent ID、VNet、私有端点</td><td>Azure RBAC</td><td>OpenTelemetry 原生</td><td>中（Azure DevOps）</td><td>开源 + 托管</td><td>身份、治理、互操作</td></tr>
+<tr><td><strong>Google ADK + Vertex AI Agent Engine</strong></td><td>结构化智能体工程 + 评估</td><td>中</td><td>中高</td><td>MCP + A2A</td><td>VPC-SC、IAM</td><td>云侧策略</td><td>内置评估与追踪</td><td>中</td><td>商业托管</td><td>V&amp;V、评估</td></tr>
+<tr><td><strong>AWS Bedrock AgentCore</strong></td><td>托管运行时 + 工具/记忆</td><td>中</td><td>中</td><td>MCP</td><td>VPC 隔离、IAM</td><td>云侧策略</td><td>CloudWatch/OTel</td><td>中</td><td>商业托管</td><td>隔离、运行时</td></tr>
+<tr><td><strong>CrewAI / Dify / Coze</strong></td><td>角色—任务 / 低代码可视化</td><td>弱—中</td><td>中—低</td><td>有限</td><td>依赖部署</td><td>弱</td><td>基础</td><td>弱</td><td>开源/商业</td><td>快速原型</td></tr>
+<tr><td><strong>SWE-agent / OpenHands</strong></td><td>ACI / 事件流 + 沙箱</td><td>事件流可审计</td><td>中（单智能体循环）</td><td>工具即接口（研究对象）</td><td>Docker 沙箱（每会话）</td><td>实验性</td><td>全轨迹可检视</td><td>弱（面向基准）</td><td>开源 MIT</td><td>接口设计、可复现实验</td></tr>
+<tr><td><strong>GitHub Copilot coding agent</strong></td><td>issue/PR 原生智能体</td><td>分支 + PR</td><td>中</td><td>MCP（GitHub/Playwright 默认）</td><td>Actions 环境</td><td>PR 评审即审批门</td><td>Actions 日志</td><td>强（与 SCM 同构）</td><td>商业</td><td>变更控制、人在回路</td></tr>
+</tbody></table>
+<p>读表要点有三：</p>
+<ol><li><strong>没有全栈赢家</strong>。DevOps 平台型在变更控制、审计与回滚上明显领先，但在编排表达力、状态恢复与基准化评估上落后；开发框架型恰好相反。这正是"融合"研究的产业动机。</li><li><strong>SE 覆盖高度偏斜</strong>。除 Harness 与 GitHub 外，多数平台把治理、V&amp;V、配置管理留给了使用方，形成"平台负责能力、组织负责纪律"的隐性契约，而这一契约在学术文献中几乎未被形式化。</li><li><strong>研究型 harness 的不可替代性</strong>。SWE-agent 与 OpenHands 虽无企业治理能力，却提供了受控、可复现、可消融的实验台；任何声称"编排改进带来收益"的实证研究，都应在这一类 harness 上做配置冻结的对照实验，而非在商业平台上做前后对比。</li><li><strong>中文落地证据补强低代码平台行（6.9）</strong>：罗岚等[W-17] 在浙江省血液中心以 Dify 作智能体编排平台、DeepSeek 作推理引擎、MCP 封装地图/数据库工具、BGE-M3 构建 RAG 知识库，并采用双 LLM 协同校验与 Docker 私有化部署；王湘平[W-18] 给出 "MCP + RAG + 低代码" 的广电故障诊断智能体构建方法。二者印证表 4 中"Dify 类低代码平台"的工具互操作与快速原型定位，也说明中文产业落地已普遍采用"平台 + 协议 + 检索"三件套。苗延飞等[W-19] 把 MCP 用于无人集群作战效能评估（载《系统工程与电子技术》），是协议机制进入系统工程场景的直接例证。</li></ol>
+<h3 id="sec-30">3.2 三级融合深度模型</h3>
+<p>本文提出一个用于定位现有工作的分级：</p>
+<table><thead><tr><th>层级</th><th>含义</th><th>典型表现</th><th>代表</th></tr></thead><tbody>
+<tr><td><strong>L1 工具级</strong></td><td>智能体作为 SE 活动的自动化工具</td><td>用 LLM 写需求、生成测试、修复构建</td><td>GenAI Workbench / ID 4.0[R-3]、Architect Mode[3]</td></tr>
+<tr><td><strong>L2 流程级</strong></td><td>SE 流程作为智能体的约束基础设施</td><td>智能体动作被纳入流水线、审批、策略、审计、回滚</td><td>Harness[1][2]、AI-Augmented CI/CD[16]</td></tr>
+<tr><td><strong>L3 理论级</strong></td><td>SE 理论被改写以刻画智能体特有的涌现、自治与责任</td><td>系统论、交互契约、图工程、Agentic QoS、成熟度模型</td><td>[5][6][7][R-4]</td></tr>
+</tbody></table>
+<p>关键观察是<strong>产业与学术的错配</strong>：工业平台几乎全部停留在 L2（且做得很扎实），学术倡议几乎全部指向 L3（且多为立场论文、分类学或研究议程）。<strong>万方核对修正（6.6、6.10）</strong>：原稿"连接 L2 与 L3 的可检验桥接方法几乎无人完成"应改为"<strong>已有中文桥接雏形，但缺真实平台上的受控验证</strong>"。[W-10] 的工程化 Loop 与工具契约、[W-11] 的五元组形式化调度、[W-5] 的多智能体架构模型生成、[W-13] 的四智能体协同检测（工业级数据集，漏报/误报率较基线降约 18.2%/19.1%，并发现 1 个 CVE）均已跨越纯倡议阶段；但前两者为原型走查/仿真，后两者为特定任务的实验验证，均未在真实 CI/CD 平台上做配置冻结的多框架对照。这一收窄反而使空白更可操作：差异点不再是"有没有人做"，而是"<strong>能否在可复现的生产级轨迹上验证契约与状态治理的因果贡献</strong>"。Di Ruscio 等人对"监控、评估、反馈整合与持续演化支持不足"的判断[8]，以及 ASOC 对"生态正在 ad hoc 地重造服务计算基础"的批评[7]，本质上都是对这一断层的描述。这一断层构成 1.3 节 RQ4 的核心答案。</p>
+<h3 id="sec-31">3.3 生命周期模型适配性对比</h3>
+<table><thead><tr><th>模型</th><th>对智能体系统的适用性</th><th>主要失效点</th></tr></thead><tbody>
+<tr><td>V 模型（需求↔验证逐级对应）</td><td>适合合规关键、规格可形式化的交付环节</td><td>意图以自然语言给出，规格随上下文漂移，分解—验证对应关系难以建立</td></tr>
+<tr><td>螺旋 / 增量迭代</td><td>适合评估驱动的提示与工具迭代</td><td>每次迭代改变模型/提示版本，若不做配置冻结则结果不可比</td></tr>
+<tr><td>DevOps 双环 / 持续交付</td><td><strong>当前最贴合</strong>，尤其与 DORA 指标、渐进式发布、自动回滚结合[3][16]</td><td>环内"人"的决策被智能体替代后，责任链与审计边界模糊</td></tr>
+<tr><td>PDCA 管理体系（ISO 42001）[18]</td><td>适合组织级治理与合规</td><td>粒度偏粗，缺少工程可执行的技术控制</td></tr>
+<tr><td>运行时保证（runtime assurance）</td><td>最有前景：把纪律从设计时迁移到运行时[6][R-4]</td><td>缺乏标准化的准入不变量与恢复语义</td></tr>
+</tbody></table>
+<p>结论是：不存在单一替代模型，可行路径是"<strong>DevOps 双环作为执行骨架 + PDCA 作为治理外壳 + 运行时保证作为安全内核</strong>"的组合，而这一组合的形式化描述本身即是可发表的方法学贡献。</p>
+<h3 id="sec-32">3.4 证据强度与偏倚分析</h3>
+<ul><li><strong>厂商数据不可复现</strong>：如"部署时间缩短 75%""构建失败率下降 67%"等来自客户案例[1]，无对照、无置信区间、无环境描述，只能作为现象线索，不能作为因果结论。</li><li><strong>预印本占比过高（已部分改善）</strong>：图工程[6]、MAST[9]、系统理论立场论文[5] 均为 arXiv 预印本或立场性工作；ASOC[7] 与 IEEE Software 分类法[8] 已获会议接收/期刊接收。万方补检后，《软件学报》[W-1][W-5][W-12][W-13][W-16]、《计算机学报》[W-14]、《计算机研究与发展》[W-8] 等中文同行评议文献可替换部分二级资料，证据等级整体提升；但中文工作多为方法/原型/单一场景实验，仍缺生产环境大规模对照，不能据此把综述整体证据强度上调。</li><li><strong>失败率数字口径不一</strong>：41%—86.7% 区间来自多项独立研究与不同基准配置[R-7][9]，二手来源对同一分类法占比的报告亦有差异，综述中应避免转引为确定常数。</li><li><strong>基准混淆</strong>：SWE-bench 类基准测的是"任务解决率"，不能推断"编排质量"；把模型升级带来的增益归因于框架是常见的内部效度威胁[R-4]。</li><li><strong>中文文献覆盖：已补检但仍有明确缺口（6.11）</strong>：本次通过万方完成 8 组主题检索，核实 25 条来源，[W-1]—[W-23] 覆盖智能体软件工程、MBSE、协议安全、可靠性与运维；但检索配额在"中文理论源流"与"法规库"两组用尽，<strong>钱学森"从定性到定量的综合集成法"原始文献[31]、综合集成研讨厅研究脉络，以及《智能体规范应用与创新发展实施意见》的万方法规库原文均未取得</strong>（后者已由中央网信办官网核实）。因此 [31]、5.2 选题 F 与 2.3.5 的相关论断仍须保留"待补检"标记。</li></ul>
+<h3 id="sec-33">3.5 四组结构性矛盾</h3>
+<ol><li><strong>设计时保证 vs 运行时涌现</strong>：软编排把架构决策推迟到运行时[6][R-4]，而 ISO 15288 的技术过程以"先定义、再实现、再验证"为默认假设[17]。</li><li><strong>灵活性 vs 可控性</strong>：动态协调提升表达力却放大对 LLM 行为的依赖[8]；Harness 用"同一身份、同一策略、同一证据"把智能体收敛到既有变更控制[2]，代价是自主性天花板。</li><li><strong>自治分级 vs 责任归属</strong>：自治度可按任务/环境/团队分档[2][16]，但当智能体跨组织边界经 A2A 委派时，责任链如何不因委派而稀释，标准尚缺[R-5]。</li><li><strong>协议互操作 vs 语义治理</strong>：MCP/A2A 解决了"连得上"[24][25]，未解决"能力含义一致"与"策略可移植"，这正是本体工程与 Agentic QoS 的动因[6][7]。</li></ol>
+<hr>
+<h2 id="sec-34">4 总结与展望</h2>
+<h3 id="sec-35">4.1 主要结论</h3>
+<ol><li><strong>瓶颈已完成迁移</strong>。智能体规模化的约束条件从模型能力转向组合、交付、验证与治理；产业数据（60%—70% 时间在外环[1]）与理论判断（功能性能动性是系统层涌现属性[5]）指向同一结论。</li><li><strong>"Harness"的三重含义具有共同内核</strong>：为智能能力套上可控制、可观测、可复现的外部结构；接口设计本身即是系统行为的一阶决定因素[11]。</li><li><strong>SE 映射不均衡</strong>。生命周期、治理、变更控制映射较成熟；架构描述、接口契约、V&amp;V 与配置/状态治理映射最薄弱（表 2），而这四项恰是当前生产失效的主要来源[9]。</li><li><strong>产业在 L2、学术在 L3，中间缺可复现的桥</strong>（3.2 节）。经万方补检，中文文献已出现工具契约、分级授权与形式化调度等桥接雏形[W-10][W-11][W-5]，但均未在真实交付平台上做配置冻结的受控验证；空白因此收窄为"缺生产级受控实证"，而非"无人尝试"（第 6 章）。</li><li><strong>证据基础尚不稳固</strong>。厂商案例、预印本与不可比基准占主导，形式化与实证之间尚未闭合。</li></ol>
+<h3 id="sec-36">4.2 未来研究趋势（2—3 年）</h3>
+<ul><li><strong>从"智能体工程"走向"系统智能工程"</strong>：图工程三张图[6] 与本体工程、SysML v2、数字线程概念合流，形成领域方法论骨架。</li><li><strong>形式化工具系统性引入</strong>：交互契约、准入不变量、隔离保证、持续保障，预期出现面向智能体系统的运行时验证标准[R-4]。</li><li><strong>生命周期治理与成熟度模型成为竞争焦点</strong>：从"框架比拼"转向"流程与认证比拼"[7][R-4]。</li><li><strong>混合符号—神经架构回归</strong>：BDI + LLM 的可靠性互补[R-10]。</li><li><strong>协议生态与平台理论耦合</strong>：MCP/A2A 之上的网络编排、Agent OS 与图原生运行时的形态竞争[R-4][R-6]。</li><li><strong>评估与基准成为瓶颈议题</strong>：冻结模型标识、提示版本、工具 schema、随机种子与评估日期，报告失效归因分布而非仅报告成功率[R-4][9]。</li></ul>
+<h3 id="sec-37">4.3 关键挑战</h3>
+<table><thead><tr><th>类别</th><th>挑战</th></tr></thead><tbody>
+<tr><td>理论</td><td>缺少可检验的系统理论；现有多元组抽象[5] 未导出可操作设计规则</td></tr>
+<tr><td>方法</td><td>尚无等价于 ISO/IEC/IEEE 15288 的智能体生命周期流程规范（中国已启动智能体标准体系建设[W-24]）；KARMA[W-4]/AADL[W-5]/SysML[W-6][W-7] 已能承载 LLM 生成的架构模型，但仍无法把自治等级与治理约束作为一等元素表达并编译为可执行策略</td></tr>
+<tr><td>工程</td><td>状态丢失、工具误用、绕过 CI/CD 治理、结果"看似合理却不可追溯"[R-6]</td></tr>
+<tr><td>评测</td><td>基准不可比、模型与编排增益混淆、缺少系统级失效归因标准</td></tr>
+<tr><td>治理</td><td>跨边界委派的责任归属、审计证据的时间一致性、协议语义层缺位</td></tr>
+<tr><td>组织</td><td>平台工程团队与 AI 团队职责重叠；审计、法务与工程的证据需求不一致</td></tr>
+</tbody></table>
+<h3 id="sec-38">4.4 一个可操作的研究议程</h3>
+<ul><li><strong>第 1 年</strong>：完成 SLR + 分类法；建立配置冻结的多框架实验台（SWE-agent / OpenHands / LangGraph），采集轨迹并复现 MAST 失效分布。</li><li><strong>第 2 年</strong>：提出"接口契约 → 准入不变量 → 运行时恢复"的形式化框架，在开源 CI/CD 上实现原型，用反事实回放验证回滚与补偿策略。</li><li><strong>第 3 年</strong>：与 2—3 家工业伙伴做多案例研究，形成成熟度评估工具，输出可复现工件与数据集，并对齐 ISO/IEC 42001 审计需求。</li></ul>
+<hr>
+<h2 id="sec-39">5 投稿潜力评估与投稿指南</h2>
+<blockquote>本部分为面向科研决策的附加内容，不属于综述论文正文；若正式投稿，应删除或改写为"研究议程"一节。</blockquote>
+<h3 id="sec-40">5.1 总体判断</h3>
+<p><strong>结论：具备 SCI 及以上级别投稿潜力，但"纯描述性综述"不具备。</strong></p>
+<p>分层判断如下：</p>
+<table><thead><tr><th>稿件形态</th><th>可达层级</th><th>判断</th></tr></thead><tbody>
+<tr><td>描述性综述（本文现状）</td><td>中文核心 / EI / 一般国际期刊</td><td>可作为课程报告、技术白皮书或开题报告基础，直接投 SCI Q1 大概率 desk reject</td></tr>
+<tr><td>规范 SLR + 分类法（taxonomy）+ 证据地图</td><td>SCI Q2 / CCF B，部分 Q1</td><td>可行，但需 200+ 篇严格筛选、可复现检索协议、编码一致性检验（Cohen's κ）与超越"年份/venue 统计"的实质性发现[35]</td></tr>
+<tr><td>SLR + 可检验理论框架 + 受控实证</td><td><strong>SCI Q1 / CCF A（TSE、TOSEM、ICSE、ASE、FSE）</strong></td><td>具备明确潜力</td></tr>
+<tr><td>理论框架 + 工业多案例 + 工具原型 + 开放工件</td><td><strong>SCI Q1 / CCF A，或 JSS In Practice / IEEE Software</strong></td><td>最具竞争力</td></tr>
+</tbody></table>
+<p><strong>为什么现在是窗口期</strong>：(1) 理论锚点刚确立（2025—2026 年的系统理论立场论文[5]、图工程[6]、ASOC[7]、IEEE Software 分类法[8] 均属最新成果）；(2) 标准缺位（无面向智能体的 15288 等价规范）；(3) 产业平台已产生可观测的真实数据（Harness 类平台[1][2]），为实证研究提供场域；(4) 期刊主动开设相关专刊（见 5.5）。</p>
+<p><strong>主要风险</strong>：智能体综述在 2024—2026 年高度同质化；主题时效性强，18 个月审稿周期可能导致"发表即过时"；厂商资料不可复现；若只有分类学而无实证或形式化贡献，容易被评审判为 "a well-written but incremental survey"。<strong>万方补检新增风险（6.8）</strong>：中文文献已出现与推荐选题高度近似的先行工作——[W-10] 的工具契约 + 分级授权 + 可回滚原子动作、[W-11] 的形式化调度模型、[W-5] 的多智能体架构生成、[W-8] 的 MCP 权限实证。投稿时须逐项引用并显式划界（先行工作为原型/仿真/单一场景，本文为生产轨迹上的受控实证与可判定不变量），否则易被熟悉中文文献的审稿人指出重复性。</p>
+<h3 id="sec-41">5.2 六个可投稿的具体选题</h3>
+<p><strong>选题 A｜面向智能体系统的接口契约与运行时状态治理框架</strong>（最推荐）</p>
+<ul><li>RQ：如何把自然语言意图编译为可强制执行的交互契约？契约如何导出准入不变量与恢复语义？</li><li>方法：类型化契约语言 + 不变量检查器 + 在 OpenHands/LangGraph 上做故障注入（陈旧读、丢失更新、工具误用、级联幻觉），对比回放/回滚/补偿策略的恢复率与代价。</li><li>贡献：形式化模型、开源工具、失效归因数据集。</li><li>目标：IEEE TSE / ACM TOSEM / ICSE / ASE。</li><li>依据：同时被图工程[6]、AIS 交互契约[R-4]、ASOC[7] 三方指向，且与配置管理/接口管理传统直接对应。</li><li><strong>万方核对后的必要调整（6.8）</strong>：必须把 [W-10] 列为最接近的先行工作并说明差异——该文已有工具契约、L0—L3 分级授权、结构化动作单与回滚约束，但自述为原型场景走查、未做量化验证、且绑定兵棋运维领域；本文应定位为"把契约编译为可判定的准入不变量，并在真实 CI/CD 轨迹上做配置冻结的对照实验"，而非首次提出契约思想。另需引用 [W-8] 作为"最小权限缺失"的量化动机。</li></ul>
+<p><strong>选题 B｜智能体集成平台的系统工程能力成熟度模型</strong></p>
+<ul><li>RQ：组织级智能体工程能力可分几级？各级的可观测判据是什么？</li><li>方法：SLR → Delphi（15—25 位专家，2—3 轮）→ 2—3 家企业的多案例评估 → 效度检验；把 CMMI 式五级结构[R-4] 操作化为可评分条目。</li><li>目标：Journal of Systems and Software（含 In Practice 轨道）、Information and Software Technology、Empirical Software Engineering。</li><li>注意：必须有跨组织效度证据，否则易被判为"咨询框架"。</li></ul>
+<p><strong>选题 C｜智能体集成平台的系统文献综述与证据地图</strong>（综述路线的最优形态）</p>
+<ul><li>RQ：平台架构原语如何演化？哪些 SE 关切被覆盖/忽略？产业证据与学术证据的一致性如何？</li><li>方法：PRISMA/SLR 协议，检索 6 个数据库（含 CNKI/万方补检），双人编码 + κ 一致性，纳入/排除标准与检索式公开，工件存 Zenodo；结论须超越描述统计（JSS 明确要求[35]）。</li><li>目标：ACM Computing Surveys、JSS、IST、IEEE Software（综述/趋势类）。</li><li>差异化：现有综述多按"框架功能"分类，本文按"SE 过程覆盖度"分类，这是明确的定位差异。</li></ul>
+<p><strong>选题 D｜智能体交付流水线的准入不变量与自动化验证门禁</strong></p>
+<ul><li>RQ：智能体的哪些配置必须冻结才能构成可比评估？门禁应拒绝哪些变更？</li><li>方法：定义评估配置清单 → 在真实 CI 中实现评估门禁 → 用反事实回放量化"模型升级 vs 编排改进"的贡献分离。</li><li>目标：ICSE / FSE / ASE 短文或 TSE 扩展版；IEEE Software 实践类。</li><li>依据：CI/CD 智能体化已有框架[16] 与产业实现[3][4]，但门禁的形式化尚空白。</li></ul>
+<p><strong>选题 E｜面向智能体系统的 SysML v2 建模与可追溯性</strong></p>
+<ul><li>RQ：如何表达自治等级、工具权限、人在回路节点与治理约束？如何从模型生成策略配置？</li><li>目标：Software and Systems Modeling、IEEE Systems Journal、INCOSE 相关会议、MODELS。</li><li>依据：MBSE 智能体化已有架构范式[R-3]。<strong>万方核对后收窄（6.3）</strong>："用架构模型承载 LLM 生成"已不空白（KARMA[W-4]、AADL[W-5]、SysML 需求建模[W-6][W-7]），故选题应改为"<strong>面向自治等级与治理约束的架构描述扩展及其到策略配置的可验证编译</strong>"，并把 [W-4]—[W-7] 列为必引 related work。</li></ul>
+<p><strong>选题 F｜综合集成研讨厅与系统智能的理论对话</strong>（中文语境，低竞争）</p>
+<ul><li>RQ：钱学森体系下"从定性到定量的综合集成法"与图工程/系统智能在涌现观、人机关系、控制机制上的异同为何？能否互相补足？</li><li>目标：《中国科学：信息科学》《自动化学报》《系统工程理论与实践》《软件学报》。</li><li>风险：易写成纯思辨；建议加入形式化对照表与至少一个实证/仿真案例。</li><li><strong>万方核对结果（6.11）</strong>：本次检索配额用尽前未能完成"综合集成法 / 从定性到定量 / 钱学森"组的检索，[31] 仍未取得可核实著录；万方收录的《在线学习》2026 年专题导语转述了国家智能体政策与首批高等教育智能体，但不足以支撑理论溯源。<strong>该选题的前置条件仍是 CNKI/万方的定向补检</strong>，切勿按"已核实"处理。</li></ul>
+<h3 id="sec-42">5.3 目标期刊与会议清单</h3>
+<p><strong>表 5　候选投稿去向</strong>（指标为第三方汇总的 2025 年度数据[36]，投稿前务必以最新 JCR / 中科院分区 / CCF 目录复核）</p>
+<table><thead><tr><th>去向</th><th>类型</th><th>大致层级</th><th>匹配度</th><th>适合稿件</th><th>关键注意点</th></tr></thead><tbody>
+<tr><td>ACM Computing Surveys</td><td>期刊</td><td>SCI Q1，IF≈30</td><td>高（综述专用）</td><td>选题 C 的完整 SLR</td><td>仅收综述；要求权威性、覆盖面与长期参考价值</td></tr>
+<tr><td>IEEE Trans. on Software Engineering (TSE)</td><td>期刊</td><td>CCF A，SCI Q1，IF≈6.0</td><td>高</td><td>A、D</td><td>要求理论结果或充分实证验证；纯分类学不足</td></tr>
+<tr><td>ACM TOSEM</td><td>期刊</td><td>CCF A，SCI Q1，IF≈6.2</td><td>高</td><td>A、D、E</td><td>偏好方法与工具的形式化与评估</td></tr>
+<tr><td>Journal of Systems and Software (JSS)</td><td>期刊</td><td>CCF B，SCI Q1/Q2，IF≈3.8</td><td><strong>很高</strong></td><td>B、C、工业案例</td><td>明确欢迎 SLR/mapping study，但要求实质结论；有 In Practice、NITP 轨道与开放科学政策[32][35]</td></tr>
+<tr><td>Information and Software Technology (IST)</td><td>期刊</td><td>SCI Q1，IF≈4.6</td><td>高</td><td>B、C</td><td>偏好实证与系统评价</td></tr>
+<tr><td>Empirical Software Engineering (EMSE)</td><td>期刊</td><td>CCF B，SCI Q1/Q2</td><td>中高</td><td>B、D 的实证部分</td><td>方法学严谨度要求高，需完整威胁效度分析</td></tr>
+<tr><td>Software and Systems Modeling (SoSyM)</td><td>期刊</td><td>SCI Q2/Q3</td><td>高（限选题 E）</td><td>E</td><td>需真正贡献建模语言/语义</td></tr>
+<tr><td>IEEE Software</td><td>期刊/杂志</td><td>SCI Q2，IF≈4.0</td><td>很高</td><td>C、D 的实践版、趋势与观点</td><td>2026 年设 "Engineering Agentic Systems" 专刊[8]；偏实践与观点，篇幅短</td></tr>
+<tr><td>IEEE Systems Journal / Systems Engineering (INCOSE)</td><td>期刊</td><td>SCI Q2/Q3</td><td>中高</td><td>E、F、成熟度</td><td>需真实系统/体系工程视角，不能只谈软件</td></tr>
+<tr><td>ICSE / ASE / FSE / ESEC</td><td>会议</td><td>CCF A</td><td>高</td><td>A、D 的技术原型</td><td>强基线、消融、工件可复现</td></tr>
+<tr><td>ICWS / ICSOC / SERVICE</td><td>会议</td><td>CCF B/C</td><td>高（ASOC 脉络）</td><td>A、C 的服务计算版</td><td>ASOC 宣言即发表于 ICWS 2026[7]</td></tr>
+<tr><td>《软件学报》</td><td>中文</td><td>中文核心 / EI / CCF 中文 A</td><td>很高</td><td>C、E、F</td><td>已设"面向智能体信息系统的软件新技术"专刊（截稿 2026-08-24，2027 年第 10 期出版）[33]；关注 2027/2028 专刊计划</td></tr>
+<tr><td>《中国科学：信息科学》</td><td>中文</td><td>中文顶级；对应英文刊 <em>SCIENCE CHINA Information Sciences</em> 为 SCI</td><td>高</td><td>A、E、F 的治理安全侧</td><td>已设"智能体安全"专题征文[34]</td></tr>
+<tr><td>《自动化学报》《系统工程理论与实践》</td><td>中文</td><td>EI / 中文核心</td><td>中高</td><td>F、成熟度、系统理论</td><td>《自动化学报》明确收录综述且系统理论与系统工程在范围内，双盲评审</td></tr>
+</tbody></table>
+<p><strong>万方核对新增（6.12）</strong>：本次检索显示中文同行评议阵地已相当活跃——《软件学报》2026 年连续刊出代码生成智能体综述[W-1]、根因分析综述[W-12]、SmartGen-AADL[W-5]、MARC[W-13]；《计算机学报》[W-14]、《计算机研究与发展》[W-8]、《系统工程与电子技术》[W-4][W-19] 亦有直接相关成果。这些期刊多为 EI / 中文核心而非 SCI，不宜据此调整"SCI 以上"的目标判断，但<strong>作为中文证据基础、国内合作与前期成果发布阵地价值很高</strong>；若走"中文先行 + 英文扩展"路线，须严守 5.8 节的重复发表边界（会议/中文版到英文期刊扩展须有显著增量并显式引用）。</p>
+<p><strong>优先级建议</strong>：若目标是"SCI 以上"，首选 <strong>TSE / TOSEM（选题 A、D）</strong> 或 <strong>ACM CSUR（选题 C 的完备版）</strong>；若以稳妥见刊与工业影响为主，<strong>JSS（选题 B 或 C）+ IEEE Software（实践短文）</strong> 组合最优；中文路线可并行投《软件学报》后续专刊，但注意与英文稿的重复发表边界。</p>
+<h3 id="sec-43">5.4 论文结构模板（以选题 A 为例）</h3>
+<ol><li><strong>Introduction</strong>（1.5 页）：一个真实失效场景 → 现有做法为何失效（引用 MAST 数据[9]）→ 研究空白 → 三条贡献 → 论文路线。</li><li><strong>Background &amp; Motivating Study</strong>（2 页）：ISO 15288 过程映射[17]、图工程状态图[6]、交互契约[R-4]；用 30—50 条真实轨迹的先导研究量化问题，避免"我认为"。</li><li><strong>Formal Framework</strong>（3—4 页）：契约语法、状态转移语义、不变量定义、恢复动作与代价模型；给出可判定性讨论与定理/命题。</li><li><strong>Implementation</strong>（1.5 页）：编译为 OPA/Rego 策略与运行时检查器，与 Harness/Argo/GitHub Actions 的集成方式。</li><li><strong>Evaluation</strong>（3—4 页）：RQ1 恢复有效性、RQ2 开销、RQ3 与基线对比、RQ4 消融；报告失效归因分布；配置冻结清单。</li><li><strong>Threats to Validity</strong>（1 页）：内部、构念、外部、结论效度，尤其模型版本与评估日期。</li><li><strong>Related Work</strong>（1.5 页）：与 ASOC[7]、分类法[8]、图工程[6]、MAST[9]、CI/CD 智能体化[16] 逐项区分。</li><li><strong>Conclusion &amp; Data Availability</strong>：工件链接、复现实验脚本、伦理与 LLM 使用声明。</li></ol>
+<h3 id="sec-44">5.5 评估设计与可复现性清单</h3>
+<ul><li><strong>基线</strong>：单智能体、无契约的多智能体、MAST 中的战术修复（角色规格改进/拓扑调整）、商业平台的默认护栏（若可访问）。</li><li><strong>指标</strong>：任务成功率、端到端可靠性、恢复率与恢复代价（回滚步数/令牌/时延）、干预率与人工接管率[16]、失效归因分布（能力不足 / 角色错配 / 通信损失 / 并发异常 / 工具误用）[9][R-4]、DORA 四项指标。</li><li><strong>必须冻结</strong>：模型标识与版本、提示版本、工具 schema 版本、语义约定版本[R-5]、随机种子、温度、最大步数、评估日期、数据集切片[13][R-4]。</li><li><strong>必须报告</strong>：每任务成本、API 调用次数、置信区间与效应量、失败案例定性分析；不要只报平均值。</li><li><strong>工件</strong>：检索协议与编码表（SLR 类）、轨迹数据集、容器化环境、分析脚本、Zenodo DOI；JSS 开放科学政策与 TSE/ICSE 工件评审均对此有明确激励[35]。</li><li><strong>避坑</strong>：不要把"换了更强模型带来的提升"写成"框架贡献"；不要把厂商客户案例当对照组；不要在多智能体增益上预设"加智能体即提升"（已有实证对此构成反证[9][R-7]）。</li></ul>
+<h3 id="sec-45">5.6 常见拒稿理由与规避</h3>
+<table><thead><tr><th>拒稿理由</th><th>规避动作</th></tr></thead><tbody>
+<tr><td>"Just another survey / no new insight"</td><td>产出分类法之外的可检验命题、反例或设计规则；JSS 亦明确要求 SLR 报告实质结论[35]</td></tr>
+<tr><td>"Lack of empirical validation"</td><td>至少一项受控实验或工业多案例；形式化工作需给出可判定性与原型</td></tr>
+<tr><td>"Vendor case studies are not evidence"</td><td>厂商资料仅作动机与场景描述，实证数据来自自建实验台[11][12]</td></tr>
+<tr><td>"Results not reproducible"</td><td>冻结配置清单 + 开放工件 + 记录评估日期</td></tr>
+<tr><td>"Topic will be outdated"</td><td>把贡献锚定在标准/契约/不变量等慢变量上，而非具体框架版本；投有专刊的期刊以缩短周期[33][34]</td></tr>
+<tr><td>"Out of scope"</td><td>投稿信中显式对齐期刊 aims &amp; scope（如 JSS 的 "Software Engineering for AI systems" 与 DevOps 条目[32][35]）</td></tr>
+<tr><td>中文稿"综述无创新"</td><td>加入形式化对照（可参综合集成法[31]）、实证或仿真；《自动化学报》接收综述、要求双盲评审与文献查新查全[37]</td></tr>
+</tbody></table>
+<h3 id="sec-46">5.7 12—18 个月执行时间线</h3>
+<table><thead><tr><th>阶段</th><th>月份</th><th>产出</th><th>里程碑</th></tr></thead><tbody>
+<tr><td>文献与协议</td><td>M1—M2</td><td>SLR 协议、检索式、纳入排除标准、编码表</td><td>协议预注册（可选）</td></tr>
+<tr><td>证据综合</td><td>M3—M4</td><td>证据地图、分类法、研究空白论证</td><td>可投 IEEE Software 趋势短文或专刊短文</td></tr>
+<tr><td>框架与原型</td><td>M5—M8</td><td>形式化框架、检查器、容器化实验台</td><td>投 CCF A 会议（ICSE/ASE/FSE 视截稿日）</td></tr>
+<tr><td>主实验</td><td>M9—M11</td><td>完整评估、消融、失效归因数据集</td><td>工件上传 Zenodo</td></tr>
+<tr><td>工业验证</td><td>M11—M14</td><td>2—3 家多案例、成熟度评估工具</td><td>期刊扩展版（会议版需 ≥30% 新内容）</td></tr>
+<tr><td>投稿与返修</td><td>M14—M18</td><td>期刊投稿、rebuttal、返修</td><td>目标 TSE/TOSEM/JSS</td></tr>
+</tbody></table>
+<h3 id="sec-47">5.8 合规与写作规范提示</h3>
+<ul><li><strong>LLM 使用声明</strong>：多数 Elsevier/IEEE/ACM 期刊要求声明生成式 AI 在写作中的使用范围，且不允许把 LLM 列为作者；投稿前查目标期刊最新政策。</li><li><strong>数据可用性声明</strong>：工业数据常受 NDA 约束，JSS 允许在无法披露时以简短声明说明[35]。</li><li><strong>重复发表</strong>：中文专刊稿与英文期刊稿不得内容重叠超过期刊阈值；若先投会议，期刊扩展版须显著增量并引用会议版。</li><li><strong>参考文献分层</strong>：把同行评议论文、预印本、标准、产业资料在文献表中分组标示；预印本须注明版本与日期，标准须注明版本年份。</li></ul>
+<hr>
+<h2 id="sec-48">6 万方中文文献核对：新旧结论并列与依据</h2>
+<blockquote>本章为 <strong>2026-11-09 增量核对专章</strong>。凡标注「原结论」者，均为本次更新前稿件原文（保留以便追溯）；「新依据」仅指本次万方数据知识服务平台检索所得，或明确标注的官网核实。二者证据类型不同：原文主要依据 arXiv 预印本、ISO/NIST/EU 标准文本与厂商技术文档，新增依据为中文同行评议期刊论文与一份政策原文。凡不构成直接互相否证者一律并列保留，不作静默替换。每条新增依据首次出现时给出作者、题名、刊名、年份、DOI 与可访问链接；完整著录另见参考文献 C 组。</blockquote>
+<h3 id="sec-49">6.0 检索执行、命中情况与差异总览</h3>
+<p><strong>执行方式</strong>：万方数据知识服务平台 <code>search</code>（PQ 表达式检索）与 <code>fulltext</code>（全文核验）接口；检索日 2026-11-09；资源库以 <code>OpenPeriodicalChi</code>（中文期刊）为主，兼查 <code>OpenThesis</code> / <code>OpenConference</code> / <code>OpenClaw</code>（法规）；返回字段含 Id、Title、Creator、Keywords、Abstract、PublishYear、PeriodicalTitle、DOI、CitedCount。共完成 <strong>8 组有效精确主题检索</strong>，另有 1 组宽检索仅作线索发现、2 组因接口返回 <code>AUTH_QUOTA_EXHAUSTED</code>（预付费调用次数用尽）失败，详见 6.11。最终纳入 25 条来源（[W-1]—[W-25]），其中 [W-10] 另经全文接口核验正文。</p>
+<p><strong>表 6-1 检索式与命中情况</strong>（<code>num_found</code> 为万方返回的命中总数，非纳入数）</p>
+<table><thead><tr><th>#</th><th>检索式（PQ）</th><th>资源库</th><th>num_found</th><th>本次纳入</th><th>精度说明</th></tr></thead><tbody>
+<tr><td>0</td><td>标题:智能体 OR 标题:智能体编排 OR 标题:大模型智能体</td><td>中文期刊</td><td>39 678</td><td>[W-14][W-23]</td><td>宽检索，"智能体"被分词匹配到"智能化"，绝大多数命中无关，仅 2 条可用</td></tr>
+<tr><td>1</td><td>标题:智能体 AND 标题:综述</td><td>中文期刊</td><td>263</td><td>[W-2]</td><td>混入"智能化…综述"，需人工筛选</td></tr>
+<tr><td>2</td><td>关键词:智能体 AND 关键词:软件工程</td><td>中文期刊</td><td>59</td><td>[W-11][W-15][W-20][W-25]</td><td>精度较好</td></tr>
+<tr><td>3</td><td>关键词:智能体 AND 关键词:系统工程</td><td>期刊/学位/会议</td><td>126</td><td>0</td><td>命中多为 2001—2006 年控制与交通领域经典文献，与 LLM 智能体无关</td></tr>
+<tr><td>4</td><td>标题:综合集成 OR 关键词:综合集成研讨厅</td><td>中文期刊</td><td>2 517</td><td>0</td><td>"综合集成"被切分为农业/地质类"综合…集成"，未取得钱学森理论源流</td></tr>
+<tr><td>5</td><td>关键词:MBSE AND 摘要:大语言模型</td><td>中文期刊</td><td>14</td><td>[W-3][W-4][W-6][W-7]</td><td>精度最高的一组</td></tr>
+<tr><td>6</td><td>关键词:智能体 AND 关键词:可观测性</td><td>中文期刊</td><td>6</td><td>[W-10][W-21]</td><td>存在术语歧义，见 6.7</td></tr>
+<tr><td>7</td><td>标题:智能体 AND 刊名:软件学报</td><td>中文期刊</td><td>35</td><td>[W-1][W-5][W-12][W-13][W-16]</td><td>直接命中中文核心阵地</td></tr>
+<tr><td>8</td><td>关键词:模型上下文协议 OR 标题:模型上下文协议 OR 关键词:A2A协议</td><td>中文期刊</td><td>61</td><td>[W-8][W-9][W-17][W-18][W-19][W-22]</td><td>协议与落地生态</td></tr>
+<tr><td>—</td><td>标题:从定性到定量 OR 标题:综合集成研讨厅 OR 作者:钱学森</td><td>中文期刊</td><td>失败</td><td>0</td><td>配额用尽</td></tr>
+<tr><td>—</td><td>标题:智能体规范应用与创新发展实施意见</td><td>OpenClaw 法规</td><td>失败</td><td>0</td><td>配额用尽，改由官网核实</td></tr>
+</tbody></table>
+<p><strong>表 6-2 新旧结论差异总览</strong></p>
+<table><thead><tr><th>序</th><th>原结论（更新前）</th><th>新依据</th><th>判定</th><th>更新后表述</th></tr></thead><tbody>
+<tr><td>1</td><td>瓶颈已从模型能力迁移到组合、交付、验证与治理</td><td>[W-1][W-3][W-15]</td><td><strong>一致，证据升级</strong></td><td>结论不变，证据基础从厂商数据/预印本扩展到中文同行评议文献</td></tr>
+<tr><td>2</td><td>多智能体失效以 MAST 三分类与 14 类失效模式描述</td><td>[W-2]</td><td><strong>并列，不可混用</strong></td><td>两套分类法层级与占比口径不同，须并列呈现</td></tr>
+<tr><td>3</td><td>"几乎没有工作回答如何用 SysML v2 / 42010 表达智能体的行为边界与治理约束"</td><td>[W-4]—[W-7]</td><td><strong>收窄修正</strong></td><td>架构模型承载 LLM 生成已不空白；空白是"治理语义与可验证性缺位"</td></tr>
+<tr><td>4</td><td>智能体生命周期流程规范与标准缺位</td><td>[W-24]</td><td><strong>修正</strong></td><td>国际标准仍缺位，但中国已启动智能体标准体系建设，且明确分类分级治理框架</td></tr>
+<tr><td>5</td><td>产业在 L2、学术在 L3，"可检验桥接方法几乎无人完成"</td><td>[W-5][W-10][W-11][W-13]</td><td><strong>收窄修正</strong></td><td>已有中文桥接雏形，缺的是真实交付平台上配置冻结的受控实证</td></tr>
+<tr><td>6</td><td>"公开文献中尚缺少把动态选模/护栏回退形式化为准入不变量的工作"</td><td>[W-10][W-11]</td><td><strong>修正</strong></td><td>已有工具契约、L0—L3 分级授权与形式化调度雏形；缺可判定不变量与生产轨迹验证</td></tr>
+<tr><td>7</td><td>可观测性以 OpenTelemetry GenAI 语义约定与轨迹串联为主线</td><td>[W-12][W-21]</td><td><strong>补充</strong></td><td>补入"信息获取—根因定位—效果评估"三流程；并发现中文术语歧义需显式排除</td></tr>
+<tr><td>8</td><td>预印本占比过高、中文文献覆盖不足</td><td>[W-1]—[W-23]</td><td><strong>部分改善，整体不上调</strong></td><td>中文同行评议文献可替换部分二级资料，但多为原型/仿真/单场景实验</td></tr>
+<tr><td>9</td><td>中文理论源流（综合集成法）依赖二手资料，须补检</td><td>检索失败</td><td><strong>维持待补检</strong></td><td>[31] 与综合集成研讨厅仍未核实，选题 F 前置条件不变</td></tr>
+<tr><td>10</td><td>描述性综述难进 SCI 一区；SLR + 框架 + 受控实证可达 Q1 / CCF A</td><td>全部 [W-n]</td><td><strong>维持判断，新增约束</strong></td><td>投稿前须逐项引用中文先行工作并显式划界，否则有重复性风险</td></tr>
+</tbody></table>
+<h3 id="sec-50">6.1 核心判断一：瓶颈从模型能力迁移到系统性工程问题</h3>
+<p><strong>原结论（更新前）</strong>：「智能体规模化之后，约束条件不再是模型能力，而是交付系统的吞吐、可靠性与可审计性」「瓶颈已从模型能力迁移到组合、交付、验证与治理」。<strong>原依据</strong>：Harness 融资公告披露的"外环占 60%—70% 工时"[1]（厂商数据，不可复现）、IBM 立场论文《Agentic AI Needs a Systems Theory》[5]（arXiv 预印本）、ASOC 六原则[7]。原始表述见 1.1、4.1。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：</p>
+<ul><li>[W-1] 董益宏, 姜雪, 钱家如, 等. 《基于大语言模型智能体的代码生成综述》. 软件学报, 2026. DOI: 10.13328/j.cnki.jos.007593；<a href="https://d.wanfangdata.com.cn/periodical/rjxb202608003" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202608003</a> —— 提出代码生成智能体三大特征（自主性、任务范围广泛性、<strong>工程实践性的增强</strong>），明确指出研究重心已从模型算法创新转向流程管理、系统可靠性与工具集成等工程挑战。</li><li>[W-15] 高翠芸. 《大语言模型在复杂软件生成中的潜力与局限》. 计算（CCF 会刊）, 2026. DOI: 10.11991/cccf.202609004；<a href="https://d.wanfangdata.com.cn/periodical/yykj202609005" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/yykj202609005</a> —— 指出 LLM 在复杂软件生成中受限于规模化、可信性、稳定性三重挑战，结论是"并非银弹"，需与传统软件工程方法深度融合。</li><li>[W-3] 毛寅轩, 白杨, 张灏龙, 等. 《大语言模型对人工智能赋能系统工程的技术模式影响研究》. 中国航天, 2025. DOI: 10.3969/j.issn.1002-7742.2025.10.003；<a href="https://d.wanfangdata.com.cn/periodical/zght202510003" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/zght202510003</a> —— 判断 AI 角色由"点状分析工具"转为"贯穿生命周期的生成式智能协作助手"，覆盖需求分析、系统设计、验证确认、知识管理四环节。</li></ul>
+<p><strong>差异判定</strong>：无实质冲突，属<strong>同向印证与证据升级</strong>。原依据中的量化部分来自厂商披露，新依据为中文同行评议与 CCF 会刊观点，独立性更强。</p>
+<p><strong>更新后表述</strong>：结论维持，但把"瓶颈迁移"的证据链改写为"厂商工时数据（仅作动机） + 预印本系统理论立场 + 中文同行评议综述的一致性判断"，已在 1.1 补入相应段落。厂商数据仍标注为不可复现。</p>
+<h3 id="sec-51">6.2 多智能体失效分类：MAST 三分类与中文四层异常分类并列</h3>
+<p><strong>原结论（更新前）</strong>：以 MAST（Multi-Agent System Failure Taxonomy）三分类、14 类失效模式作为生产失效的主要描述框架[9]，并在 3.4 提示"二手来源对同一分类法占比的报告有差异，不宜转引为确定常数"。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：</p>
+<ul><li>[W-2] 张珑耀, 温东新, 马庄宇, 等. 《基于大语言模型的多智能体系统异常综述（特邀）》. 计算机工程, 2026. DOI: 10.19678/j.issn.1000-3428.0252754；<a href="https://d.wanfangdata.com.cn/periodical/jsjgc202601002" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/jsjgc202601002</a> —— 选取 7 个代表性 MAS、收集 13 418 段运行轨迹，采用 LLM 初筛 + 专家人工校验，构建<strong>四层</strong>异常分类：模型理解感知异常、智能体交互异常（16.8%，主因"信息隐瞒"）、任务执行异常（27.1%，主因"决策重复出错"）、外部环境异常（18.3%，主因"记忆冲突"）；并指出模型理解感知异常是根源性诱因。</li></ul>
+<p><strong>差异判定</strong>：<strong>并列关系，不构成否证</strong>。MAST 按"规约与系统设计 / 智能体间失配 / 任务验证与终止"三分类，[W-2] 按"模型 / 交互 / 执行 / 环境"四层划分；样本集、标注协议与分母口径均不同，占比数字不可混用为同一组常数。</p>
+<p><strong>更新后表述</strong>：在 3.4 增补 [W-2] 四层分类与三项占比，明确要求两套分类法并列呈现；5.5 的失效归因分布指标相应保留两套编码表，不得合并。</p>
+<h3 id="sec-52">6.3 MBSE 与架构描述空白：从"无人问津"收窄为"治理语义与可验证性缺位"</h3>
+<p><strong>原结论（更新前）</strong>：「这类工作主要是 MBSE 的智能体化增强……目前几乎没有工作回答如何用 SysML v2 / ISO/IEC/IEEE 42010 架构描述[40] 表达智能体的行为边界、自治等级与治理约束」[R-3][R-4]；表 5 亦把"架构描述"列为空白。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：</p>
+<ul><li>[W-4] 鲁金直, 王国新, 唐锡晋, 等. 《面向空间智能的基于模型的系统工程方法》. 系统工程与电子技术, 2025. DOI: 10.12305/j.issn.1001-506X.2025.12.14；<a href="https://d.wanfangdata.com.cn/periodical/xtgcydzjs202512002" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/xtgcydzjs202512002</a> —— 以 KARMA 多架构统一建模语言融合 LLM、计算机视觉、三维建模，构建空间智能 MBSE 框架，3 个典型场景验证。</li><li>[W-5] 葛楚妍, 王培远, 王甜甜, 等. 《SmartGen-AADL:多智能体系统需求分析与AADL模型生成》. 软件学报, 2026. DOI: 10.13328/j.cnki.jos.007595；<a href="https://d.wanfangdata.com.cn/periodical/rjxb202608002" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202608002</a> —— 三阶段多智能体把自然语言需求转为 AADL 架构模型；15 个场景、4 个主流 LLM 上组件错误行占比平均降低 34.37%、结构匹配度提升超 20%，含消融实验。</li><li>[W-6] 殷泰晖, 侯申茂, 杨羽馨, 等. 《载人航天任务需求自动建模与一致性分析方法》. 航天器工程, 2025. DOI: 10.3969/j.issn.1673-8748.2025.05.016；<a href="https://d.wanfangdata.com.cn/periodical/htqgc202505017" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/htqgc202505017</a> —— 领域术语增强 Prompt + 规则驱动 SysML 生成 + 多维语义一致性分析，原型系统经真实航天任务工程验证。</li><li>[W-7] 吴文瑞. 《载人航天器系统级SysML模型体系设计》. 航天器工程, 2025. DOI: 10.3969/j.issn.1673-8748.2025.06.017；<a href="https://d.wanfangdata.com.cn/periodical/htqgc202506018" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/htqgc202506018</a> —— 系统级 SysML 模型的分层、依赖、归档与版本控制方案。</li><li>另见 [W-3]（6.1 已著录）：从技术模式层面论证 LLM 贯穿 SE 全生命周期。</li></ul>
+<p><strong>差异判定</strong>：<strong>原结论过强，须收窄</strong>。中文研究已给出 KARMA、AADL、SysML 三条"用形式化架构模型承载 LLM 生成结果"的路径，并已有带消融的实验，故"几乎无人问津"不成立。但这些工作的目标都是<strong>生成需求/架构模型</strong>，检索到的中文文献中未见把自治等级、工具权限、治理约束作为一等建模元素，并编译为可执行/可验证策略的工作。</p>
+<p><strong>更新后表述</strong>：空白从"架构描述无人问津"改为"<strong>架构描述中的治理语义与可验证性缺位</strong>"；表 5 相应行已改写；5.2 选题 E 调整为"面向自治等级与治理约束的架构描述扩展及其到策略配置的可验证编译"，并把 [W-4]—[W-7] 列为必引 related work。</p>
+<h3 id="sec-53">6.4 接口协议与最小权限：从"官方建议"升级为有样本量的实测问题</h3>
+<p><strong>原结论（更新前）</strong>：「MCP 以 JSON-RPC 2.0、host/client/server 角色标准化连接[24]；但官方明确协议兼容不等于授权，需 OAuth 资源指示与受众校验、禁止令牌透传、最小权限与增量同意[R-5]」。依据为协议规范与二级安全实践资料。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：</p>
+<ul><li>[W-8] 张泉, 冯诀宵, 周炽金, 等. 《针对大语言模型MCP服务器中权限使用的实证研究》. 计算机研究与发展, 2026. DOI: 10.7544/issn1000-1239.202550874；<a href="https://d.wanfangdata.com.cn/periodical/jsjyjyfz202605006" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/jsjyjyfz202605006</a> —— 静态分析框架收集 1 609 个 MCP Server、细析 200 个，发现平均每个 Server 调用 40.74 个权限接口，52% 的权限验证依赖 API Token 与账号密码、未遵循最小权限原则。</li><li>[W-9] 郭帅帅, 朱家兵, 叶佳, 等. 《面向具身智能与机器人物联网的模型上下文协议研究综述：从语义控制到实时安全保障》. 物联网学报, 2026. DOI: 10.11959/j.issn.2096-3750.WLW25125；<a href="https://d.wanfangdata.com.cn/periodical/wlwxb202602007" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/wlwxb202602007</a> —— 把 MCP 定位为"语义控制平面"，提出 "Context→QoS/Sec 编译器"，把高层任务意图映射为 ROS2/DDS、OPC UA/TSN、5G/6G 底层的 QoS 与安全参数，并列出可验证性、代价模型可识别性等挑战。</li><li>[W-22] 刘高峰, 潘彤, 余文艳. 《基于A2X协议的智能体互联网系统设计》. 广播电视网络, 2026. DOI: 10.3969/j.issn.2096-806X.2026.07.003；<a href="https://d.wanfangdata.com.cn/periodical/gbdswl202607003" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/gbdswl202607003</a> —— 提出与 A2A 原生兼容的扩展层 A2X，报告延迟开销低于 1%、测试环境能量节省 57.5%、效率提升 38.4%（作者自报的单一测试环境结果，未见第三方复现）。</li></ul>
+<p><strong>差异判定</strong>：<strong>新增量化证据与机制方向，不推翻原结论</strong>。[W-8] 把"应遵循最小权限"从规范建议升级为可测量的现状问题；[W-9] 是"协议解决语法、契约解决语义"论断的具体化；[W-22] 属协议扩展探索，证据等级低，仅登记为工具生态线索。</p>
+<p><strong>更新后表述</strong>：2.3 相应段落已补入 [W-8][W-9]；[W-22] 仅在本章与 C 组登记，未写入正文结论，避免把单一测试环境指标当作可推广结论。</p>
+<h3 id="sec-54">6.5 治理骨架：从"标准缺位"修正为"国际标准缺位、中国标准体系在建"</h3>
+<p><strong>原结论（更新前）</strong>：治理骨架由 ISO/IEC 42001[19]、NIST AI RMF 1.0[20] / 生成式 AI 画像[21]、EU AI Act[22]、OWASP Top 10 for LLM[23] 构成；并断言「尚无等价于 ISO/IEC/IEEE 15288 的智能体生命周期流程规范」。</p>
+<p><strong>新依据（2026-11-09 核实）</strong>：</p>
+<ul><li>[W-24] 国家互联网信息办公室, 国家发展和改革委员会, 工业和信息化部. 《智能体规范应用与创新发展实施意见》. 发布时间: 2026-05-08. 官方全文: <a href="https://www.cac.gov.cn/2026-05/08/c_1779979789523320.htm" target="_blank" rel="noopener">https://www.cac.gov.cn/2026-05/08/c_1779979789523320.htm</a> —— 四方面举措：夯实发展基础（<strong>构建标准协议、建立智能体标准体系、完善智能体工具链</strong>）、守牢安全底线（<strong>明确决策权限、加强行为管控、构建分类分级治理框架</strong>）、强化应用牵引（五大领域 <strong>19 个典型场景</strong>，其中"研发辅助"明确要求发展软件开发智能体、提升需求分析/架构设计/代码生成/测试全流程能力）、建设创新生态；并要求建立智能体发展评价指标体系。旁证：中国经济新闻网解读 <a href="https://www.cet.com.cn/xwsd/10377784.shtml" target="_blank" rel="noopener">https://www.cet.com.cn/xwsd/10377784.shtml</a> ；长沙市行政审批服务局转载 <a href="http://xzspj.changsha.gov.cn/zfxxgk/fdzdgknr/qtfdxx/gzdt1/202605/t20260514_12382181.html" target="_blank" rel="noopener">http://xzspj.changsha.gov.cn/zfxxgk/fdzdgknr/qtfdxx/gzdt1/202605/t20260514_12382181.html</a> 。<strong>说明</strong>：万方法规库（OpenClaw）检索因配额用尽失败，本条以中央网信办官网原文为准，非万方记录。</li><li>[W-23] 刘增辉. 《教育智能体与高等教育：一场静水流深的变革》. 在线学习, 2026（专题导语，无 DOI）. 万方记录 Id: zgycjy-xby202605008；<a href="https://d.wanfangdata.com.cn/periodical/zgycjy-xby202605008" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/zgycjy-xby202605008</a> —— 转述《实施意见》19 个典型场景及 2026 世界数字教育大会公布的首批 18 项高等教育智能体，可作为政策落地侧的中文佐证，但不构成理论溯源依据。</li></ul>
+<p><strong>差异判定</strong>：<strong>原结论须修正</strong>。"尚无生命周期流程规范"在国际标准层面仍成立；但中国已以政策形式启动智能体标准体系、标准协议与分类分级治理框架建设，故"标准缺位"作为全局判断不准确。原稿治理骨架遗漏中国监管侧，属覆盖不全而非判断错误。</p>
+<p><strong>更新后表述</strong>：统一改为"<strong>国际标准缺位、中国标准体系正在建设</strong>"；表 5 对应行补注 [W-24]；2.3 治理段落、4.3 与 5.2 已强调"成熟度模型 / 分类分级治理"选题的政策相关性。</p>
+<h3 id="sec-55">6.6 L2→L3 断层与准入不变量：从"无人完成"收窄为"缺生产级受控实证"</h3>
+<p><strong>原结论（更新前）</strong>：3.2 断言「连接 L2 与 L3 的『可检验桥接方法』……几乎无人完成」；2.3 断言「公开文献中尚缺少把动态选模 + 护栏回退[4] 形式化为<strong>准入不变量（admission invariants）</strong> 与运行时验证标准的工作」[R-4]。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：</p>
+<ul><li>[W-10] 郭子昌, 张丹, 李浩, 等. 《基于Loop的兵棋推演系统智能体安全运维方法研究》. 智能安全, 2026. DOI: 10.12407/j.issn.2097-2075.2026.03.067；<a href="https://d.wanfangdata.com.cn/periodical/znaq202603006" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/znaq202603006</a> —— 提出"观测—研判—决策—执行—复盘"Loop，以<strong>证据卡片、L0—L3 分级授权、工具契约、结构化动作单、可回滚原子动作、配置基线与交付环境漂移闭环</strong>约束执行边界。经万方 <code>fulltext</code> 接口核验正文，另有两处关键表述：「已注册工具、权限策略、系统版本与知识条目版本应纳入同一发布管理；当脚本、依赖接口或回滚逻辑变更时，应重新审核相应工具契约」「未经审核、参数范围失效或回滚路径不可用的工具，应自动从智能体可用清单中下线」。作者自述为"原型场景走查"，并明确「本文不将该观察外推为普适的人力节省或性能提升结论；后续将按匿名化故障注入、统一评价协议和重复试验开展量化验证」。</li><li>[W-11] 严亚伟, 汪东升. 《多智能体协同软件开发的形式化建模与实验验证》. 软件导刊, 2026. DOI: 10.11907/rjdk.261340；<a href="https://d.wanfangdata.com.cn/periodical/rjdk202607001" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjdk202607001</a> —— 五元组形式化模型 S=〈T,A,F,M,Π〉与 BayesSchedule 调度算法；Pegasus 工作流基准 + Bernoulli-Gaussian 失败模型下 5 组仿真，对比 UCB1、Thompson Sampling、QL-HEFT 三个在线学习基线，报告 makespan 较 HEFT 降低 10.0%、总成本较三基线分别降低 30.2%/28.3%/67.9%（<strong>均为仿真结果</strong>）。</li><li>[W-25] 宋瑞霞. 《基于LLM智能体的软件交付风险管控与范式转型》. 信息技术时代, 2026（无 DOI）. 万方记录 Id: QKBJBD20262026040300004297；<a href="https://d.wanfangdata.com.cn/periodical/QKBJBD20262026040300004297" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/QKBJBD20262026040300004297</a> —— 构建基于 LLM 智能体的软件交付风险管控框架并讨论管理范式转型，属框架/观点性文献，为"交付风险"主题提供中文线索，未含受控实验。</li></ul>
+<p><strong>差异判定</strong>：<strong>两处原结论均过于绝对，须收窄而非撤回</strong>。[W-10] 已具备契约、分级授权与回滚约束的工程化闭环，[W-11] 已具备形式化模型与调度验证，二者构成 L2→L3 的桥接雏形；但 [W-10] 为原型走查且绑定兵棋运维领域、自述不作性能外推，[W-11] 为仿真而非生产平台轨迹，[W-25] 为框架性论述。真正缺少的是<strong>在真实 CI/CD 平台上、配置冻结、多框架对照的受控实证，以及可判定的准入不变量标准</strong>。</p>
+<p><strong>更新后表述</strong>：3.2 与 2.3 已改写为"已有中文桥接雏形，但缺真实平台上的受控验证"；5.2 选题 A 明确要求把 [W-10] 列为最接近的先行工作并划界，把 [W-8] 作为"最小权限缺失"的量化动机；5.3 补入重复性风险提示。</p>
+<h3 id="sec-56">6.7 可观测性：三流程框架与术语歧义</h3>
+<p><strong>原结论（更新前）</strong>：以 OpenTelemetry GenAI 语义约定把模型调用、检索、MCP 工具、A2A 任务、护栏决策、人工审批串成单一轨迹[R-5][R-9]，并指出"根因定位与效果评估"缺少统一标准。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：</p>
+<ul><li>[W-12] 康俊驰, 丁博, 冯大为, 等. 《大语言模型智能体在软件系统根因分析中的应用综述》. 软件学报, 2026. DOI: 10.13328/j.cnki.jos.007594；<a href="https://d.wanfangdata.com.cn/periodical/rjxb202608007" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202608007</a> —— 把智能体运维归纳为"<strong>信息获取—根因定位—效果评估</strong>"三流程，并明确该方向"仍处早期阶段"，与原文对 OTel 轨迹串联的定位互补。</li><li>[W-21] 高坤. 《基于大模型驱动的云网可观测智能体研究》. 微型电脑应用, 2026. DOI: 10.3969/j.issn.1007-757X.2026.03.080；<a href="https://d.wanfangdata.com.cn/periodical/wxdnyy202603080" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/wxdnyy202603080</a> —— 该文所谓"可观测智能体"指<strong>用于观测云网的智能体</strong>（无侵入采集、多源融合、自适应调度），而非<strong>对智能体自身的可观测性</strong>。</li></ul>
+<p><strong>差异判定</strong>：<strong>补充 + 方法学警示</strong>。前者补上流程视角，后者暴露中文检索式的关键歧义：本次 <code>关键词:智能体 AND 关键词:可观测性</code> 组仅 6 条命中，其中相当比例属"智能体用于观测"而非"观测智能体"，若做正式 SLR 必须在检索式中显式排除（如加 <code>NOT 标题:云网</code>、<code>NOT 标题:监测</code>）并做人工编码。</p>
+<p><strong>更新后表述</strong>：2.3 可观测性段落补入 [W-12] 三流程与 [W-21] 术语歧义提醒；5.5 的 SLR 检索协议须写入排除规则。</p>
+<h3 id="sec-57">6.8 投稿选题划界：中文先行工作带来的重复性风险</h3>
+<p><strong>原结论（更新前）</strong>：5.2 推荐首选选题 A「接口契约 → 准入不变量 → 运行时状态治理」，依据为图工程[6]、AIS 交互契约[R-4]、ASOC[7] 三方指向；5.3 列出的主要风险为"综述同质化、时效性、厂商资料不可复现、缺实证或形式化贡献"。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：与推荐选题高度近似的中文先行工作已存在，来源分别为 [W-10]（工具契约 + L0—L3 分级授权 + 可回滚原子动作，6.6 已著录）、[W-11]（形式化调度模型，6.6 已著录）、[W-5]（多智能体架构模型生成，6.3 已著录）、[W-8]（MCP 权限实证，6.4 已著录）。此外：</p>
+<ul><li>[W-13] 芮志清, 凌祥, 曹方泽, 等. 《MARC:基于多智能体协同的硬件安全缺陷早期检测方法》. 软件学报, 2026. DOI: 10.13328/j.cnki.jos.007618；<a href="https://d.wanfangdata.com.cn/periodical/rjxb202606004" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202606004</a> —— 4 类智能体协同，工业级数据集上漏报率/误报率降至 0.382 9 / 0.369 5（较基线降约 18.2% / 19.1%），并发现 1 个获 CVE 编号的硬件漏洞，属"多智能体协同 + 真实工件"的中文实证范例。</li></ul>
+<p><strong>差异判定</strong>：<strong>新增风险，不改变投稿潜力判断</strong>。原稿未预见到中文文献中存在如此接近的先行工作；若投稿时未引用并划界，熟悉中文文献的审稿人可能指出重复性。</p>
+<p><strong>更新后表述</strong>：5.3 已补入"中文先行工作重复性"风险；5.2 选题 A 增加必须逐项引用并划界的要求，并把本文定位为"把契约编译为可判定准入不变量 + 真实 CI/CD 轨迹上的配置冻结对照实验"，而非首次提出契约思想；选题 E 按 6.3 收窄。</p>
+<h3 id="sec-58">6.9 低代码平台与落地生态：中文实证补强表 4</h3>
+<p><strong>原结论（更新前）</strong>：表 4 把 Dify / Coze 类低代码平台定位为"工具互操作与快速原型"，主要依据二级产业资料 [R-1][R-6]，缺少中文可核实的落地案例。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：</p>
+<ul><li>[W-17] 罗岚, 万康烈, 郑悦, 等. 《基于大语言模型的智慧献血服务小助手设计》. 中国输血杂志, 2026. DOI: 10.13303/j.cjbt.issn.1004-549x.2026.02.012；<a href="https://d.wanfangdata.com.cn/periodical/zgsxzz202602012" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/zgsxzz202602012</a> —— 浙江省血液中心真实业务场景，以 Dify 作智能体编排平台、DeepSeek 作推理引擎、MCP 封装高德地图 API 与 MySQL 查询、BGE-M3 构建 RAG 知识库，采用双 LLM 协同校验与 Docker 私有化部署；结论验证 "Dify+MCP+RAG" 框架可行性。</li><li>[W-18] 王湘平. 《基于MCP与RAG的广电业务故障诊断智能体构建方法》. 广播电视信息, 2026. DOI: 10.3969/j.issn.1007-1997.2026.10.019；<a href="https://d.wanfangdata.com.cn/periodical/gbdsxx202610019" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/gbdsxx202610019</a> —— 低代码方案：QA/API 文档转 JSON 知识库切片、MCP 把诊断 API 标准化为可调用工具，强调即插即用与模块化组合。</li><li>[W-19] 苗延飞, 陈海昕, 高原, 等. 《基于MCP的无人集群作战效能评估方法》. 系统工程与电子技术, 2026. DOI: 10.12305/j.issn.1001-506X.2026.08.13；<a href="https://d.wanfangdata.com.cn/periodical/xtgcydzjs202608013" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/xtgcydzjs202608013</a> —— 把 MCP 引入作战效能评估（自然语言解析 → 模型调度 → 数据处理 → 多维结果），是协议机制进入系统工程场景的直接例证。</li><li>[W-20] 彭新蕾, 李子奇, 徐晓蕊. 《面向软件工程垂直任务的质量驱动智能体协同数据集自动构建框架》. 江苏通信, 2026. DOI: 10.3969/j.issn.1007-9513.2026.04.004；<a href="https://d.wanfangdata.com.cn/periodical/jstxjs202604004" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/jstxjs202604004</a> —— 规划器/执行器/验证器三智能体，自动构建 5 万级样本，重复率与噪声均低于 2%、语义对齐正确率超 97%。<strong>本章新增登记，正文表 4 未改动。</strong></li><li>[W-16] 王路桥, 周洋涛, 李青山, 等. 《基于大语言模型的多智能体协作代码评审人推荐》. 软件学报, 2025. DOI: 10.13328/j.cnki.jos.007326；<a href="https://d.wanfangdata.com.cn/periodical/rjxb202506009" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202506009</a> —— 真实数据集上较基线提升 4.45%—26.04%，为"多智能体嵌入既有 CI 环节"提供中文同行评议证据。<strong>本章新增登记，正文表 4 未改动。</strong></li></ul>
+<p><strong>差异判定</strong>：<strong>一致，证据补强</strong>。中文落地已普遍采用"编排平台 + 协议 + 检索"三件套，与表 4 对低代码平台的定位吻合；[W-19] 还把协议机制与系统工程场景直接连通。</p>
+<p><strong>更新后表述</strong>：3.1 已补入 [W-17][W-18][W-19] 作为低代码平台的中文落地证据；[W-16][W-20] 仅在本章与 C 组登记，供后续版本修订表 4 与 5.5 基线清单时引用。</p>
+<h3 id="sec-59">6.10 三级融合深度模型与证据强度：收窄后的空白更可操作</h3>
+<p><strong>原结论（更新前）</strong>：「工业平台几乎全部停留在 L2……学术倡议几乎全部指向 L3……连接 L2 与 L3 的『可检验桥接方法』几乎无人完成」；3.4 判断"预印本占比过高""中文文献覆盖不足"。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：[W-10] 的工程化 Loop 与工具契约、[W-11] 的形式化调度、[W-5] 的架构模型生成（含消融）、[W-13] 的工业级数据集实证，均已跨越纯倡议阶段；另有：</p>
+<ul><li>[W-14] 要鑫, 宋美玲, 孙彬弘, 等. 《面向情境-记忆冲突的智能体协同知识融合技术》. 计算机学报, 2026. DOI: 10.11897/SP.J.1016.2026.01009；<a href="https://d.wanfangdata.com.cn/periodical/jsjxb202605002" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/jsjxb202605002</a> —— 双智能体 ACR 框架（E-Agent 置信度校准 + K-Agent 动态融合），5 个公开数据集上平均性能提升 6.08%，属"状态/记忆治理"方向可引用的中文实证。</li></ul>
+<p><strong>差异判定</strong>：<strong>空白收窄，但投稿价值反而提高</strong>。前两组为原型走查/仿真，后两组为特定任务实验，均未在真实 CI/CD 平台上做配置冻结的多框架对照。差异点从"有没有人做"变为"<strong>能否在可复现的生产级轨迹上验证契约与状态治理的因果贡献</strong>"。证据强度方面，[W-1][W-5][W-8][W-12][W-13][W-14][W-16] 等中文同行评议文献可替换部分二级资料，但多为方法/原型/单场景实验，<strong>不能据此把综述整体证据等级上调</strong>。</p>
+<p><strong>更新后表述</strong>：3.2、3.4、4.1 已按上述口径改写；摘要与投稿潜力总判断同步补充"经万方补检，断层判断收窄为缺真实平台上的受控验证"。</p>
+<h3 id="sec-60">6.11 检索局限、失败记录与未核实清单（须随稿保留）</h3>
+<ol><li><strong>配额失败</strong>：<code>标题:从定性到定量 OR 标题:综合集成研讨厅 OR 作者:钱学森</code> 与 <code>标题:智能体规范应用与创新发展实施意见</code>（OpenClaw 法规库）两组返回 <code>AUTH_QUOTA_EXHAUSTED</code>（"工具「search」的预付费调用次数已用尽"）。因此 <strong>钱学森"从定性到定量的综合集成法"原始文献[31]、综合集成研讨厅研究脉络，以及《实施意见》的万方法规库原文，均未取得万方记录</strong>；[W-24] 改由中央网信办官网核实。5.2 选题 F 与 2.3.5 的相关论断仍须保留"待补检"标记。</li><li><strong>CNKI 未检索</strong>：本次仅用万方，中文覆盖仍不完整；[31] 及中文理论源流须以 CNKI/万方定向补检后使用。</li><li><strong>元数据粒度</strong>：万方接口仅返回出版年（PublishYear），多数条目无卷、期、页码与具体出版月；C 组统一按出版年著录并附 DOI 与万方详情页链接，精确卷期页码以 DOI 落地页或期刊官网为准。无 DOI 条目（[W-23][W-25]）以万方记录 Id 拼接详情页路径，需在万方站内以题名复核。</li><li><strong>链接可达性</strong>：万方详情页匿名访问可能触发真人验证（本次对 rjxb202608003 的匿名访问即返回验证页），属站点正常机制，不影响链接指向；有 DOI 的条目建议同时用 <a href="https://doi.org/" target="_blank" rel="noopener">https://doi.org/</a> 落地页核对。</li><li><strong>检索精度</strong>：表 6-1 中第 0、3、4 组误命中率高（"智能化""综合…集成"分词问题、"智能体"在控制领域的旧义），正式 SLR 必须重做检索式、记录 PRISMA 流程与人工编码一致性。</li><li><strong>证据分层</strong>：[W-22] 的效能数字、[W-11] 的成本降幅、[W-5] 的模型提升等均为作者自报的单一环境结果，未经第三方复现；本稿一律标注来源与场景，不作跨场景外推。</li></ol>
+<h3 id="sec-61">6.12 中文发表阵地与"SCI 以上"判断的关系</h3>
+<p><strong>原结论（更新前）</strong>：目标期刊清单以 TSE / TOSEM / CSUR / JSS / IST / IEEE Software / ICSE 等英文期刊会议为主，中文路线仅提示《软件学报》专刊与《自动化学报》[33][34][37]。</p>
+<p><strong>新依据（万方，2026-11-09）</strong>：本次命中显示中文同行评议阵地已相当活跃——《软件学报》连续刊出 [W-1] 代码生成智能体综述（2026）、[W-12] 根因分析综述（2026）、[W-5] SmartGen-AADL（2026）、[W-13] MARC（2026）、[W-16] 多智能体代码评审人推荐（2025）；《计算机学报》[W-14]、《计算机研究与发展》[W-8]、《系统工程与电子技术》[W-4][W-19]、《计算机工程》[W-2] 亦有直接相关成果（各条完整著录见上文与本稿 C 组）。</p>
+<p><strong>差异判定</strong>：<strong>不改变"SCI 以上"目标判断，但改变证据与投稿策略</strong>。上述期刊多为 EI / 中文核心，不宜据此调整英文期刊分区预期；但作为中文证据基础、国内合作与前期成果发布阵地价值很高。若走"中文先行 + 英文扩展"路线，须严守 5.8 的重复发表边界（显著增量 + 显式引用中文版）。</p>
+<p><strong>更新后表述</strong>：5.3 优先级建议前已补入中文阵地段落；本稿核心投稿建议维持不变。</p>
+<hr>
+<h2 id="sec-62">参考文献</h2>
+<h3 id="sec-63">A. 同行评议论文与学术专著</h3>
+<p>[1] HARNESS INC. Harness Announces $240M Financing Round Led by Goldman Sachs Alternatives to Advance "AI for Everything After Code"[R/OL]. Press Release, 2025-12-11. <a href="https://www.harness.io/press-and-news/" target="_blank" rel="noopener">https://www.harness.io/press-and-news/</a>. <strong>（产业资料，非同行评议；外环 60%—70% 数据、三层基础架构、客户案例）</strong></p>
+<p>[2] HARNESS INC. Harness AI — One Platform for the Autonomous SDLC[EB/OL]. Product documentation. <a href="https://harness.io/products/harness-ai" target="_blank" rel="noopener">https://harness.io/products/harness-ai</a>. <strong>（产业资料；Expert/Worker Agents、SDLC Knowledge Graph、Delegate、OPA/RBAC、签名审计、自治分档、自动回滚）</strong></p>
+<p>[3] HARNESS INC. Autonomous Software Delivery: Unscripted 2025 Announcements[EB/OL]. 2025. <a href="https://www.harness.io/blog/unscripted-2025-announcements" target="_blank" rel="noopener">https://www.harness.io/blog/unscripted-2025-announcements</a>. <strong>（产业资料；Autonomous Code Maintenance、AI 验证与回滚、Architect Mode、IDP Knowledge Agent）</strong></p>
+<p>[4] HARNESS INC. Harness AI November 2025 Updates[EB/OL]. 2025. <a href="https://harness.io/blog/harness-ai-november-2025-updates" target="_blank" rel="noopener">https://harness.io/blog/harness-ai-november-2025-updates</a>. <strong>（产业资料；MCP Server 160+ 工具、AI 数据库迁移、Error Analyzer、动态选模与护栏回退）</strong></p>
+<p>[5] MIEHLING E, RAMAMURTHY K N, VARSHNEY K R, et al. Agentic AI Needs a Systems Theory[EB/OL]. arXiv:2503.00237, 2025-02-28. <a href="https://arxiv.org/abs/2503.00237" target="_blank" rel="noopener">https://arxiv.org/abs/2503.00237</a>. （预印本，立场论文）</p>
+<p>[6] FENG Y, XIANG Z, YANG C, et al. Graph Engineering in the Era of LLM Agents: From Individual Intelligence to System Intelligence[EB/OL]. arXiv:2608.21156v2, 2026-08-26. <a href="https://arxiv.org/abs/2608.21156" target="_blank" rel="noopener">https://arxiv.org/abs/2608.21156</a>. （预印本综述）</p>
+<p>[7] BEHESHTI A, CHANG R N, BENATALLAH B, et al. Agentic Service-Oriented Computing: A Manifesto for the Next Frontier of Service-Oriented Computing[C]//2026 IEEE International Conference on Web Services (ICWS). 2026. DOI: 10.1109/ICWS72778.2026.00163; arXiv:2607.12619.</p>
+<p>[8] DI RUSCIO D, NGUYEN P T, DI SIPIO C, RUBEI R. Engineering LLM-Based Multi-Agent Systems: A Taxonomy of Emerging Frameworks[J]. IEEE Software, 2026 (Special Issue on Engineering Agentic Systems, accepted author version). DOI: 10.1109/MS.2026.3694089.</p>
+<p>[9] CEMRI M, PAN M Z, YANG S, et al. Why Do Multi-Agent LLM Systems Fail?[EB/OL]. arXiv:2503.13657, 2025. <a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener">https://arxiv.org/abs/2503.13657</a>. （预印本；MAST 分类法）</p>
+<p>[10] WANG L, MA C, FENG X, et al. A Survey on Large Language Model based Autonomous Agents[J]. Frontiers of Computer Science, 2024, 18(6): 186345. DOI: 10.1007/s11704-024-40231-1.</p>
+<p>[11] YANG J, JIMENEZ C E, WETTIG A, et al. SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering[C]//Advances in Neural Information Processing Systems 37 (NeurIPS 2024). 2024.</p>
+<p>[12] WANG X, LI B, SONG Y, et al. OpenHands: An Open Platform for AI Software Developers as Generalist Agents[C]//International Conference on Learning Representations (ICLR), 2025.</p>
+<p>[13] JIMENEZ C E, YANG J, WETTIG A, et al. SWE-bench: Can Language Models Resolve Real-World GitHub Issues?[C]//International Conference on Learning Representations (ICLR), 2024.</p>
+<p>[14] XIA C, WEN Y, DENG Y, et al. Agentless: Demystifying LLM-based Software Engineering Agents[C]//47th IEEE/ACM International Conference on Software Engineering (ICSE), 2025.</p>
+<p>[15] LI M M, REINHARD P, LEIMEISTER J M. Agentic AI: From Autonomous Agents to Enterprise Agentic AI Systems[J]. Business &amp; Information Systems Engineering, 2026. DOI: 10.1007/s12599-026-01009-w.</p>
+<p>[16] BAQAR M, NAQVI S, KHANDA R. AI-Augmented CI/CD Pipelines: From Code Commit to Production with Autonomous Decisions[C]//IEEE International Conference on Foundation and Large Language Models (FLLM), 2025. arXiv:2508.11867. DOI: 10.1109/FLLM67465.2025.11391007.</p>
+<p>[17] ISO/IEC/IEEE 15288:2023. Systems and software engineering — System life cycle processes[S]. 2nd ed. Geneva: ISO, 2023-05.</p>
+<p>[18] ISO/IEC 42001:2023. Information technology — Artificial intelligence — Management system[S]. Geneva: ISO, 2023-12.</p>
+<p>[19] ISO/IEC 23894:2023. Information technology — Artificial intelligence — Guidance on risk management[S]. Geneva: ISO, 2023.</p>
+<p>[20] NIST. Artificial Intelligence Risk Management Framework (AI RMF 1.0): NIST AI 100-1[R]. Gaithersburg: U.S. Department of Commerce, 2023-01.</p>
+<p>[21] NIST. Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile: NIST AI 600-1[R]. 2024-07.</p>
+<p>[22] European Parliament, Council of the European Union. Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (EU AI Act)[S]. Official Journal of the European Union, 2024-07-12. （特别参见 Art. 12 自动日志记录、Art. 15 鲁棒性与安全性）</p>
+<p>[23] OWASP Foundation. OWASP Top 10 for LLM Applications 2025[R/OL]. 2025. （LLM01 提示注入、LLM06 过度代理、LLM10 无界消耗等）</p>
+<p>[24] Model Context Protocol. MCP Specification (2025-06-18) and Architecture Documentation[EB/OL]. <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">https://modelcontextprotocol.io</a>. （协议规范，非学术论文）</p>
+<p>[25] Agent2Agent (A2A) Protocol Project. A2A Protocol Documentation[EB/OL]. Linux Foundation / Google, 2026. （协议规范）</p>
+<p>[26] OpenTelemetry. Semantic Conventions for Generative AI Systems (invoke_agent / execute_tool spans; status: Development)[EB/OL]. CNCF. <a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/" target="_blank" rel="noopener">https://opentelemetry.io/docs/specs/semconv/gen-ai/</a>.</p>
+<p>[27] LangChain, Inc. LangChain / LangGraph Official Documentation: create_agent, configurable harness, durable execution, checkpointing, LangSmith[EB/OL]. <a href="https://python.langchain.com" target="_blank" rel="noopener">https://python.langchain.com</a>.</p>
+<p>[28] Microsoft. Microsoft Agent Framework / Azure AI Foundry Agent Service Documentation[EB/OL]. Microsoft Learn.</p>
+<p>[29] Google Cloud. Agent Development Kit (ADK) and Vertex AI Agent Engine Documentation[EB/OL].</p>
+<p>[30] Amazon Web Services. Amazon Bedrock AgentCore Documentation[EB/OL].</p>
+<p>[31] 钱学森、戴汝为等关于"从定性到定量的综合集成法"与"综合集成研讨厅"的系列论述（中文文献，本次未系统检索，<strong>投稿前须以 CNKI/万方补全并核对版本</strong>）。</p>
+<p>[32] Elsevier. Journal of Systems and Software — Aims and Scope[EB/OL]. <a href="https://www.sciencedirect.com/journal/journal-of-systems-and-software" target="_blank" rel="noopener">https://www.sciencedirect.com/journal/journal-of-systems-and-software</a>. （含 "Software Engineering for AI systems"、DevOps、持续集成与构建测试自动化等条目）</p>
+<p>[33] 《软件学报》编辑部. "面向智能体信息系统的软件新技术"专刊征文通知[EB/OL]. 2026-05-08. <a href="https://jos.org.cn/jos/news/view/20260508161949001" target="_blank" rel="noopener">https://jos.org.cn/jos/news/view/20260508161949001</a>. （截稿 2026-08-24，拟 2027 年第 10 期出版）</p>
+<p>[34] 《中国科学：信息科学》编辑部. "智能体安全"专题征文[EB/OL]. 2026-05-20.</p>
+<p>[35] Journal of Systems and Software. Guide for Authors, Open Science Initiative, In Practice / New Ideas and Trends (NITP) Tracks[EB/OL]. Elsevier. <strong>关键要求：欢迎 systematic literature reviews / mapping studies / meta-analyses，但须报告"有趣且重要的结论，而非仅提供年份、venue 等统计"；鼓励开放科学工件；设产业实践轨道与 Journal First。</strong></p>
+<p>[36] 期刊指标第三方汇总（2025 JCR / 2026 更新）：ACM Computing Surveys ≈30.4、ACM TOSEM ≈6.2、IEEE TSE 6.0、IST ≈4.6、IEEE Software ≈4.0、JSS ≈3.8、EMSE ≈3.4、SoSyM ≈3.0[EB/OL]. <strong>须以 Clarivate Journal Citation Reports 最新发布值复核。</strong></p>
+<p>[37] 《自动化学报》投稿须知：接收综述/论文/短文，范围含系统理论与系统工程、人工智能与智能控制，实行双盲评审[EB/OL]. <a href="http://www.aas.net.cn" target="_blank" rel="noopener">http://www.aas.net.cn</a>.</p>
+<p>[38] LIU Y, WU Y, ZHANG D, SUN L. Agentic AutoSurvey: Let LLMs Survey LLMs[EB/OL]. arXiv:2509.18661, 2025. （多智能体自动综述生成，可作方法学侧参考）</p>
+<p>[39] PANG W. A Systems Perspective on Multi-Agent Applications: Programming, Evaluation, and Runtime[R/OL]. The Chinese University of Hong Kong, Shenzhen, 2026. （技术报告/学位论文，含 AutoGen 会话编程抽象、DynTaskMAS 动态任务图调度）</p>
+<p>[40] ISO/IEC/IEEE 42010. Systems and software engineering — Architecture description[S]. （架构描述标准，以现行版本为准）</p>
+<h3 id="sec-64">B. 产业与二级资料（标注为 [R-n]，非同行评议）</h3>
+<blockquote>仅用于平台能力描述、趋势判断与研究空白定位；<strong>正式投稿前须逐条回溯至原始论文、标准文本或官方仓库并替换引用</strong>。</blockquote>
+<p>[R-1] 主流智能体框架与云托管运行时的公开特性对比资料：LangGraph、Microsoft Agent Framework（AutoGen + Semantic Kernel）、Google ADK + Vertex AI Agent Engine、AWS Bedrock AgentCore、CrewAI、Dify、Coze、Copilot Studio。来源为各项目官方文档及 2025—2026 年第三方框架评测。</p>
+<p>[R-2] 研究型 agent harness 形态资料：SWE-agent / mini-SWE-agent / OpenHands / GitHub Copilot coding agent 的沙箱、事件流、PR 工作流与 MCP 集成说明。来源为项目仓库、官方文档与技术评测。</p>
+<p>[R-3] Agentic AI Integration with MBSE Toolchains 综述性技术资料：GenAI Workbench（Bank et al., 2026）、Intelligent Design 4.0（Jiang et al., 2025）的服务化分层、UID 索引、XMI/FMI 交换格式与无状态微智能体编排。</p>
+<p>[R-4] 综合性二级资料合集：Agent-Integrated Software 的 Intent-Level Interaction Abstraction 与交互契约、"软编排（soft orchestration）"、Agentic AI Platform Networks 三种集成模式、智能体系统工程五级成熟度模型、综合集成研讨厅在 LLM 时代的再阐释、评估配置冻结建议、平台典型失效模式（状态丢失、工具误用、绕过 CI/CD 治理、结果看似合理却不可追溯）等。</p>
+<p>[R-5] MCP / A2A / OpenTelemetry GenAI 语义约定交叉对照与安全实践：授权边界、OAuth 资源指示与受众校验、禁止令牌透传、跨信任边界重新授权、trace 仅作关联数据、语义约定版本固定、输入/输出内容属性默认关闭、证据捆绑等。</p>
+<p>[R-6] AgentOps 运营模型与云原生可靠性模式：幂等键与重试安全、编排层去重、断路器与背压、模型回退链、降级模式、失效域与爆炸半径隔离；以及生产级智能体平台的四类典型失效模式。</p>
+<p>[R-7] 多智能体系统生产失败率与复合可靠性分析资料：41%—87% 失败率区间、0.95^20≈36% 的串联可靠性推算、集中式编排优于非集中式结构的观察。<strong>不同基准与配置口径差异大，仅作现象线索，不作确定结论。</strong></p>
+<p>[R-8] PANG W. A Systems Perspective on Multi-Agent Applications: Programming, Evaluation, and Runtime[R/OL]. CUHK-Shenzhen, 2026（即 [39] 的细化引用）：DynTaskMAS 动态任务图调度、语义感知上下文分发、21%—33% 执行时间下降与近线性扩展。</p>
+<p>[R-9] 智能体可观测性工程实践资料：以 OpenTelemetry GenAI span 串联模型调用、检索、MCP 工具、A2A 任务、护栏决策、人工审批与最终工件，形成单一连贯运行轨迹。</p>
+<p>[R-10] ENGINES: ENGineering INtElligent Systems around intelligent agent technologies[EB/OL]. Università di Bologna, PRIN 2022 项目成果页. （BDI 符号架构 + LLM 的混合系统）</p>
+<h3 id="sec-65">C. 万方核对新增中文文献（编号 [W-n]，检索日 2026-11-09）</h3>
+<blockquote>著录依据为万方 <code>search</code> 接口返回的 Title / Creator / PublishYear / PeriodicalTitle / DOI / Id 字段；链接为万方详情页 <code>https://d.wanfangdata.com.cn/periodical/&lt;Id&gt;</code>。多数条目接口未返回卷期页码，故统一按出版年著录。[W-24] 为政策原文，以中央网信办官网链接为准。</blockquote>
+<p>[W-1] 董益宏, 姜雪, 钱家如, 等. 基于大语言模型智能体的代码生成综述[J]. 软件学报, 2026. DOI: 10.13328/j.cnki.jos.007593. <a href="https://d.wanfangdata.com.cn/periodical/rjxb202608003" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202608003</a></p>
+<p>[W-2] 张珑耀, 温东新, 马庄宇, 等. 基于大语言模型的多智能体系统异常综述（特邀）[J]. 计算机工程, 2026. DOI: 10.19678/j.issn.1000-3428.0252754. <a href="https://d.wanfangdata.com.cn/periodical/jsjgc202601002" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/jsjgc202601002</a></p>
+<p>[W-3] 毛寅轩, 白杨, 张灏龙, 等. 大语言模型对人工智能赋能系统工程的技术模式影响研究[J]. 中国航天, 2025. DOI: 10.3969/j.issn.1002-7742.2025.10.003. <a href="https://d.wanfangdata.com.cn/periodical/zght202510003" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/zght202510003</a></p>
+<p>[W-4] 鲁金直, 王国新, 唐锡晋, 等. 面向空间智能的基于模型的系统工程方法[J]. 系统工程与电子技术, 2025. DOI: 10.12305/j.issn.1001-506X.2025.12.14. <a href="https://d.wanfangdata.com.cn/periodical/xtgcydzjs202512002" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/xtgcydzjs202512002</a></p>
+<p>[W-5] 葛楚妍, 王培远, 王甜甜, 等. SmartGen-AADL:多智能体系统需求分析与AADL模型生成[J]. 软件学报, 2026. DOI: 10.13328/j.cnki.jos.007595. <a href="https://d.wanfangdata.com.cn/periodical/rjxb202608002" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202608002</a></p>
+<p>[W-6] 殷泰晖, 侯申茂, 杨羽馨, 等. 载人航天任务需求自动建模与一致性分析方法[J]. 航天器工程, 2025. DOI: 10.3969/j.issn.1673-8748.2025.05.016. <a href="https://d.wanfangdata.com.cn/periodical/htqgc202505017" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/htqgc202505017</a></p>
+<p>[W-7] 吴文瑞. 载人航天器系统级SysML模型体系设计[J]. 航天器工程, 2025. DOI: 10.3969/j.issn.1673-8748.2025.06.017. <a href="https://d.wanfangdata.com.cn/periodical/htqgc202506018" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/htqgc202506018</a></p>
+<p>[W-8] 张泉, 冯诀宵, 周炽金, 等. 针对大语言模型MCP服务器中权限使用的实证研究[J]. 计算机研究与发展, 2026. DOI: 10.7544/issn1000-1239.202550874. <a href="https://d.wanfangdata.com.cn/periodical/jsjyjyfz202605006" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/jsjyjyfz202605006</a></p>
+<p>[W-9] 郭帅帅, 朱家兵, 叶佳, 等. 面向具身智能与机器人物联网的模型上下文协议研究综述:从语义控制到实时安全保障[J]. 物联网学报, 2026. DOI: 10.11959/j.issn.2096-3750.WLW25125. <a href="https://d.wanfangdata.com.cn/periodical/wlwxb202602007" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/wlwxb202602007</a></p>
+<p>[W-10] 郭子昌, 张丹, 李浩, 等. 基于Loop的兵棋推演系统智能体安全运维方法研究[J]. 智能安全, 2026. DOI: 10.12407/j.issn.2097-2075.2026.03.067. <a href="https://d.wanfangdata.com.cn/periodical/znaq202603006" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/znaq202603006</a>. （另经万方 fulltext 接口核验正文关键段落，见 6.6）</p>
+<p>[W-11] 严亚伟, 汪东升. 多智能体协同软件开发的形式化建模与实验验证[J]. 软件导刊, 2026. DOI: 10.11907/rjdk.261340. <a href="https://d.wanfangdata.com.cn/periodical/rjdk202607001" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjdk202607001</a></p>
+<p>[W-12] 康俊驰, 丁博, 冯大为, 等. 大语言模型智能体在软件系统根因分析中的应用综述[J]. 软件学报, 2026. DOI: 10.13328/j.cnki.jos.007594. <a href="https://d.wanfangdata.com.cn/periodical/rjxb202608007" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202608007</a></p>
+<p>[W-13] 芮志清, 凌祥, 曹方泽, 等. MARC:基于多智能体协同的硬件安全缺陷早期检测方法[J]. 软件学报, 2026. DOI: 10.13328/j.cnki.jos.007618. <a href="https://d.wanfangdata.com.cn/periodical/rjxb202606004" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202606004</a></p>
+<p>[W-14] 要鑫, 宋美玲, 孙彬弘, 等. 面向情境-记忆冲突的智能体协同知识融合技术[J]. 计算机学报, 2026. DOI: 10.11897/SP.J.1016.2026.01009. <a href="https://d.wanfangdata.com.cn/periodical/jsjxb202605002" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/jsjxb202605002</a></p>
+<p>[W-15] 高翠芸. 大语言模型在复杂软件生成中的潜力与局限[J]. 计算, 2026. DOI: 10.11991/cccf.202609004. <a href="https://d.wanfangdata.com.cn/periodical/yykj202609005" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/yykj202609005</a></p>
+<p>[W-16] 王路桥, 周洋涛, 李青山, 等. 基于大语言模型的多智能体协作代码评审人推荐[J]. 软件学报, 2025. DOI: 10.13328/j.cnki.jos.007326. <a href="https://d.wanfangdata.com.cn/periodical/rjxb202506009" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/rjxb202506009</a></p>
+<p>[W-17] 罗岚, 万康烈, 郑悦, 等. 基于大语言模型的智慧献血服务小助手设计[J]. 中国输血杂志, 2026. DOI: 10.13303/j.cjbt.issn.1004-549x.2026.02.012. <a href="https://d.wanfangdata.com.cn/periodical/zgsxzz202602012" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/zgsxzz202602012</a></p>
+<p>[W-18] 王湘平. 基于MCP与RAG的广电业务故障诊断智能体构建方法[J]. 广播电视信息, 2026. DOI: 10.3969/j.issn.1007-1997.2026.10.019. <a href="https://d.wanfangdata.com.cn/periodical/gbdsxx202610019" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/gbdsxx202610019</a></p>
+<p>[W-19] 苗延飞, 陈海昕, 高原, 等. 基于MCP的无人集群作战效能评估方法[J]. 系统工程与电子技术, 2026. DOI: 10.12305/j.issn.1001-506X.2026.08.13. <a href="https://d.wanfangdata.com.cn/periodical/xtgcydzjs202608013" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/xtgcydzjs202608013</a></p>
+<p>[W-20] 彭新蕾, 李子奇, 徐晓蕊. 面向软件工程垂直任务的质量驱动智能体协同数据集自动构建框架[J]. 江苏通信, 2026. DOI: 10.3969/j.issn.1007-9513.2026.04.004. <a href="https://d.wanfangdata.com.cn/periodical/jstxjs202604004" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/jstxjs202604004</a></p>
+<p>[W-21] 高坤. 基于大模型驱动的云网可观测智能体研究[J]. 微型电脑应用, 2026. DOI: 10.3969/j.issn.1007-757X.2026.03.080. <a href="https://d.wanfangdata.com.cn/periodical/wxdnyy202603080" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/wxdnyy202603080</a></p>
+<p>[W-22] 刘高峰, 潘彤, 余文艳. 基于A2X协议的智能体互联网系统设计[J]. 广播电视网络, 2026. DOI: 10.3969/j.issn.2096-806X.2026.07.003. <a href="https://d.wanfangdata.com.cn/periodical/gbdswl202607003" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/gbdswl202607003</a></p>
+<p>[W-23] 刘增辉. 教育智能体与高等教育:一场静水流深的变革[J]. 在线学习, 2026. 万方记录 Id: zgycjy-xby202605008. <a href="https://d.wanfangdata.com.cn/periodical/zgycjy-xby202605008" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/zgycjy-xby202605008</a></p>
+<p>[W-24] 国家互联网信息办公室, 国家发展和改革委员会, 工业和信息化部. 智能体规范应用与创新发展实施意见[Z/OL]. 2026-05-08. <a href="https://www.cac.gov.cn/2026-05/08/c_1779979789523320.htm" target="_blank" rel="noopener">https://www.cac.gov.cn/2026-05/08/c_1779979789523320.htm</a> （万方法规库检索因配额失败，以官网原文为准）</p>
+<p>[W-25] 宋瑞霞. 基于LLM智能体的软件交付风险管控与范式转型[J]. 信息技术时代, 2026. 万方记录 Id: QKBJBD20262026040300004297. <a href="https://d.wanfangdata.com.cn/periodical/QKBJBD20262026040300004297" target="_blank" rel="noopener">https://d.wanfangdata.com.cn/periodical/QKBJBD20262026040300004297</a></p>
+<h3 id="sec-66">D. 文献诚信说明</h3>
+<ol><li>编号 [1]—[4] 为 Harness 官方产业资料（新闻稿、产品页、博客），虽列入主编号但<strong>不属于同行评议文献</strong>；正文引用时仅用于平台能力与案例描述。标注 [R-n] 的条目为产业/二级资料，证据等级低于 [5]—[39]。正式投稿时应把厂商资料单独归入"技术报告/产业资料"类。</li><li>[5][6][9][38][39] 为预印本或学位/技术报告，[7][8] 为已接收会议/期刊论文；引用时应核查最终出版版本。</li><li><strong>2026-11-09 已通过万方数据知识服务平台完成中文补检</strong>，新增 [W-1]—[W-25]（著录见 C 组，逐条核对见第 6 章），并更新 1.3、2.2、2.3、3.1—3.4、4.1、4.3、5.1—5.3 的相关结论。但检索在"综合集成法理论源流"与"法规库"两组因预付费调用次数用尽而中止，故 [31] 及综合集成研讨厅中文原始文献仍未核实；[W-24] 政策原文经中央网信办官网核实而非万方法规库；CNKI 未检索。投稿前仍须补齐这几项。</li><li>所有期刊影响因子、分区、截稿日期均为检索时点信息，具有时效性，须以官方最新发布为准。</li><li>万方检索接口返回的元数据粒度为出版年（PublishYear），多数条目未返回卷、期、页码与具体出版月；C 组统一按出版年著录并附 DOI 与万方详情页链接，精确卷期页码请以 DOI 落地页或期刊官网为准。[W-10] 已额外经万方全文接口核验正文关键段落。万方详情页匿名访问可能触发真人验证，属站点正常机制，不影响链接指向。</li><li>第 6 章"新旧并列"中的"原结论"均为 2026-11-09 更新前稿件原文，保留以便追溯；"新依据"仅指本次万方检索（及明确标注的官网核实）所得，二者证据类型不同，不构成直接互相否证时均并列保留。</li><li>[W-1]—[W-25] 为万方中文核对新增来源：其中 [W-1]—[W-23]、[W-25] 为中文期刊论文/专题导语，[W-24] 为政策文件（非学术论文）。C 组按万方返回字段著录，未见卷期页码者不臆补；DOI 与万方详情页链接并列给出以便复核。</li></ol>
+<hr>
+<h2 id="sec-67">附录：术语对照</h2>
+<table><thead><tr><th>缩写/术语</th><th>中文</th><th>说明</th></tr></thead><tbody>
+<tr><td>Agent Harness</td><td>智能体运行时脚手架</td><td>包裹模型、工具、状态与控制回路的可执行外壳</td></tr>
+<tr><td>ACI</td><td>智能体—计算机接口</td><td>SWE-agent 提出，把工具接口本身作为设计对象[11]</td></tr>
+<tr><td>ASOC</td><td>智能体化服务计算</td><td>把智能体作为服务来工程化的研究议程[7]</td></tr>
+<tr><td>MAST</td><td>多智能体系统失效分类法</td><td>14 种失效模式、3 大类[9]</td></tr>
+<tr><td>MBSE</td><td>基于模型的系统工程</td><td>以形式化模型（SysML 等）为数字线程主干</td></tr>
+<tr><td>V&amp;V</td><td>验证与确认</td><td>Verification / Validation</td></tr>
+<tr><td>Admission Invariant</td><td>准入不变量</td><td>变更/动作进入执行前必须满足的条件</td></tr>
+<tr><td>Agentic QoS</td><td>智能体服务质量</td><td>ASOC 提出的研究维度[7]</td></tr>
+<tr><td>DORA</td><td>DevOps 研究与评估</td><td>交付效能四项关键指标</td></tr>
+<tr><td>HITL</td><td>人在回路</td><td>Human-in-the-loop</td></tr>
+<tr><td>MCP</td><td>模型上下文协议</td><td>智能体—工具接口协议；权限实证见 [W-8]，语义控制平面见 [W-9]</td></tr>
+<tr><td>KARMA</td><td>多架构统一建模语言</td><td>中文 MBSE 智能体化建模路径之一[W-4]</td></tr>
+<tr><td>AADL</td><td>结构分析与设计语言</td><td>多智能体生成架构模型的目标语言[W-5]</td></tr>
+<tr><td>Loop 运维</td><td>观测—研判—决策—执行—复盘闭环</td><td>中文工具契约与分级授权实践[W-10]</td></tr>
+</tbody></table>
+<hr>
+<p><em>本文为文献研究综述与投稿决策参考稿，不构成对任何商业平台的性能背书。所有产业数据均为厂商公开披露，未经独立验证。</em></p>
+<p><em>第 6 章的万方核对完成于 2026-11-09，新增来源的著录信息以该时点万方检索接口返回字段为准；因检索配额限制，覆盖并不完整，详见 6.11 与参考文献 D 组说明。</em></p></div></body></html>
