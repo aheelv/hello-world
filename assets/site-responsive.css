@@ -1,0 +1,128 @@
+/* ==========================================================================
+   全站移动端适配补丁  site-responsive.css
+   - 所有规则均位于 @media 之内，宽度 > 900px 的桌面端完全不生效。
+   - 目的：补齐窄屏下的表格/宽内容滚动、可读字号、触屏点击区域、
+     表单控件、图片与代码块，以及交互式课件固定舞台的流式阅读。
+   - 不修改任何原有内容、链接、脚本与桌面端布局。
+   ========================================================================== */
+
+@media (max-width: 900px) {
+
+  /* ---------- 1. 基础盒模型与媒体元素 ---------- */
+  html { -webkit-text-size-adjust: 100%; }
+  body { max-width: 100%; }
+  *, *::before, *::after { box-sizing: border-box; }
+
+  img, video, canvas, iframe {
+    max-width: 100% !important;
+  }
+  img, video, canvas { height: auto !important; }
+  svg { max-width: 100%; }
+
+  /* ---------- 2. 表单控件（16px 可避免 iOS 聚焦自动缩放） ---------- */
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):not([type=color]),
+  select, textarea {
+    font-size: 16px !important;
+    max-width: 100% !important;
+  }
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):not([type=color]),
+  select, textarea, button, [role=button] {
+    min-height: 40px;
+  }
+  button { max-width: 100%; }
+
+  /* ---------- 3. 代码块与长串内容 ---------- */
+  pre {
+    max-width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  code { overflow-wrap: anywhere; }
+
+  /* ---------- 4. 由脚本添加的宽内容滚动容器 ---------- */
+  .wb-scroll, .wb-scroll-x {
+    max-width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  .wb-scroll-tip {
+    font-size: 11.5px;
+    color: #6b7280;
+    margin: 2px 0 6px;
+    line-height: 1.5;
+  }
+
+  /* ---------- 5. 触屏点击区域（仅块级/替换元素，不打乱行内文字） ---------- */
+  .wb-tap { min-height: 40px !important; min-width: 40px !important; }
+
+  /* ---------- 6. 过小文字提升到可读下限 ---------- */
+  .wb-readable { font-size: 12px !important; line-height: 1.6; }
+
+  /* ---------- 7. 常见横向导航 / 工具条允许横向滑动 ---------- */
+  .jump, .navscroller, .toolbar, .filters, .tabs, .modebar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ---------- 8. 固定 1280x720 课件舞台：切换为流式阅读 ---------- */
+  body.wb-stage-mobile #stage {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  body.wb-stage-slides #stage .slide {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 18px 14px 26px !important;
+    transform: none !important;
+  }
+  body.wb-stage-slides #stage .slide:not(.active) { display: none !important; }
+  body.wb-stage-slides #stage .slide.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  body.wb-stage-mobile #stage [style*="grid-template-columns"],
+  body.wb-stage-mobile #stage .toc,
+  body.wb-stage-mobile #stage .hs-wrap,
+  body.wb-stage-mobile #stage .graph-wrap,
+  body.wb-stage-mobile #stage .sort-wrap,
+  body.wb-stage-mobile #stage .sumwrap,
+  body.wb-stage-mobile #stage .grid,
+  body.wb-stage-mobile #stage .opts {
+    grid-template-columns: 1fr !important;
+  }
+  body.wb-stage-mobile #stage table { max-width: 100%; }
+  body.wb-stage-mobile #stage #dots { position: static; margin: 10px 0; }
+}
+
+/* ---------- 9. 更窄屏幕：收紧横向留白 ---------- */
+@media (max-width: 480px) {
+  .wrap, .container, .content, main, article {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+  table { font-size: 13px; }
+  th, td { padding-left: 8px; padding-right: 8px; }
+}
+
+/* ---------- 10. 横屏矮视口：减少纵向留白，避免首屏被顶栏占满 ---------- */
+@media (max-height: 480px) and (max-width: 1000px) {
+  body.wb-stage-mobile #stage .slide {
+    padding-top: 12px !important;
+    padding-bottom: 16px !important;
+  }
+  header.hero, .hero { padding-top: 14px !important; padding-bottom: 14px !important; }
+}
