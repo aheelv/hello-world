@@ -93,6 +93,9 @@
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    /* 固定宽度的图表/示意块可左右滑动查看，避免被裁切 */
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
   body.wb-stage-mobile #stage [style*="grid-template-columns"],
   body.wb-stage-mobile #stage .toc,
