@@ -72,6 +72,8 @@
       if (el.tagName === "A" && s.display === "inline") continue;
       var r = el.getBoundingClientRect();
       if (r.width < 1 || r.height < 1) continue;
+      /* 页码圆点等纯装饰性小按钮不放大，避免被撑成大圆 */
+      if (r.width < 24 && r.height < 24 && !(el.textContent || "").trim()) continue;
       if (r.height < 40 || r.width < 40) el.classList.add("wb-tap");
     }
   }

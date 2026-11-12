@@ -97,6 +97,26 @@
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
   }
+  /* 幻灯片容器与底栏原本是绝对定位，流式后需回到文档流，否则会被挤到顶部 */
+  body.wb-stage-slides #stage #deck {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+  }
+  body.wb-stage-slides #stage #chrome {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    flex-wrap: wrap !important;
+    gap: 8px 10px !important;
+    padding: 12px 14px 20px !important;
+  }
+  body.wb-stage-slides #stage #dots button {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    width: 9px !important;
+    height: 9px !important;
+  }
   body.wb-stage-mobile #stage [style*="grid-template-columns"],
   body.wb-stage-mobile #stage .toc,
   body.wb-stage-mobile #stage .hs-wrap,
@@ -108,7 +128,48 @@
     grid-template-columns: 1fr !important;
   }
   body.wb-stage-mobile #stage table { max-width: 100%; }
-  body.wb-stage-mobile #stage #dots { position: static; margin: 10px 0; }
+
+  /* 流式课件：顶栏进入文档流并允许换行；页码点、返回键保持原有固定定位 */
+  body.wb-stage-mobile #stage #topbar {
+    position: static !important;
+    height: auto !important;
+    min-height: 0;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    gap: 6px 10px !important;
+    padding: 10px 14px !important;
+  }
+  body.wb-stage-mobile #stage #progress {
+    position: static !important;
+    width: 100% !important;
+  }
+  body.wb-stage-mobile #stage #topbar .meta {
+    flex-wrap: wrap;
+    gap: 4px 10px !important;
+    font-size: 12px !important;
+  }
+  body.wb-stage-mobile #stage .cover h1,
+  body.wb-stage-mobile #stage .fin h1 {
+    font-size: clamp(28px, 8.5vw, 44px) !important;
+    letter-spacing: 0 !important;
+    line-height: 1.2 !important;
+  }
+  body.wb-stage-mobile #stage .cover .en {
+    font-size: 12px !important;
+    letter-spacing: 2px !important;
+  }
+  body.wb-stage-mobile #stage .cover .lead {
+    font-size: 15px !important;
+    margin-top: 14px !important;
+  }
+  body.wb-stage-mobile #stage .cover { padding: 0 2px !important; }
+  body.wb-stage-mobile #stage .cover .go {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin-top: 20px !important;
+  }
+  body.wb-stage-mobile #stage .btn { white-space: nowrap !important; }
+  body.wb-stage-mobile #stage .cover svg.deco { display: none !important; }
 }
 
 /* ---------- 9. 更窄屏幕：收紧横向留白 ---------- */
