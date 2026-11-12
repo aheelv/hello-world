@@ -109,6 +109,35 @@
       ? "wb-stage-slides" : "wb-stage-plain");
   }
 
+  /* 6. SVG 图表内部连线 / 标签超出自身 viewBox 时，
+        给最近的定位容器补一层横向滚动，避免超出部分被视口裁掉 */
+  function svgOverflow() {
+    var list = document.querySelectorAll("svg"), i;
+    for (i = 0; i < list.length; i++) {
+      var svg = list[i];
+      if (hasScrollParent(svg)) continue;
+      var sr = svg.getBoundingClientRect();
+      if (sr.width < 40 || sr.height < 20) continue;
+      var kids = svg.querySelectorAll("path,text,rect,line,polyline,polygon,circle,ellipse");
+      var far = false, k;
+      for (k = 0; k < kids.length; k++) {
+        var kr = kids[k].getBoundingClientRect();
+        if (kr.width < 2 && kr.height < 2) continue;
+        if (kr.right > sr.right + 20 || kr.left < sr.left - 20) { far = true; break; }
+      }
+      if (!far) continue;
+      var p = svg.parentNode;
+      while (p && p.nodeType === 1 && p !== document.body) {
+        var ps = css(p);
+        if (ps.position === "relative" || ps.position === "absolute") {
+          p.classList.add("wb-scroll");
+          break;
+        }
+        p = p.parentNode;
+      }
+    }
+  }
+
   function run() {
     if (!mq.matches || applied) return;
     applied = true;
@@ -117,6 +146,7 @@
       detectStage();
       wrapTables();
       wideContainers();
+      svgOverflow();
       tapTargets();
       readableText();
     } catch (e) {

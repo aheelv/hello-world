@@ -180,6 +180,35 @@
   }
   table { font-size: 13px; }
   th, td { padding-left: 8px; padding-right: 8px; }
+
+  /* 固定列宽网格 / 时间轴：子项默认的 min-width:auto 会被长内容撑开，
+     使浏览器把移动布局视口整体放大再缩小页面，实际字号随之变小。
+     让子项可收缩并允许长词换行，保证 320px 等极窄屏仍是 1:1 视口。 */
+  .tl, .timeline, .grid, [class*="-grid"], [class*="grid-"],
+  [style*="grid-template-columns"] { max-width: 100%; }
+  .tl > *, .timeline > *, .grid > *, [class*="-grid"] > *,
+  [class*="grid-"] > *, [style*="grid-template-columns"] > * {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  /* 全幅 Hero 的负外边距在窄屏会超出视口，收回为常规留白 */
+  header.hero, .hero {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    max-width: 100%;
+  }
+
+  /* 图表 SVG 内部标签可能超出 viewBox：由父容器提供横向滑动，避免被裁切 */
+  .mermaid, .chart-svg {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mermaid svg, .chart-svg svg { overflow: visible; }
 }
 
 /* ---------- 10. 横屏矮视口：减少纵向留白，避免首屏被顶栏占满 ---------- */
