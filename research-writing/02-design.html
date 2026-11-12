@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="报告规范解决「说清楚」，不解决「做得对」。设计阶段要留下能被人复核的证据链。">
+<title>研究设计 · 科研论文写作与发表 · 循证教程</title>
+<link rel="stylesheet" href="assets/site-nav.css">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到正文</a>
+<nav class="site-nav" aria-label="站点导航">
+  <a class="sn-brand" href="index.html">科研写作 · 循证教程</a>
+  <div class="sn-links">
+      <a href="index.html">首页</a>
+      <a href="01-topic.html">选题</a>
+      <a href="02-design.html">设计</a>
+      <a href="03-writing.html">写作</a>
+      <a href="04-submission.html">投稿</a>
+      <a href="05-review.html">评审</a>
+      <a href="06-strategy.html">策略</a>
+      <a href="07-integrity.html">合规</a>
+      <a href="translations.html">译介</a>
+      <a href="resources.html">资源库</a>
+      <a href="glossary.html">术语</a>
+      <a href="maintain.html">维护</a>
+  </div>
+</nav>
+<header class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">STAGE 02 / 06</span>
+    <h1>研究设计</h1>
+    <p>报告规范解决「说清楚」，不解决「做得对」。设计阶段要留下能被人复核的证据链。</p>
+    <div class="hero-meta"><span>核验日期 <b data-render="verifiedAt"></b></span><span>资源 <b data-render="resourceCount"></b> 项</span><span>证据分级 A–D</span><span>不承诺发表结果</span></div>
+  </div>
+</header>
+<main id="main" class="wrap">
+<section>
+  <h2>一、先分清三种「规范」</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th style="width:20%">类型</th><th>管什么</th><th>典型来源</th></tr></thead>
+    <tbody>
+      <tr><td><strong>研究设计规范</strong></td><td>抽样、测量、对照、盲法、随机化、样本量与功效、偏差控制</td><td>本学科方法学文献、资助方要求、伦理审批</td></tr>
+      <tr><td><strong>报告规范</strong></td><td>论文各章节必须报告哪些信息</td><td><a href="resources.html#R21">R21 APA JARS</a>、<a href="resources.html#R23">R23 EQUATOR</a>、<a href="resources.html#R26">R26 PRISMA</a></td></tr>
+      <tr><td><strong>排版/投稿规范</strong></td><td>字数、结构、图表、引用样式、匿名化、补充材料</td><td>目标期刊当期 Author Guidelines</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout warn"><strong>关键边界：</strong>EQUATOR 官网明确写道，报告规范「不会替你做研究设计上的决策」。一份逐条填满的 checklist 完全可能对应一份设计有缺陷的研究。<a href="translations.html#T08">查看 T08 摘译 →</a></div>
+</section>
+
+<section>
+  <h2>二、确认性 vs 探索性：先说清楚，再分析</h2>
+  <p>Center for Open Science 把预注册定义为「在研究开展之前明确指定研究计划，并提交到登记处」，核心目的是区分<strong>计划内 / 计划外</strong>与<strong>确认性 / 探索性</strong>分析。COS 特别强调：同一份数据不能既用来生成假设，又用来检验假设。</p>
+  <div class="grid grid-2">
+    <div class="card"><h3 style="margin-top:0">确认性分析</h3><ul class="small">
+      <li>假设与分析方式在数据接触前确定；</li>
+      <li>p 值保留诊断价值，结果标准最严格；</li>
+      <li>可预先写明条件分支（IF–THEN 决策树），仍属计划内。</li>
+    </ul></div>
+    <div class="card"><h3 style="margin-top:0">探索性分析</h3><ul class="small">
+      <li>由数据线索触发，或事后改变了检验方式；</li>
+      <li>p 值失去诊断价值，结论应表述为暂定；</li>
+      <li>需要用新数据做确认性检验；<strong>必须明确标注为探索性</strong>。</li>
+    </ul></div>
+  </div>
+  <p class="small">预注册不禁止探索性分析，只要求把两者透明区分；COS 要求报告全部计划内结果，并用 Transparent Changes 模板披露偏离。依据 <a href="resources.html#R28">R28</a>；<a href="translations.html#T04">T04 原文摘译</a>。</p>
+  <div class="callout"><strong>适用边界：</strong>纯质性研究、深度探索性研究、使用受限既有数据的二次分析不必强行预注册；但仍应说明分析决策发生在看到结果之前还是之后。预注册是透明度工具，不是质量认证。</div>
+</section>
+
+<section>
+  <h2>三、数据可追溯性：设计阶段就要建链</h2>
+  <ol class="steps">
+    <li><strong>原始导出优先</strong>：保留平台原始导出文件、时间戳、导出参数与采集日志，而不是只保留清洗后的分析表。</li>
+    <li><strong>版本与校验</strong>：为关键文件记录版本号与 SHA-256 校验值；任何重跑都应产生可比对的新版本，而非静默覆盖。</li>
+    <li><strong>凭证齐备</strong>：伦理审批、组织许可、数据使用协议、参与者知情同意、档案 KPI 授权，与设计文档一一对应。</li>
+    <li><strong>变量字典</strong>：字段、取值范围、缺失编码、单位、来源表与关联键写进 codebook，供复核与复现。</li>
+    <li><strong>脚本与结果绑定</strong>：每个报告数字都能回溯到具体脚本版本与数据版本。</li>
+  </ol>
+  <div class="callout danger"><strong>红线：</strong>中科院《关于在科研活动中规范使用人工智能技术的诚信提醒》提醒三明确「反对将人工智能生成的数据作为实验数据」；使用 AI 生成的模拟仿真/测试数据须全面如实声明。美国 ORI 定义中，编造数据或结果属于 <em>fabrication</em>。中国《科研失信行为调查处理规则》第二条第（二）项涵盖编造研究过程、伪造研究成果与篡改数据图表结论。依据 <a href="resources.html#R08">R08</a>、<a href="resources.html#R03">R03</a>、<a href="resources.html#R06">R06</a>。</div>
+</section>
+
+<section>
+  <h2>四、按研究类型选报告规范</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th style="width:28%">研究类型</th><th style="width:24%">可查规范</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>定量实证（心理 / 管理 / 社会科学）</td><td>JARS–Quant <span class="badge b-grey">R22</span></td><td>规定方法、结果、样本、缺失与透明度应报告的信息；不等于 APA 排版格式。</td></tr>
+      <tr><td>质性 / 混合方法</td><td>JARS–Qual / JARS–Mixed <span class="badge b-grey">R21</span></td><td>JARS–REC 适用于全部研究，指导族群与文化相关表述。</td></tr>
+      <tr><td>随机对照试验</td><td>CONSORT <span class="badge b-grey">R24</span></td><td>含受试者流程图；原域名已重定向至 consort-spirit.org。</td></tr>
+      <tr><td>观察性研究</td><td>STROBE <span class="badge b-grey">R25</span></td><td>队列、病例对照、横断面。</td></tr>
+      <tr><td>系统综述 / Meta 分析</td><td>PRISMA <span class="badge b-grey">R26</span></td><td>版本较多，引用须注明所用版本。</td></tr>
+      <tr><td>动物实验</td><td>ARRIVE <span class="badge b-grey">R27</span></td><td>含随机化、盲法与动物福利条目。</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout warn"><strong>学科边界：</strong>EQUATOR 主要面向健康与医学研究，官网收录 700+ 项规范。工程、管理与信息科学研究通常没有一一对应的 EQUATOR 清单；可借鉴其透明度框架，但<strong>不要声称「遵循 STROBE」却未逐条满足</strong>。是否要求提交 checklist 取决于目标期刊。</div>
+</section>
+
+<section>
+  <h2>本阶段相关资源</h2>
+  <div data-related="design" data-limit="10"></div>
+</section>
+
+<section><div class="callout"><strong>下一阶段：</strong><a href="03-writing.html">论文写作</a>——把设计说清楚，并让每个主张都找得到证据。</div></section>
+
+</main>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-grid">
+    <div><h4>关于本站</h4>
+      <p style="margin:.3rem 0;max-width:46ch">中文循证教程：选题 → 设计 → 写作 → 投稿 → 同行评审 → 发表。所有结论标注来源、适用边界与核验日期；不承诺任何发表结果。</p>
+      <p class="small" style="margin:.3rem 0">核验日期 <b data-render="verifiedAt"></b> · <span data-render="version"></span></p>
+    </div>
+      <div><h4>教程</h4><div class="footer-links"><a href="01-topic.html">选题</a><a href="02-design.html">设计</a><a href="03-writing.html">写作</a><a href="04-submission.html">投稿</a><a href="05-review.html">评审</a><a href="06-strategy.html">策略</a><a href="07-integrity.html">合规</a></div></div>
+      <div><h4>查证</h4><div class="footer-links"><a href="translations.html">译介</a><a href="resources.html">资源库</a><a href="glossary.html">术语</a><a href="maintain.html">维护</a></div></div>
+  </div>
+  <div class="footer-bottom">
+    <p style="margin:0 0 .35rem" data-render="disclaimer"></p>
+    <p style="margin:0" data-render="buildNote"></p>
+  </div>
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

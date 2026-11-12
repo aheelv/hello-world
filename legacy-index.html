@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f2">
+<meta name="description" content="大连财经学院 数据治理与技术应用课程群 数字资源中心：课程群信息、运筹学交互课件、科研选题与投稿指南、常用网站导航。">
+<title>数字资源中心 | 数据治理与技术应用课程群</title>
+<style>
+:root{
+  --ink:#111827; --ink-2:#374151; --ink-3:#6b7280;
+  --line:#e5e7eb; --line-2:#d1d5db;
+  --bg:#f6f5f2; --paper:#ffffff;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.14);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  font-size:16px;line-height:1.65;
+  padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(246,245,242,.86);backdrop-filter:saturate(160%) blur(12px);
+  -webkit-backdrop-filter:saturate(160%) blur(12px);
+  border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top);
+}
+.topbar .wrap{display:flex;align-items:center;gap:14px;min-height:56px}
+.brand{font-weight:700;font-size:15px;letter-spacing:.02em;white-space:nowrap}
+.brand span{color:var(--ink-3);font-weight:500}
+.jump{margin-left:auto;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.jump::-webkit-scrollbar{display:none}
+.jump a{
+  flex:0 0 auto;font-size:13px;color:var(--ink-2);padding:7px 11px;border-radius:999px;
+  transition:background .16s,color .16s;
+}
+.jump a:hover{background:#ebe9e4;color:var(--ink)}
+
+/* ---------- 首屏 ---------- */
+.hero{padding:clamp(36px,7vw,72px) 0 clamp(24px,4vw,36px)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 18px;
+}
+.eyebrow::before{content:"";width:26px;height:2px;background:var(--ink);opacity:.55}
+h1{
+  margin:0 0 18px;font-size:clamp(28px,5.4vw,46px);line-height:1.18;
+  letter-spacing:-.02em;font-weight:800;text-wrap:balance;max-width:20em;
+}
+.lede{
+  margin:0;max-width:38em;color:var(--ink-2);
+  font-size:clamp(15px,1.6vw,17px);line-height:1.75;text-wrap:pretty;
+}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.stat{
+  background:var(--paper);border:1px solid var(--line);border-radius:999px;
+  padding:7px 15px;font-size:13px;color:var(--ink-2);
+}
+.stat b{color:var(--ink);font-weight:700;margin-right:5px}
+
+/* ---------- 板块 ---------- */
+.section{padding:clamp(30px,5vw,52px) 0;border-top:1px solid var(--line)}
+.section-head{display:flex;align-items:flex-start;gap:clamp(12px,2.4vw,24px);margin-bottom:clamp(18px,3vw,30px)}
+.section-no{
+  flex:0 0 auto;font-size:clamp(26px,4vw,40px);font-weight:800;line-height:1;
+  color:var(--accent);opacity:.22;font-variant-numeric:tabular-nums;
+  letter-spacing:-.04em;padding-top:2px;
+}
+.section-head h2{
+  margin:0 0 6px;font-size:clamp(20px,2.8vw,27px);line-height:1.3;
+  font-weight:750;letter-spacing:-.01em;text-wrap:balance;
+}
+.section-label{
+  display:inline-block;font-size:11.5px;letter-spacing:.12em;font-weight:700;
+  color:var(--accent);text-transform:uppercase;margin-bottom:9px;
+}
+.section-desc{margin:0;color:var(--ink-3);font-size:14.5px;line-height:1.7;max-width:44em}
+
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(258px,1fr))}
+.grid.single{grid-template-columns:1fr}
+.grid.single .card{grid-column:span 1}
+.grid.single .card-desc{max-width:62ch}
+
+.card{
+  position:relative;display:flex;flex-direction:column;gap:8px;
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 18px 16px;box-shadow:var(--shadow);
+  transition:transform .18s cubic-bezier(.2,.7,.3,1),border-color .18s,box-shadow .18s;
+  will-change:transform;
+}
+.card::after{
+  content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--accent);opacity:0;transition:opacity .18s;
+}
+.card:hover{transform:translateY(-2px);border-color:var(--line-2);box-shadow:0 2px 4px rgba(16,24,40,.05),0 16px 32px -16px rgba(16,24,40,.2)}
+.card:hover::after{opacity:.85}
+.card:active{transform:translateY(0) scale(.995)}
+.card-top{display:flex;align-items:baseline;gap:8px}
+.card-name{font-weight:700;font-size:15.5px;line-height:1.45;letter-spacing:-.005em}
+.card-arrow{
+  margin-left:auto;flex:0 0 auto;font-size:14px;color:var(--accent);
+  opacity:.45;transition:transform .18s,opacity .18s;
+}
+.card:hover .card-arrow{transform:translateX(3px);opacity:1}
+.card-desc{margin:0;color:var(--ink-3);font-size:13.5px;line-height:1.68}
+.card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.tag{
+  font-size:11.5px;color:var(--ink-2);background:#f3f2ef;
+  border:1px solid #e8e6e1;border-radius:5px;padding:2px 7px;line-height:1.6;
+}
+.card.primary{
+  grid-column:span 2;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 7%,#fff),var(--paper) 62%);
+  border-color:color-mix(in srgb,var(--accent) 22%,var(--line));
+}
+.card.primary .card-name{font-size:17px}
+.card.primary .card-desc{color:var(--ink-2);font-size:14px}
+
+/* ---------- 页脚 ---------- */
+.foot{
+  border-top:1px solid var(--line);margin-top:clamp(28px,4vw,44px);
+  padding:26px 0 44px;color:var(--ink-3);font-size:13px;line-height:1.85;
+}
+.foot b{color:var(--ink-2);font-weight:600}
+.foot p{margin:0 0 4px}
+
+@media (max-width:700px){
+  /* 窄屏：顶部导航让出整行，四项均分，无需横向滑动 */
+  .brand{display:none}
+  .jump{margin-left:0;width:100%;justify-content:space-between;gap:0}
+  .jump a{padding:8px 10px;font-size:13px}
+}
+@media (max-width:640px){
+  body{font-size:15.5px}
+  .card.primary{grid-column:span 1}
+  .grid{grid-template-columns:1fr;gap:10px}
+  .card{padding:15px 15px 14px}
+  .section-head{gap:10px}
+  .section-no{font-size:24px;min-width:34px}
+  .stat{padding:6px 12px;font-size:12.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+  <link rel="stylesheet" href="assets/site-responsive.css">
+  <script defer src="assets/site-responsive.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">数字资源中心 <span>· 数据治理与技术应用课程群</span></div>
+    <nav class="jump"><a href="#teaching">教学建设</a><a href="#agents">交互课件</a><a href="#research">科研支持</a><a href="#nav">资源导航</a></nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section class="hero">
+      <p class="eyebrow">大连财经学院 · 大数据与人工智能学院</p>
+      <h1>数据治理与技术应用<br>课程群数字资源中心</h1>
+      <p class="lede">把课程群建设中分散的网页、课件与资料收拢到一处：教学建设查课程与师资，课堂演示直接投屏，科研选题顺着流程往下走，常用站点一键直达。全部页面均为单文件，手机与电脑同源可用。</p>
+      <div class="stats">
+        <div class="stat"><b>4</b>个板块</div>
+        <div class="stat"><b>15</b>个页面</div>
+        <div class="stat"><b>14</b>门课程 · <b>14</b>位教师</div>
+        <div class="stat"><b>128</b>个精选站点</div>
+        <div class="stat"><b>移动端</b>已适配</div>
+      </div>
+    </section>
+
+<section class="section" id="teaching" style="--accent:#1b3a63">
+      <div class="section-head">
+        <div class="section-no">01</div>
+        <div>
+          <div class="section-label">教学建设</div>
+          <h2>课程群与基层教学组织</h2>
+          <p class="section-desc">专业课程体系、师资队伍结构、方案对照与教研活动记录，一门课一个人都能查到。</p>
+        </div>
+      </div>
+      <div class="grid single">
+        <a class="card primary" href="course-group/" style="--accent:#1b3a63"><div class="card-top"><span class="card-name">数据治理与技术应用课程群</span><span class="card-arrow">→</span></div><p class="card-desc">14 门专业选修课程、14 位课程组教师、两套培养方案对照、4 次教研活动记录，桌面为表格、手机自动切卡片。</p><div class="card-meta"><span class="tag">14 门课程</span><span class="tag">14 位教师</span><span class="tag">4 次教研</span></div></a>
+      </div>
+    </section>
+
+    <section class="section" id="agents" style="--accent:#0f766e">
+      <div class="section-head">
+        <div class="section-no">02</div>
+        <div>
+          <div class="section-label">交互课件</div>
+          <h2>运筹学课件与多智能体演示</h2>
+          <p class="section-desc">可点击、可拖拽、可逐步演算的课堂演示，覆盖线性规划三大经典问题与智能体协作原理。</p>
+        </div>
+      </div>
+      <div class="grid">
+        <a class="card primary" href="agents/" style="--accent:#0f766e"><div class="card-top"><span class="card-name">运筹学 · 交互式课件中心</span><span class="card-arrow">→</span></div><p class="card-desc">课件总入口，按知识点聚合全部演示，含使用说明与教学建议。</p><div class="card-meta"><span class="tag">总入口</span></div></a>
+        <a class="card" href="agents/simplex-courseware.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">单纯形法 · 交互式教学课件</span><span class="card-arrow">→</span></div><p class="card-desc">单纯形表逐步迭代，实时高亮入基、出基与主元，支持自定义算例。</p><div class="card-meta"><span class="tag">线性规划</span><span class="tag">逐步演算</span></div></a>
+        <a class="card" href="agents/duality-courseware.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">对偶理论 · 交互式教学课件</span><span class="card-arrow">→</span></div><p class="card-desc">原问题与对偶问题并排对照，影子价格与经济含义联动解释。</p><div class="card-meta"><span class="tag">对偶</span><span class="tag">影子价格</span></div></a>
+        <a class="card" href="agents/transportation-courseware.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">运输问题 · 表上作业法</span><span class="card-arrow">→</span></div><p class="card-desc">最小元素法与伏格尔法求初始解，位势法检验，产销平衡自动处理。</p><div class="card-meta"><span class="tag">运输问题</span><span class="tag">位势法</span></div></a>
+        <a class="card" href="agents/simplex-method-demo.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">单纯形法教学演示</span><span class="card-arrow">→</span></div><p class="card-desc">几何直观版：可行域图形与顶点移动同步，讲清“为什么最优在顶点”。</p><div class="card-meta"><span class="tag">几何直观</span></div></a>
+        <a class="card" href="agents/multi-agent-demo.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">多智能体协作原理演示</span><span class="card-arrow">→</span></div><p class="card-desc">以技术报告流水线为例，展示角色分工、消息传递与结果汇总全过程。</p><div class="card-meta"><span class="tag">多智能体</span><span class="tag">流水线</span></div></a>
+        <a class="card" href="agents/devops-lifecycle.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">DevOps 全生命周期演示</span><span class="card-arrow">→</span></div><p class="card-desc">从一次代码提交到生产运行的完整链路，含各环节卡点与回滚策略。</p><div class="card-meta"><span class="tag">DevOps</span><span class="tag">工程实践</span></div></a>
+      </div>
+    </section>
+
+    <section class="section" id="research" style="--accent:#6d28d9">
+      <div class="section-head">
+        <div class="section-no">03</div>
+        <div>
+          <div class="section-label">科研支持</div>
+          <h2>研究选题与投稿全流程</h2>
+          <p class="section-desc">系统工程方法论与 AI 智能体 Harness 技术的交叉选题地图，配套期刊筛选与投稿大纲。</p>
+        </div>
+      </div>
+      <div class="grid">
+        <a class="card primary" href="research/" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">研究选题与投稿导航</span><span class="card-arrow">→</span></div><p class="card-desc">全流程总览：从选题定位、文献缺口、期刊匹配到投稿材料准备。</p><div class="card-meta"><span class="tag">总入口</span><span class="tag">全流程</span></div></a>
+        <a class="card" href="research/research_landscape_se_ai_harness.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">交叉融合研究全景</span><span class="card-arrow">→</span></div><p class="card-desc">系统工程 × AI 智能体 Harness 的六大研究方向与代表性文献缺口。</p><div class="card-meta"><span class="tag">研究全景</span><span class="tag">选题地图</span></div></a>
+        <a class="card" href="research/sci-journal-guide.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">SCI 期刊投稿指南</span><span class="card-arrow">→</span></div><p class="card-desc">面向大数据管理与应用专业的期刊分层清单、审稿周期与命中率参考。</p><div class="card-meta"><span class="tag">期刊清单</span><span class="tag">分层</span></div></a>
+        <a class="card" href="research/submission_guides.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">一区 + 投稿指南</span><span class="card-arrow">→</span></div><p class="card-desc">SCI/SSCI 一区及以上期刊的范围匹配、写作侧重与常见退稿原因。</p><div class="card-meta"><span class="tag">一区</span><span class="tag">写作侧重</span></div></a>
+        <a class="card" href="research/submission_outlines.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">一区 + 投稿大纲</span><span class="card-arrow">→</span></div><p class="card-desc">按目标期刊结构拆解的论文提纲，可直接填充为初稿骨架。</p><div class="card-meta"><span class="tag">论文提纲</span></div></a>
+        <a class="card" href="research/ai-adoption-archive.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">研究资料包 · 归档汇总</span><span class="card-arrow">→</span></div><p class="card-desc">企业 AI 采纳与架构能力方向：咨询报告与研究方案的结构化归档、关键结论与待确认事项。</p><div class="card-meta"><span class="tag">2 份文档</span><span class="tag">3 种格式</span><span class="tag">归档总览</span></div></a>
+        <a class="card" href="se-ai-agent/" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">系统工程 × AI 智能体 · 研究门户</span><span class="card-arrow">→</span></div><p class="card-desc">AI 研究助手三步上手入口，含研究路线图与资源清单／执行手册，三页静态站点可直接在浏览器打开。</p><div class="card-meta"><span class="tag">3 页静态网页</span><span class="tag">研究路线图</span><span class="tag">执行手册</span></div></a>
+      </div>
+    </section>
+
+    <section class="section" id="nav" style="--accent:#b45309">
+      <div class="section-head">
+        <div class="section-no">04</div>
+        <div>
+          <div class="section-label">资源导航</div>
+          <h2>常用网站直达</h2>
+          <p class="section-desc">16 个分类、128 个站点，含学术科研专区，覆盖文献检索、统计数据、AI 工具、开发与办公，支持即时搜索。</p>
+        </div>
+      </div>
+      <div class="grid single">
+        <a class="card primary" href="nav/" style="--accent:#b45309"><div class="card-top"><span class="card-name">网址大全 · 热门网站导航</span><span class="card-arrow">→</span></div><p class="card-desc">按用途分类整理的高频站点清单，输入关键词即可过滤，全部在新标签页打开。</p><div class="card-meta"><span class="tag">16 分类</span><span class="tag">128 站点</span><span class="tag">即时搜索</span></div></a>
+      </div>
+    </section>
+
+    <section class="section" id="title-review" style="--accent:#9a3412">
+      <div class="section-head">
+        <div class="section-no">05</div>
+        <div>
+          <div class="section-label">教师服务</div>
+          <h2>2026 年职称评审申报</h2>
+          <p class="section-desc">本次申报季形成的资料汇编：全景路线图、副高级职称转评条件核查表与申报群通知，含关键时间节点、口径变化与易错点。</p>
+        </div>
+      </div>
+      <div class="grid single">
+        <a class="card primary" href="title-review/" style="--accent:#9a3412"><div class="card-top"><span class="card-name">2026 年职称评审申报资料汇编</span><span class="card-arrow">→</span></div><p class="card-desc">点击进入详情：三份可直接打开的单文件页面、11 个评审环节时间节点、关键口径变化、同级转评要点与申报群操作要求。</p><div class="card-meta"><span class="tag">3 份页面</span><span class="tag">11 个环节</span><span class="tag">转评核查</span><span class="tag">群通知</span></div></a>
+      </div>
+    </section>
+
+    <section class="section" id="library" style="--accent:#334155">
+      <div class="section-head">
+        <div class="section-no">06</div>
+        <div>
+          <div class="section-label">个人资料库</div>
+          <h2>专题资料整理入口</h2>
+          <p class="section-desc">四个本地专题资料集的整理入口，覆盖学生培养课题、AI 学习路径、学术投稿与职称转评分析。</p>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr))">
+        <a class="card" href="student-development/" style="--accent:#334155"><div class="card-top"><span class="card-name">数据驱动的学生培养模式</span><span class="card-arrow">→</span></div><p class="card-desc">课题评估、题目重构、论文规划、数据口径、投稿合规与匹配度核验，6 份报告串成一条完整研究链路。</p><div class="card-meta"><span class="tag">6 份报告</span><span class="tag">课题研究</span></div></a>
+        <a class="card" href="summer-learning/" style="--accent:#334155"><div class="card-top"><span class="card-name">暑假学习 · AI 路径</span><span class="card-arrow">→</span></div><p class="card-desc">AI Agent 学习路书与 AI 技术应用路线图，含七层能力框架与 36 个月分阶段学习计划。</p><div class="card-meta"><span class="tag">2 份路书</span><span class="tag">学习规划</span></div></a>
+        <a class="card" href="book-to-skill/" style="--accent:#334155"><div class="card-top"><span class="card-name">学术投稿指南</span><span class="card-arrow">→</span></div><p class="card-desc">AI × 管理科学 2026 下半年投稿指南，按零费用优先筛刊，附 6 大方向选题库。</p><div class="card-meta"><span class="tag">投稿指南</span><span class="tag">期刊清单</span></div></a>
+        <a class="card" href="associate-professor/" style="--accent:#334155"><div class="card-top"><span class="card-name">副教授评审分析</span><span class="card-arrow">→</span></div><p class="card-desc">高级工程师转评副教授的两版规则逐条对照、资格判定与量化赋分测算。</p><div class="card-meta"><span class="tag">资格判定</span><span class="tag">赋分对照</span></div></a>
+        <a class="card" href="library/" style="--accent:#2E5C8A"><div class="card-top"><span class="card-name">我的书库 · 读书整理</span><span class="card-arrow">→</span></div><p class="card-desc">12 本书的结构化精读：结构导图、核心观点、中英金句与实践清单，按入门／认知／风险／决策／思维五个模块分组，支持检索与切换。</p><div class="card-meta"><span class="tag">12 本书</span><span class="tag">5 个模块</span><span class="tag">可检索</span></div></a>
+        <a class="card" href="library/naval/" style="--accent:#2E5C8A"><div class="card-top"><span class="card-name">纳瓦尔宝典 · 实践页</span><span class="card-arrow">→</span></div><p class="card-desc">《纳瓦尔宝典》结构化精读页（含配套实践 Skill），原目录已迁入书库统一管理，此入口直达。</p><div class="card-meta"><span class="tag">精读页</span><span class="tag">实践清单</span></div></a>
+      </div>
+    </section>
+
+    <section class="section" id="ai-paper-11-9" style="--accent:#0f766e">
+      <style>#ai-paper-11-9 .topics{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(330px,100%),1fr))}
+#ai-paper-11-9 .topic{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 16px 14px;border-top:3px solid var(--accent,#1d4ed8)}
+#ai-paper-11-9 .topic h3{margin:0 0 4px;font-size:15.5px;letter-spacing:-.01em}
+#ai-paper-11-9 .topic .tdesc{margin:0 0 12px;color:var(--ink-3);font-size:13px;line-height:1.65}
+#ai-paper-11-9 .topic a.item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-top:8px;background:#fcfcfd;transition:border-color .18s,transform .18s}
+#ai-paper-11-9 .topic a.item:hover{border-color:var(--accent);transform:translateY(-1px)}
+#ai-paper-11-9 .topic a.item b{font-size:13.5px;line-height:1.45}
+#ai-paper-11-9 .topic a.item small{display:block;font-weight:400;color:var(--ink-3);font-size:12.3px;line-height:1.55;margin-top:3px}
+#ai-paper-11-9 .topic a.item em{font-style:normal;color:var(--accent);flex:0 0 auto}
+#ai-paper-11-9 .overview{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding:13px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);text-decoration:none;color:inherit}
+#ai-paper-11-9 .overview:hover{border-color:#0f766e}
+#ai-paper-11-9 .overview b{font-size:14.5px}
+#ai-paper-11-9 .overview span{color:var(--ink-3);font-size:13px}
+#ai-paper-11-9 .overview em{font-style:normal;color:#0f766e;font-weight:700}</style>
+      <div class="section-head">
+        <div class="section-no">07</div>
+        <div>
+          <div class="section-label">11-9 专题资料</div>
+          <h2>AI 智能体论文投稿 · 主题索引</h2>
+          <p class="section-desc">按综述评估、投稿规划、费用方案三个主题整理；每项含资料名称、简要说明与直达链接，阅读版与 Markdown 原文均可访问。</p>
+        </div>
+      </div>
+      <a class="overview" href="ai-paper-submission/index.html"><b>专题总览 · 资料集合入口</b><span>3 个主题 / 6 份资料 / 收录说明</span><em>→</em></a>
+      <div class="topics">
+        <div class="topic" style="--accent:#1d4ed8">
+          <h3>01 · 综述与投稿评估</h3>
+          <p class="tdesc">智能体集成平台与系统工程的融合综述：七层参考架构、8 类平台 × 11 维对比、三级融合深度模型；含万方中文文献核对与 75 条编号文献、6 个投稿选题。</p>
+          <a class="item" href="ai-paper-submission/review-guide.html"><span><b>研究综述与投稿评估 · 阅读版 HTML</b><small>自包含排版阅读版，含目录、16 张表与可点外链，可直接打印为 PDF。</small></span><em>→</em></a>
+          <a class="item" href="ai-paper-submission/review-guide.md"><span><b>研究综述与投稿评估 · Markdown 原文</b><small>Markdown 原文，完整保留引用编号、表格与待核验标记，便于二次编辑。</small></span><em>→</em></a>
+        </div>
+        <div class="topic" style="--accent:#0f766e">
+          <h3>02 · 投稿规划与初稿</h3>
+          <p class="tdesc">5 个研究方向比选、R1/R2/R3 期刊匹配、按 R1 撰写的初稿全文、实证合规设计与近半年投稿工作计划（2026-11—2027-04）。</p>
+          <a class="item" href="ai-paper-submission/submission-plan.html"><span><b>论文投稿规划与初稿 · 阅读版 HTML</b><small>单页导航版：12 个页内锚点、21 张表与快速跳转，实证部分均为设计+占位。</small></span><em>→</em></a>
+          <a class="item" href="ai-paper-submission/submission-plan.md"><span><b>论文投稿规划与初稿 · Markdown 原文</b><small>Markdown 原文，含 20 项待补清单与合规控制表，便于继续撰写。</small></span><em>→</em></a>
+        </div>
+        <div class="topic" style="--accent:#b45309">
+          <h3>03 · 费用与低成本方案</h3>
+          <p class="tdesc">五本中文期刊与 JSS 的收费标准、支付方式、额外费用与退费政策，按节省金额排序的降费建议、零成本备选期刊与投稿前待核验清单。</p>
+          <a class="item" href="ai-paper-submission/cost-guide.html"><span><b>投稿费用与低成本方案 · 阅读版 HTML</b><small>自包含阅读版，含目录、4 张表、待核验高亮与 13 个可点外链。</small></span><em>→</em></a>
+          <a class="item" href="ai-paper-submission/cost-guide.md"><span><b>投稿费用与低成本方案 · Markdown 原文</b><small>Markdown 原文，按〔官方〕〔刊内信息〕〔第三方统计〕分级标注来源。</small></span><em>→</em></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ai-reading-notes" style="--accent:#6d28d9">
+      <div class="section-head">
+        <div class="section-no">08</div>
+        <div>
+          <div class="section-label">AI 读书笔记</div>
+          <h2>思维导图与全篇索引</h2>
+          <p class="section-desc">以《毛泽东选集》为首册的数据驱动读书笔记：按问题域重组哲学理论、实践应用与方法工具，逐节点详解，五卷 229 篇逐段可查、可回溯原文。</p>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))">
+        <a class="card primary" href="ai-reading-notes/" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">AI 读书笔记 · 《毛泽东选集》</span><span class="card-arrow">→</span></div><p class="card-desc">总入口：交互式思维导图，四个分支、十个主题与十条方法工具；点击任一节点查看详细解释。</p><div class="card-meta"><span class="tag">229 篇</span><span class="tag">思维导图</span><span class="tag">首册</span></div></a>
+        <a class="card" href="ai-reading-notes/#index" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">篇目索引 · 五卷 229 篇</span><span class="card-arrow">→</span></div><p class="card-desc">按原书卷次保全全部篇目，支持筛选与检索；逐篇标注题解、年代、章节、篇幅与主题归属。</p><div class="card-meta"><span class="tag">按卷索引</span><span class="tag">可筛选</span></div></a>
+        <a class="card" href="ai-reading-notes/#read" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">全文阅读 · 逐段核对</span><span class="card-arrow">→</span></div><p class="card-desc">按卷按需加载全文，正文逐段完整呈现、尾注独立成列，每篇附原文核对链接与全文检索。</p><div class="card-meta"><span class="tag">逐段全文</span><span class="tag">原文核对</span></div></a>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><b>数据治理与技术应用课程群</b> · 大连财经学院 大数据与人工智能学院</p>
+    <p>入口页仅作索引，各页面内容独立维护；如遇页面打不开，多为相对路径或文件名变动，可在仓库中核对。</p>
+    <p>课程—教师对应关系依研究方向拟定，待课程群会议确认后更新。</p>
+  </div>
+</footer>
+
+</body>
+</html>

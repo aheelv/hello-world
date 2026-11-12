@@ -1,0 +1,96 @@
+{
+  "name": "research-writing-evidence-guide",
+  "version": "1.0.0",
+  "contentVerifiedAt": "2026-11-12",
+  "builtAt": "2026-11-12T02:29:01.706Z",
+  "commit": null,
+  "entry": "index.html",
+  "pages": [
+    "01-topic.html",
+    "02-design.html",
+    "03-writing.html",
+    "04-submission.html",
+    "05-review.html",
+    "06-strategy.html",
+    "07-integrity.html",
+    "glossary.html",
+    "index.html",
+    "maintain.html",
+    "resources.html",
+    "translations.html"
+  ],
+  "content": {
+    "resources": 53,
+    "translations": 9,
+    "strategies": 12,
+    "practices": 22,
+    "glossary": 32
+  },
+  "files": [
+    {
+      "path": "01-topic.html",
+      "bytes": 8398
+    },
+    {
+      "path": "02-design.html",
+      "bytes": 9555
+    },
+    {
+      "path": "03-writing.html",
+      "bytes": 9587
+    },
+    {
+      "path": "04-submission.html",
+      "bytes": 10741
+    },
+    {
+      "path": "05-review.html",
+      "bytes": 7458
+    },
+    {
+      "path": "06-strategy.html",
+      "bytes": 5920
+    },
+    {
+      "path": "07-integrity.html",
+      "bytes": 8016
+    },
+    {
+      "path": "assets/app.js",
+      "bytes": 17789
+    },
+    {
+      "path": "assets/site-nav.css",
+      "bytes": 2465
+    },
+    {
+      "path": "assets/site.css",
+      "bytes": 18256
+    },
+    {
+      "path": "data/site-data.js",
+      "bytes": 77381
+    },
+    {
+      "path": "glossary.html",
+      "bytes": 3985
+    },
+    {
+      "path": "index.html",
+      "bytes": 8534
+    },
+    {
+      "path": "maintain.html",
+      "bytes": 10890
+    },
+    {
+      "path": "resources.html",
+      "bytes": 5781
+    },
+    {
+      "path": "translations.html",
+      "bytes": 4572
+    }
+  ],
+  "totalBytes": 209328
+}

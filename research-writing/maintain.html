@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="内容即数据：日常更新只改一个文件，构建与校验脚本负责拦截错误。">
+<title>维护与更新 · 科研论文写作与发表 · 循证教程</title>
+<link rel="stylesheet" href="assets/site-nav.css">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到正文</a>
+<nav class="site-nav" aria-label="站点导航">
+  <a class="sn-brand" href="index.html">科研写作 · 循证教程</a>
+  <div class="sn-links">
+      <a href="index.html">首页</a>
+      <a href="01-topic.html">选题</a>
+      <a href="02-design.html">设计</a>
+      <a href="03-writing.html">写作</a>
+      <a href="04-submission.html">投稿</a>
+      <a href="05-review.html">评审</a>
+      <a href="06-strategy.html">策略</a>
+      <a href="07-integrity.html">合规</a>
+      <a href="translations.html">译介</a>
+      <a href="resources.html">资源库</a>
+      <a href="glossary.html">术语</a>
+      <a href="maintain.html">维护</a>
+  </div>
+</nav>
+<header class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">MAINTENANCE / 可追溯</span>
+    <h1>维护与持续更新</h1>
+    <p>内容即数据：日常更新只改一个文件，构建与校验脚本负责拦截错误。</p>
+    <div class="hero-meta"><span>核验日期 <b data-render="verifiedAt"></b></span><span>资源 <b data-render="resourceCount"></b> 项</span><span>证据分级 A–D</span><span>不承诺发表结果</span></div>
+  </div>
+</header>
+<main id="main" class="wrap">
+<section>
+  <h2>一、架构：与工作区既有站点一致</h2>
+  <p>本项目沿用工作区 <code>se-ai-harness-site</code> 已验证的静态架构：纯 HTML/CSS/JS、零第三方运行时依赖、Node.js 内置模块完成构建与冒烟校验。新增的两点是<strong>内容数据化</strong>与<strong>内容校验门禁</strong>。</p>
+  <div class="table-scroll"><table>
+    <thead><tr><th style="width:28%">路径</th><th>职责</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/data/site-data.js</code></td><td><strong>唯一内容数据源</strong>：资源库、译介、策略、合规清单、术语表、证据等级、变更记录、未收录项。页面只写叙述性正文。</td></tr>
+      <tr><td><code>src/assets/app.js</code></td><td>把数据渲染进 <code>data-render</code> / <code>data-related</code> 挂载点；处理筛选、搜索与导航高亮。</td></tr>
+      <tr><td><code>src/assets/site.css</code> / <code>site-nav.css</code></td><td>共享设计系统与导航条；含响应式、打印样式与可访问性焦点样式。</td></tr>
+      <tr><td><code>scripts/check-content.mjs</code></td><td><strong>内容门禁</strong>：校验必填字段、ID 唯一、URL 合法、等级/阶段枚举、策略与清单的引用编号真实存在。</td></tr>
+      <tr><td><code>scripts/build.mjs</code></td><td>清理 dist → 校验 HTML 结构与所有内部引用 → 校验 <code>data-render</code> 挂载点与正文 <code>Rnn/Tnn</code> 锚点均可解析 → 复制 → 生成 <code>dist/build-info.json</code>。</td></tr>
+      <tr><td><code>scripts/verify.mjs</code></td><td>临时端口启动 dist，逐页请求 200、内部链接可达、构建清单可解析。</td></tr>
+      <tr><td><code>scripts/generate_pages.py</code></td><td>页面生成器（内容编写工具）。重跑会覆盖 <code>src/*.html</code>；已直接手改 HTML 正文时不要盲目重跑。</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>二、日常更新流程</h2>
+  <ol class="steps">
+    <li>新增/修订资源：编辑 <code>src/data/site-data.js</code> 的 <code>resources</code> 数组，填写全部必填字段，并同步更新 <code>meta.verifiedAt</code> 与 <code>changelog</code>。</li>
+    <li>若新增策略或合规条目，<code>evidence</code> 数组中的 <code>Rnn</code> 编号必须已存在于资源库，否则内容校验会失败。</li>
+    <li>运行 <code>npm run check</code> 做内容校验；运行 <code>npm run build</code> 做结构与内部链接校验。</li>
+    <li>运行 <code>npm run verify</code> 做部署前冒烟校验（逐页 HTTP 200、内部引用可达、构建清单一致）；全绿再发布 <code>dist/</code>。</li>
+    <li>纯静态产物，可部署到任意静态托管或直接用 <code>scripts/serve.mjs</code> 单端口服务。</li>
+  </ol>
+  <p class="small">命令一览：<code>npm run dev</code>（预览 src） · <code>npm run check</code> · <code>npm run build</code> · <code>npm run preview</code> · <code>npm run verify</code> · <code>npm run deploy</code>（check + build + verify）。无需 <code>npm install</code>。</p>
+</section>
+
+<section>
+  <h2>三、资源新增规范</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th style="width:16%">字段</th><th style="width:14%">必填</th><th>要求</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>是</td><td>形如 <code>R54</code>，全库唯一且只增不改；其他内容通过编号引用。</td></tr>
+      <tr><td><code>zh / en / org / url</code></td><td>是</td><td>中英文名称、发布机构、原始 https 链接；不使用短链或聚合站。</td></tr>
+      <tr><td><code>level / kind / stages</code></td><td>是</td><td>level ∈ A/B/C/D；stages 为阶段 id 数组；kind 用于资源库类型筛选。</td></tr>
+      <tr><td><code>audience / time / note / caution</code></td><td>是</td><td>适用对象或场景、时效/版本、中文译介、适用边界与误用风险。<strong>缺 caution 的条目不予收录</strong>。</td></tr>
+      <tr><td><code>status</code></td><td>是</td><td>ok / bot / redirect；描述本次核验的链接状态，不描述内容质量。</td></tr>
+      <tr><td><code>stars / starsAt</code></td><td>GitHub 项必填</td><td>通过 GitHub API 读取并注明读取日期；不得凭印象填写。</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout warn"><strong>审慎原则：</strong>不收录无法核验的链接，不把搜索结果摘要当作原文，不补写原文没有的数字与结论。若某条政策未能从官方页面核实（例如本站对 ICMJE 二次发表条款的处理），应在正文中明确写「未能核验」而非推测。</div>
+</section>
+
+<section>
+  <h2>四、核验方法（<span data-render="verifiedAt"></span>）</h2>
+  <ul class="small">
+    <li><strong>链接可达性</strong>：对全部候选 URL 发起带浏览器 UA 的 HTTPS 请求，记录状态码与最终跳转地址。</li>
+    <li><strong>反爬站点</strong>：对返回 403 / 412 的官方站点（COPE、Science、PLOS、DOAJ、NIH、T&amp;F、AOM、DORA、rOpenSci 文档站等），改用内容抓取获取正文后再判断；这部分资源在卡片中标注为「反爬拦截」，<strong>不声称其链接对所有人返回 200</strong>。</li>
+    <li><strong>中文法规</strong>：以发布机关官网（科技部、国家卫健委、中国科协、中科院学部、国家标准全文公开系统）原文为准，记录发文字号、成文日期与有效性。</li>
+    <li><strong>GitHub 星数</strong>：通过 <code>api.github.com/repos/{owner}/{repo}</code> 读取 <code>stargazers_count</code> 与 <code>pushed_at</code>，标注读取日期；星数会变化，不写进结论性表述。</li>
+    <li><strong>剔除留痕</strong>：星数不足、链接 404、域名变更等未收录项记录在下表，避免「只报喜不报忧」。</li>
+    <li><strong>定期复查</strong>：运行 <code>npm run check:links</code> 可重新逐条请求全部资源 URL 并报告「可达 / 反爬拦截 / 失效 / 未验成」四类状态。该脚本只在本地运行、不自动改写数据；网络超时不计为失效，确认变更后再人工更新 <code>meta.verifiedAt</code> 与 <code>changelog</code>。</li>
+  </ul>
+  <div class="callout"><strong>巡检结果如何解读：</strong>脚本把结果分为「可达 / 反爬拦截 / 失效（404、410）/ 未验成（网络或超时）」四类。<strong>「未验成」不等于链接失效</strong>，反爬拦截也不等于内容不可用；只有明确的 404/410 才需要在人工复核后更新或移除条目。巡检结果随网络环境波动，不自动改变已记录的核验状态。</div>
+</section>
+
+<section>
+  <h2>五、证据等级分布</h2>
+  <div data-render="levelStats"></div>
+</section>
+
+<section>
+  <h2>六、变更记录</h2>
+  <div data-render="changelog"></div>
+</section>
+
+<section>
+  <h2>七、检索后未收录的候选资源</h2>
+  <div data-render="excluded"></div>
+</section>
+
+<section>
+  <h2>八、已知限制</h2>
+  <ul class="small">
+    <li>资源库以英文官方资料为主，中文法规与标准为主要补充；未系统覆盖各学科全部报告规范。</li>
+    <li>具体期刊的字数、格式、审稿周期与政策变动频繁，本站不固化这些数字；请以官网当期文件为准。</li>
+    <li>本站未对 C 级同行评议文献逐篇核对全文结论；引用前请自行核对出版社页面与卷期页码。</li>
+    <li>内容为教育与工作流参考，不构成法律意见、伦理审批或期刊政策的替代。</li>
+  </ul>
+  <p class="small" data-render="disclaimer"></p>
+</section>
+
+</main>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-grid">
+    <div><h4>关于本站</h4>
+      <p style="margin:.3rem 0;max-width:46ch">中文循证教程：选题 → 设计 → 写作 → 投稿 → 同行评审 → 发表。所有结论标注来源、适用边界与核验日期；不承诺任何发表结果。</p>
+      <p class="small" style="margin:.3rem 0">核验日期 <b data-render="verifiedAt"></b> · <span data-render="version"></span></p>
+    </div>
+      <div><h4>教程</h4><div class="footer-links"><a href="01-topic.html">选题</a><a href="02-design.html">设计</a><a href="03-writing.html">写作</a><a href="04-submission.html">投稿</a><a href="05-review.html">评审</a><a href="06-strategy.html">策略</a><a href="07-integrity.html">合规</a></div></div>
+      <div><h4>查证</h4><div class="footer-links"><a href="translations.html">译介</a><a href="resources.html">资源库</a><a href="glossary.html">术语</a><a href="maintain.html">维护</a></div></div>
+  </div>
+  <div class="footer-bottom">
+    <p style="margin:0 0 .35rem" data-render="disclaimer"></p>
+    <p style="margin:0" data-render="buildNote"></p>
+  </div>
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

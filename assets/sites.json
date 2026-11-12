@@ -1,0 +1,1014 @@
+{
+  "template": "Simple.css / MIT",
+  "groups": [
+    {
+      "id": "teaching",
+      "no": "01",
+      "name": "教学建设",
+      "desc": "课程群与基层教学组织建设资料：课程体系、师资结构与教研活动记录。"
+    },
+    {
+      "id": "agents",
+      "no": "02",
+      "name": "交互课件",
+      "desc": "运筹学与多智能体交互式教学演示，全部可在浏览器直接操作。"
+    },
+    {
+      "id": "research",
+      "no": "03",
+      "name": "科研支持",
+      "desc": "研究选题、期刊匹配、投稿材料，以及系统工程 × AI 智能体研究门户。"
+    },
+    {
+      "id": "nav",
+      "no": "04",
+      "name": "资源导航",
+      "desc": "按用途分类整理的高频站点清单，支持关键词即时过滤。"
+    },
+    {
+      "id": "title-review",
+      "no": "05",
+      "name": "职称评审",
+      "desc": "2026 年职称评审申报资料、时间节点与转评条件核查。"
+    },
+    {
+      "id": "library",
+      "no": "06",
+      "name": "个人资料库",
+      "desc": "学生培养、暑假学习、学术投稿与评审分析等专题资料入口与内容页。"
+    },
+    {
+      "id": "books",
+      "no": "07",
+      "name": "书库藏书",
+      "desc": "12 本著作的结构化精读页：全书地图、核心观点、中英金句与行动清单。"
+    },
+    {
+      "id": "ai-paper",
+      "no": "08",
+      "name": "论文投稿专题",
+      "desc": "AI 智能体论文投稿的综述、规划与费用资料，HTML 阅读版与 Markdown 原文成对收录。"
+    },
+    {
+      "id": "notes",
+      "no": "09",
+      "name": "AI 读书笔记",
+      "desc": "《毛泽东选集》思维导图层级笔记、五卷 229 篇索引与全文逐段阅读。"
+    },
+    {
+      "id": "site",
+      "no": "10",
+      "name": "站点与归档",
+      "desc": "站点入口与改造前的原版首页归档。"
+    },
+    {
+      "id": "writing",
+      "no": "11",
+      "name": "科研写作与发表教程",
+      "desc": "SCI 及高水平期刊论文的循证中文教程：六阶段路线图、53 项核验资源、英文原文摘译与学术诚信红线，12 页完整静态站点。"
+    }
+  ],
+  "items": [
+    {
+      "group": "teaching",
+      "groupName": "教学建设",
+      "name": "数据治理与技术应用课程群",
+      "desc": "14 门专业选修课程、14 位课程组教师、两套培养方案对照与 4 次教研活动记录；桌面为表格，手机自动切卡片。",
+      "url": "course-group/",
+      "rawUrl": "course-group/",
+      "tags": [
+        "14 门课程",
+        "14 位教师",
+        "4 次教研"
+      ],
+      "featured": true
+    },
+    {
+      "group": "agents",
+      "groupName": "交互课件",
+      "name": "运筹学 · 交互式课件中心",
+      "desc": "课件总入口，按知识点聚合全部演示，含使用说明与教学建议。",
+      "url": "agents/",
+      "rawUrl": "agents/",
+      "tags": [
+        "总入口"
+      ],
+      "featured": true
+    },
+    {
+      "group": "agents",
+      "groupName": "交互课件",
+      "name": "单纯形法 · 交互式教学课件",
+      "desc": "单纯形表逐步迭代，实时高亮入基、出基与主元，支持自定义算例。",
+      "url": "agents/simplex-courseware.html",
+      "rawUrl": "agents/simplex-courseware.html",
+      "tags": [
+        "线性规划",
+        "逐步演算"
+      ],
+      "featured": true
+    },
+    {
+      "group": "agents",
+      "groupName": "交互课件",
+      "name": "对偶理论 · 交互式教学课件",
+      "desc": "原问题与对偶问题并排对照，影子价格与经济含义联动解释。",
+      "url": "agents/duality-courseware.html",
+      "rawUrl": "agents/duality-courseware.html",
+      "tags": [
+        "对偶",
+        "影子价格"
+      ],
+      "featured": true
+    },
+    {
+      "group": "agents",
+      "groupName": "交互课件",
+      "name": "运输问题 · 表上作业法",
+      "desc": "最小元素法与伏格尔法求初始解，位势法检验，产销平衡自动处理。",
+      "url": "agents/transportation-courseware.html",
+      "rawUrl": "agents/transportation-courseware.html",
+      "tags": [
+        "运输问题",
+        "位势法"
+      ],
+      "featured": true
+    },
+    {
+      "group": "agents",
+      "groupName": "交互课件",
+      "name": "单纯形法教学演示",
+      "desc": "几何直观版：可行域图形与顶点移动同步，讲清「为什么最优在顶点」。",
+      "url": "agents/simplex-method-demo.html",
+      "rawUrl": "agents/simplex-method-demo.html",
+      "tags": [
+        "几何直观"
+      ],
+      "featured": true
+    },
+    {
+      "group": "agents",
+      "groupName": "交互课件",
+      "name": "多智能体协作原理演示",
+      "desc": "以技术报告流水线为例，展示角色分工、消息传递与结果汇总全过程。",
+      "url": "agents/multi-agent-demo.html",
+      "rawUrl": "agents/multi-agent-demo.html",
+      "tags": [
+        "多智能体",
+        "流水线"
+      ],
+      "featured": true
+    },
+    {
+      "group": "agents",
+      "groupName": "交互课件",
+      "name": "DevOps 全生命周期演示",
+      "desc": "从一次代码提交到生产运行的完整链路，含各环节卡点与回滚策略。",
+      "url": "agents/devops-lifecycle.html",
+      "rawUrl": "agents/devops-lifecycle.html",
+      "tags": [
+        "DevOps",
+        "工程实践"
+      ],
+      "featured": true
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "研究选题与投稿导航",
+      "desc": "全流程总览：从选题定位、文献缺口、期刊匹配到投稿材料准备。",
+      "url": "research/",
+      "rawUrl": "research/",
+      "tags": [
+        "总入口",
+        "全流程"
+      ],
+      "featured": true
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "交叉融合研究全景",
+      "desc": "系统工程 × AI 智能体 Harness 的六大研究方向与代表性文献缺口。",
+      "url": "research/research_landscape_se_ai_harness.html",
+      "rawUrl": "research/research_landscape_se_ai_harness.html",
+      "tags": [
+        "研究全景",
+        "选题地图"
+      ],
+      "featured": true
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "SCI 期刊投稿指南",
+      "desc": "面向大数据管理与应用专业的期刊分层清单、审稿周期与命中率参考。",
+      "url": "research/sci-journal-guide.html",
+      "rawUrl": "research/sci-journal-guide.html",
+      "tags": [
+        "期刊清单",
+        "分层"
+      ],
+      "featured": true
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "一区 + 投稿指南",
+      "desc": "SCI/SSCI 一区及以上期刊的范围匹配、写作侧重与常见退稿原因。",
+      "url": "research/submission_guides.html",
+      "rawUrl": "research/submission_guides.html",
+      "tags": [
+        "一区",
+        "写作侧重"
+      ],
+      "featured": true
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "一区 + 投稿大纲",
+      "desc": "按目标期刊结构拆解的论文提纲，可直接填充为初稿骨架。",
+      "url": "research/submission_outlines.html",
+      "rawUrl": "research/submission_outlines.html",
+      "tags": [
+        "论文提纲"
+      ],
+      "featured": true
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "研究资料包 · 归档汇总",
+      "desc": "企业 AI 采纳与架构能力方向：咨询报告与研究方案的结构化归档、关键结论与待确认事项。",
+      "url": "research/ai-adoption-archive.html",
+      "rawUrl": "research/ai-adoption-archive.html",
+      "tags": [
+        "2 份文档",
+        "归档总览"
+      ],
+      "featured": true
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "系统工程 × AI 智能体 · 研究门户",
+      "desc": "AI 研究助手三步上手入口，含研究路线图与资源清单／执行手册，三页静态站点可直接在浏览器打开。",
+      "url": "se-ai-agent/",
+      "rawUrl": "se-ai-agent/",
+      "tags": [
+        "3 页静态网页",
+        "研究路线图"
+      ],
+      "featured": true
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "系统工程 × AI 智能体 · 研究路线图",
+      "desc": "研究门户内页：阶段划分、里程碑与各阶段预期产出。",
+      "url": "se-ai-agent/roadmap.html",
+      "rawUrl": "se-ai-agent/roadmap.html",
+      "tags": [
+        "路线图",
+        "门户内页"
+      ],
+      "featured": false
+    },
+    {
+      "group": "research",
+      "groupName": "科研支持",
+      "name": "资源清单与执行手册",
+      "desc": "研究门户内页：可用资源、操作清单与落地实施步骤说明。",
+      "url": "se-ai-agent/handbook.html",
+      "rawUrl": "se-ai-agent/handbook.html",
+      "tags": [
+        "执行手册",
+        "门户内页"
+      ],
+      "featured": false
+    },
+    {
+      "group": "nav",
+      "groupName": "资源导航",
+      "name": "网址大全 · 热门网站导航",
+      "desc": "按用途分类整理的高频站点清单，输入关键词即可过滤，全部在新标签页打开。",
+      "url": "nav/",
+      "rawUrl": "nav/",
+      "tags": [
+        "16 分类",
+        "128 站点",
+        "即时搜索"
+      ],
+      "featured": true
+    },
+    {
+      "group": "title-review",
+      "groupName": "职称评审",
+      "name": "2026 年职称评审申报资料汇编",
+      "desc": "三份可直接打开的单文件页面、11 个评审环节时间节点、关键口径变化、同级转评要点与申报群操作要求。",
+      "url": "title-review/",
+      "rawUrl": "title-review/",
+      "tags": [
+        "3 份页面",
+        "11 个环节"
+      ],
+      "featured": true
+    },
+    {
+      "group": "title-review",
+      "groupName": "职称评审",
+      "name": "职称评审全景路线图",
+      "desc": "大连财经学院 2026 年职称评审分阶段全景路线图，按时间轴展开各环节。",
+      "url": "title-review/%E8%81%8C%E7%A7%B0%E8%AF%84%E5%AE%A1%E5%85%A8%E6%99%AF%E8%B7%AF%E7%BA%BF%E5%9B%BE.html",
+      "rawUrl": "title-review/职称评审全景路线图.html",
+      "tags": [
+        "时间轴",
+        "路线图"
+      ],
+      "featured": false
+    },
+    {
+      "group": "title-review",
+      "groupName": "职称评审",
+      "name": "副高级职称转评条件核查表",
+      "desc": "副高级职称转评的逐项条件核查表，用于申报前自查。",
+      "url": "title-review/%E5%89%AF%E9%AB%98%E7%BA%A7%E8%81%8C%E7%A7%B0%E8%BD%AC%E8%AF%84%E6%9D%A1%E4%BB%B6%E6%A0%B8%E6%9F%A5%E8%A1%A8.html",
+      "rawUrl": "title-review/副高级职称转评条件核查表.html",
+      "tags": [
+        "条件核查",
+        "自查"
+      ],
+      "featured": false
+    },
+    {
+      "group": "title-review",
+      "groupName": "职称评审",
+      "name": "2026 年申报群通知",
+      "desc": "申报群通知汇编，含申报口径、材料要求与系统操作提醒。",
+      "url": "title-review/2026%E5%B9%B4%E7%94%B3%E6%8A%A5%E7%BE%A4%E9%80%9A%E7%9F%A5.html",
+      "rawUrl": "title-review/2026年申报群通知.html",
+      "tags": [
+        "通知汇编"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "数据驱动的学生培养模式",
+      "desc": "课题评估、题目重构、论文规划、数据口径、投稿合规与匹配度核验，6 份报告串成一条完整研究链路。",
+      "url": "student-development/",
+      "rawUrl": "student-development/",
+      "tags": [
+        "6 份报告",
+        "课题研究"
+      ],
+      "featured": true
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "课题系统性评估报告",
+      "desc": "《数据驱动的学生培养模式创新探索》课题的系统性评估报告，含问题诊断与改进建议。",
+      "url": "student-development/%E8%AF%BE%E9%A2%98%E8%AF%84%E4%BC%B0%E6%8A%A5%E5%91%8A_%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8%E7%9A%84%E5%AD%A6%E7%94%9F%E5%9F%B9%E5%85%BB%E6%A8%A1%E5%BC%8F%E5%88%9B%E6%96%B0%E6%8E%A2%E7%B4%A2.html",
+      "rawUrl": "student-development/课题评估报告_数据驱动的学生培养模式创新探索.html",
+      "tags": [
+        "课题评估"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "课题题目优化方案",
+      "desc": "纳入 AI 因子与 Harness 视角的题目重构方案与备选表述。",
+      "url": "student-development/%E8%AF%BE%E9%A2%98%E9%A2%98%E7%9B%AE%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88_%E7%BA%B3%E5%85%A5AI%E5%9B%A0%E5%AD%90%E4%B8%8EHarness%E8%A7%86%E8%A7%92.html",
+      "rawUrl": "student-development/课题题目优化方案_纳入AI因子与Harness视角.html",
+      "tags": [
+        "题目重构"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "论文写作规划与期刊投稿选型方案",
+      "desc": "智能体编排能力导向的论文写作规划与期刊选型对照。",
+      "url": "student-development/%E8%AE%BA%E6%96%87%E5%86%99%E4%BD%9C%E8%A7%84%E5%88%92%E4%B8%8E%E6%9C%9F%E5%88%8A%E6%8A%95%E7%A8%BF%E9%80%89%E5%9E%8B%E6%96%B9%E6%A1%88.html",
+      "rawUrl": "student-development/论文写作规划与期刊投稿选型方案.html",
+      "tags": [
+        "写作规划",
+        "期刊选型"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "论文数据获取说明与核对清单",
+      "desc": "一手／二手数据获取路径、字段口径与逐项核对清单。",
+      "url": "student-development/%E8%AE%BA%E6%96%87%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E8%AF%B4%E6%98%8E%E4%B8%8E%E6%A0%B8%E5%AF%B9%E6%B8%85%E5%8D%95.html",
+      "rawUrl": "student-development/论文数据获取说明与核对清单.html",
+      "tags": [
+        "数据口径",
+        "核对清单"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "数据与论文匹配度核验报告",
+      "desc": "运筹学课程数据与论文论证结构的匹配度核验结果。",
+      "url": "student-development/%E6%95%B0%E6%8D%AE%E4%B8%8E%E8%AE%BA%E6%96%87%E5%8C%B9%E9%85%8D%E5%BA%A6%E6%A0%B8%E9%AA%8C%E6%8A%A5%E5%91%8A.html",
+      "rawUrl": "student-development/数据与论文匹配度核验报告.html",
+      "tags": [
+        "匹配度核验"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "EAIT 投稿合规检查与操作指南",
+      "desc": "EAIT 投稿前的合规检查项与系统操作步骤。",
+      "url": "student-development/EAIT%E6%8A%95%E7%A8%BF%E5%90%88%E8%A7%84%E6%A3%80%E6%9F%A5%E4%B8%8E%E6%93%8D%E4%BD%9C%E6%8C%87%E5%8D%97.html",
+      "rawUrl": "student-development/EAIT投稿合规检查与操作指南.html",
+      "tags": [
+        "投稿合规"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "暑假学习 · AI 路径",
+      "desc": "AI Agent 学习路书与 AI 技术应用路线图，含七层能力框架与 36 个月分阶段学习计划。",
+      "url": "summer-learning/",
+      "rawUrl": "summer-learning/",
+      "tags": [
+        "2 份路书",
+        "学习规划"
+      ],
+      "featured": true
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "AI Agent 学习路书",
+      "desc": "从大模型基础到智能体应用开发的分层学习路径与阶段目标。",
+      "url": "summer-learning/agent-learning-guide.html",
+      "rawUrl": "summer-learning/agent-learning-guide.html",
+      "tags": [
+        "学习路书"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "AI 技术应用方向学习路线图",
+      "desc": "副教授级知识层次的七层能力框架与 36 个月分阶段学习计划。",
+      "url": "summer-learning/ai-learning-roadmap.html",
+      "rawUrl": "summer-learning/ai-learning-roadmap.html",
+      "tags": [
+        "36 个月",
+        "能力框架"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "学术投稿指南",
+      "desc": "AI × 管理科学 2026 下半年投稿指南，按零费用优先筛刊，附 6 大方向选题库。",
+      "url": "book-to-skill/",
+      "rawUrl": "book-to-skill/",
+      "tags": [
+        "投稿指南",
+        "期刊清单"
+      ],
+      "featured": true
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "AI × 管理科学 2026 下半年投稿指南",
+      "desc": "面向学术新手的投稿指南（学术小白版），含期刊筛选与选题建议。",
+      "url": "book-to-skill/AI%E4%B8%8E%E7%AE%A1%E7%90%86%E7%A7%91%E5%AD%A6_2026%E4%B8%8B%E5%8D%8A%E5%B9%B4%E6%8A%95%E7%A8%BF%E6%8C%87%E5%8D%97.html",
+      "rawUrl": "book-to-skill/AI与管理科学_2026下半年投稿指南.html",
+      "tags": [
+        "学术小白版"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "副教授评审分析",
+      "desc": "高级工程师转评副教授的两版规则逐条对照、资格判定与量化赋分测算。",
+      "url": "associate-professor/",
+      "rawUrl": "associate-professor/",
+      "tags": [
+        "资格判定",
+        "赋分对照"
+      ],
+      "featured": true
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "转评资格与量化赋分分析",
+      "desc": "两版规则对照、资格判定与量化赋分测算明细（两版对照版）。",
+      "url": "associate-professor/%E9%AB%98%E7%BA%A7%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%BD%AC%E8%AF%84%E5%89%AF%E6%95%99%E6%8E%88-%E8%B5%84%E6%A0%BC%E4%B8%8E%E8%B5%8B%E5%88%86%E5%88%86%E6%9E%90.html",
+      "rawUrl": "associate-professor/高级工程师转评副教授-资格与赋分分析.html",
+      "tags": [
+        "两版对照"
+      ],
+      "featured": false
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "我的书库 · 读书整理",
+      "desc": "12 本书的结构化精读：结构导图、核心观点、中英金句与实践清单，按五个模块分组，支持检索与切换。",
+      "url": "library/",
+      "rawUrl": "library/",
+      "tags": [
+        "12 本书",
+        "5 个模块"
+      ],
+      "featured": true
+    },
+    {
+      "group": "library",
+      "groupName": "个人资料库",
+      "name": "纳瓦尔宝典 · 实践页",
+      "desc": "《纳瓦尔宝典》结构化精读页（含配套实践 Skill），原目录已迁入书库统一管理，此入口直达。",
+      "url": "library/naval/",
+      "rawUrl": "library/naval/",
+      "tags": [
+        "精读页",
+        "实践清单"
+      ],
+      "featured": true
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "反脆弱 · 结构化精读",
+      "desc": "《反脆弱》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/antifragile/index.html",
+      "rawUrl": "library/books/antifragile/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "学会提问 · 结构化精读",
+      "desc": "《学会提问》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/asking-the-right-questions/index.html",
+      "rawUrl": "library/books/asking-the-right-questions/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "巴菲特致股东的信 · 结构化精读",
+      "desc": "《巴菲特致股东的信》全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/buffett-letters/index.html",
+      "rawUrl": "library/books/buffett-letters/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "影响力 · 结构化精读",
+      "desc": "《影响力》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/influence/index.html",
+      "rawUrl": "library/books/influence/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "终身成长 · 结构化精读",
+      "desc": "《终身成长》（Mindset）全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/mindset/index.html",
+      "rawUrl": "library/books/mindset/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "纳瓦尔宝典 · 结构化精读",
+      "desc": "《纳瓦尔宝典》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/naval-almanack/index.html",
+      "rawUrl": "library/books/naval-almanack/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "噪声 · 结构化精读",
+      "desc": "《噪声》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/noise/index.html",
+      "rawUrl": "library/books/noise/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "穷查理宝典 · 结构化精读",
+      "desc": "《穷查理宝典》全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/poor-charlies-almanack/index.html",
+      "rawUrl": "library/books/poor-charlies-almanack/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "原则 · 结构化精读",
+      "desc": "《原则》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/principles/index.html",
+      "rawUrl": "library/books/principles/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "超预测 · 结构化精读",
+      "desc": "《超预测》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/superforecasting/index.html",
+      "rawUrl": "library/books/superforecasting/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "思考致富 · 结构化精读",
+      "desc": "《思考致富》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/think-and-grow-rich/index.html",
+      "rawUrl": "library/books/think-and-grow-rich/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "对赌 · 结构化精读",
+      "desc": "《对赌》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。",
+      "url": "library/books/thinking-in-bets/index.html",
+      "rawUrl": "library/books/thinking-in-bets/index.html",
+      "tags": [
+        "结构化精读"
+      ],
+      "featured": false
+    },
+    {
+      "group": "books",
+      "groupName": "书库藏书",
+      "name": "新书模板 · 页面骨架",
+      "desc": "新增书籍时复制此目录作为页面骨架，差异只在 data.js；本页为占位模板，非成书内容。",
+      "url": "library/books/_template/index.html",
+      "rawUrl": "library/books/_template/index.html",
+      "tags": [
+        "模板",
+        "占位页"
+      ],
+      "featured": false
+    },
+    {
+      "group": "ai-paper",
+      "groupName": "论文投稿专题",
+      "name": "专题总览 · 资料集合入口",
+      "desc": "3 个主题 / 6 份资料 / 收录说明，按主题分类的索引页。",
+      "url": "ai-paper-submission/index.html",
+      "rawUrl": "ai-paper-submission/index.html",
+      "tags": [
+        "专题总览",
+        "3 主题"
+      ],
+      "featured": true
+    },
+    {
+      "group": "ai-paper",
+      "groupName": "论文投稿专题",
+      "name": "研究综述与投稿评估 · 阅读版 HTML",
+      "desc": "自包含排版阅读版，含目录、16 张表与可点外链，可直接打印为 PDF。",
+      "url": "ai-paper-submission/review-guide.html",
+      "rawUrl": "ai-paper-submission/review-guide.html",
+      "tags": [
+        "HTML",
+        "16 张表"
+      ],
+      "featured": true
+    },
+    {
+      "group": "ai-paper",
+      "groupName": "论文投稿专题",
+      "name": "研究综述与投稿评估 · Markdown 原文",
+      "desc": "Markdown 原文，完整保留引用编号、表格与待核验标记，便于二次编辑。",
+      "url": "ai-paper-submission/review-guide.md",
+      "rawUrl": "ai-paper-submission/review-guide.md",
+      "tags": [
+        "Markdown",
+        "原文"
+      ],
+      "featured": true
+    },
+    {
+      "group": "ai-paper",
+      "groupName": "论文投稿专题",
+      "name": "论文投稿规划与初稿 · 阅读版 HTML",
+      "desc": "单页导航版：12 个页内锚点、21 张表与快速跳转，实证部分均为设计 + 占位。",
+      "url": "ai-paper-submission/submission-plan.html",
+      "rawUrl": "ai-paper-submission/submission-plan.html",
+      "tags": [
+        "HTML",
+        "21 张表"
+      ],
+      "featured": true
+    },
+    {
+      "group": "ai-paper",
+      "groupName": "论文投稿专题",
+      "name": "论文投稿规划与初稿 · Markdown 原文",
+      "desc": "Markdown 原文，含 20 项待补清单与合规控制表，便于继续撰写。",
+      "url": "ai-paper-submission/submission-plan.md",
+      "rawUrl": "ai-paper-submission/submission-plan.md",
+      "tags": [
+        "Markdown",
+        "原文"
+      ],
+      "featured": true
+    },
+    {
+      "group": "ai-paper",
+      "groupName": "论文投稿专题",
+      "name": "投稿费用与低成本方案 · 阅读版 HTML",
+      "desc": "自包含阅读版，含目录、4 张表、待核验高亮与 13 个可点外链。",
+      "url": "ai-paper-submission/cost-guide.html",
+      "rawUrl": "ai-paper-submission/cost-guide.html",
+      "tags": [
+        "HTML",
+        "4 张表"
+      ],
+      "featured": true
+    },
+    {
+      "group": "ai-paper",
+      "groupName": "论文投稿专题",
+      "name": "投稿费用与低成本方案 · Markdown 原文",
+      "desc": "Markdown 原文，按〔官方〕〔刊内信息〕〔第三方统计〕分级标注来源。",
+      "url": "ai-paper-submission/cost-guide.md",
+      "rawUrl": "ai-paper-submission/cost-guide.md",
+      "tags": [
+        "Markdown",
+        "原文"
+      ],
+      "featured": true
+    },
+    {
+      "group": "notes",
+      "groupName": "AI 读书笔记",
+      "name": "AI 读书笔记 · 《毛泽东选集》",
+      "desc": "总入口：交互式思维导图，四个分支、十个主题与十条方法工具；点击任一节点查看详细解释。",
+      "url": "ai-reading-notes/",
+      "rawUrl": "ai-reading-notes/",
+      "tags": [
+        "229 篇",
+        "思维导图"
+      ],
+      "featured": true
+    },
+    {
+      "group": "notes",
+      "groupName": "AI 读书笔记",
+      "name": "篇目索引 · 五卷 229 篇",
+      "desc": "按原书卷次保全全部篇目，支持筛选与检索；逐篇标注题解、年代、章节、篇幅与主题归属。",
+      "url": "ai-reading-notes/#index",
+      "rawUrl": "ai-reading-notes/#index",
+      "tags": [
+        "按卷索引",
+        "可筛选"
+      ],
+      "featured": true
+    },
+    {
+      "group": "notes",
+      "groupName": "AI 读书笔记",
+      "name": "全文阅读 · 逐段核对",
+      "desc": "按卷按需加载全文，正文逐段完整呈现、尾注独立成列，每篇附原文核对链接与全文检索。",
+      "url": "ai-reading-notes/#read",
+      "rawUrl": "ai-reading-notes/#read",
+      "tags": [
+        "逐段全文",
+        "原文核对"
+      ],
+      "featured": true
+    },
+    {
+      "group": "site",
+      "groupName": "站点与归档",
+      "name": "原版首页 · 归档保留",
+      "desc": "改造前的原始首页，原有板块、卡片与链接全部保留，便于对照与回溯。",
+      "url": "legacy-index.html",
+      "rawUrl": "legacy-index.html",
+      "tags": [
+        "原版首页",
+        "归档"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "科研论文写作与发表 · 循证教程",
+      "desc": "站点总入口：六阶段路线图、证据分级 A–D、站点概览与适用边界；12 个页面、53 项经核验资源全部可从顶部导航直达。",
+      "url": "research-writing/",
+      "rawUrl": "research-writing/",
+      "tags": [
+        "站点首页",
+        "12 页",
+        "六阶段路线"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "一、选题与定位",
+      "desc": "四个判据判断问题是否站得住、可执行的选题流程、关于「SCI 及更高水平」的审慎表述与常见误区。",
+      "url": "research-writing/01-topic.html",
+      "rawUrl": "research-writing/01-topic.html",
+      "tags": [
+        "选题",
+        "四个判据"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "二、研究设计",
+      "desc": "先分清三类规范、确认性 vs 探索性研究预设、设计阶段的数据可追溯性建链，并按研究类型选择报告规范。",
+      "url": "research-writing/02-design.html",
+      "rawUrl": "research-writing/02-design.html",
+      "tags": [
+        "研究设计",
+        "报告规范"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "三、论文写作",
+      "desc": "各章节功能与自查点、主张—证据对照表、引用与参考文献规范、生成式 AI 可为与不可为，附英文原文摘译入口。",
+      "url": "research-writing/03-writing.html",
+      "rawUrl": "research-writing/03-writing.html",
+      "tags": [
+        "论文写作",
+        "AI 披露"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "四、投稿准备",
+      "desc": "可信度清单筛刊、投稿材料逐项核对、署名四条标准与国内红线、一稿一投／预印本／会议扩展版与第三方服务边界。",
+      "url": "research-writing/04-submission.html",
+      "rawUrl": "research-writing/04-submission.html",
+      "tags": [
+        "投稿材料",
+        "署名规范"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "五、同行评审",
+      "desc": "常见流程与各类决定的含义、回复信四栏结构、审稿一侧的伦理要求，以及公开评审可参考但不可照搬的边界。",
+      "url": "research-writing/05-review.html",
+      "rawUrl": "research-writing/05-review.html",
+      "tags": [
+        "同行评审",
+        "回复信"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "六、发表策略与发表后",
+      "desc": "按阶段的策略总览、发表后的可验证性与更正机制，以及把评价语言转回研究本身的成果表述方式。",
+      "url": "research-writing/06-strategy.html",
+      "rawUrl": "research-writing/06-strategy.html",
+      "tags": [
+        "12 条策略",
+        "发表后"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "合规与学术诚信红线",
+      "desc": "把做法三分类为合规提效／非正规高风险／学术不端，给出三级判断依据、后果链、本站不提供的内容与不确定时的处理。",
+      "url": "research-writing/07-integrity.html",
+      "rawUrl": "research-writing/07-integrity.html",
+      "tags": [
+        "22 条判定",
+        "科研诚信"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "经核验资源库",
+      "desc": "53 项资源逐条标注来源机构、原始链接、适用对象、时效与证据等级，支持按等级筛选；Rnn 编号与各教程正文互相跳转。",
+      "url": "research-writing/resources.html",
+      "rawUrl": "research-writing/resources.html",
+      "tags": [
+        "53 项资源",
+        "证据分级"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "英文原文对照摘译",
+      "desc": "9 段关键英文规范的中文对照摘译，明确标注为本站编译、非官方中文版，并说明翻译与表述原则。",
+      "url": "research-writing/translations.html",
+      "rawUrl": "research-writing/translations.html",
+      "tags": [
+        "9 段摘译",
+        "非官方译本"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "中英术语对照表",
+      "desc": "32 条中英术语对照与统一译法使用说明，便于写作与回复信中的表述一致。",
+      "url": "research-writing/glossary.html",
+      "rawUrl": "research-writing/glossary.html",
+      "tags": [
+        "32 条术语"
+      ],
+      "featured": false
+    },
+    {
+      "group": "writing",
+      "groupName": "科研写作与发表教程",
+      "name": "维护与持续更新",
+      "desc": "站点架构、日常更新流程、资源新增规范、核验方法、证据等级分布、变更记录、未收录候选与已知限制。",
+      "url": "research-writing/maintain.html",
+      "rawUrl": "research-writing/maintain.html",
+      "tags": [
+        "核验方法",
+        "变更记录"
+      ],
+      "featured": false
+    }
+  ]
+}

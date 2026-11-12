@@ -1,360 +1,730 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f6f5f2">
-<meta name="description" content="大连财经学院 数据治理与技术应用课程群 数字资源中心：课程群信息、运筹学交互课件、科研选题与投稿指南、常用网站导航。">
-<title>数字资源中心 | 数据治理与技术应用课程群</title>
-<style>
-:root{
-  --ink:#111827; --ink-2:#374151; --ink-3:#6b7280;
-  --line:#e5e7eb; --line-2:#d1d5db;
-  --bg:#f6f5f2; --paper:#ffffff;
-  --radius:14px;
-  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.14);
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-body{
-  margin:0;background:var(--bg);color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
-  font-size:16px;line-height:1.65;
-  padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  -webkit-font-smoothing:antialiased;
-}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
-
-/* ---------- 顶栏 ---------- */
-.topbar{
-  position:sticky;top:0;z-index:50;
-  background:rgba(246,245,242,.86);backdrop-filter:saturate(160%) blur(12px);
-  -webkit-backdrop-filter:saturate(160%) blur(12px);
-  border-bottom:1px solid var(--line);
-  padding-top:env(safe-area-inset-top);
-}
-.topbar .wrap{display:flex;align-items:center;gap:14px;min-height:56px}
-.brand{font-weight:700;font-size:15px;letter-spacing:.02em;white-space:nowrap}
-.brand span{color:var(--ink-3);font-weight:500}
-.jump{margin-left:auto;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
-.jump::-webkit-scrollbar{display:none}
-.jump a{
-  flex:0 0 auto;font-size:13px;color:var(--ink-2);padding:7px 11px;border-radius:999px;
-  transition:background .16s,color .16s;
-}
-.jump a:hover{background:#ebe9e4;color:var(--ink)}
-
-/* ---------- 首屏 ---------- */
-.hero{padding:clamp(36px,7vw,72px) 0 clamp(24px,4vw,36px)}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--ink-3);margin:0 0 18px;
-}
-.eyebrow::before{content:"";width:26px;height:2px;background:var(--ink);opacity:.55}
-h1{
-  margin:0 0 18px;font-size:clamp(28px,5.4vw,46px);line-height:1.18;
-  letter-spacing:-.02em;font-weight:800;text-wrap:balance;max-width:20em;
-}
-.lede{
-  margin:0;max-width:38em;color:var(--ink-2);
-  font-size:clamp(15px,1.6vw,17px);line-height:1.75;text-wrap:pretty;
-}
-.stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
-.stat{
-  background:var(--paper);border:1px solid var(--line);border-radius:999px;
-  padding:7px 15px;font-size:13px;color:var(--ink-2);
-}
-.stat b{color:var(--ink);font-weight:700;margin-right:5px}
-
-/* ---------- 板块 ---------- */
-.section{padding:clamp(30px,5vw,52px) 0;border-top:1px solid var(--line)}
-.section-head{display:flex;align-items:flex-start;gap:clamp(12px,2.4vw,24px);margin-bottom:clamp(18px,3vw,30px)}
-.section-no{
-  flex:0 0 auto;font-size:clamp(26px,4vw,40px);font-weight:800;line-height:1;
-  color:var(--accent);opacity:.22;font-variant-numeric:tabular-nums;
-  letter-spacing:-.04em;padding-top:2px;
-}
-.section-head h2{
-  margin:0 0 6px;font-size:clamp(20px,2.8vw,27px);line-height:1.3;
-  font-weight:750;letter-spacing:-.01em;text-wrap:balance;
-}
-.section-label{
-  display:inline-block;font-size:11.5px;letter-spacing:.12em;font-weight:700;
-  color:var(--accent);text-transform:uppercase;margin-bottom:9px;
-}
-.section-desc{margin:0;color:var(--ink-3);font-size:14.5px;line-height:1.7;max-width:44em}
-
-.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(258px,1fr))}
-.grid.single{grid-template-columns:1fr}
-.grid.single .card{grid-column:span 1}
-.grid.single .card-desc{max-width:62ch}
-
-.card{
-  position:relative;display:flex;flex-direction:column;gap:8px;
-  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-  padding:18px 18px 16px;box-shadow:var(--shadow);
-  transition:transform .18s cubic-bezier(.2,.7,.3,1),border-color .18s,box-shadow .18s;
-  will-change:transform;
-}
-.card::after{
-  content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;
-  border-radius:0 3px 3px 0;background:var(--accent);opacity:0;transition:opacity .18s;
-}
-.card:hover{transform:translateY(-2px);border-color:var(--line-2);box-shadow:0 2px 4px rgba(16,24,40,.05),0 16px 32px -16px rgba(16,24,40,.2)}
-.card:hover::after{opacity:.85}
-.card:active{transform:translateY(0) scale(.995)}
-.card-top{display:flex;align-items:baseline;gap:8px}
-.card-name{font-weight:700;font-size:15.5px;line-height:1.45;letter-spacing:-.005em}
-.card-arrow{
-  margin-left:auto;flex:0 0 auto;font-size:14px;color:var(--accent);
-  opacity:.45;transition:transform .18s,opacity .18s;
-}
-.card:hover .card-arrow{transform:translateX(3px);opacity:1}
-.card-desc{margin:0;color:var(--ink-3);font-size:13.5px;line-height:1.68}
-.card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
-.tag{
-  font-size:11.5px;color:var(--ink-2);background:#f3f2ef;
-  border:1px solid #e8e6e1;border-radius:5px;padding:2px 7px;line-height:1.6;
-}
-.card.primary{
-  grid-column:span 2;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 7%,#fff),var(--paper) 62%);
-  border-color:color-mix(in srgb,var(--accent) 22%,var(--line));
-}
-.card.primary .card-name{font-size:17px}
-.card.primary .card-desc{color:var(--ink-2);font-size:14px}
-
-/* ---------- 页脚 ---------- */
-.foot{
-  border-top:1px solid var(--line);margin-top:clamp(28px,4vw,44px);
-  padding:26px 0 44px;color:var(--ink-3);font-size:13px;line-height:1.85;
-}
-.foot b{color:var(--ink-2);font-weight:600}
-.foot p{margin:0 0 4px}
-
-@media (max-width:700px){
-  /* 窄屏：顶部导航让出整行，四项均分，无需横向滑动 */
-  .brand{display:none}
-  .jump{margin-left:0;width:100%;justify-content:space-between;gap:0}
-  .jump a{padding:8px 10px;font-size:13px}
-}
-@media (max-width:640px){
-  body{font-size:15.5px}
-  .card.primary{grid-column:span 1}
-  .grid{grid-template-columns:1fr;gap:10px}
-  .card{padding:15px 15px 14px}
-  .section-head{gap:10px}
-  .section-no{font-size:24px;min-width:34px}
-  .stat{padding:6px 12px;font-size:12.5px}
-}
-@media (prefers-reduced-motion:reduce){
-  *{transition:none!important;animation:none!important}
-  html{scroll-behavior:auto}
-}
-</style>
-  <link rel="stylesheet" href="assets/site-responsive.css">
-  <script defer src="assets/site-responsive.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="数字资源中心站点合集：教学建设、交互课件、科研支持、职称评审、个人资料库、书库、AI 读书笔记与科研写作与发表教程等全部独立网页的统一入口。">
+  <title>数字资源中心 · 站点合集</title>
+  <!-- 基底模板：Simple.css (MIT, Copyright (c) 2020 Simple.css / Kev Quirk) -->
+  <link rel="stylesheet" href="assets/simple.css">
+  <link rel="stylesheet" href="assets/portal.css">
+  <script defer src="assets/portal.js"></script>
 </head>
 <body>
-
-<header class="topbar">
-  <div class="wrap">
-    <div class="brand">数字资源中心 <span>· 数据治理与技术应用课程群</span></div>
-    <nav class="jump"><a href="#teaching">教学建设</a><a href="#agents">交互课件</a><a href="#research">科研支持</a><a href="#nav">资源导航</a></nav>
+<header>
+  <div class="wrap hero-inner">
+    <span class="hero-kicker">Site Collection · 全部独立网页统一入口</span>
+    <h1>数字资源中心 · 站点合集</h1>
+    <p class="hero-lead">把散落在各处的独立网页收拢到一处：按主题分组、逐页标注名称与内容简述，
+      每条都有醒目的跳转入口。点开后仍是原来的页面，原有内容与访问路径完整保留。</p>
+    <div class="hero-stats">
+      <span class="hero-stat"><b id="stat-pages">74</b> 个挂载页</span>
+      <span class="hero-stat"><b id="stat-groups">11</b> 个主题分组</span>
+      <span class="hero-stat"><b>0</b> 外部依赖</span>
+      <span class="hero-stat"><b>MIT</b> 模板许可</span>
+    </div>
+    <div class="searchbar">
+      <input id="portal-search" type="search" autocomplete="off"
+             placeholder="搜索页面名称、简介、标签或路径…" aria-label="搜索挂载页">
+      <p class="search-hint" id="search-hint">共 74 个入口 · 支持按名称、简介、标签或路径筛选</p>
+    </div>
   </div>
 </header>
 
-<main>
-  <div class="wrap">
+<div class="groupnav">
+  <nav class="wrap groupnav-inner" aria-label="主题分组导航">
+      <a href="#g-teaching">01 教学建设 <span class="n">1</span></a>
+      <a href="#g-agents">02 交互课件 <span class="n">7</span></a>
+      <a href="#g-research">03 科研支持 <span class="n">9</span></a>
+      <a href="#g-nav">04 资源导航 <span class="n">1</span></a>
+      <a href="#g-title-review">05 职称评审 <span class="n">4</span></a>
+      <a href="#g-library">06 个人资料库 <span class="n">16</span></a>
+      <a href="#g-books">07 书库藏书 <span class="n">13</span></a>
+      <a href="#g-ai-paper">08 论文投稿专题 <span class="n">7</span></a>
+      <a href="#g-notes">09 AI 读书笔记 <span class="n">3</span></a>
+      <a href="#g-site">10 站点与归档 <span class="n">1</span></a>
+      <a href="#g-writing">11 科研写作与发表教程 <span class="n">12</span></a>
+  </nav>
+</div>
 
-    <section class="hero">
-      <p class="eyebrow">大连财经学院 · 大数据与人工智能学院</p>
-      <h1>数据治理与技术应用<br>课程群数字资源中心</h1>
-      <p class="lede">把课程群建设中分散的网页、课件与资料收拢到一处：教学建设查课程与师资，课堂演示直接投屏，科研选题顺着流程往下走，常用站点一键直达。全部页面均为单文件，手机与电脑同源可用。</p>
-      <div class="stats">
-        <div class="stat"><b>4</b>个板块</div>
-        <div class="stat"><b>15</b>个页面</div>
-        <div class="stat"><b>14</b>门课程 · <b>14</b>位教师</div>
-        <div class="stat"><b>128</b>个精选站点</div>
-        <div class="stat"><b>移动端</b>已适配</div>
+<main class="wrap">
+    <section class="pgroup" id="g-teaching">
+      <div class="pgroup-head"><span class="pgroup-no">01</span><h2>教学建设</h2><span class="pgroup-count">1 个页面</span></div>
+      <p class="pgroup-desc">课程群与基层教学组织建设资料：课程体系、师资结构与教研活动记录。</p>
+      <div class="pgrid">
+        <article class="pcard has-badge" data-search="数据治理与技术应用课程群 14 门专业选修课程、14 位课程组教师、两套培养方案对照与 4 次教研活动记录；桌面为表格，手机自动切卡片。 14 门课程 14 位教师 4 次教研 course-group/ 教学建设">
+          <span class="badge">首页入口</span>
+          <h3>数据治理与技术应用课程群</h3>
+          <p class="desc">14 门专业选修课程、14 位课程组教师、两套培养方案对照与 4 次教研活动记录；桌面为表格，手机自动切卡片。</p>
+          <div class="tags"><span class="tag">14 门课程</span><span class="tag">14 位教师</span><span class="tag">4 次教研</span></div>
+          <a class="pbtn" href="course-group/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">course-group/</span>
+        </article>
       </div>
     </section>
-
-<section class="section" id="teaching" style="--accent:#1b3a63">
-      <div class="section-head">
-        <div class="section-no">01</div>
-        <div>
-          <div class="section-label">教学建设</div>
-          <h2>课程群与基层教学组织</h2>
-          <p class="section-desc">专业课程体系、师资队伍结构、方案对照与教研活动记录，一门课一个人都能查到。</p>
-        </div>
-      </div>
-      <div class="grid single">
-        <a class="card primary" href="course-group/" style="--accent:#1b3a63"><div class="card-top"><span class="card-name">数据治理与技术应用课程群</span><span class="card-arrow">→</span></div><p class="card-desc">14 门专业选修课程、14 位课程组教师、两套培养方案对照、4 次教研活动记录，桌面为表格、手机自动切卡片。</p><div class="card-meta"><span class="tag">14 门课程</span><span class="tag">14 位教师</span><span class="tag">4 次教研</span></div></a>
-      </div>
-    </section>
-
-    <section class="section" id="agents" style="--accent:#0f766e">
-      <div class="section-head">
-        <div class="section-no">02</div>
-        <div>
-          <div class="section-label">交互课件</div>
-          <h2>运筹学课件与多智能体演示</h2>
-          <p class="section-desc">可点击、可拖拽、可逐步演算的课堂演示，覆盖线性规划三大经典问题与智能体协作原理。</p>
-        </div>
-      </div>
-      <div class="grid">
-        <a class="card primary" href="agents/" style="--accent:#0f766e"><div class="card-top"><span class="card-name">运筹学 · 交互式课件中心</span><span class="card-arrow">→</span></div><p class="card-desc">课件总入口，按知识点聚合全部演示，含使用说明与教学建议。</p><div class="card-meta"><span class="tag">总入口</span></div></a>
-        <a class="card" href="agents/simplex-courseware.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">单纯形法 · 交互式教学课件</span><span class="card-arrow">→</span></div><p class="card-desc">单纯形表逐步迭代，实时高亮入基、出基与主元，支持自定义算例。</p><div class="card-meta"><span class="tag">线性规划</span><span class="tag">逐步演算</span></div></a>
-        <a class="card" href="agents/duality-courseware.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">对偶理论 · 交互式教学课件</span><span class="card-arrow">→</span></div><p class="card-desc">原问题与对偶问题并排对照，影子价格与经济含义联动解释。</p><div class="card-meta"><span class="tag">对偶</span><span class="tag">影子价格</span></div></a>
-        <a class="card" href="agents/transportation-courseware.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">运输问题 · 表上作业法</span><span class="card-arrow">→</span></div><p class="card-desc">最小元素法与伏格尔法求初始解，位势法检验，产销平衡自动处理。</p><div class="card-meta"><span class="tag">运输问题</span><span class="tag">位势法</span></div></a>
-        <a class="card" href="agents/simplex-method-demo.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">单纯形法教学演示</span><span class="card-arrow">→</span></div><p class="card-desc">几何直观版：可行域图形与顶点移动同步，讲清“为什么最优在顶点”。</p><div class="card-meta"><span class="tag">几何直观</span></div></a>
-        <a class="card" href="agents/multi-agent-demo.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">多智能体协作原理演示</span><span class="card-arrow">→</span></div><p class="card-desc">以技术报告流水线为例，展示角色分工、消息传递与结果汇总全过程。</p><div class="card-meta"><span class="tag">多智能体</span><span class="tag">流水线</span></div></a>
-        <a class="card" href="agents/devops-lifecycle.html" style="--accent:#0f766e"><div class="card-top"><span class="card-name">DevOps 全生命周期演示</span><span class="card-arrow">→</span></div><p class="card-desc">从一次代码提交到生产运行的完整链路，含各环节卡点与回滚策略。</p><div class="card-meta"><span class="tag">DevOps</span><span class="tag">工程实践</span></div></a>
-      </div>
-    </section>
-
-    <section class="section" id="research" style="--accent:#6d28d9">
-      <div class="section-head">
-        <div class="section-no">03</div>
-        <div>
-          <div class="section-label">科研支持</div>
-          <h2>研究选题与投稿全流程</h2>
-          <p class="section-desc">系统工程方法论与 AI 智能体 Harness 技术的交叉选题地图，配套期刊筛选与投稿大纲。</p>
-        </div>
-      </div>
-      <div class="grid">
-        <a class="card primary" href="research/" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">研究选题与投稿导航</span><span class="card-arrow">→</span></div><p class="card-desc">全流程总览：从选题定位、文献缺口、期刊匹配到投稿材料准备。</p><div class="card-meta"><span class="tag">总入口</span><span class="tag">全流程</span></div></a>
-        <a class="card" href="research/research_landscape_se_ai_harness.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">交叉融合研究全景</span><span class="card-arrow">→</span></div><p class="card-desc">系统工程 × AI 智能体 Harness 的六大研究方向与代表性文献缺口。</p><div class="card-meta"><span class="tag">研究全景</span><span class="tag">选题地图</span></div></a>
-        <a class="card" href="research/sci-journal-guide.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">SCI 期刊投稿指南</span><span class="card-arrow">→</span></div><p class="card-desc">面向大数据管理与应用专业的期刊分层清单、审稿周期与命中率参考。</p><div class="card-meta"><span class="tag">期刊清单</span><span class="tag">分层</span></div></a>
-        <a class="card" href="research/submission_guides.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">一区 + 投稿指南</span><span class="card-arrow">→</span></div><p class="card-desc">SCI/SSCI 一区及以上期刊的范围匹配、写作侧重与常见退稿原因。</p><div class="card-meta"><span class="tag">一区</span><span class="tag">写作侧重</span></div></a>
-        <a class="card" href="research/submission_outlines.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">一区 + 投稿大纲</span><span class="card-arrow">→</span></div><p class="card-desc">按目标期刊结构拆解的论文提纲，可直接填充为初稿骨架。</p><div class="card-meta"><span class="tag">论文提纲</span></div></a>
-        <a class="card" href="research/ai-adoption-archive.html" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">研究资料包 · 归档汇总</span><span class="card-arrow">→</span></div><p class="card-desc">企业 AI 采纳与架构能力方向：咨询报告与研究方案的结构化归档、关键结论与待确认事项。</p><div class="card-meta"><span class="tag">2 份文档</span><span class="tag">3 种格式</span><span class="tag">归档总览</span></div></a>
-        <a class="card" href="se-ai-agent/" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">系统工程 × AI 智能体 · 研究门户</span><span class="card-arrow">→</span></div><p class="card-desc">AI 研究助手三步上手入口，含研究路线图与资源清单／执行手册，三页静态站点可直接在浏览器打开。</p><div class="card-meta"><span class="tag">3 页静态网页</span><span class="tag">研究路线图</span><span class="tag">执行手册</span></div></a>
-      </div>
-    </section>
-
-    <section class="section" id="nav" style="--accent:#b45309">
-      <div class="section-head">
-        <div class="section-no">04</div>
-        <div>
-          <div class="section-label">资源导航</div>
-          <h2>常用网站直达</h2>
-          <p class="section-desc">16 个分类、128 个站点，含学术科研专区，覆盖文献检索、统计数据、AI 工具、开发与办公，支持即时搜索。</p>
-        </div>
-      </div>
-      <div class="grid single">
-        <a class="card primary" href="nav/" style="--accent:#b45309"><div class="card-top"><span class="card-name">网址大全 · 热门网站导航</span><span class="card-arrow">→</span></div><p class="card-desc">按用途分类整理的高频站点清单，输入关键词即可过滤，全部在新标签页打开。</p><div class="card-meta"><span class="tag">16 分类</span><span class="tag">128 站点</span><span class="tag">即时搜索</span></div></a>
+    <section class="pgroup" id="g-agents">
+      <div class="pgroup-head"><span class="pgroup-no">02</span><h2>交互课件</h2><span class="pgroup-count">7 个页面</span></div>
+      <p class="pgroup-desc">运筹学与多智能体交互式教学演示，全部可在浏览器直接操作。</p>
+      <div class="pgrid">
+        <article class="pcard has-badge" data-search="运筹学 · 交互式课件中心 课件总入口，按知识点聚合全部演示，含使用说明与教学建议。 总入口 agents/ 交互课件">
+          <span class="badge">首页入口</span>
+          <h3>运筹学 · 交互式课件中心</h3>
+          <p class="desc">课件总入口，按知识点聚合全部演示，含使用说明与教学建议。</p>
+          <div class="tags"><span class="tag">总入口</span></div>
+          <a class="pbtn" href="agents/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">agents/</span>
+        </article>
+        <article class="pcard has-badge" data-search="单纯形法 · 交互式教学课件 单纯形表逐步迭代，实时高亮入基、出基与主元，支持自定义算例。 线性规划 逐步演算 agents/simplex-courseware.html 交互课件">
+          <span class="badge">首页入口</span>
+          <h3>单纯形法 · 交互式教学课件</h3>
+          <p class="desc">单纯形表逐步迭代，实时高亮入基、出基与主元，支持自定义算例。</p>
+          <div class="tags"><span class="tag">线性规划</span><span class="tag">逐步演算</span></div>
+          <a class="pbtn" href="agents/simplex-courseware.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">agents/simplex-courseware.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="对偶理论 · 交互式教学课件 原问题与对偶问题并排对照，影子价格与经济含义联动解释。 对偶 影子价格 agents/duality-courseware.html 交互课件">
+          <span class="badge">首页入口</span>
+          <h3>对偶理论 · 交互式教学课件</h3>
+          <p class="desc">原问题与对偶问题并排对照，影子价格与经济含义联动解释。</p>
+          <div class="tags"><span class="tag">对偶</span><span class="tag">影子价格</span></div>
+          <a class="pbtn" href="agents/duality-courseware.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">agents/duality-courseware.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="运输问题 · 表上作业法 最小元素法与伏格尔法求初始解，位势法检验，产销平衡自动处理。 运输问题 位势法 agents/transportation-courseware.html 交互课件">
+          <span class="badge">首页入口</span>
+          <h3>运输问题 · 表上作业法</h3>
+          <p class="desc">最小元素法与伏格尔法求初始解，位势法检验，产销平衡自动处理。</p>
+          <div class="tags"><span class="tag">运输问题</span><span class="tag">位势法</span></div>
+          <a class="pbtn" href="agents/transportation-courseware.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">agents/transportation-courseware.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="单纯形法教学演示 几何直观版：可行域图形与顶点移动同步，讲清「为什么最优在顶点」。 几何直观 agents/simplex-method-demo.html 交互课件">
+          <span class="badge">首页入口</span>
+          <h3>单纯形法教学演示</h3>
+          <p class="desc">几何直观版：可行域图形与顶点移动同步，讲清「为什么最优在顶点」。</p>
+          <div class="tags"><span class="tag">几何直观</span></div>
+          <a class="pbtn" href="agents/simplex-method-demo.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">agents/simplex-method-demo.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="多智能体协作原理演示 以技术报告流水线为例，展示角色分工、消息传递与结果汇总全过程。 多智能体 流水线 agents/multi-agent-demo.html 交互课件">
+          <span class="badge">首页入口</span>
+          <h3>多智能体协作原理演示</h3>
+          <p class="desc">以技术报告流水线为例，展示角色分工、消息传递与结果汇总全过程。</p>
+          <div class="tags"><span class="tag">多智能体</span><span class="tag">流水线</span></div>
+          <a class="pbtn" href="agents/multi-agent-demo.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">agents/multi-agent-demo.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="DevOps 全生命周期演示 从一次代码提交到生产运行的完整链路，含各环节卡点与回滚策略。 DevOps 工程实践 agents/devops-lifecycle.html 交互课件">
+          <span class="badge">首页入口</span>
+          <h3>DevOps 全生命周期演示</h3>
+          <p class="desc">从一次代码提交到生产运行的完整链路，含各环节卡点与回滚策略。</p>
+          <div class="tags"><span class="tag">DevOps</span><span class="tag">工程实践</span></div>
+          <a class="pbtn" href="agents/devops-lifecycle.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">agents/devops-lifecycle.html</span>
+        </article>
       </div>
     </section>
-
-    <section class="section" id="title-review" style="--accent:#9a3412">
-      <div class="section-head">
-        <div class="section-no">05</div>
-        <div>
-          <div class="section-label">教师服务</div>
-          <h2>2026 年职称评审申报</h2>
-          <p class="section-desc">本次申报季形成的资料汇编：全景路线图、副高级职称转评条件核查表与申报群通知，含关键时间节点、口径变化与易错点。</p>
-        </div>
-      </div>
-      <div class="grid single">
-        <a class="card primary" href="title-review/" style="--accent:#9a3412"><div class="card-top"><span class="card-name">2026 年职称评审申报资料汇编</span><span class="card-arrow">→</span></div><p class="card-desc">点击进入详情：三份可直接打开的单文件页面、11 个评审环节时间节点、关键口径变化、同级转评要点与申报群操作要求。</p><div class="card-meta"><span class="tag">3 份页面</span><span class="tag">11 个环节</span><span class="tag">转评核查</span><span class="tag">群通知</span></div></a>
-      </div>
-    </section>
-
-    <section class="section" id="library" style="--accent:#334155">
-      <div class="section-head">
-        <div class="section-no">06</div>
-        <div>
-          <div class="section-label">个人资料库</div>
-          <h2>专题资料整理入口</h2>
-          <p class="section-desc">四个本地专题资料集的整理入口，覆盖学生培养课题、AI 学习路径、学术投稿与职称转评分析。</p>
-        </div>
-      </div>
-      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr))">
-        <a class="card" href="student-development/" style="--accent:#334155"><div class="card-top"><span class="card-name">数据驱动的学生培养模式</span><span class="card-arrow">→</span></div><p class="card-desc">课题评估、题目重构、论文规划、数据口径、投稿合规与匹配度核验，6 份报告串成一条完整研究链路。</p><div class="card-meta"><span class="tag">6 份报告</span><span class="tag">课题研究</span></div></a>
-        <a class="card" href="summer-learning/" style="--accent:#334155"><div class="card-top"><span class="card-name">暑假学习 · AI 路径</span><span class="card-arrow">→</span></div><p class="card-desc">AI Agent 学习路书与 AI 技术应用路线图，含七层能力框架与 36 个月分阶段学习计划。</p><div class="card-meta"><span class="tag">2 份路书</span><span class="tag">学习规划</span></div></a>
-        <a class="card" href="book-to-skill/" style="--accent:#334155"><div class="card-top"><span class="card-name">学术投稿指南</span><span class="card-arrow">→</span></div><p class="card-desc">AI × 管理科学 2026 下半年投稿指南，按零费用优先筛刊，附 6 大方向选题库。</p><div class="card-meta"><span class="tag">投稿指南</span><span class="tag">期刊清单</span></div></a>
-        <a class="card" href="associate-professor/" style="--accent:#334155"><div class="card-top"><span class="card-name">副教授评审分析</span><span class="card-arrow">→</span></div><p class="card-desc">高级工程师转评副教授的两版规则逐条对照、资格判定与量化赋分测算。</p><div class="card-meta"><span class="tag">资格判定</span><span class="tag">赋分对照</span></div></a>
-        <a class="card" href="library/" style="--accent:#2E5C8A"><div class="card-top"><span class="card-name">我的书库 · 读书整理</span><span class="card-arrow">→</span></div><p class="card-desc">12 本书的结构化精读：结构导图、核心观点、中英金句与实践清单，按入门／认知／风险／决策／思维五个模块分组，支持检索与切换。</p><div class="card-meta"><span class="tag">12 本书</span><span class="tag">5 个模块</span><span class="tag">可检索</span></div></a>
-        <a class="card" href="library/naval/" style="--accent:#2E5C8A"><div class="card-top"><span class="card-name">纳瓦尔宝典 · 实践页</span><span class="card-arrow">→</span></div><p class="card-desc">《纳瓦尔宝典》结构化精读页（含配套实践 Skill），原目录已迁入书库统一管理，此入口直达。</p><div class="card-meta"><span class="tag">精读页</span><span class="tag">实践清单</span></div></a>
-      </div>
-    </section>
-
-    <section class="section" id="ai-paper-11-9" style="--accent:#0f766e">
-      <style>#ai-paper-11-9 .topics{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(330px,100%),1fr))}
-#ai-paper-11-9 .topic{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 16px 14px;border-top:3px solid var(--accent,#1d4ed8)}
-#ai-paper-11-9 .topic h3{margin:0 0 4px;font-size:15.5px;letter-spacing:-.01em}
-#ai-paper-11-9 .topic .tdesc{margin:0 0 12px;color:var(--ink-3);font-size:13px;line-height:1.65}
-#ai-paper-11-9 .topic a.item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-top:8px;background:#fcfcfd;transition:border-color .18s,transform .18s}
-#ai-paper-11-9 .topic a.item:hover{border-color:var(--accent);transform:translateY(-1px)}
-#ai-paper-11-9 .topic a.item b{font-size:13.5px;line-height:1.45}
-#ai-paper-11-9 .topic a.item small{display:block;font-weight:400;color:var(--ink-3);font-size:12.3px;line-height:1.55;margin-top:3px}
-#ai-paper-11-9 .topic a.item em{font-style:normal;color:var(--accent);flex:0 0 auto}
-#ai-paper-11-9 .overview{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding:13px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);text-decoration:none;color:inherit}
-#ai-paper-11-9 .overview:hover{border-color:#0f766e}
-#ai-paper-11-9 .overview b{font-size:14.5px}
-#ai-paper-11-9 .overview span{color:var(--ink-3);font-size:13px}
-#ai-paper-11-9 .overview em{font-style:normal;color:#0f766e;font-weight:700}</style>
-      <div class="section-head">
-        <div class="section-no">07</div>
-        <div>
-          <div class="section-label">11-9 专题资料</div>
-          <h2>AI 智能体论文投稿 · 主题索引</h2>
-          <p class="section-desc">按综述评估、投稿规划、费用方案三个主题整理；每项含资料名称、简要说明与直达链接，阅读版与 Markdown 原文均可访问。</p>
-        </div>
-      </div>
-      <a class="overview" href="ai-paper-submission/index.html"><b>专题总览 · 资料集合入口</b><span>3 个主题 / 6 份资料 / 收录说明</span><em>→</em></a>
-      <div class="topics">
-        <div class="topic" style="--accent:#1d4ed8">
-          <h3>01 · 综述与投稿评估</h3>
-          <p class="tdesc">智能体集成平台与系统工程的融合综述：七层参考架构、8 类平台 × 11 维对比、三级融合深度模型；含万方中文文献核对与 75 条编号文献、6 个投稿选题。</p>
-          <a class="item" href="ai-paper-submission/review-guide.html"><span><b>研究综述与投稿评估 · 阅读版 HTML</b><small>自包含排版阅读版，含目录、16 张表与可点外链，可直接打印为 PDF。</small></span><em>→</em></a>
-          <a class="item" href="ai-paper-submission/review-guide.md"><span><b>研究综述与投稿评估 · Markdown 原文</b><small>Markdown 原文，完整保留引用编号、表格与待核验标记，便于二次编辑。</small></span><em>→</em></a>
-        </div>
-        <div class="topic" style="--accent:#0f766e">
-          <h3>02 · 投稿规划与初稿</h3>
-          <p class="tdesc">5 个研究方向比选、R1/R2/R3 期刊匹配、按 R1 撰写的初稿全文、实证合规设计与近半年投稿工作计划（2026-11—2027-04）。</p>
-          <a class="item" href="ai-paper-submission/submission-plan.html"><span><b>论文投稿规划与初稿 · 阅读版 HTML</b><small>单页导航版：12 个页内锚点、21 张表与快速跳转，实证部分均为设计+占位。</small></span><em>→</em></a>
-          <a class="item" href="ai-paper-submission/submission-plan.md"><span><b>论文投稿规划与初稿 · Markdown 原文</b><small>Markdown 原文，含 20 项待补清单与合规控制表，便于继续撰写。</small></span><em>→</em></a>
-        </div>
-        <div class="topic" style="--accent:#b45309">
-          <h3>03 · 费用与低成本方案</h3>
-          <p class="tdesc">五本中文期刊与 JSS 的收费标准、支付方式、额外费用与退费政策，按节省金额排序的降费建议、零成本备选期刊与投稿前待核验清单。</p>
-          <a class="item" href="ai-paper-submission/cost-guide.html"><span><b>投稿费用与低成本方案 · 阅读版 HTML</b><small>自包含阅读版，含目录、4 张表、待核验高亮与 13 个可点外链。</small></span><em>→</em></a>
-          <a class="item" href="ai-paper-submission/cost-guide.md"><span><b>投稿费用与低成本方案 · Markdown 原文</b><small>Markdown 原文，按〔官方〕〔刊内信息〕〔第三方统计〕分级标注来源。</small></span><em>→</em></a>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="ai-reading-notes" style="--accent:#6d28d9">
-      <div class="section-head">
-        <div class="section-no">08</div>
-        <div>
-          <div class="section-label">AI 读书笔记</div>
-          <h2>思维导图与全篇索引</h2>
-          <p class="section-desc">以《毛泽东选集》为首册的数据驱动读书笔记：按问题域重组哲学理论、实践应用与方法工具，逐节点详解，五卷 229 篇逐段可查、可回溯原文。</p>
-        </div>
-      </div>
-      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))">
-        <a class="card primary" href="ai-reading-notes/" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">AI 读书笔记 · 《毛泽东选集》</span><span class="card-arrow">→</span></div><p class="card-desc">总入口：交互式思维导图，四个分支、十个主题与十条方法工具；点击任一节点查看详细解释。</p><div class="card-meta"><span class="tag">229 篇</span><span class="tag">思维导图</span><span class="tag">首册</span></div></a>
-        <a class="card" href="ai-reading-notes/#index" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">篇目索引 · 五卷 229 篇</span><span class="card-arrow">→</span></div><p class="card-desc">按原书卷次保全全部篇目，支持筛选与检索；逐篇标注题解、年代、章节、篇幅与主题归属。</p><div class="card-meta"><span class="tag">按卷索引</span><span class="tag">可筛选</span></div></a>
-        <a class="card" href="ai-reading-notes/#read" style="--accent:#6d28d9"><div class="card-top"><span class="card-name">全文阅读 · 逐段核对</span><span class="card-arrow">→</span></div><p class="card-desc">按卷按需加载全文，正文逐段完整呈现、尾注独立成列，每篇附原文核对链接与全文检索。</p><div class="card-meta"><span class="tag">逐段全文</span><span class="tag">原文核对</span></div></a>
+    <section class="pgroup" id="g-research">
+      <div class="pgroup-head"><span class="pgroup-no">03</span><h2>科研支持</h2><span class="pgroup-count">9 个页面</span></div>
+      <p class="pgroup-desc">研究选题、期刊匹配、投稿材料，以及系统工程 × AI 智能体研究门户。</p>
+      <div class="pgrid">
+        <article class="pcard has-badge" data-search="研究选题与投稿导航 全流程总览：从选题定位、文献缺口、期刊匹配到投稿材料准备。 总入口 全流程 research/ 科研支持">
+          <span class="badge">首页入口</span>
+          <h3>研究选题与投稿导航</h3>
+          <p class="desc">全流程总览：从选题定位、文献缺口、期刊匹配到投稿材料准备。</p>
+          <div class="tags"><span class="tag">总入口</span><span class="tag">全流程</span></div>
+          <a class="pbtn" href="research/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research/</span>
+        </article>
+        <article class="pcard has-badge" data-search="交叉融合研究全景 系统工程 × AI 智能体 Harness 的六大研究方向与代表性文献缺口。 研究全景 选题地图 research/research_landscape_se_ai_harness.html 科研支持">
+          <span class="badge">首页入口</span>
+          <h3>交叉融合研究全景</h3>
+          <p class="desc">系统工程 × AI 智能体 Harness 的六大研究方向与代表性文献缺口。</p>
+          <div class="tags"><span class="tag">研究全景</span><span class="tag">选题地图</span></div>
+          <a class="pbtn" href="research/research_landscape_se_ai_harness.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research/research_landscape_se_ai_harness.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="SCI 期刊投稿指南 面向大数据管理与应用专业的期刊分层清单、审稿周期与命中率参考。 期刊清单 分层 research/sci-journal-guide.html 科研支持">
+          <span class="badge">首页入口</span>
+          <h3>SCI 期刊投稿指南</h3>
+          <p class="desc">面向大数据管理与应用专业的期刊分层清单、审稿周期与命中率参考。</p>
+          <div class="tags"><span class="tag">期刊清单</span><span class="tag">分层</span></div>
+          <a class="pbtn" href="research/sci-journal-guide.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research/sci-journal-guide.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="一区 + 投稿指南 SCI/SSCI 一区及以上期刊的范围匹配、写作侧重与常见退稿原因。 一区 写作侧重 research/submission_guides.html 科研支持">
+          <span class="badge">首页入口</span>
+          <h3>一区 + 投稿指南</h3>
+          <p class="desc">SCI/SSCI 一区及以上期刊的范围匹配、写作侧重与常见退稿原因。</p>
+          <div class="tags"><span class="tag">一区</span><span class="tag">写作侧重</span></div>
+          <a class="pbtn" href="research/submission_guides.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research/submission_guides.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="一区 + 投稿大纲 按目标期刊结构拆解的论文提纲，可直接填充为初稿骨架。 论文提纲 research/submission_outlines.html 科研支持">
+          <span class="badge">首页入口</span>
+          <h3>一区 + 投稿大纲</h3>
+          <p class="desc">按目标期刊结构拆解的论文提纲，可直接填充为初稿骨架。</p>
+          <div class="tags"><span class="tag">论文提纲</span></div>
+          <a class="pbtn" href="research/submission_outlines.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research/submission_outlines.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="研究资料包 · 归档汇总 企业 AI 采纳与架构能力方向：咨询报告与研究方案的结构化归档、关键结论与待确认事项。 2 份文档 归档总览 research/ai-adoption-archive.html 科研支持">
+          <span class="badge">首页入口</span>
+          <h3>研究资料包 · 归档汇总</h3>
+          <p class="desc">企业 AI 采纳与架构能力方向：咨询报告与研究方案的结构化归档、关键结论与待确认事项。</p>
+          <div class="tags"><span class="tag">2 份文档</span><span class="tag">归档总览</span></div>
+          <a class="pbtn" href="research/ai-adoption-archive.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research/ai-adoption-archive.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="系统工程 × AI 智能体 · 研究门户 AI 研究助手三步上手入口，含研究路线图与资源清单／执行手册，三页静态站点可直接在浏览器打开。 3 页静态网页 研究路线图 se-ai-agent/ 科研支持">
+          <span class="badge">首页入口</span>
+          <h3>系统工程 × AI 智能体 · 研究门户</h3>
+          <p class="desc">AI 研究助手三步上手入口，含研究路线图与资源清单／执行手册，三页静态站点可直接在浏览器打开。</p>
+          <div class="tags"><span class="tag">3 页静态网页</span><span class="tag">研究路线图</span></div>
+          <a class="pbtn" href="se-ai-agent/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">se-ai-agent/</span>
+        </article>
+        <article class="pcard" data-search="系统工程 × AI 智能体 · 研究路线图 研究门户内页：阶段划分、里程碑与各阶段预期产出。 路线图 门户内页 se-ai-agent/roadmap.html 科研支持">
+          
+          <h3>系统工程 × AI 智能体 · 研究路线图</h3>
+          <p class="desc">研究门户内页：阶段划分、里程碑与各阶段预期产出。</p>
+          <div class="tags"><span class="tag">路线图</span><span class="tag">门户内页</span></div>
+          <a class="pbtn" href="se-ai-agent/roadmap.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">se-ai-agent/roadmap.html</span>
+        </article>
+        <article class="pcard" data-search="资源清单与执行手册 研究门户内页：可用资源、操作清单与落地实施步骤说明。 执行手册 门户内页 se-ai-agent/handbook.html 科研支持">
+          
+          <h3>资源清单与执行手册</h3>
+          <p class="desc">研究门户内页：可用资源、操作清单与落地实施步骤说明。</p>
+          <div class="tags"><span class="tag">执行手册</span><span class="tag">门户内页</span></div>
+          <a class="pbtn" href="se-ai-agent/handbook.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">se-ai-agent/handbook.html</span>
+        </article>
       </div>
     </section>
-
-  </div>
+    <section class="pgroup" id="g-nav">
+      <div class="pgroup-head"><span class="pgroup-no">04</span><h2>资源导航</h2><span class="pgroup-count">1 个页面</span></div>
+      <p class="pgroup-desc">按用途分类整理的高频站点清单，支持关键词即时过滤。</p>
+      <div class="pgrid">
+        <article class="pcard has-badge" data-search="网址大全 · 热门网站导航 按用途分类整理的高频站点清单，输入关键词即可过滤，全部在新标签页打开。 16 分类 128 站点 即时搜索 nav/ 资源导航">
+          <span class="badge">首页入口</span>
+          <h3>网址大全 · 热门网站导航</h3>
+          <p class="desc">按用途分类整理的高频站点清单，输入关键词即可过滤，全部在新标签页打开。</p>
+          <div class="tags"><span class="tag">16 分类</span><span class="tag">128 站点</span><span class="tag">即时搜索</span></div>
+          <a class="pbtn" href="nav/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">nav/</span>
+        </article>
+      </div>
+    </section>
+    <section class="pgroup" id="g-title-review">
+      <div class="pgroup-head"><span class="pgroup-no">05</span><h2>职称评审</h2><span class="pgroup-count">4 个页面</span></div>
+      <p class="pgroup-desc">2026 年职称评审申报资料、时间节点与转评条件核查。</p>
+      <div class="pgrid">
+        <article class="pcard has-badge" data-search="2026 年职称评审申报资料汇编 三份可直接打开的单文件页面、11 个评审环节时间节点、关键口径变化、同级转评要点与申报群操作要求。 3 份页面 11 个环节 title-review/ 职称评审">
+          <span class="badge">首页入口</span>
+          <h3>2026 年职称评审申报资料汇编</h3>
+          <p class="desc">三份可直接打开的单文件页面、11 个评审环节时间节点、关键口径变化、同级转评要点与申报群操作要求。</p>
+          <div class="tags"><span class="tag">3 份页面</span><span class="tag">11 个环节</span></div>
+          <a class="pbtn" href="title-review/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">title-review/</span>
+        </article>
+        <article class="pcard" data-search="职称评审全景路线图 大连财经学院 2026 年职称评审分阶段全景路线图，按时间轴展开各环节。 时间轴 路线图 title-review/职称评审全景路线图.html 职称评审">
+          
+          <h3>职称评审全景路线图</h3>
+          <p class="desc">大连财经学院 2026 年职称评审分阶段全景路线图，按时间轴展开各环节。</p>
+          <div class="tags"><span class="tag">时间轴</span><span class="tag">路线图</span></div>
+          <a class="pbtn" href="title-review/%E8%81%8C%E7%A7%B0%E8%AF%84%E5%AE%A1%E5%85%A8%E6%99%AF%E8%B7%AF%E7%BA%BF%E5%9B%BE.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">title-review/职称评审全景路线图.html</span>
+        </article>
+        <article class="pcard" data-search="副高级职称转评条件核查表 副高级职称转评的逐项条件核查表，用于申报前自查。 条件核查 自查 title-review/副高级职称转评条件核查表.html 职称评审">
+          
+          <h3>副高级职称转评条件核查表</h3>
+          <p class="desc">副高级职称转评的逐项条件核查表，用于申报前自查。</p>
+          <div class="tags"><span class="tag">条件核查</span><span class="tag">自查</span></div>
+          <a class="pbtn" href="title-review/%E5%89%AF%E9%AB%98%E7%BA%A7%E8%81%8C%E7%A7%B0%E8%BD%AC%E8%AF%84%E6%9D%A1%E4%BB%B6%E6%A0%B8%E6%9F%A5%E8%A1%A8.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">title-review/副高级职称转评条件核查表.html</span>
+        </article>
+        <article class="pcard" data-search="2026 年申报群通知 申报群通知汇编，含申报口径、材料要求与系统操作提醒。 通知汇编 title-review/2026年申报群通知.html 职称评审">
+          
+          <h3>2026 年申报群通知</h3>
+          <p class="desc">申报群通知汇编，含申报口径、材料要求与系统操作提醒。</p>
+          <div class="tags"><span class="tag">通知汇编</span></div>
+          <a class="pbtn" href="title-review/2026%E5%B9%B4%E7%94%B3%E6%8A%A5%E7%BE%A4%E9%80%9A%E7%9F%A5.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">title-review/2026年申报群通知.html</span>
+        </article>
+      </div>
+    </section>
+    <section class="pgroup" id="g-library">
+      <div class="pgroup-head"><span class="pgroup-no">06</span><h2>个人资料库</h2><span class="pgroup-count">16 个页面</span></div>
+      <p class="pgroup-desc">学生培养、暑假学习、学术投稿与评审分析等专题资料入口与内容页。</p>
+      <div class="pgrid">
+        <article class="pcard has-badge" data-search="数据驱动的学生培养模式 课题评估、题目重构、论文规划、数据口径、投稿合规与匹配度核验，6 份报告串成一条完整研究链路。 6 份报告 课题研究 student-development/ 个人资料库">
+          <span class="badge">首页入口</span>
+          <h3>数据驱动的学生培养模式</h3>
+          <p class="desc">课题评估、题目重构、论文规划、数据口径、投稿合规与匹配度核验，6 份报告串成一条完整研究链路。</p>
+          <div class="tags"><span class="tag">6 份报告</span><span class="tag">课题研究</span></div>
+          <a class="pbtn" href="student-development/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">student-development/</span>
+        </article>
+        <article class="pcard" data-search="课题系统性评估报告 《数据驱动的学生培养模式创新探索》课题的系统性评估报告，含问题诊断与改进建议。 课题评估 student-development/课题评估报告_数据驱动的学生培养模式创新探索.html 个人资料库">
+          
+          <h3>课题系统性评估报告</h3>
+          <p class="desc">《数据驱动的学生培养模式创新探索》课题的系统性评估报告，含问题诊断与改进建议。</p>
+          <div class="tags"><span class="tag">课题评估</span></div>
+          <a class="pbtn" href="student-development/%E8%AF%BE%E9%A2%98%E8%AF%84%E4%BC%B0%E6%8A%A5%E5%91%8A_%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8%E7%9A%84%E5%AD%A6%E7%94%9F%E5%9F%B9%E5%85%BB%E6%A8%A1%E5%BC%8F%E5%88%9B%E6%96%B0%E6%8E%A2%E7%B4%A2.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">student-development/课题评估报告_数据驱动的学生培养模式创新探索.html</span>
+        </article>
+        <article class="pcard" data-search="课题题目优化方案 纳入 AI 因子与 Harness 视角的题目重构方案与备选表述。 题目重构 student-development/课题题目优化方案_纳入AI因子与Harness视角.html 个人资料库">
+          
+          <h3>课题题目优化方案</h3>
+          <p class="desc">纳入 AI 因子与 Harness 视角的题目重构方案与备选表述。</p>
+          <div class="tags"><span class="tag">题目重构</span></div>
+          <a class="pbtn" href="student-development/%E8%AF%BE%E9%A2%98%E9%A2%98%E7%9B%AE%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88_%E7%BA%B3%E5%85%A5AI%E5%9B%A0%E5%AD%90%E4%B8%8EHarness%E8%A7%86%E8%A7%92.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">student-development/课题题目优化方案_纳入AI因子与Harness视角.html</span>
+        </article>
+        <article class="pcard" data-search="论文写作规划与期刊投稿选型方案 智能体编排能力导向的论文写作规划与期刊选型对照。 写作规划 期刊选型 student-development/论文写作规划与期刊投稿选型方案.html 个人资料库">
+          
+          <h3>论文写作规划与期刊投稿选型方案</h3>
+          <p class="desc">智能体编排能力导向的论文写作规划与期刊选型对照。</p>
+          <div class="tags"><span class="tag">写作规划</span><span class="tag">期刊选型</span></div>
+          <a class="pbtn" href="student-development/%E8%AE%BA%E6%96%87%E5%86%99%E4%BD%9C%E8%A7%84%E5%88%92%E4%B8%8E%E6%9C%9F%E5%88%8A%E6%8A%95%E7%A8%BF%E9%80%89%E5%9E%8B%E6%96%B9%E6%A1%88.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">student-development/论文写作规划与期刊投稿选型方案.html</span>
+        </article>
+        <article class="pcard" data-search="论文数据获取说明与核对清单 一手／二手数据获取路径、字段口径与逐项核对清单。 数据口径 核对清单 student-development/论文数据获取说明与核对清单.html 个人资料库">
+          
+          <h3>论文数据获取说明与核对清单</h3>
+          <p class="desc">一手／二手数据获取路径、字段口径与逐项核对清单。</p>
+          <div class="tags"><span class="tag">数据口径</span><span class="tag">核对清单</span></div>
+          <a class="pbtn" href="student-development/%E8%AE%BA%E6%96%87%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E8%AF%B4%E6%98%8E%E4%B8%8E%E6%A0%B8%E5%AF%B9%E6%B8%85%E5%8D%95.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">student-development/论文数据获取说明与核对清单.html</span>
+        </article>
+        <article class="pcard" data-search="数据与论文匹配度核验报告 运筹学课程数据与论文论证结构的匹配度核验结果。 匹配度核验 student-development/数据与论文匹配度核验报告.html 个人资料库">
+          
+          <h3>数据与论文匹配度核验报告</h3>
+          <p class="desc">运筹学课程数据与论文论证结构的匹配度核验结果。</p>
+          <div class="tags"><span class="tag">匹配度核验</span></div>
+          <a class="pbtn" href="student-development/%E6%95%B0%E6%8D%AE%E4%B8%8E%E8%AE%BA%E6%96%87%E5%8C%B9%E9%85%8D%E5%BA%A6%E6%A0%B8%E9%AA%8C%E6%8A%A5%E5%91%8A.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">student-development/数据与论文匹配度核验报告.html</span>
+        </article>
+        <article class="pcard" data-search="EAIT 投稿合规检查与操作指南 EAIT 投稿前的合规检查项与系统操作步骤。 投稿合规 student-development/EAIT投稿合规检查与操作指南.html 个人资料库">
+          
+          <h3>EAIT 投稿合规检查与操作指南</h3>
+          <p class="desc">EAIT 投稿前的合规检查项与系统操作步骤。</p>
+          <div class="tags"><span class="tag">投稿合规</span></div>
+          <a class="pbtn" href="student-development/EAIT%E6%8A%95%E7%A8%BF%E5%90%88%E8%A7%84%E6%A3%80%E6%9F%A5%E4%B8%8E%E6%93%8D%E4%BD%9C%E6%8C%87%E5%8D%97.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">student-development/EAIT投稿合规检查与操作指南.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="暑假学习 · AI 路径 AI Agent 学习路书与 AI 技术应用路线图，含七层能力框架与 36 个月分阶段学习计划。 2 份路书 学习规划 summer-learning/ 个人资料库">
+          <span class="badge">首页入口</span>
+          <h3>暑假学习 · AI 路径</h3>
+          <p class="desc">AI Agent 学习路书与 AI 技术应用路线图，含七层能力框架与 36 个月分阶段学习计划。</p>
+          <div class="tags"><span class="tag">2 份路书</span><span class="tag">学习规划</span></div>
+          <a class="pbtn" href="summer-learning/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">summer-learning/</span>
+        </article>
+        <article class="pcard" data-search="AI Agent 学习路书 从大模型基础到智能体应用开发的分层学习路径与阶段目标。 学习路书 summer-learning/agent-learning-guide.html 个人资料库">
+          
+          <h3>AI Agent 学习路书</h3>
+          <p class="desc">从大模型基础到智能体应用开发的分层学习路径与阶段目标。</p>
+          <div class="tags"><span class="tag">学习路书</span></div>
+          <a class="pbtn" href="summer-learning/agent-learning-guide.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">summer-learning/agent-learning-guide.html</span>
+        </article>
+        <article class="pcard" data-search="AI 技术应用方向学习路线图 副教授级知识层次的七层能力框架与 36 个月分阶段学习计划。 36 个月 能力框架 summer-learning/ai-learning-roadmap.html 个人资料库">
+          
+          <h3>AI 技术应用方向学习路线图</h3>
+          <p class="desc">副教授级知识层次的七层能力框架与 36 个月分阶段学习计划。</p>
+          <div class="tags"><span class="tag">36 个月</span><span class="tag">能力框架</span></div>
+          <a class="pbtn" href="summer-learning/ai-learning-roadmap.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">summer-learning/ai-learning-roadmap.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="学术投稿指南 AI × 管理科学 2026 下半年投稿指南，按零费用优先筛刊，附 6 大方向选题库。 投稿指南 期刊清单 book-to-skill/ 个人资料库">
+          <span class="badge">首页入口</span>
+          <h3>学术投稿指南</h3>
+          <p class="desc">AI × 管理科学 2026 下半年投稿指南，按零费用优先筛刊，附 6 大方向选题库。</p>
+          <div class="tags"><span class="tag">投稿指南</span><span class="tag">期刊清单</span></div>
+          <a class="pbtn" href="book-to-skill/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">book-to-skill/</span>
+        </article>
+        <article class="pcard" data-search="AI × 管理科学 2026 下半年投稿指南 面向学术新手的投稿指南（学术小白版），含期刊筛选与选题建议。 学术小白版 book-to-skill/AI与管理科学_2026下半年投稿指南.html 个人资料库">
+          
+          <h3>AI × 管理科学 2026 下半年投稿指南</h3>
+          <p class="desc">面向学术新手的投稿指南（学术小白版），含期刊筛选与选题建议。</p>
+          <div class="tags"><span class="tag">学术小白版</span></div>
+          <a class="pbtn" href="book-to-skill/AI%E4%B8%8E%E7%AE%A1%E7%90%86%E7%A7%91%E5%AD%A6_2026%E4%B8%8B%E5%8D%8A%E5%B9%B4%E6%8A%95%E7%A8%BF%E6%8C%87%E5%8D%97.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">book-to-skill/AI与管理科学_2026下半年投稿指南.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="副教授评审分析 高级工程师转评副教授的两版规则逐条对照、资格判定与量化赋分测算。 资格判定 赋分对照 associate-professor/ 个人资料库">
+          <span class="badge">首页入口</span>
+          <h3>副教授评审分析</h3>
+          <p class="desc">高级工程师转评副教授的两版规则逐条对照、资格判定与量化赋分测算。</p>
+          <div class="tags"><span class="tag">资格判定</span><span class="tag">赋分对照</span></div>
+          <a class="pbtn" href="associate-professor/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">associate-professor/</span>
+        </article>
+        <article class="pcard" data-search="转评资格与量化赋分分析 两版规则对照、资格判定与量化赋分测算明细（两版对照版）。 两版对照 associate-professor/高级工程师转评副教授-资格与赋分分析.html 个人资料库">
+          
+          <h3>转评资格与量化赋分分析</h3>
+          <p class="desc">两版规则对照、资格判定与量化赋分测算明细（两版对照版）。</p>
+          <div class="tags"><span class="tag">两版对照</span></div>
+          <a class="pbtn" href="associate-professor/%E9%AB%98%E7%BA%A7%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%BD%AC%E8%AF%84%E5%89%AF%E6%95%99%E6%8E%88-%E8%B5%84%E6%A0%BC%E4%B8%8E%E8%B5%8B%E5%88%86%E5%88%86%E6%9E%90.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">associate-professor/高级工程师转评副教授-资格与赋分分析.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="我的书库 · 读书整理 12 本书的结构化精读：结构导图、核心观点、中英金句与实践清单，按五个模块分组，支持检索与切换。 12 本书 5 个模块 library/ 个人资料库">
+          <span class="badge">首页入口</span>
+          <h3>我的书库 · 读书整理</h3>
+          <p class="desc">12 本书的结构化精读：结构导图、核心观点、中英金句与实践清单，按五个模块分组，支持检索与切换。</p>
+          <div class="tags"><span class="tag">12 本书</span><span class="tag">5 个模块</span></div>
+          <a class="pbtn" href="library/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/</span>
+        </article>
+        <article class="pcard has-badge" data-search="纳瓦尔宝典 · 实践页 《纳瓦尔宝典》结构化精读页（含配套实践 Skill），原目录已迁入书库统一管理，此入口直达。 精读页 实践清单 library/naval/ 个人资料库">
+          <span class="badge">首页入口</span>
+          <h3>纳瓦尔宝典 · 实践页</h3>
+          <p class="desc">《纳瓦尔宝典》结构化精读页（含配套实践 Skill），原目录已迁入书库统一管理，此入口直达。</p>
+          <div class="tags"><span class="tag">精读页</span><span class="tag">实践清单</span></div>
+          <a class="pbtn" href="library/naval/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/naval/</span>
+        </article>
+      </div>
+    </section>
+    <section class="pgroup" id="g-books">
+      <div class="pgroup-head"><span class="pgroup-no">07</span><h2>书库藏书</h2><span class="pgroup-count">13 个页面</span></div>
+      <p class="pgroup-desc">12 本著作的结构化精读页：全书地图、核心观点、中英金句与行动清单。</p>
+      <div class="pgrid">
+        <article class="pcard" data-search="反脆弱 · 结构化精读 《反脆弱》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/antifragile/index.html 书库藏书">
+          
+          <h3>反脆弱 · 结构化精读</h3>
+          <p class="desc">《反脆弱》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/antifragile/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/antifragile/index.html</span>
+        </article>
+        <article class="pcard" data-search="学会提问 · 结构化精读 《学会提问》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/asking-the-right-questions/index.html 书库藏书">
+          
+          <h3>学会提问 · 结构化精读</h3>
+          <p class="desc">《学会提问》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/asking-the-right-questions/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/asking-the-right-questions/index.html</span>
+        </article>
+        <article class="pcard" data-search="巴菲特致股东的信 · 结构化精读 《巴菲特致股东的信》全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/buffett-letters/index.html 书库藏书">
+          
+          <h3>巴菲特致股东的信 · 结构化精读</h3>
+          <p class="desc">《巴菲特致股东的信》全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/buffett-letters/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/buffett-letters/index.html</span>
+        </article>
+        <article class="pcard" data-search="影响力 · 结构化精读 《影响力》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/influence/index.html 书库藏书">
+          
+          <h3>影响力 · 结构化精读</h3>
+          <p class="desc">《影响力》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/influence/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/influence/index.html</span>
+        </article>
+        <article class="pcard" data-search="终身成长 · 结构化精读 《终身成长》（Mindset）全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/mindset/index.html 书库藏书">
+          
+          <h3>终身成长 · 结构化精读</h3>
+          <p class="desc">《终身成长》（Mindset）全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/mindset/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/mindset/index.html</span>
+        </article>
+        <article class="pcard" data-search="纳瓦尔宝典 · 结构化精读 《纳瓦尔宝典》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/naval-almanack/index.html 书库藏书">
+          
+          <h3>纳瓦尔宝典 · 结构化精读</h3>
+          <p class="desc">《纳瓦尔宝典》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/naval-almanack/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/naval-almanack/index.html</span>
+        </article>
+        <article class="pcard" data-search="噪声 · 结构化精读 《噪声》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/noise/index.html 书库藏书">
+          
+          <h3>噪声 · 结构化精读</h3>
+          <p class="desc">《噪声》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/noise/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/noise/index.html</span>
+        </article>
+        <article class="pcard" data-search="穷查理宝典 · 结构化精读 《穷查理宝典》全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/poor-charlies-almanack/index.html 书库藏书">
+          
+          <h3>穷查理宝典 · 结构化精读</h3>
+          <p class="desc">《穷查理宝典》全书地图、核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/poor-charlies-almanack/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/poor-charlies-almanack/index.html</span>
+        </article>
+        <article class="pcard" data-search="原则 · 结构化精读 《原则》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/principles/index.html 书库藏书">
+          
+          <h3>原则 · 结构化精读</h3>
+          <p class="desc">《原则》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/principles/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/principles/index.html</span>
+        </article>
+        <article class="pcard" data-search="超预测 · 结构化精读 《超预测》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/superforecasting/index.html 书库藏书">
+          
+          <h3>超预测 · 结构化精读</h3>
+          <p class="desc">《超预测》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/superforecasting/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/superforecasting/index.html</span>
+        </article>
+        <article class="pcard" data-search="思考致富 · 结构化精读 《思考致富》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/think-and-grow-rich/index.html 书库藏书">
+          
+          <h3>思考致富 · 结构化精读</h3>
+          <p class="desc">《思考致富》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/think-and-grow-rich/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/think-and-grow-rich/index.html</span>
+        </article>
+        <article class="pcard" data-search="对赌 · 结构化精读 《对赌》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。 结构化精读 library/books/thinking-in-bets/index.html 书库藏书">
+          
+          <h3>对赌 · 结构化精读</h3>
+          <p class="desc">《对赌》全书地图、按主题整理的核心观点、中英金句与行动清单，支持主题筛选与本地勾选。</p>
+          <div class="tags"><span class="tag">结构化精读</span></div>
+          <a class="pbtn" href="library/books/thinking-in-bets/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/thinking-in-bets/index.html</span>
+        </article>
+        <article class="pcard" data-search="新书模板 · 页面骨架 新增书籍时复制此目录作为页面骨架，差异只在 data.js；本页为占位模板，非成书内容。 模板 占位页 library/books/_template/index.html 书库藏书">
+          
+          <h3>新书模板 · 页面骨架</h3>
+          <p class="desc">新增书籍时复制此目录作为页面骨架，差异只在 data.js；本页为占位模板，非成书内容。</p>
+          <div class="tags"><span class="tag">模板</span><span class="tag">占位页</span></div>
+          <a class="pbtn" href="library/books/_template/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">library/books/_template/index.html</span>
+        </article>
+      </div>
+    </section>
+    <section class="pgroup" id="g-ai-paper">
+      <div class="pgroup-head"><span class="pgroup-no">08</span><h2>论文投稿专题</h2><span class="pgroup-count">7 个页面</span></div>
+      <p class="pgroup-desc">AI 智能体论文投稿的综述、规划与费用资料，HTML 阅读版与 Markdown 原文成对收录。</p>
+      <div class="pgrid">
+        <article class="pcard has-badge" data-search="专题总览 · 资料集合入口 3 个主题 / 6 份资料 / 收录说明，按主题分类的索引页。 专题总览 3 主题 ai-paper-submission/index.html 论文投稿专题">
+          <span class="badge">首页入口</span>
+          <h3>专题总览 · 资料集合入口</h3>
+          <p class="desc">3 个主题 / 6 份资料 / 收录说明，按主题分类的索引页。</p>
+          <div class="tags"><span class="tag">专题总览</span><span class="tag">3 主题</span></div>
+          <a class="pbtn" href="ai-paper-submission/index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-paper-submission/index.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="研究综述与投稿评估 · 阅读版 HTML 自包含排版阅读版，含目录、16 张表与可点外链，可直接打印为 PDF。 HTML 16 张表 ai-paper-submission/review-guide.html 论文投稿专题">
+          <span class="badge">首页入口</span>
+          <h3>研究综述与投稿评估 · 阅读版 HTML</h3>
+          <p class="desc">自包含排版阅读版，含目录、16 张表与可点外链，可直接打印为 PDF。</p>
+          <div class="tags"><span class="tag">HTML</span><span class="tag">16 张表</span></div>
+          <a class="pbtn" href="ai-paper-submission/review-guide.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-paper-submission/review-guide.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="研究综述与投稿评估 · Markdown 原文 Markdown 原文，完整保留引用编号、表格与待核验标记，便于二次编辑。 Markdown 原文 ai-paper-submission/review-guide.md 论文投稿专题">
+          <span class="badge">首页入口</span>
+          <h3>研究综述与投稿评估 · Markdown 原文</h3>
+          <p class="desc">Markdown 原文，完整保留引用编号、表格与待核验标记，便于二次编辑。</p>
+          <div class="tags"><span class="tag">Markdown</span><span class="tag">原文</span></div>
+          <a class="pbtn" href="ai-paper-submission/review-guide.md">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-paper-submission/review-guide.md</span>
+        </article>
+        <article class="pcard has-badge" data-search="论文投稿规划与初稿 · 阅读版 HTML 单页导航版：12 个页内锚点、21 张表与快速跳转，实证部分均为设计 + 占位。 HTML 21 张表 ai-paper-submission/submission-plan.html 论文投稿专题">
+          <span class="badge">首页入口</span>
+          <h3>论文投稿规划与初稿 · 阅读版 HTML</h3>
+          <p class="desc">单页导航版：12 个页内锚点、21 张表与快速跳转，实证部分均为设计 + 占位。</p>
+          <div class="tags"><span class="tag">HTML</span><span class="tag">21 张表</span></div>
+          <a class="pbtn" href="ai-paper-submission/submission-plan.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-paper-submission/submission-plan.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="论文投稿规划与初稿 · Markdown 原文 Markdown 原文，含 20 项待补清单与合规控制表，便于继续撰写。 Markdown 原文 ai-paper-submission/submission-plan.md 论文投稿专题">
+          <span class="badge">首页入口</span>
+          <h3>论文投稿规划与初稿 · Markdown 原文</h3>
+          <p class="desc">Markdown 原文，含 20 项待补清单与合规控制表，便于继续撰写。</p>
+          <div class="tags"><span class="tag">Markdown</span><span class="tag">原文</span></div>
+          <a class="pbtn" href="ai-paper-submission/submission-plan.md">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-paper-submission/submission-plan.md</span>
+        </article>
+        <article class="pcard has-badge" data-search="投稿费用与低成本方案 · 阅读版 HTML 自包含阅读版，含目录、4 张表、待核验高亮与 13 个可点外链。 HTML 4 张表 ai-paper-submission/cost-guide.html 论文投稿专题">
+          <span class="badge">首页入口</span>
+          <h3>投稿费用与低成本方案 · 阅读版 HTML</h3>
+          <p class="desc">自包含阅读版，含目录、4 张表、待核验高亮与 13 个可点外链。</p>
+          <div class="tags"><span class="tag">HTML</span><span class="tag">4 张表</span></div>
+          <a class="pbtn" href="ai-paper-submission/cost-guide.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-paper-submission/cost-guide.html</span>
+        </article>
+        <article class="pcard has-badge" data-search="投稿费用与低成本方案 · Markdown 原文 Markdown 原文，按〔官方〕〔刊内信息〕〔第三方统计〕分级标注来源。 Markdown 原文 ai-paper-submission/cost-guide.md 论文投稿专题">
+          <span class="badge">首页入口</span>
+          <h3>投稿费用与低成本方案 · Markdown 原文</h3>
+          <p class="desc">Markdown 原文，按〔官方〕〔刊内信息〕〔第三方统计〕分级标注来源。</p>
+          <div class="tags"><span class="tag">Markdown</span><span class="tag">原文</span></div>
+          <a class="pbtn" href="ai-paper-submission/cost-guide.md">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-paper-submission/cost-guide.md</span>
+        </article>
+      </div>
+    </section>
+    <section class="pgroup" id="g-notes">
+      <div class="pgroup-head"><span class="pgroup-no">09</span><h2>AI 读书笔记</h2><span class="pgroup-count">3 个页面</span></div>
+      <p class="pgroup-desc">《毛泽东选集》思维导图层级笔记、五卷 229 篇索引与全文逐段阅读。</p>
+      <div class="pgrid">
+        <article class="pcard has-badge" data-search="AI 读书笔记 · 《毛泽东选集》 总入口：交互式思维导图，四个分支、十个主题与十条方法工具；点击任一节点查看详细解释。 229 篇 思维导图 ai-reading-notes/ AI 读书笔记">
+          <span class="badge">首页入口</span>
+          <h3>AI 读书笔记 · 《毛泽东选集》</h3>
+          <p class="desc">总入口：交互式思维导图，四个分支、十个主题与十条方法工具；点击任一节点查看详细解释。</p>
+          <div class="tags"><span class="tag">229 篇</span><span class="tag">思维导图</span></div>
+          <a class="pbtn" href="ai-reading-notes/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-reading-notes/</span>
+        </article>
+        <article class="pcard has-badge" data-search="篇目索引 · 五卷 229 篇 按原书卷次保全全部篇目，支持筛选与检索；逐篇标注题解、年代、章节、篇幅与主题归属。 按卷索引 可筛选 ai-reading-notes/#index AI 读书笔记">
+          <span class="badge">首页入口</span>
+          <h3>篇目索引 · 五卷 229 篇</h3>
+          <p class="desc">按原书卷次保全全部篇目，支持筛选与检索；逐篇标注题解、年代、章节、篇幅与主题归属。</p>
+          <div class="tags"><span class="tag">按卷索引</span><span class="tag">可筛选</span></div>
+          <a class="pbtn" href="ai-reading-notes/#index">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-reading-notes/#index</span>
+        </article>
+        <article class="pcard has-badge" data-search="全文阅读 · 逐段核对 按卷按需加载全文，正文逐段完整呈现、尾注独立成列，每篇附原文核对链接与全文检索。 逐段全文 原文核对 ai-reading-notes/#read AI 读书笔记">
+          <span class="badge">首页入口</span>
+          <h3>全文阅读 · 逐段核对</h3>
+          <p class="desc">按卷按需加载全文，正文逐段完整呈现、尾注独立成列，每篇附原文核对链接与全文检索。</p>
+          <div class="tags"><span class="tag">逐段全文</span><span class="tag">原文核对</span></div>
+          <a class="pbtn" href="ai-reading-notes/#read">打开页面 <span class="arrow">→</span></a>
+          <span class="path">ai-reading-notes/#read</span>
+        </article>
+      </div>
+    </section>
+    <section class="pgroup" id="g-site">
+      <div class="pgroup-head"><span class="pgroup-no">10</span><h2>站点与归档</h2><span class="pgroup-count">1 个页面</span></div>
+      <p class="pgroup-desc">站点入口与改造前的原版首页归档。</p>
+      <div class="pgrid">
+        <article class="pcard" data-search="原版首页 · 归档保留 改造前的原始首页，原有板块、卡片与链接全部保留，便于对照与回溯。 原版首页 归档 legacy-index.html 站点与归档">
+          
+          <h3>原版首页 · 归档保留</h3>
+          <p class="desc">改造前的原始首页，原有板块、卡片与链接全部保留，便于对照与回溯。</p>
+          <div class="tags"><span class="tag">原版首页</span><span class="tag">归档</span></div>
+          <a class="pbtn" href="legacy-index.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">legacy-index.html</span>
+        </article>
+      </div>
+    </section>
+    <section class="pgroup" id="g-writing">
+      <div class="pgroup-head"><span class="pgroup-no">11</span><h2>科研写作与发表教程</h2><span class="pgroup-count">12 个页面</span></div>
+      <p class="pgroup-desc">SCI 及高水平期刊论文的循证中文教程：六阶段路线图、53 项核验资源、英文原文摘译与学术诚信红线，12 页完整静态站点。</p>
+      <div class="pgrid">
+        <article class="pcard" data-search="科研论文写作与发表 · 循证教程 站点总入口：六阶段路线图、证据分级 A–D、站点概览与适用边界；12 个页面、53 项经核验资源全部可从顶部导航直达。 站点首页 12 页 六阶段路线 research-writing/ 科研写作与发表教程">
+          
+          <h3>科研论文写作与发表 · 循证教程</h3>
+          <p class="desc">站点总入口：六阶段路线图、证据分级 A–D、站点概览与适用边界；12 个页面、53 项经核验资源全部可从顶部导航直达。</p>
+          <div class="tags"><span class="tag">站点首页</span><span class="tag">12 页</span><span class="tag">六阶段路线</span></div>
+          <a class="pbtn" href="research-writing/">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/</span>
+        </article>
+        <article class="pcard" data-search="一、选题与定位 四个判据判断问题是否站得住、可执行的选题流程、关于「SCI 及更高水平」的审慎表述与常见误区。 选题 四个判据 research-writing/01-topic.html 科研写作与发表教程">
+          
+          <h3>一、选题与定位</h3>
+          <p class="desc">四个判据判断问题是否站得住、可执行的选题流程、关于「SCI 及更高水平」的审慎表述与常见误区。</p>
+          <div class="tags"><span class="tag">选题</span><span class="tag">四个判据</span></div>
+          <a class="pbtn" href="research-writing/01-topic.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/01-topic.html</span>
+        </article>
+        <article class="pcard" data-search="二、研究设计 先分清三类规范、确认性 vs 探索性研究预设、设计阶段的数据可追溯性建链，并按研究类型选择报告规范。 研究设计 报告规范 research-writing/02-design.html 科研写作与发表教程">
+          
+          <h3>二、研究设计</h3>
+          <p class="desc">先分清三类规范、确认性 vs 探索性研究预设、设计阶段的数据可追溯性建链，并按研究类型选择报告规范。</p>
+          <div class="tags"><span class="tag">研究设计</span><span class="tag">报告规范</span></div>
+          <a class="pbtn" href="research-writing/02-design.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/02-design.html</span>
+        </article>
+        <article class="pcard" data-search="三、论文写作 各章节功能与自查点、主张—证据对照表、引用与参考文献规范、生成式 AI 可为与不可为，附英文原文摘译入口。 论文写作 AI 披露 research-writing/03-writing.html 科研写作与发表教程">
+          
+          <h3>三、论文写作</h3>
+          <p class="desc">各章节功能与自查点、主张—证据对照表、引用与参考文献规范、生成式 AI 可为与不可为，附英文原文摘译入口。</p>
+          <div class="tags"><span class="tag">论文写作</span><span class="tag">AI 披露</span></div>
+          <a class="pbtn" href="research-writing/03-writing.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/03-writing.html</span>
+        </article>
+        <article class="pcard" data-search="四、投稿准备 可信度清单筛刊、投稿材料逐项核对、署名四条标准与国内红线、一稿一投／预印本／会议扩展版与第三方服务边界。 投稿材料 署名规范 research-writing/04-submission.html 科研写作与发表教程">
+          
+          <h3>四、投稿准备</h3>
+          <p class="desc">可信度清单筛刊、投稿材料逐项核对、署名四条标准与国内红线、一稿一投／预印本／会议扩展版与第三方服务边界。</p>
+          <div class="tags"><span class="tag">投稿材料</span><span class="tag">署名规范</span></div>
+          <a class="pbtn" href="research-writing/04-submission.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/04-submission.html</span>
+        </article>
+        <article class="pcard" data-search="五、同行评审 常见流程与各类决定的含义、回复信四栏结构、审稿一侧的伦理要求，以及公开评审可参考但不可照搬的边界。 同行评审 回复信 research-writing/05-review.html 科研写作与发表教程">
+          
+          <h3>五、同行评审</h3>
+          <p class="desc">常见流程与各类决定的含义、回复信四栏结构、审稿一侧的伦理要求，以及公开评审可参考但不可照搬的边界。</p>
+          <div class="tags"><span class="tag">同行评审</span><span class="tag">回复信</span></div>
+          <a class="pbtn" href="research-writing/05-review.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/05-review.html</span>
+        </article>
+        <article class="pcard" data-search="六、发表策略与发表后 按阶段的策略总览、发表后的可验证性与更正机制，以及把评价语言转回研究本身的成果表述方式。 12 条策略 发表后 research-writing/06-strategy.html 科研写作与发表教程">
+          
+          <h3>六、发表策略与发表后</h3>
+          <p class="desc">按阶段的策略总览、发表后的可验证性与更正机制，以及把评价语言转回研究本身的成果表述方式。</p>
+          <div class="tags"><span class="tag">12 条策略</span><span class="tag">发表后</span></div>
+          <a class="pbtn" href="research-writing/06-strategy.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/06-strategy.html</span>
+        </article>
+        <article class="pcard" data-search="合规与学术诚信红线 把做法三分类为合规提效／非正规高风险／学术不端，给出三级判断依据、后果链、本站不提供的内容与不确定时的处理。 22 条判定 科研诚信 research-writing/07-integrity.html 科研写作与发表教程">
+          
+          <h3>合规与学术诚信红线</h3>
+          <p class="desc">把做法三分类为合规提效／非正规高风险／学术不端，给出三级判断依据、后果链、本站不提供的内容与不确定时的处理。</p>
+          <div class="tags"><span class="tag">22 条判定</span><span class="tag">科研诚信</span></div>
+          <a class="pbtn" href="research-writing/07-integrity.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/07-integrity.html</span>
+        </article>
+        <article class="pcard" data-search="经核验资源库 53 项资源逐条标注来源机构、原始链接、适用对象、时效与证据等级，支持按等级筛选；Rnn 编号与各教程正文互相跳转。 53 项资源 证据分级 research-writing/resources.html 科研写作与发表教程">
+          
+          <h3>经核验资源库</h3>
+          <p class="desc">53 项资源逐条标注来源机构、原始链接、适用对象、时效与证据等级，支持按等级筛选；Rnn 编号与各教程正文互相跳转。</p>
+          <div class="tags"><span class="tag">53 项资源</span><span class="tag">证据分级</span></div>
+          <a class="pbtn" href="research-writing/resources.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/resources.html</span>
+        </article>
+        <article class="pcard" data-search="英文原文对照摘译 9 段关键英文规范的中文对照摘译，明确标注为本站编译、非官方中文版，并说明翻译与表述原则。 9 段摘译 非官方译本 research-writing/translations.html 科研写作与发表教程">
+          
+          <h3>英文原文对照摘译</h3>
+          <p class="desc">9 段关键英文规范的中文对照摘译，明确标注为本站编译、非官方中文版，并说明翻译与表述原则。</p>
+          <div class="tags"><span class="tag">9 段摘译</span><span class="tag">非官方译本</span></div>
+          <a class="pbtn" href="research-writing/translations.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/translations.html</span>
+        </article>
+        <article class="pcard" data-search="中英术语对照表 32 条中英术语对照与统一译法使用说明，便于写作与回复信中的表述一致。 32 条术语 research-writing/glossary.html 科研写作与发表教程">
+          
+          <h3>中英术语对照表</h3>
+          <p class="desc">32 条中英术语对照与统一译法使用说明，便于写作与回复信中的表述一致。</p>
+          <div class="tags"><span class="tag">32 条术语</span></div>
+          <a class="pbtn" href="research-writing/glossary.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/glossary.html</span>
+        </article>
+        <article class="pcard" data-search="维护与持续更新 站点架构、日常更新流程、资源新增规范、核验方法、证据等级分布、变更记录、未收录候选与已知限制。 核验方法 变更记录 research-writing/maintain.html 科研写作与发表教程">
+          
+          <h3>维护与持续更新</h3>
+          <p class="desc">站点架构、日常更新流程、资源新增规范、核验方法、证据等级分布、变更记录、未收录候选与已知限制。</p>
+          <div class="tags"><span class="tag">核验方法</span><span class="tag">变更记录</span></div>
+          <a class="pbtn" href="research-writing/maintain.html">打开页面 <span class="arrow">→</span></a>
+          <span class="path">research-writing/maintain.html</span>
+        </article>
+      </div>
+    </section>
+  <div class="noresult" id="noresult">没有匹配的页面，试试更短的关键词，或清空搜索框。</div>
+  <span id="match-count" hidden></span>
 </main>
 
-<footer class="foot">
-  <div class="wrap">
-    <p><b>数据治理与技术应用课程群</b> · 大连财经学院 大数据与人工智能学院</p>
-    <p>入口页仅作索引，各页面内容独立维护；如遇页面打不开，多为相对路径或文件名变动，可在仓库中核对。</p>
-    <p>课程—教师对应关系依研究方向拟定，待课程群会议确认后更新。</p>
+<footer>
+  <div class="wrap footer-grid">
+    <div>
+      <p><b>数字资源中心 · 站点合集</b>　|　74 个挂载页 · 11 个主题分组</p>
+      <p>门户样式基底：<a href="https://github.com/kevquirk/simple.css">Simple.css</a>
+         （Kev Quirk，<a href="LICENSE-Simple.css.txt">MIT License</a>）；
+         详见 <a href="CREDITS.md">CREDITS.md</a>。子页内容与链接均保持原样。</p>
+    </div>
+    <div class="footer-links">
+      <a href="legacy-index.html">原版首页（归档）</a>
+      <a href="CREDITS.md">模板来源与许可</a>
+      <a href="README.md">使用与扩展说明</a>
+      <a href="assets/sites.json">页面清单 JSON</a>
+    </div>
   </div>
 </footer>
-
 </body>
 </html>
