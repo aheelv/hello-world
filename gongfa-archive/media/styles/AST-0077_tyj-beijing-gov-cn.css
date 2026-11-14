@@ -1,0 +1,94 @@
+*{
+font-family: "微软雅黑" !important;
+}
+
+a:link, a:visited, a:hover, a:active{color:#404040; text-decoration:none; font-size:14px;}
+a:hover{color:#BD1A2D;}
+body, object, iframe, h1, h2, h3, h4, h5, h6, blockquote, a, code, em, img, q, small, strong, dd, dl, dt, li, ol, ul, fieldset, form, label, table, tbody, tr, th, td, input, p,textarea {
+color:inherit;
+font-family:"微软雅黑";
+padding: 0;
+margin: 0;
+}
+ul li{list-style:none;}
+.clearfix::before,.clearfix::after {content: ".";display: block;height: 0;visibility: hidden;}
+.clearfix:after {clear: both;}
+.clearfix {zoom: 1; }
+.font14 td,.font14 td a{ font-size:14px; color:#000}
+table{border-collapse: collapse;}
+.mo1_list{ padding:6px 4px 6px 12px;}
+.mo1_list a{ font-size:14px; color:#000; text-decoration:none;}
+.mo1_list li{ display:block; height:24px; line-height:24px; background:url(/bjsports/resource/cms/2014/11/2014110516483751420.jpg) no-repeat left; padding-left:8px;}
+.bsfw_piclink{ margin-bottom:10px;}
+.tygz_wz{ line-height:20px;}
+.blsx{ background:url(/bjsports/resource/cms/2014/11/2014111315311770667.jpg) repeat-x bottom; height:273px; padding:10px;}
+.blsx_icon{background:url(/bjsports/resource/cms/2014/11/2014110516483751420.jpg) no-repeat left; padding-left:8px; font-size:14px;}
+.blsx_a a{ font-size:12px; color:#0073c6;}
+.mo1_k{ border:1px solid #cccdcd; background:#fff;}
+.mo1_top{ height:30px; line-height:30px; padding-right:10px; padding-left:12px;}
+.mo1_line1{border-bottom:2px solid #009ad9;}
+.mo1_line2{border-bottom:2px solid #ff6c00;}
+.mo1_line3{border-bottom:2px solid #277c0d;}
+.mo1_more{ display:block; float:right; color:#f96f00;}
+.mo1_more a{ color:#898989;}
+.mo1_tit{ display:block; float:left; color:#343333; font-weight:bold; font-size:14px;}
+.ywwj{background:url(/bjsports/resource/cms/2014/11/2014111315450888445.jpg) repeat-x; height:214px; padding:10px; margin-top:10px;}
+.jgsz{  padding:10px;}
+.jgsz_icon{background:url(/bjsports/resource/cms/2014/11/2014110516483751420.jpg) no-repeat left; padding-left:8px; font-size:12px;}
+.jgsz_icon a{font-size:12px; color:#000;}
+.jgsz_icon a:hover{font-size:12px; color:#000;}
+.mo1_list2{ padding:6px 4px 6px 12px;}
+.mo1_list2 a{ font-size:12px; color:#000; text-decoration:none;}
+.mo1_list2 li{ display:block; width:340px; height:24px; line-height:24px; float:left;font-size:12px;}
+.xsjg{padding:10px; margin-top:10px;}
+
+
+/*职业鉴定*/
+
+.bsfw_piclink {margin-bottom: 10px;}
+
+/*列表页*/
+
+.news_list_time li{ background:url(/bjsports/resource/cms/2014/11/2014110516483751420.jpg) no-repeat left center; padding-left:10px; line-height:30px; height:30px; *line-height:28px; *height:28px;  overflow:hidden;}
+.news_list_time li a{ float:left;  display:block;  font-weight:100;}
+.news_list_time li span{ float:right; display:block; width:100px; font-size:14px; color:#000;  }
+/*体育业务*/
+
+
+/*群众体育切换样式*/
+/*.lib_Menubox{height: 30px;}
+.lib_title{height: 30px;line-height:30px;font-size:18px;color:#525252;float:left;}
+.lib_title li{float:left;height:30px; line-height:30px;font-size:18px; margin-right:10px;}
+.lib_title li a{padding:0 10px;}
+.lib_title li a,.con_lib_one{font-size: 18px; color:#525252;height:30px; line-height:30px;}
+.lib_title a:hover,.lib_title li.lib_title_xz a{color:#ed342e;height: 30px;line-height:30px;float:left;}*/
+
+.lankuangtyb2 li {font-size: 14px;line-height: 28px;margin-left: 10px;padding-left: 8px;font-weight:100;}
+
+.saishihuodongclxia_ul1{ width:528px; float:left;}
+.saishihuodongclxia_ul2{ width:150px; float:left;}
+.saishihuodongclxia_ul2 li{ background:none;}
+.saishihuodongclxia_ul2 a{ color:#005ba5; line-height:32px;}
+
+.saishihuodongclxia1{ background:url(/bjsports/resource/cms/2014/11/2014112410064112561.jpg) no-repeat right center #FFF;}
+.saishihuodongclxia2{ background:url(/bjsports/resource/cms/2014/11/2014112410064198706.jpg) no-repeat right center #FFF;}
+.saishihuodongclxia3{ background:url(/bjsports/resource/cms/2014/11/2014112410064218138.jpg) no-repeat right center #FFF;}
+
+
+
+.lankuangtyt{ background:#fff;}
+.lankuangtyb { background:#fff;}
+
+
+.Left{padding-bottom:;}
+.Left,.Right{min-height:400px;}
+
+/*手机站样式*/
+body{    font-family: "微软雅黑"}
+#logo{width:100%; padding:16px 0;}
+#logo img{display:block; height:40px; width:204px; margin:0 auto;}
+.title_bt a{font-size:12px;color:#666666;font-family: "微软雅黑"!important;}
+
+.abc{
+display:none;
+}

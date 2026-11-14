@@ -16,6 +16,7 @@ portal-site/                     ← 静态站点根目录（整个目录发布�
 │   ├── sites.json               条目机器可读清单（与首页同源，用于校验/批量维护）
 │   ├── site-responsive.css      原有全站移动端适配补丁（子页依赖）
 │   └── site-responsive.js
+├── gongfa-archive/             新增挂载站点：中国养生功法公开资料库（VitePress，247 文件）
 ├── research-writing/            新增挂载站点：科研写作与发表教程（dist/ 原样复制，17 文件）
 ├── agents/  research/  library/  ai-reading-notes/  …   ← 全部原有子页与资源（逐字节复制）
 ├── CREDITS.md                   模板来源与许可信息
@@ -28,6 +29,7 @@ portal-site/                     ← 静态站点根目录（整个目录发布�
 - **GitHub Pages**：把 `portal-site/` 内的全部文件提交到仓库根目录（或把该目录设为 Pages 的发布根），开启 Pages 即可。
 - **任意静态托管 / Nginx / 对象存储**：把 `portal-site/` 整个目录作为站点根上传即可，无需安装依赖、无需构建。
 - 所有链接均为相对路径；子页原有的「返回资源中心」链接会自动指向新的门户首页，原有页面之间的相互跳转保持不变。
+- `gongfa-archive/` 是 VitePress 多页静态站：构建时按 `base: /hello-world/gongfa-archive/` 生成，并把内容中硬编码的站内绝对路径统一补上该前缀，因此所有 CSS/JS/字体/图片/音视频都在本站子目录内，不与门户根 `assets/` 冲突；GitHub Pages 的 `/foo` → `foo.html` 已实测支持，站内 cleanUrls 链接可直接访问。
 - `research-writing/` 是整体挂载的独立静态站：其 12 个页面与 `assets/`、`data/` 资源均使用**同级相对路径**，不含 `<base>`、绝对路径或动态 fetch，因此挂到子目录后无需改写任何路径；`build-info.json` 一并随站发布。
 
 ## 如何新增一个挂载页（只需在首页追加一条）
@@ -56,7 +58,7 @@ portal-site/                     ← 静态站点根目录（整个目录发布�
 ## 条目规则
 
 - 每个挂载页都有：页面名称、内容简述、标签、醒目的「打开页面 →」按钮与相对路径。
-- 按 11 个主题分组，顶部导航可直接跳转；搜索框按名称 / 简述 / 标签 / 路径即时过滤。
+- 按 12 个主题分组，顶部导航可直接跳转；搜索框按名称 / 简述 / 标签 / 路径即时过滤。
 - 首页卡片为静态 HTML，不依赖 JS 渲染；`assets/portal.js` 仅提供搜索与计数。
 - 顶部「挂载页 / 分组」数字由 `assets/portal.js` 在页面加载时按实际卡片数自动校正，
   **追加条目后无需修改任何数字**（禁用 JS 时显示的是生成时的初始值，不影响浏览与跳转）。

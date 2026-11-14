@@ -1,0 +1,54 @@
+*{padding:0;margin:0;font-size:16px}
+h2,span,a{font-family:"微软雅黑"}
+img{max-width:100%;border:none}
+.clearfix:after{
+  content:"";
+  visibility:hidden;
+  display:block;
+  clear:both;
+}
+* html .clearfix{
+  zoom:1;
+}
+
+.main{width:1200px;margin:0 auto}
+
+.location{color:#9a9a9a;margin-top:30px}
+.location a{font-size:16px;color:#9a9a9a}
+
+.BjImg{height:10px;margin-top:20px;background: url(/eportal/fileDir/tyjgb/resource/cms/2020/02/img_pc_site/2020022517133123504.jpg) repeat-x}
+.main .Left{float:left;width:48%;min-height: auto;}
+.main .Right{width:48%;float:right;min-height: auto;}
+.main .Bottom{width:100%}
+
+
+
+/**文章列表样式**/
+.lists_tit{margin:35px 0;padding: 15px 0;border-bottom: 1px solid #ddd;}
+.lists_tit img{float:left}
+.lists_tit h2{font-weight: 400;color: #333;float:left;font-size:24px;background: url(/eportal/fileDir/tyjgb/resource/cms/2020/02/img_pc_site/2020022516295674596.jpg) no-repeat left 6px;padding-left: 20px;}
+.lists_tit a{float:right;display:block;font-size:16px;margin-top:5px;color:#888;}
+.lists_list li a{font-size:18px;margin-left:5px;color:#404040}
+.lists_list li a:hover{color:#bd1a2d}
+.lists_list li{margin-bottom:35px}
+
+@media screen and (max-width:1200px){
+
+.main{
+   width:auto;
+   padding:10px;
+}
+
+.location {
+  margin-top:10px;
+  font-size:12px;
+}
+.location a,
+.location span,
+.location font {
+  font-size:12px;
+}
+
+
+
+}

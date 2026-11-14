@@ -1,0 +1,44 @@
+/* wz */
+.sec4wz{
+	height: 69px;
+	line-height: 69px;
+	background-color: #f5f5f5;
+}
+.sec4wz .fl{
+	
+	font-size: 14px;
+}
+.sec4wz .fl a{
+	color: #999999;
+}
+.sec5wz .wz .wztitle{
+	padding: 60px 0 30px 0;
+	font-size: 24px;
+	color: #0066cc;
+	font-weight: bold;
+	text-align: center;
+	line-height: 40px;
+}
+.sec5wz .wz .banner {
+	height: 45px;
+	line-height: 45px;
+	border-bottom: 1px solid #e7e7e7;
+}
+.sec5wz .wz .banner span{
+	color: #999999;
+	font-size: 14px;
+}
+.sec5wz .wz .banner span.ziti{
+	margin-right: 5px;
+	cursor: pointer;
+}
+.sec5wz .wz  .content{
+	padding-top: 68px;
+	margin-bottom: 110px;
+}
+.sec5wz .wz  .content p{
+	text-indent: 2em;
+	line-height: 40px;
+	margin-bottom: 50px;
+}
+/* wz */

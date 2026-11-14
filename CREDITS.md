@@ -35,6 +35,7 @@
 
 - `index.html`、`assets/portal.css`、`assets/portal.js`、`assets/sites.json`、`README.md`、本文件：为本次生成的门户层。
 - 其余原有子页与资源：来自 `aheelv/hello-world` 已发布内容，逐字节复制，保持原有内容、相对路径与访问入口不变。
+- `gongfa-archive/`：新增挂载站点「中国养生功法公开资料库」，由 VitePress 1.6.4 静态产物接入。为适配子目录部署，构建时使用 `base: /hello-world/gongfa-archive/` 并在挂载副本上补齐内容中的站内绝对路径；源项目配置与原始 `dist/` 均未改动，媒体素材逐字节保留。
 - `research-writing/`：新增挂载站点「科研论文写作与发表 · 循证教程」，由本地 `dist/` 目录 17 个文件逐字节复制。该站点自带两套 CSS、两个数据／渲染脚本与 12 个页面，站内引用全部为同级相对路径，未改动任何字节、未引入外部静态依赖。
 - `legacy-index.html`：改造前原版首页的完整归档副本。
 

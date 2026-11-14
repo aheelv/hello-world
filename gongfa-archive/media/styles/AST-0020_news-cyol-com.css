@@ -1,0 +1,168 @@
+body, div, dl, 
+dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td,select,img {
+	margin: 0;padding: 0;}
+a{color:#333;}
+a:link {text-decoration: none;}
+a:visited {text-decoration: none;}
+a:hover{color:#e60012;text-decoration: none;}
+a:active {text-decoration: none;}
+ul,li {list-style-type: none;}
+img {border: 0;}
+input{outline: none;border: none;}
+.left{float:left;}
+.right{float:right;}
+.clear {clear: both;}
+body{min-width:1200px;font: 16px/1.5 Microsoft YaHei,Heiti SC,tahoma,arial,sans-serif!important;color:#333;background-image: linear-gradient(to bottom, #e9e9e9, #f9f9f9);}
+video,audio{outline:none;}
+.con,.conBox{width:1200px;margin:0px auto;} 
+#spSrc{display:none;}
+
+.header{background:#fff;}
+.pd-head {width:1000px;margin:0 auto;}
+.pd-head .pd{padding-left:30px;font-size:14px;color:#777;height:32px;line-height:26px;overflow:hidden;background:url(/themes/cyol/assets/images/cyol/home/cyol_2026dht.png) 0px 0px no-repeat;}
+.pd-head .pd span{color:#014296}
+
+/*正文*/
+#art_geshi p,#art_geshi  h2{text-indent: 2em;}
+#art_geshi p[align=center],#art_geshi  h2[align=center]{text-indent: 0em!important;}
+#art_geshi p[style*="center"],#art_geshi h2[style*="center"]{text-indent: 0em!important;}
+
+.main{width:1000px;margin:0px auto 40px;background:#fff;padding-bottom:20px;border-radius:10px;box-shadow: 1px 5px 10px rgba(153, 153, 153, 0.2);}
+.info{width:830px;margin:0px auto;padding:35px 0;}
+.info .infoBox h1{font-size:36px;text-align:center;line-height:46px;padding:15px 0px;color:#004195;}
+.info .infoBox h3{font-size:20px;text-align:center;line-height:30px;font-weight: normal;color:#004195;}
+.info .infoBox .about{text-align:left;height:38px;line-height:38px;font-size:14px;color:#666;margin: 20px 0px 30px;border-top:1px solid #ebebeb;border-bottom:1px solid #ebebeb;}
+.info .infoBox .about span{padding:0px 10px;}
+
+/*字号变化*/
+.info .infoBox .about .changeSize{/*text-align:right;width:100px;*/}
+.info .infoBox .about .changeSize span{margin-left:12px;padding:0px;    margin-top:4px;}
+#bigger{display:inline-block;width:30px;height:30px;background:url(/themes/cyol/assets/images/cyol/btn_fontsize.png) 0px 0 no-repeat;cursor:pointer;}
+#smaller{display:inline-block;width:30px;height:30px;background:url(/themes/cyol/assets/images/cyol/btn_fontsize.png) 0px -32px no-repeat;cursor:pointer;}
+
+.zhengwen{font-size:18px;}
+.info .infoBox p{line-height: 180%;margin-bottom: 1.4em;}
+.info .infoBox p.img_cut_to_doc,.info .infoBox p.img_cut_to_doc img{margin-bottom:0;}
+.info .infoBox p.img_cut_to_doc img{margin:0 auto!important;}
+.info .infoBox p img{margin-bottom: 1.4em;}
+.info .infoBox  p br{ display:none; }
+.info .infoBox h2,.vdzhaiyao h2{line-height:180%;margin-bottom: 1.1em;font-size:18px;}
+.info .infoBox img{max-width:100%!important;margin:0px auto;display:block;width: auto!important;    height: auto !important;}
+.vdBox img{max-width:100%!important;margin:0px auto;display:block;width: auto!important;}
+
+.guide{background: #f2f2f2;padding: 10px; border-top: 3px solid #D0D0D0;color: #777;padding:15px;font-size:14px;line-height:24px;margin-bottom:15px;}
+.zbry{text-align:right;font-size:15px;color: #666;}
+.ql-img-description-wrapper{padding:0!important;margin:-20px 0px 20px;font-size: 14px!important;}
+video,audio{margin-bottom:1.4em!important;display:block;margin:0px auto!important;margin-bottom: 20px!important;}
+audio{width:100%;height:50px;}
+.video-js .vjs-tech {position: relative !important;margin: 0px auto;}
+.video-js{margin-bottom:20px!important;}
+.zhengwen .video-js, .v_player video , .zhengwen video{  margin: 0px auto;/*max-width: 880px;min-height: 360px;max-height: 495px;min-width: 640px;*/} 
+.zhengwen .video-js,.zhengwen video{max-width:880px;min-width:420px;height:auto;}
+.qingping_about{margin:30px 0px 10px;}
+.qingping_list{font-size:14px;line-height:30px;}
+
+/*图集*/
+.am-slider-desc{margin-bottom: 25px;font-size: 16px;text-align: justify;line-height:26px;    }    
+#tj_container  a { color: #fff; text-decoration: none;}
+#tj_container { overflow: hidden;  margin:0px auto 60px;background:#fff;}
+#sliderCon { position: relative; width:100%; /*max-width: 900px;*/  margin: 0 auto;}
+#tj_container .slide { width: 100%; height: auto;min-height:600px; position: relative; overflow: hidden;}
+#tj_container .slide img { width: 100%; /*max-width: 80% !important;*/height: auto; /*max-height:600px;*/ display: block; margin:0px auto;}
+#tj_container   .slide { position: absolute; z-index: 0; opacity: 0; pointer-events: none;}
+#tj_container   .slide.active {  position: relative;  z-index: 1;  opacity: 1;  pointer-events: auto;}
+#tj_container   .slideInfo { /* position: absolute;  bottom: 0; left: 0;  right: 0; padding: 0px;*/ background-color: #fff; color: #333;}
+#tj_container   .slideInfo p { font-size: 15px; }
+#tj_container  .arrow { width:22px;  height: 48px; position: absolute;  top:50%;  bottom: 0; background-color: #fff; margin-top:-80px; cursor: pointer; z-index: 100; background-size:22px 48px; background-repeat: no-repeat; pointer-events: none;  opacity: 0; transition: all 0.2s; -webkit-transition: all 0.2s;}
+#tj_container   #pre { left: 5px;  background-image: url(/themes/cyol/assets/images/cyol/home/cyol_2026left.png);background-position: 0px center;}
+#tj_container   #next {  right:5px;  background-image: url(/themes/cyol/assets/images/cyol/home/cyol_2026right.png); background-position: 0px center;}
+#tj_container .sliderHovered .arrow {  opacity: 1; pointer-events: auto;}
+#tj_container .sliderHovered #pre { transform: translateX(0);  -webkit-transform: translateX(0);}
+#tj_container .sliderHovered #next {  transform: translateX(0);  -webkit-transform: translateX(0);}
+#tj_container p{margin:10px 20px;text-indent:0px;font-size:16px;}
+#tj_container p span{font-size:22px;color:#0c2b4e;line-height:30px;padding-right:8px;}
+  /* 推荐 */
+.xg-box {background: #f3f2f2;padding-top: 40px;}
+.xg {width: 1200px;margin: 0 auto;overflow: hidden;}
+.xg-title {font-size: 24px;border-bottom: 4px solid #e5e5e5;padding-bottom: 10px;}
+.xg-box .intro {font-size: 12px;color: #999!important; margin-bottom: 0px !important;padding: 0px !important;border:none!important;}
+.xg-box .intro a { color: #999;}
+.theLast { position: relative; width: 1200px;  margin: 30px auto 40px; }
+.theLast .picTit1 { float: left;width: 387px; height:320px;overflow: hidden; margin-right: 19px;}
+.theLast .picTit1 .img-cr { width: 387px; height: 216px;}
+.theLast .picTit1 .img-cr img {width: 387px;height: 216px;}
+.theLast .picTit1 h3 { margin-top: 20px;font-size: 16px;margin-bottom: 10px;line-height:24px;max-height:48px;overflow:hidden;}
+.theLast .picTit1 h3 a {font-size: 18px;color: #333;font-weight: normal; }
+.theLast .Cont {overflow: hidden;height:320px; }
+.theLast .ScrCont {width: 10000000px;}
+.scroll_cont{ position:relative;}
+.theLast #List11,  #List12 {float: left;}
+.theLast .blk02 {overflow: auto;}
+.theLast .LeftBotton{height: 60px; width: 40px;background: url(../../images/cyol/2019btn_left.png) no-repeat 0 0;overflow: hidden;position: absolute;top: 80px;left: 0;z-index:10000; cursor:pointer;}
+.theLast .RightBotton{height: 60px;width: 40px;background: url(../../images/cyol/2019btn_right.png) no-repeat 0 0;overflow: hidden;position: absolute;top: 80px;right: 0;z-index: 10000;cursor: pointer;}
+
+/*视频稿件*/
+.vdBox .vcon,.vdzhaiyao{width:1000px;margin:0px auto;}
+.vdBox{background: url(/themes/cyol/assets/images/cyol/home/cyol_2026playerbg.jpg) center top no-repeat;overflow: hidden;padding: 10px 0 46px}
+.vdBox .videotxt{margin-bottom:10px;}
+.vdBox .videotxt h1 { font-size: 36px; color: #004195;  font-weight: normal;  padding: 24px 0 10px;}
+.vdBox .videointro {color: #004195;font-size: 16px;height:27px;}
+.vdBox .videointro span{display:inline-block;margin-right:15px;height:25px;}
+.vdBox .videotxt span.time{background: url(/themes/cyol/assets/images/cyol/home/cyol_2026time.png) left top no-repeat;padding-left:28px;background-size:25px 25px;}
+.vdBox .videotxt span.zuozhe{background: url(/themes/cyol/assets/images/cyol/home/cyol_2026zz.png) left top no-repeat;padding-left:22px;}
+.vdBox .videotxt span.laiyuan{background: url(/themes/cyol/assets/images/cyol/home/cyol_2026yuan.png) left top no-repeat;padding-left:22px;}
+.vdzhaiyao{padding:30px 0px;line-height: 30px;text-indent:0em;}
+.vdzhaiyao img{max-width:80%;text-indent:0px;}
+.vdzhaiyao p{font-size:16px;line-height:32px;color:#004195;white-space:pre-line;word-break: break-all;}
+.vdzhaiyao  p br{ display:none; }
+.vdzhaiyao .zb{color:#666;}
+.vdzhaiyao .content-tag{display:none;margin:20px 0px;text-indent:0px;}
+.vdzhaiyao .content-tag span{display:inline-block;padding:5px 20px;border-radius:20px;background:#eee;margin-right: 10px;    margin-bottom: 10px;}
+.vdzhaiyao .content-tag span a{font-size:14px;color:#999;}
+.vdzhaiyao  .bqsm{font-size:14px;color:#999;margin-top:20px;text-indent:0px;}
+.vdzhaiyao .share .bdsharebuttonbox {width:300px;}
+.vdzhaiyao .share h6{font-size:14px;color:#888;font-weight:normal;}
+
+.vdBox .pd-head{color:#ddd;}
+.vdBox .pd-head .pd {font-size: 16px; color: #777; height: 70px;line-height: 62px; overflow: hidden;padding-left:0px;}
+.vdBox .pd-head .pd a{color:#ddd;}
+
+.vdBox .v_aboth{width:100%;height:550px;background:#434343;} 
+.vdBox .v_aboth .v_player{width:1000px;height:550px;float:left;background:#000;}
+.vdBox .v_aboth .v_player .prism-player{margin:0 auto;}
+.vdBox .v_aboth .v_player .prism-player .prism-cover {background-size:1000px 100%;} 
+
+.tuijian{width:1200px;background:#fff;border-radius:8px;margin:0 auto 40px;padding-top:25px;}
+.tuijian dt{height: 34px; margin:0 12px;   border-top: 1px solid #e60012;    border-bottom: 1px solid #c7c7c7;    line-height: 34px;    margin-bottom: 12px;}
+.tuijian dt a{display: block;    font-size: 20px;    color: #000;    background: url(https://news.cyol.com/themes/cyol/assets/images/cyol/home/cyol_2026tbg2.png) 94px 9px no-repeat;}
+.item_list2{width:1184px;margin:0 auto;margin-top:20px;clear:both;overflow:hidden;}
+.item_list2 li{width:270px;height:260px;float:left;margin:0 13px;display:inline;}
+.item_list2 li img{width:100%;height:152px;border-radius:10px;}
+.item_list2 li h3{font-weight: normal;font-size:16px;line-height:24px;margin-top:10px;max-height:72px;overflow:hidden;}
+.item_list2 li h3 a{color:#004195;}
+.item_list2 li p{display: none;font-size: 13px;line-height: 18px;max-height:36px;overflow:hidden;margin-top:5px;color: #666;}
+
+/*zhibo*/
+.vdBox  .zhibo_player{width: 1000px;margin: 0px auto;height:562px;}
+.vdBox .bfcon{height:auto;}
+.vdBox .zhibo_player .prism-player .prism-cover {/*background-size:contain;*/} 
+.shenheno{display:none; position: relative;  width: 1000px; height: 562px;}
+.shenheno .img_fm{width: 1000px; height: 562px;position:absolute;top:0;left:0;z-index:1;}
+.shenheno .img_xdts{width: 1000px; height: 675px;position:absolute;top:0;left:0;z-index:2;}
+
+.prism-player .prism-big-play-btn {bottom:30px!important;}
+/*share到微信微博*/
+.changeSize{    position: fixed;   right: 50%;   margin-right: -540px;   top: 300px;}
+.changeSize #smaller{margin-top:0px;display:block;} 
+.shareBox{position:relative;font-size:12px;line-height:30px;display: flex;align-items: center;justify-content: flex-end;margin-top: 4px;}
+.wechat-btn {background:none; color: #fff;border-radius:6px;border:none;cursor:pointer;margin-left:10px;overflow:hidden;}
+.weibo-btn{background:none; color: #fff;border-radius:6px;border:none;margin-left:10px;cursor:pointer;overflow:hidden;}
+.info .infoBox .wechat-btn img,.info .infoBox .weibo-btn img{width:30px!important;}
+.wechat-btn:hover { background: #06ad56;}
+.vdBox .zhiboimg .shareBox img{margin-right:0px!important;}
+.zhiboBox .xx_info .shareBox{margin-top: -40px;}
+/* 弹窗样式 */
+.modal { position: absolute; top: 33px;right: 0; width: 140px;height: 140px;  justify-content: center;align-items: center; z-index: 9999;}
+#qrcode {display: inline-block;background:#fff;  padding: 3px;border: 1px solid #ddd;border-radius:3px;}
+
+

@@ -1,0 +1,24 @@
+/* 增对hanweb.css====问题的覆盖样式！ */
+body {
+  font-family:'Microsoft Yahei'; /**根据项目自行修改**/
+}
+a {transition: all 0.2s ease-out 0s; color:#333}
+a:hover{transition: all 0.2s ease-out 0s; color:#F00}
+
+
+/**********全局通用样式************/
+.box_color{ background-color:#ffffff;}
+.box_bottom{ margin-bottom:10px;}
+.list_pad{ padding:0 5px;}
+/*导航区域*/
+div.nav_xl_box{
+	width:100%;
+	height:41px;
+	clear:both;
+	}
+.phone_wzy_lm,.sp_time_phone,
+.phone_banquan{display: none;}
+
+
+	
+	
