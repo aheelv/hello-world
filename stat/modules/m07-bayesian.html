@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07 · 贝叶斯统计与计算 · 统计 · 智能学习体系</title>
+<meta name="description" content="贝叶斯统计：先验与后验、Beta-二项等共轭先验推导、可信区间与置信区间对比、Metropolis-Hastings 与 Gibbs 采样、变分推断与 ELBO、贝叶斯因子与模型比较。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m07" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 1 · <a href="../stages/statistics.html">统计学</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l3">L3 进阶</span> · 10 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 05 · 上一篇：<a href="m06-regression.html">06 · 回归分析</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m08-experiment.html">08 · 实验设计与因果推断</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m05-inference.html">05 统计推断：估计与检验</a><span class="dep-arrow">→</span><a class="dep-node" href="m06-regression.html">06 回归分析</a><span class="dep-arrow">→</span><a class="dep-node current" href="m07-bayesian.html">07 贝叶斯统计与计算</a><span class="dep-arrow">→</span><a class="dep-node" href="m08-experiment.html">08 实验设计与因果推断</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：先验分布, 似然函数, 后验分布, 共轭先验, 可信区间, MCMC, 边缘似然, Beta-Binomial</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>共轭先验让后验可解析，代价是什么？ <a class="q-anchor" href="#s3">→ 对应讲解</a></li><li>MCMC 样本如何判断「收敛」？只看轨迹图够吗？ <a class="q-anchor" href="#s5">→ 对应讲解</a></li><li>可信区间与置信区间在解释上有哪些可操作的区别？ <a class="q-anchor" href="#s4">→ 对应讲解</a></li><li>先验在大数据下会被「淹没」吗？什么时候不会？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+    <article class="module" data-module="m07">
+
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/statistics.html">阶段 1 · 统计学</a> / 07 · 贝叶斯统计与计算</div>
+        <h1>07 · 贝叶斯统计与计算</h1>
+        <p class="lead">
+          频率学派说「参数是固定未知的常数」；贝叶斯学派说「参数也有不确定性，可以用概率描述」。
+          这不是文字游戏——它让我们能自然地说「这个参数有 95% 的把握落在 0.38 到 0.86 之间」，
+          并且随着数据变多而持续更新信念。本章先讲清两派分歧，再推导共轭先验，最后深入现代贝叶斯的两大计算引擎：
+          <strong>MCMC 采样</strong>与<strong>变分推断</strong>——后者正是 AI 大模型训练中各种「近似推断」的思想源头。
+        </p>
+        <div class="module-meta">
+          <span class="badge ok">进阶</span>
+          <span class="badge">10 学时</span>
+          <span class="badge">前置：模块 05</span>
+          <span class="badge brand">阶段三 · 建模进阶</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>用直觉例子说清频率学派与贝叶斯学派的分歧到底在哪</li>
+          <li>写出贝叶斯公式 $p(\theta \mid x) \propto p(x \mid \theta)\, p(\theta)$，说清似然、先验、后验、证据各是什么</li>
+          <li>完整推导 Beta-二项共轭更新 $Beta(\alpha,\beta) \to Beta(\alpha+s,\ \beta+n-s)$，会算后验均值与可信区间</li>
+          <li>说清后验均值 / 中位数 / MAP 三种点估计的区别</li>
+          <li>对比可信区间与置信区间——两者的「95%」含义不同</li>
+          <li>理解 Metropolis-Hastings 的接受率公式并能手算一步</li>
+          <li>理解 KL 散度与 ELBO 的推导思路，会比较 MCMC 与变分推断的取舍</li>
+          <li>知道贝叶斯因子与后验预测检查分别解决什么问题</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 两大学派：参数到底是不是随机的</h2>
+
+      <h3 id="s1-1">1.1 分歧的直觉例子</h3>
+      <p>问：「明天下雨的概率是 30%」——这句话在说什么？</p>
+      <ul>
+        <li><strong>频率学派（Frequentist）</strong>：概率 = 长期频率。「明天」是唯一一次事件，谈不上频率。他们会说：这句话的意思是「在大量类似的气象条件下，有 30% 的日子下了雨」。参数（例如某地年降雨概率 $p$）是<strong>固定的未知常数</strong>，数据才是随机的。</li>
+        <li><strong>贝叶斯学派（Bayesian）</strong>：概率 = <strong>主观信念的度量</strong>。「明天下雨的概率 30%」就是「我对明天下雨这件事的信心是 0.3」。参数 $p$ 本身也可以是不确定的，用一个概率分布描述它。</li>
+      </ul>
+
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          直觉：一个硬币，谁在掷它？
+        </div>
+        <p>一枚硬币的「正面概率 $p$」到底是多少？频率学派说 $p$ 是个固定数，我们只能反复掷来<em>估计</em>它；贝叶斯学派说：在看到数据之前，我先有信念（比如「多半是公平的」），每掷一次就<strong>更新一次信念</strong>。两派用同一套数据常常得出不同的表述方式——但只要数据足够多，结论会越来越接近。<strong>实践中的分歧远小于教科书上的对立</strong>：关键是知道自己在用哪种语言说话。</p>
+      </div>
+
+      <h3 id="s1-2">1.2 对照表：两派的核心差异</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>维度</th><th>频率学派</th><th>贝叶斯学派</th></tr></thead>
+          <tbody>
+            <tr><td>参数 $\theta$</td><td>固定未知常数</td><td>随机变量，用分布描述</td></tr>
+            <tr><td>概率含义</td><td>长期重复试验的频率</td><td>信念/不确定性的度量</td></tr>
+            <tr><td>核心工具</td><td>点估计、置信区间、p 值（模块 05）</td><td>先验、后验、可信区间、贝叶斯因子</td></tr>
+            <tr><td>「95% 区间」的含义</td><td>重复抽样构造的区间，95% 会覆盖真值</td><td>参数落在这个区间内的概率是 95%</td></tr>
+            <tr><td>先验知识</td><td>难以正式纳入</td><td>通过先验分布自然纳入</td></tr>
+            <tr><td>小样本表现</td><td>依赖大样本性质，小样本不稳</td><td>先验提供「伪观测」，小样本更稳</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 贝叶斯公式与参数推断</h2>
+      <p>贝叶斯统计的发动机就是条件概率公式。设 $\theta$ 是参数，$x$ 是观测数据：</p>
+
+      <div class="formula-box">
+        <div class="f-name">贝叶斯公式（参数推断版）</div>
+        $$ p(\theta \mid x) = \frac{p(x \mid \theta)\, p(\theta)}{p(x)} \;\propto\; p(x \mid \theta)\, p(\theta) $$
+        <div class="f-note">
+          <strong>后验</strong> $p(\theta \mid x)$：看到数据后，对参数的信念分布（我们最终想要的）。<br>
+          <strong>似然</strong> $p(x \mid \theta)$：在参数取 $\theta$ 时，观测到当前数据的可能性（与模块 05 的似然函数同一概念）。<br>
+          <strong>先验</strong> $p(\theta)$：看数据之前对参数的信念。<br>
+          <strong>证据 / 边缘似然</strong> $p(x)$：数据的总概率，起归一化作用。
+          $\propto$ 读作「正比于」——因为 $p(x)$ 与 $\theta$ 无关，算后验形状时可以先不管它。
+        </div>
+      </div>
+
+      <h3 id="s2-1">2.1 证据 $p(x)$ 是什么</h3>
+      <p>证据（evidence）把似然对参数的所有可能取值「加总」（连续参数用积分，离散参数用求和）：</p>
+      $$ p(x) = \int p(x \mid \theta)\, p(\theta)\, d\theta $$
+      <p>直觉：它是「数据在所有可能参数下的平均可能性」。<strong>难点也在这里</strong>——这个积分通常没有闭式解，这正是第 6、7 节（MCMC 与变分推断）存在的理由：当 $p(x)$ 算不出来时，怎么还能得到后验？</p>
+
+      <h3 id="s2-2">2.2 贝叶斯更新的三步心法</h3>
+      <ol>
+        <li><strong>写下先验</strong>：$p(\theta)$——你对参数的初始信念（可以来自历史数据、领域知识，或「我不知道」的无信息先验）。</li>
+        <li><strong>写下似然</strong>：$p(x \mid \theta)$——数据产生的模型（二项？正态？泊松？）。</li>
+        <li><strong>相乘并归一化</strong>：后验 $\propto$ 似然 $\times$ 先验，再调整成标准分布。</li>
+      </ol>
+      <p>一句话记忆：<strong>后验 ∝ 似然 × 先验</strong>。数据越多，似然「话语权」越大，先验的影响被稀释——这与直觉一致。</p>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 共轭先验：让后验有闭式解（重点）</h2>
+
+      <h3 id="s3-1">3.1 什么是共轭</h3>
+      <p>如果先验选自某个分布族，使得<strong>后验仍然落在同一族</strong>中（只是参数变了），这个先验族就叫<strong>共轭先验</strong>（Conjugate Prior）。好处：</p>
+      <ul>
+        <li>后验有<strong>闭式解</strong>，不用计算机也能手算更新；</li>
+        <li>更新规则极其简洁——往往是「参数直接相加」；</li>
+        <li>「先验 → 后验 → 作为下一步的先验」可以连环更新（序贯分析）。</li>
+      </ul>
+
+      <h3 id="s3-2">3.2 Beta-二项共轭：完整推导（重点）</h3>
+      <p>场景：抛一枚硬币 $n$ 次，正面 $s$ 次，反面 $n-s$ 次。参数 $\theta = P(\text{正面}) \in [0,1]$。</p>
+      <p><strong>第 1 步：似然。</strong>二项模型下，数据的似然是：</p>
+      $$ p(x \mid \theta) = \binom{n}{s} \theta^{s} (1-\theta)^{n-s} $$
+      <p><strong>第 2 步：先验。</strong>取 $Beta(\alpha,\beta)$ 分布（定义在 $[0,1]$ 上，密度 $\propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$）：</p>
+      $$ p(\theta) = \frac{1}{B(\alpha,\beta)}\, \theta^{\alpha-1} (1-\theta)^{\beta-1} $$
+      <p><strong>第 3 步：相乘。</strong>后验 $\propto$ 似然 × 先验，把 $\theta$ 的幂次合并（常数因子统统扔进 $\propto$ 里）：</p>
+      $$ p(\theta \mid x) \;\propto\; \theta^{s} (1-\theta)^{n-s} \cdot \theta^{\alpha-1} (1-\theta)^{\beta-1} = \theta^{(\alpha+s)-1} (1-\theta)^{(\beta+n-s)-1} $$
+      <p>右边恰好是 $Beta(\alpha+s,\ \beta+n-s)$ 的<strong>核</strong>（kernel，忽略归一化常数后的部分）。于是：</p>
+
+      <div class="formula-box">
+        <div class="f-name">Beta-二项共轭更新</div>
+        $$ \text{先验 } Beta(\alpha,\beta) \;+\; \text{数据（} n \text{ 次试验中 } s \text{ 次成功）} \;\Longrightarrow\; \text{后验 } Beta(\alpha + s,\ \beta + n - s) $$
+        <div class="f-note">
+          <strong>读法</strong>：$\alpha$ 可以理解为「事前已见过 $\alpha$ 次成功」，$\beta$ 是「事前已见过 $\beta$ 次失败」——
+          这叫<strong>伪计数</strong>（pseudo-counts）。后验均值：
+          $$ E(\theta \mid x) = \frac{\alpha + s}{\alpha + \beta + n} $$
+          可以看成「先验均值 $\frac{\alpha}{\alpha+\beta}$」与「频率估计 $\frac{s}{n}$」的<strong>加权平均</strong>，
+          权重分别是先验强度 $\alpha+\beta$ 与数据量 $n$。
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.1</span>
+          <span class="ex-title">抛 10 次硬币 7 次正面：Beta(2,2) 先验的完整更新</span>
+        </div>
+        <div class="example-body">
+          <p>先验 $p(\theta) = Beta(2,2)$（相信硬币「大致公平」）。抛 10 次出现 7 次正面。求后验分布、后验均值、后验众数，并给出 95% 可信区间的直觉。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步：识别参数。</strong>$\alpha = 2$，$\beta = 2$，$n = 10$，$s = 7$。</p>
+              <p><strong>第 2 步：共轭更新。</strong></p>
+              $$ \text{后验} = Beta(\alpha + s,\ \beta + n - s) = Beta(2+7,\ 2+3) = Beta(9,\ 5) $$
+              <p><strong>第 3 步：后验均值与先验、频率估计对比。</strong></p>
+              $$ E(\theta \mid x) = \frac{9}{9+5} = \frac{9}{14} \approx 0.643 $$
+              <ul>
+                <li>先验均值：$2/4 = 0.5$（本来认为大致公平）</li>
+                <li>频率估计（极大似然）：$\hat{\theta} = 7/10 = 0.7$</li>
+                <li>后验均值 $0.643$ 恰好落在两者之间——<strong>数据把信念从 0.5 拉向 0.7，但没拉到底</strong>。</li>
+              </ul>
+              <p>验证加权平均公式：$E(\theta \mid x) = \dfrac{(\alpha+\beta)\cdot 0.5 + n \cdot 0.7}{\alpha+\beta+n} = \dfrac{4\times 0.5 + 10 \times 0.7}{14} = \dfrac{9}{14} \approx 0.643$ ✓</p>
+              <p><strong>第 4 步：后验众数（MAP）。</strong>$Beta$ 分布的众数 $= \dfrac{\alpha'-1}{\alpha'+\beta'-2} = \dfrac{8}{12} = \dfrac{2}{3} \approx 0.667$。</p>
+              <p><strong>第 5 步：95% 可信区间直觉。</strong>手算可用正态近似：$Beta(9,5)$ 的方差</p>
+              $$ \mathrm{Var}(\theta \mid x) = \frac{\alpha' \beta'}{(\alpha'+\beta')^2 (\alpha'+\beta'+1)} = \frac{45}{196 \times 15} \approx 0.0153, \quad \text{sd} \approx 0.124 $$
+              $$ 0.643 \pm 1.96 \times 0.124 \approx (0.40,\ 0.89) $$
+              <p>用软件求精确分位数得到约 $(0.38,\ 0.86)$（Beta 分布略微右偏，两侧不完全对称）。
+              <strong>正确读法</strong>：「$\theta$ 落在 $(0.38,\ 0.86)$ 之间的概率是 95%」——这是贝叶斯可信区间可以直接说的句子。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s3-3">3.3 正态-正态共轭</h3>
+      <p>场景：观测 $x_1,\dots,x_n \overset{iid}{\sim} N(\theta, \sigma^2)$，方差 $\sigma^2$ 已知，估计均值 $\theta$。取正态先验 $\theta \sim N(\mu_0, \sigma_0^2)$，则后验仍是正态：</p>
+      $$ \theta \mid x \;\sim\; N(\mu_n, \sigma_n^2), \qquad \frac{1}{\sigma_n^2} = \frac{1}{\sigma_0^2} + \frac{n}{\sigma^2} $$
+      $$ \mu_n = \frac{\dfrac{\mu_0}{\sigma_0^2} + \dfrac{n\bar{x}}{\sigma^2}}{\dfrac{1}{\sigma_0^2} + \dfrac{n}{\sigma^2}} $$
+      <p>用<strong>精度</strong>（precision = 方差的倒数）理解最清楚：<strong>后验精度 = 先验精度 + 数据精度</strong>；
+      后验均值是先验均值与样本均值的<strong>精度加权平均</strong>。数据量 $n$ 越大，$\bar{x}$ 的权重越大。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.2</span>
+          <span class="ex-title">正态-正态共轭：精度相加与样本量的稀释作用</span>
+        </div>
+        <div class="example-body">
+          <p>某精密零件的长度服从 $N(\theta,\sigma^{2})$，产线历史显示 $\sigma=2$ mm 且长期稳定（视为已知）。工艺经验认为 $\theta$ 应在 $100$ mm 附近，取先验 $\theta \sim N(100,\ 1)$。现抽检 $n=16$ 件，测得样本均值 $\bar{x}=102$ mm。（a）求后验分布；（b）求后验均值与 95% 可信区间；（c）若样本量增至 $n=100$（仍 $\bar{x}=102$），后验如何变化？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步：算出两个「精度」。</strong>先验精度 $1/\sigma_0^{2}=1/1=1$，数据精度 $n/\sigma^{2}=16/4=4$。这里的数据精度用 $n/\sigma^{2}$，等价于「样本均值的方差 $\sigma^{2}/n=0.25$ 的倒数」。</p>
+              <p><strong>第 2 步：后验精度与后验方差。</strong></p>
+              $$ \frac{1}{\sigma_n^{2}} = 1 + 4 = 5 \;\Longrightarrow\; \sigma_n^{2} = 0.2,\qquad \sigma_n = \sqrt{0.2} \approx 0.447 $$
+              <p><strong>第 3 步：后验均值（精度加权平均）。</strong></p>
+              $$ \mu_n = \frac{1\times 100 + 4\times 102}{5} = \frac{100+408}{5} = 101.6 $$
+              <p>权重解释：先验权重 $1/5 = 20\%$，数据权重 $4/5 = 80\%$。样本均值 $102$ 把先验的 $100$ 拉了 $80\%$ 的距离。</p>
+              <p><strong>第 4 步：95% 可信区间。</strong>后验为正态，直接用 $\mu_n \pm 1.96\,\sigma_n$：</p>
+              $$ 101.6 \pm 1.96\times 0.447 \approx 101.6 \pm 0.876 \;\Longrightarrow\; (100.72,\ 102.48) $$
+              <p><strong>第 5 步：样本量增到 100 的敏感性。</strong>数据精度变为 $100/4=25$，后验精度 $26$：</p>
+              $$ \sigma_n^{2} = \frac{1}{26} \approx 0.0385,\qquad \sigma_n \approx 0.196 $$
+              $$ \mu_n = \frac{1\times 100 + 25\times 102}{26} = \frac{2650}{26} \approx 101.92 $$
+              <p>先验权重从 $20\%$ 掉到 $1/26 \approx 3.8\%$，后验均值几乎贴上 $\bar{x}$，区间宽度从约 $1.75$ mm 收窄到约 $0.77$ mm——<strong>数据越多，先验越被稀释</strong>。</p>
+              <p><strong>易错提示：</strong>共轭更新里相加的是<strong>精度（方差倒数）</strong>，不是方差。若误写成 $\sigma_n^{2} = \sigma_0^{2} + \sigma^{2}/n = 1+0.25$，就等于说「看得越多越不确定」，方向完全反了。另一个常见混淆是把 $\sigma^{2}/n$ 当成数据精度——它是样本均值的<strong>方差</strong>，取倒数才是精度。</p>
+              <p><strong>应用/AI 关联：</strong>「后验精度 = 先验精度 + 数据精度」是卡尔曼滤波的递推核心（每来一个观测就把精度加上去），也是多源融合的标准代数：把不同模型的估计当作带精度的观测，按精度加权平均即得融合结果——推荐系统的多路打分融合、联邦学习的参数聚合都在复用这套公式。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s3-4">3.4 Gamma-泊松共轭与超参数</h3>
+      <p>场景：单位时间内的事件数 $x_i \overset{iid}{\sim} \text{Poisson}(\lambda)$。取 $Gamma(\alpha,\beta)$ 先验（$\beta$ 为速率参数），则：</p>
+      $$ \text{后验} = Gamma\Big(\alpha + \sum_{i=1}^n x_i,\ \beta + n\Big), \qquad E(\lambda \mid x) = \frac{\alpha + \sum x_i}{\beta + n} $$
+      <p>又是「参数相加」。这里的 $\alpha,\beta$ 叫<strong>超参数</strong>（hyperparameters）——「参数的参数」，控制先验的形状与强度：</p>
+      <ul>
+        <li><strong>先验强度</strong>（如 Beta 的 $\alpha+\beta$、Gamma 的 $\beta$）相当于「伪观测数」，决定先验要多少数据才能被撼动；</li>
+        <li>超参数本身也可以再放一层先验（层级模型 / 超先验），但那是更进阶的话题。</li>
+      </ul>
+
+      <div class="table-wrap">
+        <table>
+          <caption>表 3.1 常用共轭先验速查</caption>
+          <thead><tr><th>数据模型（似然）</th><th>共轭先验</th><th>后验</th><th>后验均值直觉</th></tr></thead>
+          <tbody>
+            <tr><td>二项（成功次数 $s$ / $n$）</td><td>$Beta(\alpha,\beta)$</td><td>$Beta(\alpha+s,\ \beta+n-s)$</td><td>成功率的加权平均</td></tr>
+            <tr><td>正态（已知 $\sigma^2$，估均值）</td><td>$N(\mu_0,\sigma_0^2)$</td><td>$N(\mu_n,\sigma_n^2)$</td><td>精度加权平均</td></tr>
+            <tr><td>泊松（计数）</td><td>$Gamma(\alpha,\beta)$</td><td>$Gamma(\alpha+\sum x_i,\ \beta+n)$</td><td>率的「总计数 / 总时长」</td></tr>
+            <tr><td>正态（已知均值，估方差）</td><td>逆 Gamma</td><td>逆 Gamma</td><td>方差的平滑估计</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.3</span>
+          <span class="ex-title">Gamma-泊松共轭：呼叫中心到达率与序贯更新</span>
+        </div>
+        <div class="example-body">
+          <p>某呼叫中心以 5 分钟为一个时段统计来电数，$x_i \sim \text{Poisson}(\lambda)$。历史认为平均每时段约 $1.5$ 通，取先验 $\lambda \sim Gamma(3,\ 2)$（$\beta=2$ 为速率参数）。观测 $10$ 个时段，合计 $\sum_{i=1}^{n} x_i = 42$ 通。（a）求后验分布、后验均值与 95% 近似可信区间；（b）若数据分两批到达（前 5 个时段共 $19$ 通，后 5 个时段共 $23$ 通），验证序贯更新与一次性更新结果一致。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步：套共轭更新规则。</strong>$\alpha=3$，$\beta=2$，$n=10$，$\sum_{i=1}^{n} x_i=42$：</p>
+              $$ \text{后验} = Gamma(3+42,\ 2+10) = Gamma(45,\ 12) $$
+              <p><strong>第 2 步：后验均值与先验、频率估计对比。</strong></p>
+              $$ \mathrm{E}(\lambda \mid x) = \frac{45}{12} = 3.75 $$
+              <ul>
+                <li>先验均值：$3/2 = 1.5$ 通/时段</li>
+                <li>频率估计（极大似然）：$42/10 = 4.2$ 通/时段</li>
+                <li>后验均值是「伪计数加权平均」：$\dfrac{2\times 1.5 + 10\times 4.2}{2+10} = \dfrac{45}{12} = 3.75$ ✓</li>
+              </ul>
+              <p>权重 $2$ 与 $10$ 说明：先验只值「2 个时段的伪观测」，数据有 10 个时段，估计被拉向 $4.2$ 但没拉到底。</p>
+              <p><strong>第 3 步：标准差与 95% 近似区间。</strong>$Gamma(\alpha,\beta)$ 的均值为 $\alpha/\beta$、方差为 $\alpha/\beta^{2}$：</p>
+              $$ \mathrm{sd} = \frac{\sqrt{45}}{12} = \frac{6.708}{12} \approx 0.559 $$
+              $$ 3.75 \pm 1.96\times 0.559 \approx 3.75 \pm 1.10 \;\Longrightarrow\; (2.65,\ 4.85) $$
+              <p>$Gamma$ 右偏，但 $\alpha=45$ 时正态近似已相当准；精确区间需用 Gamma 分位数。</p>
+              <p><strong>第 4 步：序贯更新验证。</strong>第一批（$n_1=5$，和为 $19$）：</p>
+              $$ Gamma(3+19,\ 2+5) = Gamma(22,\ 7) $$
+              <p>第二批把上一步后验当先验（$n_2=5$，和为 $23$）：</p>
+              $$ Gamma(22+23,\ 7+5) = Gamma(45,\ 12) \quad\checkmark $$
+              <p>与一次性更新完全一致——这正是共轭先验支持<strong>在线/流式更新</strong>的原因：只需存 $(\alpha,\beta)$ 两个数，来一批数据加一次。</p>
+              <p><strong>易错提示：</strong>Gamma 有 rate 与 scale 两种参数化，$\beta$ 是速率时均值为 $\alpha/\beta$；若软件用 scale 参数 $\theta=1/\beta$，均值是 $\alpha\theta$，混用会让答案差一个量级。另外「参数相加」中 $\beta$ 加的是<strong>时段数 $n$</strong>，不是总计数——写成 $\beta + \sum x_i$ 是典型错误。</p>
+              <p><strong>应用/AI 关联：</strong>泊松-Gamma 是事件计数建模的默认组合：每秒请求数、曝光点击数、故障/事故率、理赔频次。工程上的「经验贝叶斯平滑」——把稀疏的 CTR 向全局均值收缩——本质就是给每个条目的到达率配一个 $Gamma$ 先验做后验估计，收缩强度由 $\beta$ 控制。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 点估计与区间估计</h2>
+
+      <h3 id="s4-1">4.1 三种点估计</h3>
+      <ul>
+        <li><strong>后验均值</strong> $E(\theta \mid x)$：后验分布的重心。平方误差损失下的最优选择，最常用。</li>
+        <li><strong>后验中位数</strong>：后验的 50% 分位点。绝对误差损失下的最优选择，对偏态分布更稳健。</li>
+        <li><strong>MAP</strong>（Maximum A Posteriori）：后验<strong>密度最大</strong>的点，即 $\arg\max_\theta p(\theta \mid x) = \arg\max_\theta p(x \mid \theta)p(\theta)$。
+        注意 MAP <strong>依赖于参数的表达方式</strong>（换个参数化可能得到不同的「最大点」），这是它的一个理论瑕疵。</li>
+      </ul>
+
+      <h3 id="s4-2">4.2 可信区间 vs 置信区间</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>对比项</th><th>贝叶斯可信区间 CrI</th><th>频率置信区间 CI</th></tr></thead>
+          <tbody>
+            <tr><td>构造方式</td><td>后验分布的 2.5% 与 97.5% 分位点</td><td>基于抽样分布（如 $\bar{x} \pm 1.96\,\mathrm{se}$）</td></tr>
+            <tr><td>「95%」的含义</td><td><strong>$P(\theta \in \text{区间} \mid x) = 0.95$</strong>（参数就在这里面，概率 95%）</td><td>重复抽样构造的区间中，95% 会覆盖固定真值</td></tr>
+            <tr><td>能否说「真值 95% 概率在区间内」</td><td>可以，这是它的定义</td><td><strong>不可以</strong>（真值固定，区间才是随机的）</td></tr>
+            <tr><td>先验的影响</td><td>显式进入（小样本时明显）</td><td>不出现</td></tr>
+            <tr><td>小样本</td><td>先验提供正则化，表现更稳</td><td>依赖近似（如正态近似），可能很差</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.1</span>
+          <span class="ex-title">同一组数据，两套结论：7 次正面 / 10 次</span>
+        </div>
+        <div class="example-body">
+          <p>一枚硬币抛 10 次出现 7 次正面。（a）频率学派：求 $\hat{p}$ 与 95% 置信区间（Wald 区间）。（b）贝叶斯学派：先验 $Beta(2,2)$，求后验均值与 95% 可信区间。（c）对比两种结论的表述差异。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>(a) 频率派。</strong>$\hat{p} = 0.7$，标准误 $\mathrm{se} = \sqrt{\dfrac{0.7 \times 0.3}{10}} = \sqrt{0.021} \approx 0.145$：</p>
+              $$ \hat{p} \pm 1.96 \times 0.145 = 0.7 \pm 0.284 = (0.416,\ 0.984) $$
+              <p><strong>(b) 贝叶斯派。</strong>由例 3.1：后验 $Beta(9,5)$，后验均值 $\approx 0.643$，95% 可信区间 $\approx (0.38,\ 0.86)$。</p>
+              <p><strong>(c) 表述差异（关键！）。</strong></p>
+              <ul>
+                <li>频率派只能说：「若反复做这样的 10 次抛掷并构造区间，约 95% 的区间会覆盖真值 $p$。」<strong>不能</strong>说「$p$ 有 95% 概率落在 $(0.416, 0.984)$」。</li>
+                <li>贝叶斯派可以直接说：「在 $Beta(2,2)$ 先验下，$p$ 落在 $(0.38, 0.86)$ 的概率是 95%。」</li>
+                <li><strong>数值差异的来源</strong>：先验把估计从 $0.7$ 拉向 $0.5$（后验均值 $0.643$），区间也整体左移、变窄一点。
+                  若样本量从 10 增加到 1000，两派的区间会几乎重合——<strong>数据越多，先验越不重要</strong>。</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.2</span>
+          <span class="ex-title">MAP 与后验均值差多少：Beta(2,9) 上的三种点估计</span>
+        </div>
+        <div class="example-body">
+          <p>某新工艺的次品率 $\theta$。先验取 $Beta(1,2)$（相信次品率偏低）。抽检 $8$ 件，发现 $1$ 件次品。（a）求后验；（b）分别给出 MAP、后验中位数、后验均值；（c）质检规则是「次品率超过 $15\%$ 就停机检修」，三种点估计各给出什么结论？应该怎样报告更合理？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步：后验。</strong>$\alpha=1,\ \beta=2,\ n=8,\ s=1$：</p>
+              $$ \text{后验} = Beta(1+1,\ 2+7) = Beta(2,\ 9) $$
+              <p><strong>第 2 步：三种点估计。</strong></p>
+              <ul>
+                <li><strong>后验均值</strong>：$\dfrac{\alpha'}{\alpha'+\beta'} = \dfrac{2}{11} \approx 0.182$</li>
+                <li><strong>MAP（众数）</strong>：$\dfrac{\alpha'-1}{\alpha'+\beta'-2} = \dfrac{1}{9} \approx 0.111$</li>
+                <li><strong>后验中位数</strong>：解 $\int_{0}^{m} p(\theta \mid x)\,d\theta = 0.5$。$Beta(2,9)$ 的密度为 $90\,\theta(1-\theta)^{8}$，数值求解得 $m \approx 0.162$</li>
+              </ul>
+              <p><strong>第 3 步：三者的次序与成因。</strong></p>
+              $$ \text{MAP } 0.111 \;<\; \text{中位数 } 0.162 \;<\; \text{均值 } 0.182 $$
+              <p>$Beta(2,9)$ 明显<strong>右偏</strong>（$\alpha'&lt;\beta'$，质量堆在 $0$ 附近，右侧拖一条长尾）。长尾把均值往右拉，众数锚在密度最高处——<strong>偏态越重、样本越少，MAP 与均值的差距越大</strong>。三者最大相差 $0.071$，相对差异约 $39\%$。</p>
+              <p><strong>第 4 步：对停机决策的影响。</strong></p>
+              <ul>
+                <li>按 MAP：$11.1\% &lt; 15\%$ → <strong>不停机</strong></li>
+                <li>按中位数：$16.2\% &gt; 15\%$ → <strong>停机</strong></li>
+                <li>按均值：$18.2\% &gt; 15\%$ → <strong>停机</strong></li>
+              </ul>
+              <p>同一份数据、同一套先验，换个点估计就换了结论——这说明<strong>用点估计做阈值决策本身不稳</strong>。</p>
+              <p><strong>第 5 步：更合理的报告方式——直接给后验概率。</strong>$Beta(2,9)$ 的 CDF 在 $0.15$ 处约 $0.456$，于是：</p>
+              $$ P(\theta &gt; 0.15 \mid x) \approx 1 - 0.456 = 0.544 $$
+              <p>结论应表述为「次品率超过 $15\%$ 的后验概率约 $54\%$」——把不确定性明确交给决策者，而不是藏在一个点估计后面。</p>
+              <p><strong>易错提示：</strong>① $Beta$ 众数公式 $\frac{\alpha-1}{\alpha+\beta-2}$ 只在 $\alpha&gt;1,\ \beta&gt;1$ 时成立，否则众数落在边界 $0$ 或 $1$；② MAP 不是「最可能出现的取值」——连续分布任一单点概率都是 $0$，它只是<strong>密度最高点</strong>；③ MAP 依赖参数化方式，这是它不如后验均值稳健的原因；④ 三者次序在左偏时会整体反过来（均值 &lt; 中位数 &lt; 众数），别死记。</p>
+              <p><strong>应用/AI 关联：</strong>「点估计过阈值就上线」在 AI 系统里极常见（AUC 涨 $0.5\%$ 就发版、CTR 涨 $2\%$ 就全量）。本例的教训是：小样本加偏态后验下，MAP 与均值能差出足以翻转决策的量。稳健的门禁应看<strong>后验概率或区间</strong>（如 $P(\text{提升}&gt;0) &gt; 0.95$）。变分推断的 mode-seeking 倾向、Lasso 的 MAP 解释，都是「只取众数」这一思路的延伸与其局限。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 无信息先验与正则化的贝叶斯解释</h2>
+
+      <h3 id="s5-1">5.1 「我什么都不知道」怎么写</h3>
+      <ul>
+        <li><strong>无信息先验</strong>（non-informative / reference prior）：尽量「让数据说话」。例如 $[0,1]$ 上的均匀分布 $Beta(1,1)$；$\theta \in \mathbb{R}$ 上的「平坦先验」$p(\theta) \propto 1$；成功率问题上的 Jeffreys 先验 $Beta(1/2, 1/2)$（频率性质更好）。</li>
+        <li><strong>弱信息先验</strong>（weakly informative）：比无信息稍强，用于排除明显荒谬的取值。例如「系数大概率在 $(-10,10)$ 内」的 $N(0, 25)$。这是现代贝叶斯实践更推荐的做法——纯粹的平坦先验有时会让后验 improper（积分不收敛）或不稳。</li>
+      </ul>
+
+      <h3 id="s5-2">5.2 呼应模块 06：正则化 = 先验</h3>
+      <p>模块 06 里我们「猜测」过：L2 惩罚对应高斯先验、L1 惩罚对应拉普拉斯先验。现在可以正式说清楚：</p>
+      $$ \underbrace{\min_\beta \; \| y - \mathbf{X}\beta \|_2^2 + \lambda \| \beta \|_2^2}_{\text{岭回归（L2）}} \quad\Longleftrightarrow\quad \underbrace{\beta_j \sim N(0, \sigma^2/\lambda)}_{\text{高斯先验下的 MAP 估计}} $$
+      $$ \underbrace{\min_\beta \; \| y - \mathbf{X}\beta \|_2^2 + \lambda \| \beta \|_1}_{\text{Lasso（L1）}} \quad\Longleftrightarrow\quad \underbrace{\beta_j \sim \text{Laplace}(0, b),\; b = 1/\lambda}_{\text{拉普拉斯先验下的 MAP 估计}} $$
+      <p>道理：贝叶斯后验 $\propto$ 似然 × 先验，两边取<strong>负对数</strong>，「负对数似然」就是损失函数，「负对数先验」就是惩罚项。高斯先验的负对数 $\propto \beta^2$（L2），拉普拉斯先验的负对数 $\propto |\beta|$（L1），<strong>一一对应</strong>。</p>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：MAP 只是「点」，贝叶斯不止于此
+        </div>
+        <p>「Lasso = 拉普拉斯先验的 MAP」成立，但完整的贝叶斯做法会给出<strong>整个后验分布</strong>（每个系数的不确定性），而不是一个点。把贝叶斯理解成「又一种正则化技巧」是严重的窄化——它的核心优势是<strong>自然量化不确定性</strong>，尤其在小样本、层级结构、序贯更新的场景中。</p>
+      </div>
+
+      <!-- ===== 6 ===== -->
+      <h2 id="s6">6 · MCMC 采样：用随机行走探索后验（重点）</h2>
+
+      <h3 id="s6-1">6.1 为什么需要采样</h3>
+      <p>后验 $p(\theta \mid x) = \dfrac{p(x \mid \theta)p(\theta)}{p(x)}$ 里，$p(x) = \int p(x \mid \theta)p(\theta)\,d\theta$ 这个积分：</p>
+      <ul>
+        <li>大多数实际模型<strong>没有闭式解</strong>（非共轭、参数维数高）；</li>
+        <li>维数越高，数值积分越不可行（100 个参数的网格点数量是天文数字）。</li>
+      </ul>
+      <p>突破思路：我们其实不需要 $p(x)$——它只是个归一化常数。只要能<strong>从后验中抽取大量样本</strong> $\theta^{(1)}, \theta^{(2)}, \dots$，就可以用样本近似任何后验量（均值、分位数、区间）。<strong>MCMC</strong>（Markov Chain Monte Carlo，马尔可夫链蒙特卡洛）就是一套「构造一条在参数空间游走、且游走的稳态分布恰好是后验」的算法。</p>
+
+      <h3 id="s6-2">6.2 Metropolis-Hastings 算法</h3>
+      <p>MH 算法只用到<strong>未归一化的后验</strong> $\tilde{p}(\theta \mid x) = p(x \mid \theta)p(\theta)$（不需要算 $p(x)$）。完整步骤：</p>
+      <ol>
+        <li><strong>初始化</strong>：任选起点 $\theta^{(0)}$。</li>
+        <li><strong>提议</strong>：在第 $t$ 步，从提议分布（proposal）$q(\theta' \mid \theta^{(t)})$ 抽一个候选点 $\theta'$。</li>
+        <li><strong>算接受率</strong>：</li>
+      </ol>
+
+      <div class="formula-box">
+        <div class="f-name">Metropolis-Hastings 接受率</div>
+        $$ \alpha = \min\left(1,\ \frac{\tilde{p}(\theta' \mid x)\, q(\theta^{(t)} \mid \theta')}{\tilde{p}(\theta^{(t)} \mid x)\, q(\theta' \mid \theta^{(t)})}\right) $$
+        <div class="f-note">
+          <strong>随机游走 MH 特例</strong>：若提议分布对称（如 $\theta' = \theta^{(t)} + \eta$，$\eta \sim N(0, \tau^2)$），
+          则 $q(\theta^{(t)} \mid \theta') = q(\theta' \mid \theta^{(t)})$，公式简化为：
+          $$ \alpha = \min\left(1,\ \frac{\tilde{p}(\theta' \mid x)}{\tilde{p}(\theta^{(t)} \mid x)}\right) $$
+          后验密度升高则必定接受，降低则以「密度比值」为概率接受——<strong>允许下坡</strong>才能跳出局部区域、探索整个后验。
+        </div>
+      </div>
+
+      <ol start="4">
+        <li><strong>掷骰子</strong>：抽 $u \sim U(0,1)$。若 $u &lt; \alpha$，接受：$\theta^{(t+1)} = \theta'$；否则拒绝：$\theta^{(t+1)} = \theta^{(t)}$（原地不动也是一次有效样本）。</li>
+        <li><strong>重复</strong>第 2–4 步成千上万次，丢弃开头一段（burn-in），留下的序列就是后验样本。</li>
+      </ol>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.1</span>
+          <span class="ex-title">手算 MH 的一步：接受还是拒绝？</span>
+        </div>
+        <div class="example-body">
+          <p>用随机游走 MH 采样某参数 $\theta$（提议分布对称，所以 $q$ 之比 $=1$）。当前状态 $\theta^{(t)} = 1.2$，提议 $\theta' = 0.8$。
+          已知未归一化后验密度：$\tilde{p}(0.8 \mid x) = 0.30$，$\tilde{p}(1.2 \mid x) = 0.50$。</p>
+          <p>（a）算接受率 $\alpha$；（b）若随机数 $u = 0.3$，下一步去哪？（c）若 $u = 0.75$ 呢？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>(a) 接受率。</strong>对称提议下：</p>
+              $$ \alpha = \min\left(1,\ \frac{\tilde{p}(0.8 \mid x)}{\tilde{p}(1.2 \mid x)}\right) = \min\left(1,\ \frac{0.30}{0.50}\right) = \min(1,\ 0.6) = 0.6 $$
+              <p><strong>(b) $u = 0.3$。</strong>$0.3 &lt; 0.6$，<strong>接受</strong>候选点：$\theta^{(t+1)} = 0.8$。提议方向是「下坡」（密度变小），但以 60% 的概率被接受——这正是 MH 能探索整个后验的原因。</p>
+              <p><strong>(c) $u = 0.75$。</strong>$0.75 &gt; 0.6$，<strong>拒绝</strong>：$\theta^{(t+1)} = 1.2$（原地不动）。</p>
+              <p><strong>直觉检验：</strong>密度比 $0.6$ 意味着「$0.8$ 处的相对可信度是当前点的 60%」，所以用 60% 的概率走过去，长期停留时间比例正好正比于后验密度——这就是马尔可夫链的稳态分布等于后验的机制。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.2</span>
+          <span class="ex-title">三轮 Metropolis-Hastings：接受率、随机数与链条轨迹</span>
+        </div>
+        <div class="example-body">
+          <p>后验的未归一化密度为 $\tilde{p}(\theta \mid x) = \theta^{7}(1-\theta)^{3}$（即 $Beta(8,4)$ 的核，众数在 $7/11 \approx 0.636$）。用<strong>对称随机游走</strong>提议（$q$ 之比为 1）。起点 $\theta^{(0)} = 0.7$，三轮提议依次为 $0.80$、$0.85$、$0.75$，对应随机数 $u = 0.62$、$0.90$、$0.50$。逐轮算出接受率与链的状态，并统计经验接受率。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步：算出各点的未归一化密度。</strong></p>
+              $$ \tilde{p}(0.70) = 0.70^{7}\times 0.30^{3} \approx 0.08235\times 0.0270 = 0.002224 $$
+              $$ \tilde{p}(0.80) = 0.80^{7}\times 0.20^{3} \approx 0.20972\times 0.0080 = 0.001678 $$
+              $$ \tilde{p}(0.85) = 0.85^{7}\times 0.15^{3} \approx 0.32058\times 0.003375 = 0.001082 $$
+              $$ \tilde{p}(0.75) = 0.75^{7}\times 0.25^{3} \approx 0.13348\times 0.015625 = 0.002086 $$
+              <p><strong>第 2 步：第 1 轮（$0.70 \to 0.80$）。</strong></p>
+              $$ \alpha_1 = \min\left(1,\ \frac{0.001678}{0.002224}\right) = \min(1,\ 0.754) = 0.754 $$
+              <p>$u=0.62 &lt; 0.754$ → <strong>接受</strong>，$\theta^{(1)} = 0.80$。注意这是一次「下坡」移动（$0.80$ 已越过众数 $0.636$），仍被接受。</p>
+              <p><strong>第 3 步：第 2 轮（$0.80 \to 0.85$）。</strong></p>
+              $$ \alpha_2 = \min\left(1,\ \frac{0.001082}{0.001678}\right) = \min(1,\ 0.645) = 0.645 $$
+              <p>$u=0.90 &gt; 0.645$ → <strong>拒绝</strong>，$\theta^{(2)} = 0.80$（原地不动，但仍记一个样本）。</p>
+              <p><strong>第 4 步：第 3 轮（$0.80 \to 0.75$）。</strong></p>
+              $$ \alpha_3 = \min\left(1,\ \frac{0.002086}{0.001678}\right) = \min(1,\ 1.243) = 1 $$
+              <p>$u=0.50 &lt; 1$ → <strong>必然接受</strong>，$\theta^{(3)} = 0.75$。上坡（朝众数方向）移动的接受率恒为 $1$，$u$ 取什么都接受。</p>
+              <p><strong>第 5 步：统计与解读。</strong>三轮接受 2 次，经验接受率 $2/3 \approx 0.667$。这只是三轮的抽样结果，不能用来判断步长是否合适——那要看长链的接受率与 ESS。随机游走 MH 在低维问题上接受率落在 $0.3\sim 0.5$ 附近较理想：过高说明步长太小（游走慢），过低说明步长太大（原地打转）。</p>
+              <p><strong>易错提示：</strong>① 拒绝时<strong>必须</strong>把当前值再记一次样本，跳过会让链的稳态分布偏移；② 分子分母可约掉常数，但两边必须用同一个常数（本例只用核），一边用核、一边用归一化密度就会算错；③ 接受率不是越高越好，$\alpha\approx 1$ 往往意味着步长太小、自相关极强；④ 别用「步数」冒充样本量，10 万步可能只有几百个有效样本。</p>
+              <p><strong>应用/AI 关联：</strong>MH 是层级贝叶斯模型（PyMC、Stan 的 NUTS 同属 MCMC 家族）的底层机制；在 AI 里，拒绝采样/MH 用于<strong>受约束的文本解码</strong>（候选必须满足语法或安全约束）与<strong>能量模型采样</strong>。调提议步长 $\tau$ 的直觉与调学习率同构：太大不收敛，太小走不动。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s6-3">6.3 Gibbs 采样：轮流更新每个坐标</h3>
+      <p>当参数是多维 $\theta = (\theta_1,\dots,\theta_k)$ 时，Gibbs 采样利用<strong>条件分布</strong>轮流更新：</p>
+      <ol>
+        <li>固定其余参数，从<strong>满条件分布</strong> $p(\theta_1 \mid \theta_2, \dots, \theta_k, x)$ 抽一个新 $\theta_1$；</li>
+        <li>再抽 $\theta_2 \mid \theta_{-2}, x$，依此类推，直到所有坐标更新一遍；</li>
+        <li>重复。每一轮的输出就是后验的一个（近似）样本。</li>
+      </ol>
+      <p>Gibbs 可以看作「每次只沿一个坐标方向移动的 MH，且接受率恒为 1」。它在<strong>条件分布容易抽样</strong>的模型（如层级正态模型）中极常用。条件分布难抽时，就退回一般的 MH 或更高级的算法（Hamiltonian Monte Carlo——大模型贝叶斯推断常用）。</p>
+
+      <h3 id="s6-4">6.4 收敛诊断：链跑得可信吗</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>工具</th><th>做法</th><th>健康标准</th></tr></thead>
+          <tbody>
+            <tr><td><strong>burn-in（预热）</strong></td><td>丢弃链开头的样本（起点太差时还没走到「典型区域」）</td><td>丢弃后剩余样本足够多</td></tr>
+            <tr><td><strong>轨迹图 trace plot</strong></td><td>画 $\theta^{(t)}$ 随 $t$ 的折线</td><td>像「毛毛虫」一样平稳波动，无趋势、无长时间卡住</td></tr>
+            <tr><td><strong>$\hat{R}$（R-hat）</strong></td><td>多条链比较链间/链内方差</td><td>$\hat{R} &lt; 1.1$（越接近 1 越好）</td></tr>
+            <tr><td><strong>有效样本量 ESS</strong></td><td>自相关导致样本「不独立」，ESS 折算等效独立样本数</td><td>ESS 足够大（如 &gt; 1000）再报告后验摘要</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：MCMC 样本不是免费的「真后验」
+        </div>
+        <p>常见错误：① <strong>不看诊断就用结果</strong>——链没收敛时，后验均值、可信区间全是垃圾；
+        ② <strong>把自相关样本当独立样本</strong>——链上相邻样本高度相关，10 万步可能只有几百个等效样本（看 ESS，不是步数）；
+        ③ <strong>提议分布步长失当</strong>——步长太大几乎全被拒绝（链卡住），步长太小游走缓慢（探索效率低），需要调参或用自适应算法。</p>
+      </div>
+
+      <!-- ===== 7 ===== -->
+      <h2 id="s7">7 · 变分推断 VI：把推断变成优化（重点）</h2>
+
+      <h3 id="s7-1">7.1 核心思想：换个简单的分布来近似</h3>
+      <p>MCMC 用<em>采样</em>逼近后验；变分推断（Variational Inference, VI）用<em>优化</em>逼近后验：
+      在一个简单的分布族 $\mathcal{Q}$（比如「各参数相互独立的正态分布」）里找一个 $q(\theta)$，让它<strong>尽可能接近</strong>真实后验 $p(\theta \mid x)$。</p>
+      $$ q^*(\theta) = \arg\min_{q \in \mathcal{Q}} KL\big(q(\theta)\ \|\ p(\theta \mid x)\big) $$
+      <p>「接近」用 <strong>KL 散度</strong>度量。</p>
+
+      <h3 id="s7-2">7.2 KL 散度：距离，但不对称</h3>
+      $$ KL(q \| p) = \int q(\theta) \log \frac{q(\theta)}{p(\theta \mid x)}\, d\theta = E_q\left[\log \frac{q(\theta)}{p(\theta \mid x)}\right] $$
+      <ul>
+        <li>$KL(q \| p) \ge 0$，等于 0 当且仅当 $q = p$（几乎处处）。</li>
+        <li><strong>非对称</strong>：$KL(q \| p) \ne KL(p \| q)$。直觉：$KL(q\|p)$ 对「$q$ 把概率放在 $p$ 没概率的地方」施加<strong>重罚</strong>（$\log\frac{q}{p}$ 会爆炸），所以<strong>最小化 $KL(q\|p)$ 得到的 $q$ 倾向于「只在后验高密度区活动」</strong>（mode-seeking，找众数）；反过来最小化 $KL(p\|q)$ 则倾向覆盖后验的全部质量（mean-seeking，容易被拖着变宽）。</li>
+        <li>VI 常用<strong>反向 KL</strong> $KL(q\|p)$：容易优化，但会<strong>低估不确定性</strong>（$q$ 太窄）——这是 VI 的典型代价。</li>
+      </ul>
+
+      <h3 id="s7-3">7.3 ELBO 推导：把「算不了的」变成「能优化的」</h3>
+      <p>问题：$KL(q\|p(\theta\mid x))$ 里含有 $p(\theta \mid x)$，而它带着算不动的 $p(x)$。怎么办？<strong>把 $p(x)$ 从 KL 里拆出来</strong>。</p>
+
+      <div class="formula-box">
+        <div class="f-name">证据分解与 ELBO</div>
+        $$ \log p(x) = \mathrm{ELBO}(q) + KL\big(q(\theta)\ \|\ p(\theta \mid x)\big) $$
+        $$ \mathrm{ELBO}(q) = E_q[\log p(x,\theta)] - E_q[\log q(\theta)] = E_q\left[\log \frac{p(x,\theta)}{q(\theta)}\right] $$
+        <div class="f-note">
+          因为 $\log p(x)$ 与 $q$ 无关、且 $KL \ge 0$，所以<strong>最大化 ELBO 等价于最小化 $KL(q\|p(\theta\mid x))</strong>。
+          ELBO 全称「证据下界」（Evidence Lower BOund）：它是 $\log p(x)$ 的下界，两者之差恰为 KL 散度。
+          ELBO 里的 $p(x,\theta) = p(x \mid \theta)p(\theta)$ 只涉及似然与先验——<strong>没有那个算不动的积分</strong>，可以直接用样本估计。
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.1</span>
+          <span class="ex-title">ELBO 推导填空：从 $\log p(x)$ 拆出下界</span>
+        </div>
+        <div class="example-body">
+          <p>请补全下面推导中缺失的两步，并解释每步用了什么性质：</p>
+          $$ \log p(x) = \log \int p(x,\theta)\, d\theta = \log \int q(\theta) \frac{p(x,\theta)}{q(\theta)}\, d\theta = \; ?_1 \; \ge \; ?_2 $$
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>填空：</strong></p>
+              <ul>
+                <li>$?_1 = \log E_q\left[\dfrac{p(x,\theta)}{q(\theta)}\right]$——因为 $\int q(\theta) \frac{p(x,\theta)}{q(\theta)} d\theta$ 正是<strong>随机变量 $\frac{p(x,\theta)}{q(\theta)}$ 在分布 $q$ 下的期望</strong>。</li>
+                <li>$?_2 = E_q\left[\log \dfrac{p(x,\theta)}{q(\theta)}\right] = \mathrm{ELBO}$——用了 <strong>Jensen 不等式</strong>：$\log$ 是凹函数，故「对数的期望 $\ge$ 期望的对数」：$\log E[\cdot] \ge E[\log(\cdot)]$。</li>
+              </ul>
+              <p><strong>于是</strong> $\log p(x) \ge \mathrm{ELBO}$，下界之名由此而来。</p>
+              <p><strong>再验证「下界之差 = KL」</strong>（常考）：</p>
+              $$ \mathrm{ELBO} + KL(q \| p(\theta \mid x)) = E_q[\log p(x,\theta)] - E_q[\log q] + E_q[\log q] - E_q[\log p(\theta \mid x)] $$
+              $$ = E_q[\log p(x,\theta) - \log p(\theta \mid x)] = E_q\left[\log \frac{p(x,\theta)}{p(\theta \mid x)}\right] = E_q[\log p(x)] = \log p(x) \quad\checkmark $$
+              <p>最后一步用了 $p(x,\theta) = p(\theta \mid x)\, p(x)$。<strong>结论</strong>：最大化 ELBO，就是把 $q$ 往真实后验上推，同时把证据下界顶到最高。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.2</span>
+          <span class="ex-title">两状态隐变量：ELBO 与 KL 的数值核算</span>
+        </div>
+        <div class="example-body">
+          <p>设隐变量 $z \in \{1,2\}$，联合分布为 $p(x,z_1)=0.24$、$p(x,z_2)=0.16$。用分布 $q=(q_1,q_2)$ 近似后验。（a）求 $\log p(x)$ 与真实后验；（b）分别算 $q=(0.5,0.5)$、$q=(0.6,0.4)$、$q=(0.9,0.1)$ 的 ELBO；（c）验证 $\log p(x) = \mathrm{ELBO} + KL$，并说明下界何时取等号。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步：边缘似然与真实后验。</strong></p>
+              $$ p(x) = 0.24 + 0.16 = 0.40,\qquad \log p(x) = \ln 0.40 \approx -0.9163 $$
+              $$ p(z_1 \mid x) = \frac{0.24}{0.40} = 0.6,\qquad p(z_2 \mid x) = \frac{0.16}{0.40} = 0.4 $$
+              <p><strong>第 2 步：ELBO 的定义式。</strong>离散情形 $\mathrm{ELBO}(q) = \sum_{z} q(z)\bigl[\ln p(x,z) - \ln q(z)\bigr]$。预备对数：$\ln 0.24 \approx -1.4271$，$\ln 0.16 \approx -1.8326$。</p>
+              <p><strong>第 3 步：$q=(0.5,0.5)$。</strong></p>
+              $$ \mathrm{ELBO} = 0.5\,(\ln 0.24 - \ln 0.5) + 0.5\,(\ln 0.16 - \ln 0.5) $$
+              $$ = 0.5\,(-1.4271 + 0.6931) + 0.5\,(-1.8326 + 0.6931) = -0.3670 - 0.5697 = -0.9367 $$
+              <p><strong>第 4 步：$q=(0.6,0.4)$（恰等于真实后验）。</strong></p>
+              $$ \mathrm{ELBO} = 0.6\,(\ln 0.24 - \ln 0.6) + 0.4\,(\ln 0.16 - \ln 0.4) $$
+              $$ = 0.6\,(-1.4271 + 0.5108) + 0.4\,(-1.8326 + 0.9163) = -0.5498 - 0.3665 = -0.9163 $$
+              <p>正好等于 $\log p(x)$——$q$ 等于后验时，下界被顶到最高点。</p>
+              <p><strong>第 5 步：$q=(0.9,0.1)$（严重偏离）。</strong></p>
+              $$ \mathrm{ELBO} = 0.9\,(-1.4271 + 0.1054) + 0.1\,(-1.8326 + 2.3026) = -1.1895 + 0.0470 = -1.1425 $$
+              <p><strong>第 6 步：验证「下界之差 = KL」。</strong></p>
+              $$ KL\bigl(q \,\|\, p(z \mid x)\bigr) = 0.9\ln\frac{0.9}{0.6} + 0.1\ln\frac{0.1}{0.4} = 0.9\times 0.4055 + 0.1\times(-1.3863) = 0.2263 $$
+              $$ \log p(x) - \mathrm{ELBO} = -0.9163 - (-1.1425) = 0.2262 \approx KL \quad\checkmark $$
+              <p>三种 $q$ 的对照：$q=(0.6,0.4)$ 时 gap 为 $0$；$q=(0.5,0.5)$ 时 gap $\approx 0.020$；$q=(0.9,0.1)$ 时 gap $\approx 0.226$。<strong>$q$ 越像后验，ELBO 越高、gap 越小</strong>，所以「最大化 ELBO」确实是「最小化 KL」的可行替代。</p>
+              <p><strong>易错提示：</strong>① ELBO 是<strong>下界</strong>（$\mathrm{ELBO} \leq \log p(x)$），不是上界，符号方向错了整章都会反；② 算 ELBO 用的是<strong>联合分布 $p(x,z)$</strong>，不是后验，也不能像算接受率那样随手丢掉归一化常数（丢了之后数值不再是 $\log p(x)$ 的下界）；③ $KL$ 方向别写反：VI 最小化的是 $KL(q\|p)$，不是 $KL(p\|q)$。</p>
+              <p><strong>应用/AI 关联：</strong>VAE 的训练目标就是最大化 ELBO，其损失写作「重构误差 + KL 正则」；扩散模型的训练同样来自变分下界；RLHF 中对策略偏离参考模型的 KL 惩罚也是同一族工具。本例还揭示了 VI 的代价：一旦把 $q$ 限制在「各维独立」的平均场族里，最优点只能在族内取、gap 无法归零——这正是 VI 系统性低估方差、可信区间偏窄的根源。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s7-4">7.4 坐标上升 CAVI 与实际流程</h3>
+      <p>选定 $q$ 的结构后（常见：<strong>平均场</strong>假设 $q(\theta) = \prod_{j} q_j(\theta_j)$，各参数变分因子相互独立），用<strong>坐标上升</strong>（CAVI）轮流优化每个因子：</p>
+      <ol>
+        <li>固定其他因子 $q_{-j}$，最优的 $q_j$ 正比于 $\exp\big(E_{q_{-j}}[\log p(x,\theta)]\big)$（有简洁的解析形式）；</li>
+        <li>轮流更新 $q_1, q_2, \dots$，直到 ELBO 不再上升；</li>
+        <li>输出的 $q^*$ 就是后验的近似，均值、方差、可信区间都能直接从 $q^*$ 读出。</li>
+      </ol>
+      <p>VI 把推断问题变成了<strong>优化问题</strong>，于是可以搭上梯度下降、自动微分这些现代机器学习的便车——这也是 VI 在大规模 AI 模型中广泛使用的原因。</p>
+
+      <h3 id="s7-5">7.5 MCMC vs 变分推断</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>维度</th><th>MCMC（采样）</th><th>变分推断 VI（优化）</th></tr></thead>
+          <tbody>
+            <tr><td>哲学</td><td>用随机行走收集后验样本</td><td>用简单分布 $q$ 拟合后验</td></tr>
+            <tr><td>精度</td><td><strong>渐近精确</strong>（样本足够时逼近真后验）</td><td>受分布族限制，<strong>系统性近似误差</strong>（常低估方差）</td></tr>
+            <tr><td>速度</td><td>慢（每步都要算似然；自相关拖累）</td><td><strong>快</strong>（一次优化完成；可扩展到海量数据）</td></tr>
+            <tr><td>收敛诊断</td><td>需要 burn-in、$\hat{R}$、ESS</td><td>看 ELBO 是否收敛（更直观）</td></tr>
+            <tr><td>典型用途</td><td>中小规模模型、需要高保真后验、模型比较</td><td>大规模模型、在线/分布式推断、AI 中的近似推断</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>一句话取舍：<strong>要准用 MCMC，要快用 VI；大模型里常见「先 VI 出初值，再局部 MCMC 精修」的混合策略。</strong></p>
+
+      <!-- ===== 8 ===== -->
+      <h2 id="s8">8 · 贝叶斯模型比较</h2>
+
+      <h3 id="s8-1">8.1 边缘似然与贝叶斯因子</h3>
+      <p>要比较两个模型 $M_1$ 与 $M_2$（例如「线性」vs「二次」），贝叶斯用<strong>边缘似然</strong>（即第 2 节的证据）$p(x \mid M) = \int p(x \mid \theta, M) p(\theta \mid M) d\theta$，
+      它自动包含了「模型复杂度惩罚」——参数越多越分散，同样的数据下边缘似然会吃亏。两模型的证据之比叫<strong>贝叶斯因子</strong>（Bayes Factor）：</p>
+      $$ BF_{12} = \frac{p(x \mid M_1)}{p(x \mid M_2)} $$
+      <ul>
+        <li>$BF_{12} &gt; 1$：数据更支持 $M_1$；一般认为 $BF &gt; 10$ 是「强证据」。</li>
+        <li>结合先验模型概率，还能得到后验模型概率：$p(M_1 \mid x) \propto p(x \mid M_1) p(M_1)$——形式与参数的贝叶斯公式完全一样。</li>
+      </ul>
+
+      <h3 id="s8-2">8.2 后验预测检查</h3>
+      <p>更朴素也更实用的模型检查：<strong>用拟合好的模型生成假数据，看它像不像真数据</strong>。</p>
+      <ol>
+        <li>从后验抽参数 $\theta^{(s)}$；</li>
+        <li>按模型生成复制数据 $x^{\text{rep}} \sim p(x \mid \theta^{(s)})$；</li>
+        <li>比较 $x^{\text{rep}}$ 与真实 $x$ 的关键特征（均值、方差、极值、分布形状）。</li>
+      </ol>
+      <p>如果模型生成的假数据反复「长得不像」真数据，说明模型有系统性缺陷（漏了非线性、漏了厚尾……）——这与模块 06 的残差诊断思想一脉相承，只是贝叶斯版本可以连「参数不确定性」一起模拟进去。</p>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：贝叶斯因子对先验敏感
+        </div>
+        <p>边缘似然 $p(x \mid M)$ 依赖模型的<strong>先验设定</strong>（先验越分散，边缘似然越受惩罚）。因此报告贝叶斯因子时<strong>必须报告先验</strong>，
+        并做敏感性分析（换几个合理的先验看结论是否稳定）。只报 $BF$ 不报先验，等于只报了一半的证据。</p>
+      </div>
+
+      <!-- ===== 9 ===== -->
+      <div id="examples"></div><!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><h2 id="d-deep-1">深度专题一 · 共轭与非共轭：解析可算性究竟花掉了什么</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把后验算出来，要拿什么去换</h3></div>
+  <p class="dt-lead">本章正文已经会手算 $Beta(\alpha,\beta)\to Beta(\alpha+s,\ \beta+n-s)$。这一节追问一个更根本的问题：这种「参数直接相加」的便利，是用什么换来的，以及什么时候这笔交易不划算。</p>
+
+  <h4>背景：一个算不出来的积分</h4>
+  <p>贝叶斯推断的发动机是 $p(\theta\mid x)=p(x\mid\theta)p(\theta)/p(x)$，而分母 $p(x)=\int p(x\mid\theta)p(\theta)\,d\theta$ 在绝大多数真实模型里没有闭式解。在计算机普及之前，统计学家想出一个巧办法：把先验挑成与似然「配套」的分布族，使后验仍落在同一族里，只改变少数几个参数。这套做法由 Raiffa 与 Schlaifer 在 1960 年前后系统化为<strong>共轭先验</strong>，让贝叶斯推断可以纯手算完成。当时它被看作一个无害的技术限制；直到层级模型、非指数族似然、双峰先验进入视野，人们才意识到被限制的不是计算步骤，而是<strong>模型能表达的世界</strong>。</p>
+
+  <h4>直觉：一本只有两格的账本</h4>
+  <p>把后验想成一本账。共轭结构相当于一本固定格式的账本，只有「成功格」和「失败格」两个格子：每来一批数据，只往两格里各加一个数，永远不用翻回去重排；所以更新是 $O(1)$，还能把「本轮后验」直接当「下轮先验」连续记下去。非共轭则像每来一批数据都得把整本账重排一遍——要么做数值积分，要么跑采样或优化。</p>
+  <p>但固定两格的账本只记得住「一共成功多少次、一共失败多少次」。你想记「前一千人完课率高、后一千人完课率低」这种<strong>时间漂移</strong>，或者「我事先认为完课率要么很低、要么很高，中间不太可能」这种<strong>双峰信念</strong>，账本里根本没有对应格子。于是所谓「解析可算」，其实是拿「把信念压缩成两个数」去换「永远不用算积分」；被压缩掉的，正是数据里的结构与先验里的形状。这就是代价，而且它<strong>不会因为数据变多而退还</strong>。</p>
+
+  <h4>形式化：指数族里的「相加」从哪来</h4>
+  <p>先看似然。若它属于指数族，就能写成「数据摘要」与「参数函数」相乘再取指数的形式：</p>
+  $$ p(x\mid\theta)=h(x)\exp\bigl(\eta(\theta)^{\top}T(x)-A(\theta)\bigr) $$
+  <p class="dt-lead">白话：$T(x)$ 是数据被压缩后剩下的<strong>充分统计量</strong>（二项分布里就是成功数 $s$ 与试验数 $n$），$\eta,A$ 只跟参数有关，$h(x)$ 与参数无关。常见二项、正态、泊松都在这一族里。</p>
+
+  <p>共轭先验<strong>故意</strong>写成和似然同样的形状：</p>
+  $$ p(\theta\mid\tau_0,\nu_0)\ \propto\ \exp\bigl(\eta(\theta)^{\top}\tau_0-\nu_0 A(\theta)\bigr) $$
+  <p class="dt-lead">白话：先验与似然「同形状」，乘起来还是同形状，所以后验不用重新识别分布。$\tau_0$ 是「事前的摘要」，$\nu_0$ 是「事前的伪观测数」。</p>
+
+  <p>把 $n$ 个观测相乘，充分统计量累加为 $T_{\text{tot}}=\sum_{i=1}^{n}T(x_i)$，后验的全部更新就是：</p>
+  $$ \tau_n=\tau_0+T_{\text{tot}},\qquad \nu_n=\nu_0+n $$
+  <p class="dt-lead">白话：共轭更新的全部内容只是<strong>两个数分别相加</strong>——没有积分、没有优化、没有随机数、没有收敛诊断。这是「解析可算性」四个字的确切含义。</p>
+
+  <p>落到共享案例「知学云」上：先验取 $Beta(2,2)$，$n=12000$ 名学员中完课 $s=5967$ 人，未完课 $f=12000-5967=6033$ 人，于是</p>
+  $$ p(\theta\mid x)=Beta(2+5967,\ 2+6033)=Beta(5969,\ 6035) $$
+  <p class="dt-lead">白话：$\alpha$ 是「事前成功计数」，$\beta$ 是「事前失败计数」，各加一次即可；整个后验被压进 $(5969,6035)$ 两个数里。</p>
+  $$ E(\theta\mid x)=\frac{5969}{5969+6035}=\frac{5969}{12004}=0.497251 $$
+  <p class="dt-lead">白话：后验均值就是一个除法，与站点共享案例数字严格一致。</p>
+
+  <p>现在看被压掉了什么。共轭后验<strong>只</strong>由 $(s,n)$ 决定：</p>
+  $$ T(x)=(s,n)\ \Longrightarrow\ \text{任意满足 } s'=s,\ n'=n \text{ 的数据集给出同一后验} $$
+  <p class="dt-lead">白话：把 12000 条记录的到达顺序任意打乱、把完课记录挪到任何位置，后验一模一样。若真实机制里存在「学期初完课率高、期末走低」的漂移，$(s,n)$ 对它就<strong>不再充分</strong>，而共轭结构会悄悄把这段信息平均掉。</p>
+
+  <p>再看先验形状的限制。若把先验换成双峰混合，$\tfrac12 Beta(2,8)+\tfrac12 Beta(8,2)$，似然仍是二项，则后验为</p>
+  $$ p(\theta\mid x)\ \propto\ \theta^{s}(1-\theta)^{n-s}\Bigl[\tfrac12 Beta(2,8)+\tfrac12 Beta(8,2)\Bigr] $$
+  $$ =\ w\,Beta(2+s,\ 8+n-s)+(1-w)\,Beta(8+s,\ 2+n-s) $$
+  <p>其中权重 $w$ 由两个分量的边缘似然之比决定：</p>
+  $$ w=\frac{B(2+s,\ 8+n-s)/B(2,8)}{B(2+s,\ 8+n-s)/B(2,8)+B(8+s,\ 2+n-s)/B(8,2)} $$
+  <p class="dt-lead">白话：结果不再是「一个 Beta」，而是「两个 Beta 的加权混合」，而且权重本身还要算 Beta 函数的比值。共轭性一破，计算并没有消失，只是从「加两个数」挪到了「算权重 + 维护两个分量」。</p>
+
+  <p>把代价列清楚，一共四条：</p>
+  <ul>
+    <li><strong>先验形状受限</strong>：$Beta(\alpha,\beta)$ 只有两个超参数，只能表达 $[0,1]$ 上的单峰信念；双峰、厚尾、点质量（spike）都写不出来。</li>
+    <li><strong>似然受限</strong>：必须属指数族且 $T(x)$ 维数固定；逻辑回归、含随机效应的层级模型、神经网络都不共轭。</li>
+    <li><strong>结构信息被丢弃</strong>：时间漂移、簇结构、个体异质性被压进 $(s,n)$ 后无法恢复。</li>
+    <li><strong>序贯方便但不可回退</strong>：只存两个数意味着无法「撤销某批数据」或做局部修正，除非重头再算。</li>
+  </ul>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>共轭 = 用「把先验锁进某个分布族 + 把数据压缩成固定维充分统计量」换「后验闭式解、$O(1)$ 空间、可序贯更新」；非共轭 = 用「每步算似然、采样或优化的计算预算」换「任意先验形状与任意似然」。二者不是精度高低之争，而是<strong>模型弹性</strong>与<strong>计算预算</strong>之间的交换率。共享案例里 $Beta(5969,6035)$ 这两个上万的大数，正是「压缩到极致」的标本：12000 条记录最终只剩两个整数。</div>
+
+  <h4>边界：什么时候这笔交易不成立</h4>
+  <p>在<strong>先验与似然不构成共轭对</strong>（例如混合先验、层级超先验、逻辑回归或神经网络似然），或<strong>真实数据生成机制含时间漂移与簇结构因而 $(s,n)$ 不再充分</strong>的条件下，「后验仍是同一族、只需存两个超参数」这一结论不成立，应改用 Metropolis–Hastings / NUTS 等 MCMC 采样或变分推断去近似后验，并把后验摘要的蒙特卡洛误差一并报告。</p>
+
+  <figure class="figure" id="fig-flow-bayes-update">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="贝叶斯更新：先验 → 似然 → 后验"><rect class="dg-box muted" x="20.0" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="73.6" y="94.0" text-anchor="middle">先验 p(θ)</text><text class="dg-ts" x="73.6" y="111.0" text-anchor="middle">已有信念</text><rect class="dg-box alt" x="153.2" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="206.79999999999998" y="94.0" text-anchor="middle">观测数据 D</text><text class="dg-ts" x="206.79999999999998" y="111.0" text-anchor="middle">似然 p(D|θ)</text><line class="dg-edge" x1="127.19999999999999" y1="97.0" x2="153.2" y2="97.0"/><polygon class="dg-edge" points="153.2,97.0 145.8952884775015,100.26208362447656 145.8952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="286.4" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">贝叶斯公式</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">归一化证据</text><line class="dg-edge" x1="260.4" y1="97.0" x2="286.4" y2="97.0"/><polygon class="dg-edge" points="286.4,97.0 279.0952884775015,100.26208362447656 279.0952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="419.59999999999997" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="473.2" y="94.0" text-anchor="middle">后验 p(θ|D)</text><text class="dg-ts" x="473.2" y="111.0" text-anchor="middle">更新后的信念</text><line class="dg-edge" x1="393.59999999999997" y1="97.0" x2="419.59999999999997" y2="97.0"/><polygon class="dg-edge" points="419.59999999999997,97.0 412.2952884775015,100.26208362447656 412.2952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="552.8" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="606.4" y="94.0" text-anchor="middle">下一轮先验</text><text class="dg-ts" x="606.4" y="111.0" text-anchor="middle">序贯更新</text><line class="dg-edge" x1="526.8" y1="97.0" x2="552.8" y2="97.0"/><polygon class="dg-edge" points="552.8,97.0 545.4952884775015,100.26208362447656 545.4952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">贝叶斯更新：先验 → 似然 → 后验</span>
+    <span class="fig-note">后验 ∝ 先验 × 似然；本轮后验可作为下一轮的先验，形成序贯学习。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../modules/m07-bayesian.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 可信区间与置信区间：可操作的差别，以及先验何时不会被淹没</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>数值会趋同，但能回答的问题不会</h3></div>
+  <p class="dt-lead">正文的对照表已经说清「95%」的含义不同。这一节把差别落到可执行的动作上：哪些句子能说、哪些决策能算、停止规则改变后谁还站得住；再给出「数据必然淹没先验」这一流行说法的成立条件与四类反例。</p>
+
+  <h4>背景：两套保证，两种「随机」</h4>
+  <p>置信区间由 Neyman 在 1937 年给出，保证的是<strong>造区间这台机器</strong>的长期覆盖率；可信区间来自后验分布，保证的是<strong>参数本身</strong>落在区间里的概率。教科书常说「数值接近、解释不同」，容易让人以为只是措辞之差。实际上，一旦进入决策流程（要不要全量上线、要不要停机检修），这两句话会导向完全不同的操作。</p>
+
+  <h4>直觉：渔网与画圈</h4>
+  <p>把参数想成一条固定不动的鱼。置信区间像<strong>撒网</strong>：网是随机的，鱼是固定的；「95%」说的是「重复撒 100 次网，约 95 次会罩住这条鱼」。因此对着<strong>已经撒到的这一张网</strong>，不能说「鱼在网里的概率是 95%」——鱼要么在、要么不在，只是你不知道。可信区间像<strong>给鱼的位置画圈</strong>：参数被当作不确定的量，「95%」直接就是「鱼在这个圈里的概率」。</p>
+  <p>由此产生四条可操作差异：</p>
+  <ul>
+    <li><strong>能否直接回答概率问句</strong>。业务方问「完课率超过 $50\%$ 的概率有多大」，可信区间能直接算 $P(\theta &gt; 0.5\mid x)$；置信区间手里只有 p 值，回答的是「若真值恰好等于某个数，看到这份数据的概率」，方向反过来。</li>
+    <li><strong>能否做门槛门禁</strong>。规则「$P(\theta &gt; \theta_0\mid x) &gt; 0.95$ 才上线」是贝叶斯可以直接计算的；频率框架没有对应量，只能退回显著性检验。</li>
+    <li><strong>是否依赖停止规则</strong>。置信区间的 95% 建立在「样本量事先固定、只检验一次」之上；每天偷看、一显著就停（模块 08 的 peeking）会让覆盖率承诺失效。可信区间只用到已观测数据的后验，与你「原本打算什么时候停」无关，这叫<strong>似然原则</strong>。</li>
+    <li><strong>是否尊重参数空间边界</strong>。成功率 $\theta\in[0,1]$，Wald 置信区间 $\hat p\pm1.96\,\mathrm{se}$ 在小样本或 $\hat p$ 靠近 $0$、$1$ 时会越界到 $[0,1]$ 之外；可信区间取后验分位数，天然落在先验支撑集内，还可以是不对称的。</li>
+  </ul>
+
+  <h4>形式化：两行定义，两种随机变量</h4>
+  <p>置信区间（频率）：</p>
+  $$ P_{\theta}\bigl(L(X)\ \le\ \theta\ \le\ U(X)\bigr)\ \ge\ 1-\alpha $$
+  <p class="dt-lead">白话：随机的是端点 $L(X),U(X)$，$\theta$ 是固定常数；$P_{\theta}$ 的下标提醒我们概率是对「数据 $X$」取的。等号右边是「重复抽样时区间盖住真值的比例」。</p>
+
+  <p>可信区间（贝叶斯）：</p>
+  $$ P\bigl(\theta\in[q_{0.025},\ q_{0.975}]\mid x\bigr)=0.95 $$
+  <p class="dt-lead">白话：数据 $x$ 已经固定，$\theta$ 才有分布；条件竖线右边的 $x$ 说明概率是对「参数」取的。这句话可以直接念出口，不需要附加「假如重复做实验」。</p>
+
+  <p>决策量的差别最关键。贝叶斯能算</p>
+  $$ P(\theta&gt;\theta_0\mid x)=\int_{\theta_0}^{1}p(\theta\mid x)\,d\theta $$
+  <p class="dt-lead">白话：把后验曲线在门槛 $\theta_0$ 右侧的面积积分出来，就是「参数超过门槛」的概率。频率学派能算的 $p$ 值是 $P(\text{数据或更极端}\mid H_0)$，条件方向恰好相反，二者不能互换。</p>
+
+  <h4>形式化：先验到底什么时候被淹没</h4>
+  <p>后验均值可以写成「先验均值」与「频率估计」的加权平均，权重一目了然：</p>
+  $$ E(\theta\mid x)=\frac{(\alpha+\beta)\,\mu_0+n\,\hat p}{\alpha+\beta+n},\qquad w_0=\frac{\alpha+\beta}{\alpha+\beta+n} $$
+  <p class="dt-lead">白话：先验的话语权就是「先验伪计数 /（伪计数 + 数据量）」。$n$ 越大 $w_0$ 越小，看起来数据必然淹没先验。</p>
+
+  <p>代入共享案例：$\alpha+\beta=4$，$n=12000$，</p>
+  $$ w_0=\frac{4}{12004}=0.000333,\qquad E(\theta\mid x)=0.497251,\qquad \hat p=\frac{5967}{12000}=0.497250 $$
+  <p class="dt-lead">白话：先验只剩约 $0.03\%$ 的话语权，后验均值与极大似然估计只差约 $10^{-6}$ ——这一次，先验确实被淹没了。</p>
+
+  <p>把「淹没」写成定理，就是 Bernstein–von Mises 定理。在模型正则、先验在真值附近密度为正、参数可识别的条件下：</p>
+  $$ \sqrt{n}\,(\theta-\hat\theta_{\text{MLE}})\mid x\ \xrightarrow{\ d\ }\ N\bigl(0,\ I(\theta_0)^{-1}\bigr) $$
+  <p class="dt-lead">白话：$n$ 够大时后验自动变成以极大似然估计为中心、方差由 Fisher 信息 $I(\theta_0)$ 决定的正态，先验从公式里<strong>消失</strong>。这就是「数据淹没先验」的严格版本——注意它带着一串前提。</p>
+
+  <p>下面五类情形，前提不成立，先验<strong>不会</strong>被淹没：</p>
+  <ul>
+    <li><strong>（1）小样本</strong>：$n \ll \alpha+\beta$。用共享案例做小样本对照：只看 $n=8,\ s=5$ 人，后验 $Beta(7,5)$，均值 $7/12=0.583333$，而频率估计 $0.625000$，先验把估计往回拉了 $0.041667$；此时 $w_0=4/12=0.333333$，先验占三分之一话语权。</li>
+    <li><strong>（2）先验支撑集不含真值</strong>：若先验在 $\theta_0$ 附近密度为 $0$（硬约束先验），由 $p(\theta\mid x)\propto p(x\mid\theta)p(\theta)$ 可知该处后验恒为 $0$，再多数据也进不去；上面的加权平均公式直接失效。白话：事先把某个可能性判了死刑，数据翻不了案。</li>
+    <li><strong>（3）参数不可识别</strong>：$I(\theta_0)\to0$，BvM 的方差项爆炸，似然对参数几乎是平的，数据「没意见」，后验约等于先验。</li>
+    <li><strong>（4）高维稀疏 / 层级冷启动</strong>：总样本量可以很大，但分到每个条目头上的观测只有几个，$n_{\text{eff}}$ 很小；超先验持续主导。决定权不在总 $n$，而在「每个参数分到多少数据」。</li>
+    <li><strong>（5）结构性稀疏先验</strong>：spike-and-slab、horseshoe、L1 类先验主动把大量维度压到 $0$，收缩是结构性的而非一个数值投票，数据无法「淹没」它。</li>
+  </ul>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>两者的数值在大样本下趋同，但「能回答的问题」不同：可信区间允许 $P(\theta\in\cdot\mid x)$、$P(\theta&gt;\theta_0\mid x)$ 这类<strong>直接概率陈述</strong>，不依赖停止规则、不越出参数空间、可自然不对称；置信区间只承诺固定抽样计划下的重复覆盖率，一旦改动停止规则或样本量，该承诺即失效。而「数据必然淹没先验」是 Bernstein–von Mises 正则条件下的<strong>渐近结论</strong>，不是无条件真理——共享案例 $w_0=0.000333$ 只是它成立时的一个样本点。</div>
+
+  <h4>边界：什么时候不能套用「淹没」</h4>
+  <p>在<strong>先验支撑集不含真实参数、参数不可识别、样本量远小于先验伪计数（$n \ll \alpha+\beta$）、或采用结构性稀疏先验</strong>的条件下，「数据会淹没先验、可信区间与置信区间数值趋同」这一结论不成立，应改用<strong>多组先验的敏感性分析</strong>（换几组合理先验逐一重算，比较区间宽度与决策结论是否翻转），并把后验对先验的显式依赖一并报告，而不是直接套用正态近似或 $w_0\to0$ 的渐近式。</p>
+
+  <figure class="figure-placeholder" id="fig-classic-m07-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 7-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">Beta–Binomial 共轭更新：先验、似然、后验三曲线</span>
+    <span class="fig-note">横轴为成功概率 θ，三条密度曲线展示 Beta 先验经二项数据更新为更集中后验的过程，是共轭结构最常被引用的配图。</span>
+    <span class="fig-src">来源：Gelman 等, Bayesian Data Analysis（第 3 版）第 2 章；本站资源库 b15 · 查看：<a href="https://www.statlearning.com/" target="_blank" rel="noopener">https://www.statlearning.com/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · Metropolis–Hastings MCMC</h2>
+<div class="algo-spec">
+
+  <h3>1. 原理：让链的稳态分布恰好是后验</h3>
+  <p>目标是从 $p(\theta\mid x)$ 抽样，从而绕开算不出来的 $p(x)$。做法是构造一条马尔可夫链，使它的<strong>平稳分布</strong>就是后验。充分条件是<strong>细致平衡</strong>：任取两点，来回流动的概率质量相等，链就不会在某处堆积或流失。</p>
+  $$ \pi(\theta)\,q(\theta'\mid\theta)\,\alpha(\theta,\theta')\ =\ \pi(\theta')\,q(\theta\mid\theta')\,\alpha(\theta',\theta) $$
+  <p class="dt-lead">白话：$\pi$ 是想要的平稳分布（后验），$q$ 是「从当前点提议下一个点」的分布，$\alpha$ 是接受概率；等式要求「$\theta\to\theta'$ 的流量」等于「$\theta'\to\theta$ 的流量」。</p>
+
+  <p>把它解出来，就是 Metropolis–Hastings 接受率：</p>
+  $$ \alpha=\min\left(1,\ \frac{\tilde p(\theta'\mid x)\,q(\theta\mid\theta')}{\tilde p(\theta\mid x)\,q(\theta'\mid\theta)}\right),\qquad \tilde p(\theta\mid x)=p(x\mid\theta)\,p(\theta) $$
+  <p class="dt-lead">白话：分子分母里的归一化常数 $p(x)$ 被约掉了，所以只需要能逐点计算「似然 $\times$ 先验」，这正是它绕开积分的关键。</p>
+
+  <p>若用<strong>对称随机游走</strong>提议（$\theta'=\theta^{(t)}+\eta$，$\eta\sim N(0,\tau^2)$），则 $q(\theta\mid\theta')=q(\theta'\mid\theta)$，公式简化为：</p>
+  $$ \alpha=\min\left(1,\ \frac{\tilde p(\theta'\mid x)}{\tilde p(\theta^{(t)}\mid x)}\right) $$
+  <p class="dt-lead">白话：往密度更高处走必接受；往密度更低处走，以「密度比值」为概率接受。<strong>允许下坡</strong>，链才不会卡在局部高峰、才能遍历整个后验。</p>
+
+  <p>几何解释：这条链在参数空间里随机行走，在高密度区域停留更久；长期来看，停留在各处的<strong>时间比例正比于后验密度</strong>，于是「把链上的点当样本」就等价于从后验抽样。共享案例的后验 $Beta(5969,6035)$ 极尖（$\mathrm{sd}\approx0.004563$），正好用来演示：步长稍大就会被拒绝，步长稍小链又走得慢。</p>
+
+  <h3>2. 编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>选起点</strong> $\theta^{(0)}$。取先验均值或粗略估计即可，例如 $\theta^{(0)}=0.5$。</li>
+    <li><strong>定提议与预算</strong>：对称随机游走 $N(0,\tau^2)$，给总步数 $T$、预热步数 $T_b$、链数 $C\ \ge\ 2$，并固定随机种子以便复现。</li>
+    <li><strong>提议</strong>：第 $t$ 步抽 $\theta'=\theta^{(t)}+\eta$，$\eta\sim N(0,\tau^2)$；若 $\theta'$ 越出参数空间（如 $[0,1]$），直接判为拒绝并原地记一次。</li>
+    <li><strong>算接受率（务必取对数）</strong>：$\log\alpha=\log\tilde p(\theta')-\log\tilde p(\theta^{(t)})$，再取 $\alpha=\min(1,\ e^{\log\alpha})$。共享案例的核是 $\theta^{5968}(1-\theta)^{6034}$，直接算会下溢成 $0$，必须用 $\log\tilde p(\theta)=5968\ln\theta+6034\ln(1-\theta)$。</li>
+    <li><strong>掷骰子</strong>：抽 $u\sim U(0,1)$；若 $\log u &lt; \log\alpha$ 则接受 $\theta^{(t+1)}=\theta'$，否则拒绝并令 $\theta^{(t+1)}=\theta^{(t)}$。<strong>拒绝时也必须把当前值再记一次样本</strong>，跳过会让稳态分布偏移。</li>
+    <li><strong>重复</strong>第 3–5 步共 $T$ 次，得到一条链；用 $C$ 个不同起点与种子各跑一条。</li>
+    <li><strong>诊断</strong>：丢弃前 $T_b$ 步（burn-in），再看轨迹图、$\hat R$（多链链间 / 链内方差比）、ESS（有效样本量）、经验接受率；任一不达标就回到第 2 步调 $\tau$ 或加长 $T$。</li>
+    <li><strong>报告</strong>：用保留样本算均值、标准差、$2.5\%$ / $97.5\%$ 分位数，并给出蒙特卡洛标准误 $\mathrm{sd}/\sqrt{\mathrm{ESS}}$；不要把步数 $T$ 当样本量写进结论。</li>
+  </ol>
+
+  <h3>3. 适用条件</h3>
+  <ul>
+    <li><strong>数据假设</strong>：能逐点计算未归一化对数后验 $\log\tilde p$（似然与先验都可调用）；观测可交换、似然可分解，每步扫描 $n$ 条数据。</li>
+    <li><strong>规模</strong>：中低维（经验上 $d$ 在个位数到二十几）；$n$ 不宜大到每步 $O(n)$ 都难以承受。</li>
+    <li><strong>分布与特征类型</strong>：参数连续、后验单峰或近似单峰；提议分布支撑集必须覆盖后验支撑集，链需不可约、非周期、正常返，遍历定理才成立。</li>
+    <li><strong>失效边界</strong>：后验多峰（随机游走困在单峰）应改用并行回火；高维强相关应改用 HMC / NUTS；含离散参数应改用 Gibbs；似然不可算应改用 ABC 或伪边际方法；数据极大应改用随机梯度 MCMC 或子采样 MH。</li>
+  </ul>
+
+  <div class="complexity">
+    <b>训练（采样）</b>：每步 $O(n\,d)$（扫全量数据算对数似然），$T$ 步共 $O(T\,n\,d)$；
+    <b>推理（后验摘要）</b>：均值 / 方差 $O(T)$，分位数需排序 $O(T\log T)$；
+    <b>空间</b>：仅当前状态 $O(d)$，保留全链做诊断 $O(T\,d)$，多链并行乘以 $C$；
+    <b>通信</b>：$O(C\,d)$，与 $n$ 无关。
+  </div>
+  <p class="dt-lead">白话：贵的不是内存，是「每一步都要把全量数据过一遍」以及「相邻样本高度相关，不得不跑很多步」。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>渐近精确：步数足够时逼近真后验，无系统性近似偏差。</li>
+        <li>只需<strong>未归一化</strong>后验，天然绕开 $p(x)$ 这个算不动的积分。</li>
+        <li>先验与似然可任意指定，不受共轭族限制——正是专题一的解药。</li>
+        <li>输出是样本，均值、分位数、$P(\theta&gt;\theta_0\mid x)$ 都能直接读。</li>
+        <li>有明确的收敛诊断量（$\hat R$、ESS）可审计，不是黑箱。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>相邻样本自相关，$\mathrm{ESS}\ll T$；十万步可能只有几千个有效样本。</li>
+        <li>收敛没有绝对判据，$\hat R$ 接近 $1$ 只是必要而非充分（多峰时各链可一起困住）。</li>
+        <li>提议步长需手调：过大几乎全拒绝、链卡住；过小游走慢、自相关强。</li>
+        <li>每步 $O(n)$，海量数据下成本高；高维与多峰后验混合极慢。</li>
+        <li>结果是随机的，必须固定种子并报告 MC 标准误才能复现。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>4. 示例推演：手算到底</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>共享案例：先验 $Beta(2,2)$，$n=12000$，$s=5967$，失败数 $f=6033$。目标后验 $Beta(5969,6035)$，其未归一化核为 $\tilde p(\theta)=\theta^{5968}(1-\theta)^{6034}$。</div>
+    <div class="solve-step"><span class="ss-k">后验均值。</span>$E(\theta\mid x)=\dfrac{5969}{5969+6035}=\dfrac{5969}{12004}=0.497251$，与站点共享案例数字一致。</div>
+    <div class="solve-step"><span class="ss-k">后验方差与标准差。</span>$\mathrm{Var}=\dfrac{5969\times6035}{12004^{2}\times12005}=\dfrac{36\,022\,915}{1.7299\times10^{12}}\approx2.0823\times10^{-5}$，故 $\mathrm{sd}\approx0.004563$。白话：12000 条数据把成功率锁在约 $\pm0.46$ 个百分点内。</div>
+    <div class="solve-step"><span class="ss-k">95% 可信区间（正态近似）。</span>$0.497251\pm1.96\times0.004563=(0.488307,\ 0.506195)$。这是后面判断采样是否可信的参照。</div>
+    <div class="solve-step"><span class="ss-k">MH 单步：取对数核。</span>$\log\tilde p(\theta)=5968\ln\theta+6034\ln(1-\theta)$。当前 $\theta^{(t)}=0.50$，对称提议 $\theta'=0.51$（步长 $0.01$），$q$ 之比 $=1$。</div>
+    <div class="solve-step"><span class="ss-k">算对数接受率。</span>$\ln(0.51/0.50)=\ln1.02=0.019803$，$\ln(0.49/0.50)=\ln0.98=-0.020203$；$\log\alpha=5968\times0.019803+6034\times(-0.020203)=118.182-121.903=-3.721$。</div>
+    <div class="solve-step"><span class="ss-k">还原接受率。</span>$\alpha=e^{-3.721056}=0.024208$。若 $u=0.01 &lt; 0.024208$ 接受；若 $u=0.50 &gt; 0.024208$ 拒绝并原地记一次样本。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>仅 $2.4\%$ 接受率，因为 $0.50$ 已在均值上方约 $0.6$ 个标准差，再跳 $+0.01$ 相当于往尾部走约 $2.8$ 个标准差。可见接受率由「当前位置 + 步长」共同决定，不能凭直觉拍；也说明必须用 log 核逐点算。</div>
+    <div class="solve-step"><span class="ss-k">R-hat 手算（教学迷你链，两个起点各 6 个保留样本，单位放大 $10^{3}$ 倍）。</span>链 1：$496,498,500,497,499,498$，均值 $498$；链 2：$498,500,502,499,501,500$，均值 $500$；总均值 $499$。</div>
+    <div class="solve-step"><span class="ss-k">链内方差 W。</span>两链离差平方和都是 $10$，各除以 $n-1=5$ 得 $2.0$，故 $W=2.0$。链间方差 $B=\dfrac{n}{C-1}\sum(\bar\theta_j-\bar\theta)^2=6\times(1+1)=12.0$。</div>
+    <div class="solve-step"><span class="ss-k">合成与判定。</span>$\widehat{\mathrm{var}}^{+}=\dfrac{n-1}{n}W+\dfrac{B}{n}=\dfrac56\times2+\dfrac{12}{6}=3.6667$，$\hat R=\sqrt{3.6667/2.0}=1.3540 &gt; 1.1$ → <strong>判定未收敛</strong>。白话：两条链均值只差 2 个单位、样本又只有 6 个，$B$ 被 $n$ 放大后立刻报警；$\hat R$ 对「链间漂移」很敏感，样本太少时诊断本身也不稳。</div>
+    <div class="solve-step"><span class="ss-k">ESS 手算（另一条 6 点链，演示正相关）。</span>取 $494,495,497,499,501,502$，均值 $498$，离差 $d=[-4,-3,-1,1,3,4]$，$\sum d^{2}=52$；$\sum_{t=1}^{5}d_td_{t+1}=12+3-1+3+12=29$，$\hat\rho_1=29/52=0.5577$。</div>
+    <div class="solve-step"><span class="ss-k">折算有效样本。</span>$\mathrm{ESS}\approx\dfrac{n}{1+2\rho_1}=\dfrac{6}{1+1.1154}=2.84$。白话：6 步只相当于约 2.8 个独立样本——这条链有明显上升趋势，正是「还没忘记起点」的形态。真实实现会按 Geyer 初始正序列累加多个滞后，但结论一致：<strong>看 ESS，不看步数</strong>。</div>
+  </div>
+
+  <h3>5. 横向对比：六维口径</h3>
+  <table class="compare-table">
+    <thead><tr><th>维度</th><th>Metropolis–Hastings（本章）</th><th>Beta-Binomial 共轭解析更新</th><th>Gibbs 采样</th><th>变分推断 VI（平均场）</th></tr></thead>
+    <tbody>
+      <tr><th>适用条件</th><td>任意可逐点算 $\log\tilde p$ 的后验；连续、中低维、近似单峰</td><td>先验与似然须属同一共轭对；$(s,n)$ 对参数充分</td><td>满条件分布可解析抽样；参数可分块、后验相关不太强</td><td>分布族 $\mathcal Q$ 可参数化、ELBO 可优化；规模大、要速度</td></tr>
+      <tr><th>复杂度</th><td>采样 $O(T\,n\,d)$；分位 $O(T\log T)$；空间 $O(T\,d)$</td><td class="best">一次扫描 $O(n)$；空间 $O(1)$；序贯更新 $O(1)$</td><td>每轮 $O(k\,n)$；空间 $O(k)$；无需调步长</td><td>$O(\text{迭代}\times n\,d)$；空间 $O(d)$；可与自动微分结合</td></tr>
+      <tr><th>关键超参</th><td>提议步长 $\tau$、总步数 $T$、预热 $T_b$、链数 $C$、种子</td><td>先验强度 $\alpha_0+\beta_0$（伪计数）</td><td>分块方式、扫描顺序、迭代轮数</td><td>变分族结构、学习率、ELBO 收敛容差</td></tr>
+      <tr><th>优点</th><td class="best">渐近精确；只需未归一化后验；任意先验 / 似然；诊断可审计</td><td>闭式、可手算、无 MC 误差、天然流式</td><td>接受率恒为 $1$、无步长调参；条件独立时高效</td><td>最快、可扩展到海量数据、易嵌入训练管线</td></tr>
+      <tr><th>局限与失效边界</th><td>自相关、多峰 / 高维混合慢、收敛需诊断、每步 $O(n)$</td><td>先验族受限、结构信息被压掉；非共轭即失效</td><td>满条件难抽时不可用；参数强相关时混合极慢</td><td>系统性低估方差；平均场漏掉依赖；无渐近精确保证</td></tr>
+      <tr><th>可解释性与工程成本</th><td>需跑 $\hat R$ / ESS / 轨迹图并报告 MC 标准误，成本最高</td><td class="best">一行公式可读、零运维，成本最低</td><td>需推导每个满条件，调试成本中等</td><td>输出是优化结果，需查 ELBO 曲线与校准，成本中等</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="d-code">代码实验 · 共轭更新、先验淹没与 MH 收敛诊断</h2>
+<p>下面这段程序只用 Python 标准库，把专题一、专题二与算法详解里的每个数字都算了一遍：先做共享案例的共轭更新，再对照小样本下先验不被淹没的情形，接着手算 MH 单步接受率，最后跑两条链并输出 $\hat R$ / ESS 与步长扫描。固定种子，输出可逐字复现。</p>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow">可复现：固定种子 20261107 / 20261108，不依赖 numpy / scipy / pandas</span></div>
+  <pre># -*- coding: utf-8 -*-
+"""m07 代码实验：共轭更新、先验淹没、MH 采样与 R-hat/ESS 诊断（纯标准库）"""
+import math, random
+
+# ---- 1) 共享案例的 Beta-Binomial 共轭更新 ----
+N, S = 12000, 5967          # 知学云：12000 名学员，5967 人完课
+a0, b0 = 2, 2                # 先验 Beta(2,2)
+a, b = a0 + S, b0 + (N - S)
+post_mean = a / (a + b)
+post_var = a * b / ((a + b) ** 2 * (a + b + 1))
+post_sd = math.sqrt(post_var)
+freq = S / N
+w0 = (a0 + b0) / (a0 + b0 + N)   # 先验权重
+print("[1] Beta-Binomial 共轭更新")
+print("    prior        : Beta(%d, %d)" % (a0, b0))
+print("    posterior    : Beta(%d, %d)" % (a, b))
+print("    post mean    : %.6f" % post_mean)
+print("    freq (MLE)   : %.6f" % freq)
+print("    prior weight : %.6f  (= (a0+b0)/(a0+b0+N))" % w0)
+print("    post sd      : %.6f" % post_sd)
+print("    95%% CrI(normal): [%.6f, %.6f]" % (post_mean - 1.96*post_sd, post_mean + 1.96*post_sd))
+
+# ---- 2) 小样本：先验没被淹没 ----
+n2, s2 = 8, 5
+a2, b2 = a0 + s2, b0 + (n2 - s2)
+print("[2] 小样本对照 n=8, s=5")
+print("    posterior    : Beta(%d, %d)" % (a2, b2))
+print("    post mean    : %.6f  freq=%.6f  prior pull=%.6f" % (a2/(a2+b2), s2/n2, s2/n2 - a2/(a2+b2)))
+print("    prior weight : %.6f" % ((a0+b0)/(a0+b0+n2)))
+
+# ---- 3) MH 单步手算（用 log 核，避免下溢）----
+def log_kernel(t, a, b):
+    return (a - 1) * math.log(t) + (b - 1) * math.log1p(-t)
+
+cur, prop = 0.50, 0.51
+log_ratio = log_kernel(prop, a, b) - log_kernel(cur, a, b)
+acc = min(1.0, math.exp(log_ratio))
+print("[3] MH 单步（对称随机游走，q 之比 = 1）")
+print("    theta=%.2f -&gt; %.2f" % (cur, prop))
+print("    log alpha   : %.6f" % log_ratio)
+print("    alpha       : %.6f" % acc)
+
+# ---- 4) MH 采样共享案例后验 + 收敛诊断 ----
+def mh_chain(seed, T=20000, burn=2000, step=0.004):
+    r = random.Random(seed)
+    x, chain, accepts = 0.50, [], 0
+    lk = log_kernel(x, a, b)
+    for t in range(T):
+        y = x + r.gauss(0.0, step)
+        if 0.0 &lt; y &lt; 1.0:
+            ly = log_kernel(y, a, b)
+            if math.log(r.random()) &lt; ly - lk:
+                x, lk = y, ly
+                accepts += 1
+        chain.append(x)
+    return chain[burn:], accepts / T
+
+def ess(xs):
+    T = len(xs)
+    m = sum(xs) / T
+    den = sum((v - m) ** 2 for v in xs)
+    rho1 = sum((xs[i] - m) * (xs[i+1] - m) for i in range(T - 1)) / den
+    return T / (1 + 2 * rho1), rho1
+
+def rhat(chains):
+    C, n = len(chains), len(chains[0])
+    means = [sum(c) / n for c in chains]
+    grand = sum(means) / C
+    B = n * sum((m - grand) ** 2 for m in means) / (C - 1)
+    W = sum(sum((v - m) ** 2 for v in c) / (n - 1) for c, m in zip(chains, means)) / C
+    varp = (n - 1) / n * W + B / n
+    return math.sqrt(varp / W), W, B
+
+c1, ar1 = mh_chain(20261107)
+c2, ar2 = mh_chain(20261108)
+allx = c1 + c2
+m = sum(allx) / len(allx)
+sd = math.sqrt(sum((v - m) ** 2 for v in allx) / (len(allx) - 1))
+srt = sorted(allx)
+q025 = srt[int(0.025 * len(srt))]
+q975 = srt[int(0.975 * len(srt))]
+e, rho1 = ess(c1)
+rh, W, B = rhat([c1, c2])
+print("[4] MH 采样（2 链 x 18000 保留步，步长 0.004）")
+print("    accept rate : %.4f / %.4f" % (ar1, ar2))
+print("    sample mean : %.6f   (解析值 0.497251)" % m)
+print("    sample sd   : %.6f   (解析值 %.6f)" % (sd, post_sd))
+print("    95%% CrI     : [%.6f, %.6f]" % (q025, q975))
+print("    rho1=%.4f   ESS(链1)=%.1f / %d" % (rho1, e, len(c1)))
+print("    W=%.8f  B=%.8f  R-hat=%.4f" % (W, B, rh))
+
+# ---- 5) 提议步长对混合效率的影响 ----
+print("[5] 步长扫描（单链，T=20000，burn=2000）")
+for step in (0.002, 0.004, 0.008, 0.012):
+    ch, ar = mh_chain(777, step=step)
+    ee, rr = ess(ch)
+    print("    step=%.3f  accept=%.4f  rho1=%.4f  ESS=%6.1f  ESS/T=%.3f" % (step, ar, rr, ee, ee/len(ch)))
+</pre>
+  <div class="run-output">
+    <div class="ro-head">真实运行输出（python3 直接执行上方代码所得 stdout）</div>
+    <pre>[1] Beta-Binomial 共轭更新
+    prior        : Beta(2, 2)
+    posterior    : Beta(5969, 6035)
+    post mean    : 0.497251
+    freq (MLE)   : 0.497250
+    prior weight : 0.000333  (= (a0+b0)/(a0+b0+N))
+    post sd      : 0.004563
+    95% CrI(normal): [0.488307, 0.506195]
+[2] 小样本对照 n=8, s=5
+    posterior    : Beta(7, 5)
+    post mean    : 0.583333  freq=0.625000  prior pull=0.041667
+    prior weight : 0.333333
+[3] MH 单步（对称随机游走，q 之比 = 1）
+    theta=0.50 -&gt; 0.51
+    log alpha   : -3.721056
+    alpha       : 0.024208
+[4] MH 采样（2 链 x 18000 保留步，步长 0.004）
+    accept rate : 0.7356 / 0.7349
+    sample mean : 0.497281   (解析值 0.497251)
+    sample sd   : 0.004564   (解析值 0.004563)
+    95% CrI     : [0.488306, 0.506354]
+    rho1=0.8076   ESS(链1)=6882.7 / 18000
+    W=0.00002083  B=0.00004362  R-hat=1.0000
+[5] 步长扫描（单链，T=20000，burn=2000）
+    step=0.002  accept=0.8653  rho1=0.9242  ESS=6319.5  ESS/T=0.351
+    step=0.004  accept=0.7366  rho1=0.8020  ESS=6912.6  ESS/T=0.384
+    step=0.008  accept=0.5448  rho1=0.6407  ESS=7889.7  ESS/T=0.438
+    step=0.012  accept=0.4174  rho1=0.6279  ESS=7979.3  ESS/T=0.443</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">0.497251 / 0.497250</span>分别对应专题二的 $E(\theta\mid x)$ 与 $\hat p$。两者相差约 $10^{-6}$，正是 $w_0=0.000333$ 的后果：先验被 12000 条数据淹没，共轭后验均值几乎贴上极大似然估计。改先验为 $Beta(200,200)$ 时 $w_0$ 升到约 $0.032$，这个差会放大约一百倍。</p>
+    <p><span class="ci-k">0.000333</span>是 $4/12004$，专题二里「先验话语权」的精确值。<span class="ci-k">0.004563</span>是后验标准差，乘 $1.96$ 得 $\pm0.008944$，即输出里的 $95\%$ 可信区间 $[0.488307,\ 0.506195]$ ——它完全落在 $[0,1]$ 内，印证了「可信区间不越界」那条可操作差异。</p>
+    <p><span class="ci-k">0.583333 / 0.625000 / 0.041667 / 0.333333</span>是专题二反例（1）的小样本对照：只有 8 个观测时 $Beta(2,2)$ 仍占 $1/3$ 权重，把频率估计 $0.625$ 拉回到 $0.583333$，拉动量 $0.041667$。若把 $n$ 从 8 提到 12000，这一拉动量按 $w_0$ 同比例衰减到可忽略。</p>
+    <p><span class="ci-k">-3.721056 / 0.024208</span>是算法详解「手算到底」里 MH 单步的 $\log\alpha$ 与 $\alpha$：代码用 `log_kernel` 复算，与手算的 $5968\ln(1.02)+6034\ln(0.98)$ 完全一致。它也说明为什么必须用对数核——直接算 $\theta^{5968}(1-\theta)^{6034}$ 会下溢成 $0$。</p>
+    <p><span class="ci-k">0.497281 vs 0.497251</span>是两条链共 36000 个保留样本的均值与解析值之差，约 $3.0\times10^{-5}$。蒙特卡洛标准误约为 $\mathrm{sd}/\sqrt{\mathrm{ESS}}\approx0.004563/\sqrt{6882.7}\approx5.5\times10^{-5}$，差值落在 $1$ 个标准误内，链可信。<span class="ci-k">0.004564 vs 0.004563</span>、<span class="ci-k">[0.488306, 0.506354] vs [0.488307, 0.506195]</span>同理，采样分位数与解析正态近似吻合。</p>
+    <p><span class="ci-k">0.7356 / 0.7349</span>是两条链的经验接受率，明显高于一维随机游走的理论最优约 $0.44$，说明步长 $0.004$ 偏小。<span class="ci-k">rho1=0.8076 与 ESS=6882.7/18000</span>把后果量化了：18000 步只有约 $38\%$ 是有效样本，与算法详解第 8 步「不要把 $T$ 当样本量」严格对应。</p>
+    <p><span class="ci-k">W=0.00002083 / B=0.00004362 / R-hat=1.0000</span>：虽然链间方差 $B$ 的绝对值大于链内方差 $W$，但 $B$ 在 $\widehat{\mathrm{var}}^{+}=((n-1)/n)W+B/n$ 里被 $n=18000$ 除掉后只剩约 $2.4\times10^{-9}$，相对 $W$ 可忽略，故 $\hat R$ 保留四位小数为 $1.0000$，判定收敛。对照手算的迷你链 $\hat R=1.3540$，可见「链数少 + 样本少 + 链均值有漂移」会立刻让诊断报警。</p>
+    <p><span class="ci-k">步长扫描四行</span>把调参逻辑变成可测量事实：步长从 $0.002$ 增到 $0.012$，接受率从 $0.8653$ 降到 $0.4174$（逼近最优 $0.44$），$\rho_1$ 从 $0.9242$ 降到 $0.6279$，$\mathrm{ESS}/T$ 从 $0.351$ 升到 $0.443$。改种子会小幅改变末位数字，但「步长偏小 → 自相关强 → ESS 低」的单调关系不会变；这就是把 $\tau$ 列为关键超参的原因。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>Metropolis–Hastings 从任意可逐点计算密度的后验中抽取相关样本，用样本近似后验均值、标准差、分位数与 $P(\theta&gt;\theta_0\mid x)$。它<strong>不做</strong>点估计优化，也<strong>不</strong>自动判断模型对错；模型检查需另做后验预测。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：可调用的 $\log\tilde p(\theta)=\log p(x\mid\theta)+\log p(\theta)$、起点 $\theta^{(0)}$、对称提议分布（步长 $\tau$）、总步数 $T$、预热 $T_b$、链数 $C$、随机种子。输出：$C$ 条保留样本链（量纲与 $\theta$ 相同）、后验摘要（均值 / sd / 分位数）、诊断量（经验接受率、$\hat R$、ESS、MC 标准误）。</td></tr>
+    <tr><th>适用场景</th><td>非共轭先验或层级模型；中低维连续参数；需要高保真可信区间、不对称后验、或「参数超过业务门槛的概率」的决策；小样本需借先验稳定估计；模型比较需边缘似然的近似。</td></tr>
+    <tr><th>关键参数</th><td>提议步长 $\tau$（最敏感，建议按后验 sd 的约 $2.4$ 倍起调，调到接受率约 $0.2$–$0.5$）、总步数 $T$（默认 20000）、预热 $T_b$（默认 2000）、链数 $C\ \ge\ 2$（默认 2）、随机种子（默认固定值）。判停方向：接受率达标、$\hat R &lt; 1.01$、$\mathrm{ESS}$ 足够大（如大于 1000）且 MC 标准误小于业务可容忍误差，再报告摘要。</td></tr>
+    <tr><th>边界条件</th><td>在先验支撑集不含真值、参数不可识别、后验多峰且随机游走无法跨峰、维度 $d$ 很大而每步 $O(n)$ 似然不可承受、或似然本身不可计算时，本算法不适用，应分别改用 NUTS / HMC（连续高维）、并行回火（多峰）、Gibbs 采样（离散或满条件易抽）、变分推断（海量数据）或 ABC / 伪边际方法（似然不可算）。</td></tr>
+    <tr><th>常见问题</th><td>第一，把步数 $T$ 当样本量写进结论（应看 ESS）；第二，拒绝时跳过、不重复记录当前值（稳态分布偏移）；第三，直接算 $\theta^{5968}(1-\theta)^{6034}$ 导致下溢（应取对数核）；第四，只跑一条链、不看 $\hat R$ 就报告可信区间。详见下方常见问题。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>后验明明是共轭的，为什么还要用 MH 采样？</summary><div class="faq-a">本例用 $Beta(5969,6035)$ 作靶子，是为了让「采样结果」有一个可逐位核对的解析真值：均值 $0.497251$、sd $0.004563$、区间 $[0.488307,0.506195]$ 都能手算。真实价值在于同一段代码把 $\log\tilde p$ 换成<strong>任意</strong>非共轭密度即可运行——专题一里双峰混合先验、层级模型、逻辑回归似然都属此类，那时共轭更新根本写不出来，MH 才成为唯一可走的通用路径。</div></details>
+  <details><summary>接受率越高越好吗？0.7356 是不是说明链很健康？</summary><div class="faq-a">不是。一维随机游走 MH 的理论最优接受率约 $0.44$；接受率过高意味着步长太小，链每步只挪一点点，相邻样本高度相关。代码里 $0.7356$ 对应 $\rho_1=0.8076$、$\mathrm{ESS}/T=0.384$，正是「走得慢」的证据。步长扫描显示把 $\tau$ 从 $0.004$ 调到 $0.012$，接受率降到 $0.4174$ 反而把 $\mathrm{ESS}/T$ 提到 $0.443$。判断健康看的是 ESS 与 $\hat R$，不是接受率本身。</div></details>
+  <details><summary>为什么拒绝时必须把当前值再记一次？</summary><div class="faq-a">因为「原地不动」本身就是马尔可夫链的一步：在这一步里，链以概率 $1-\alpha$ 停留在 $\theta^{(t)}$。若拒绝时跳过、不写入样本，等于人为删掉了所有停留步，链在状态间的停留时间比例就不再正比于后验密度，平稳分布会被抬高到「更愿意移动」的区域。代码里无论接受与否都执行 <code>chain.append(x)</code>，正是这个要求。</div></details>
+  <details><summary>$\hat R$ 已经等于 1.0000，还需要看 ESS 吗？</summary><div class="faq-a">需要，两者管的是不同风险。$\hat R$ 比较链间与链内方差，回答「几条链有没有收敛到同一片区域」；ESS 回答「这片区域里我究竟攒了多少个<strong>独立</strong>样本」。多峰后验里几条链可以一起困在同一个峰，$\hat R$ 依然接近 $1$ 却完全错了；反过来样本高度自相关时 $\hat R$ 正常但区间估计仍被 MC 噪声放大。代码四个诊断量一起输出，就是为了不让我们只盯一个数字。</div></details>
+  <details><summary>共享案例里 $w_0=0.000333$，是不是就可以永远忽略先验？</summary><div class="faq-a">不能。$w_0\to0$ 是 Bernstein–von Mises 正则条件下的渐近结论，专题二列了五类反例：小样本、先验支撑集不含真值、参数不可识别、高维稀疏冷启动、结构性稀疏先验。工程上稳妥的做法是<strong>先验敏感性分析</strong>：换 $Beta(1,1)$、$Beta(2,2)$、$Beta(50,50)$ 各跑一次，若后验均值与决策结论不变，才有资格说「先验不重要」；否则必须把先验写进报告。</div></details>
+  <details><summary>把 MH 放进「采集 → 存储计算 → 建模 → 评估 → 部署」链条，它站在哪里？</summary><div class="faq-a">它站在<strong>建模</strong>环节，上游契约是「建模层要拿到一份可逐点调用的对数似然与对数先验」，下游契约是「评估层要拿到带 MC 标准误的后验样本，而不是一个点估计」。它不负责采集与存储，但每步 $O(n)$ 的代价意味着上游的数据布局会直接决定采样速度；部署时若把采样结果做成在线服务，通常要改成先跑 VI 出初值、再局部 MCMC 精修的混合策略。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">共轭先验带来的「解析可算性」，本质上是用什么换来的？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 用更大的样本量换更小的方差</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 把先验锁进某个分布族、把数据压成固定维充分统计量</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 用更快的计算机换取精确积分</label>
+    </div>
+    <div class="quiz-feedback" data-explain="共轭更新的全部内容只是 τ_n=τ_0+T(x)、ν_n=ν_0+n 两个数相加；代价是先验形状必须属于配套分布族，且数据里除 (s,n) 以外的结构（顺序、漂移、异质性）全被丢掉。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">共享案例的后验是 $Beta(5969,6035)$，其后验均值是多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 0.497250</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 0.500000</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 0.497251</label>
+    </div>
+    <div class="quiz-feedback" data-explain="E(θ|x)=α/(α+β)=5969/(5969+6035)=5969/12004=0.497251。0.497250 是极大似然估计 5967/12000，两者只差约 10⁻⁶，正因为先验权重 w₀=4/12004=0.000333 极小。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">下面哪句话<strong>只有</strong>贝叶斯可信区间可以直接说？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 参数落在 (0.488, 0.506) 内的概率是 95%</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 重复抽样构造的区间中约有 95% 会覆盖真值</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 若真值等于 0.5，看到这份数据的概率不小于 0.05</label>
+    </div>
+    <div class="quiz-feedback" data-explain="A 是对参数取概率，正是可信区间的定义；B 是置信区间的覆盖率承诺，随机的是区间而非参数；C 是 p 值的口径，条件方向恰好反过来。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">代码里 18000 步的链给出 $\rho_1=0.8076$、$\mathrm{ESS}=6882.7$，正确的解读是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 18000 步全部是独立样本，可以直接当样本量用</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 只有约 38% 是有效样本，报告区间时应看 ESS 而非步数</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. ESS 大于步数，说明链过度混合、结果不可信</label>
+    </div>
+    <div class="quiz-feedback" data-explain="ESS/T=6882.7/18000≈0.38。相邻样本高度自相关，蒙特卡洛标准误约为 sd/√ESS≈5.5×10⁻⁵，必须用 ESS 而不是 T 来折算精度。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">下列哪种情形下，「数据会淹没先验」这一结论<strong>不成立</strong>？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 先验在真实参数附近密度为 0，或参数本身不可识别</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 先验 Beta(2,2)、样本量 12000、数据在真值附近有信息</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 模型正则且满足 Bernstein–von Mises 定理的前提</label>
+    </div>
+    <div class="quiz-feedback" data-explain="B、C 正是 BvM 成立的情形；A 违反了「先验在真值附近密度为正」与「参数可识别」两条前提，此时后验被先验钉死或几乎等于先验，应改用敏感性分析而不是套用 w₀→0。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+<h2 id="d-figures">本章图示汇总</h2>
+<figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s9">9 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>先验 $Beta(1,1)$（均匀先验），观察到 20 次抛掷中 12 次正面。求后验分布、后验均值，并与频率估计 $\hat{p}$ 对比。</li>
+          <li>一句话分别解释：后验均值、后验中位数、MAP。若后验分布明显右偏，三者谁最大、谁最小？</li>
+          <li>随机游走 MH 当前状态 $\theta^{(t)} = 2.0$，提议 $\theta' = 2.5$，对称提议分布。已知 $\tilde{p}(2.5 \mid x) = 0.24$，$\tilde{p}(2.0 \mid x) = 0.40$。（a）算接受率；（b）若 $u = 0.9$，下一步在哪？（c）若 $u = 0.5$ 呢？</li>
+          <li>为什么说 KL 散度是「不对称的」？结合 VI 中的 $KL(q\|p)$，说明它会让近似分布 $q$ 偏「宽」还是偏「窄」，并解释这对可信区间的影响。</li>
+          <li>场景选择题：(a) 训练一个百万参数的推荐模型需要快速得到参数不确定性近似；(b) 发表论文需要高保真的小样本后验区间。各应优先选 MCMC 还是 VI？为什么？</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> 后验 $= Beta(1+12,\ 1+8) = Beta(13,\ 9)$；后验均值 $= \dfrac{13}{22} \approx 0.591$。
+            频率估计 $\hat{p} = 12/20 = 0.6$。均匀先验下后验均值与频率估计几乎一致（先验不偏不倚，$\alpha+\beta=2$ 的强度很弱），完全符合「数据越多先验越不重要」。</p>
+            <p><strong>2.</strong> 后验均值 = 后验重心（平方损失最优）；后验中位数 = 50% 分位点（绝对损失最优）；MAP = 后验密度最高点（众数）。
+            右偏分布下典型次序：<strong>MAP &lt; 中位数 &lt; 均值</strong>（长尾把均值往右拉）。</p>
+            <p><strong>3.</strong> （a）$\alpha = \min\left(1, \dfrac{0.24}{0.40}\right) = \min(1, 0.6) = 0.6$。
+            （b）$u = 0.9 &gt; 0.6$：拒绝，$\theta^{(t+1)} = 2.0$。
+            （c）$u = 0.5 &lt; 0.6$：接受，$\theta^{(t+1)} = 2.5$。</p>
+            <p><strong>4.</strong> $KL(q\|p) = E_q[\log(q/p)]$ 中 $q$、$p$ 地位不互换，换序后数值不同（一个重罚「$q$ 有而 $p$ 无」，另一个相反）。
+            最小化反向 KL $KL(q\|p)$ 是 <strong>mode-seeking</strong>：$q$ 会收缩到后验的高密度区、避开低密度区 → <strong>偏窄</strong>，
+            低估参数不确定性 → 可信区间偏窄、覆盖率不足。这是 VI 的经典代价，重要场景需校正或改用 MCMC 验证。</p>
+            <p><strong>5.</strong> (a) 选 <strong>VI</strong>：规模大、要求速度，VI 一次优化即可，且可与自动微分/分布式训练结合；轻微低估方差在推荐场景通常可接受。
+            (b) 选 <strong>MCMC</strong>：小样本对近似误差敏感，论文要求高保真后验；MCMC 渐近精确且能给可靠的可信区间，配 $\hat{R}$/ESS 诊断即可。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 10 ===== -->
+      <h2 id="s10">10 · 本章小结</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>主题</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>两大学派</td><td>参数是固定常数 vs 随机变量；概率是频率 vs 信念</td></tr>
+            <tr><td>贝叶斯公式</td><td>后验 ∝ 似然 × 先验；证据 $p(x)$ 是归一化常数，也是模型比较的钥匙</td></tr>
+            <tr><td>共轭先验</td><td>Beta-二项：$Beta(\alpha,\beta) \to Beta(\alpha+s, \beta+n-s)$；后验均值是先验与数据的加权平均</td></tr>
+            <tr><td>点估计与区间</td><td>后验均值 / 中位数 / MAP；可信区间可说「参数在里面的概率」，置信区间不可以</td></tr>
+            <tr><td>先验与正则化</td><td>负对数先验 = 惩罚项：L2 = 高斯先验，L1 = 拉普拉斯先验（呼应模块 06）</td></tr>
+            <tr><td>MCMC</td><td>MH 接受率 $\min\left(1, \frac{\tilde{p}(\theta')q(\theta \mid \theta')}{\tilde{p}(\theta)q(\theta' \mid \theta)}\right)$；Gibbs 轮流条件采样；burn-in / trace / $\hat{R}$ / ESS 诊断</td></tr>
+            <tr><td>变分推断</td><td>最小化 $KL(q\|p)$ = 最大化 ELBO；$\log p(x) = \mathrm{ELBO} + KL$；快但低估不确定性</td></tr>
+            <tr><td>模型比较</td><td>贝叶斯因子 = 边缘似然之比（对先验敏感）；后验预测检查「假数据像不像真数据」</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：贝叶斯更新。</strong>以 Beta(2,2) 为先验，用共轭更新得到完课率后验并给出可信区间。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="current" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="../resources.html#r-b15">Bayesian Data Analysis（第 3 版）</a> <span class="muted small">（2013 · 权威共识）</span><span class="fr-why">为什么读：BDA3 是共轭、层次模型与 MCMC 收敛诊断的标准参考。</span></span></div><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://probml.github.io/pml-book/" target="_blank" rel="noopener">Probabilistic Machine Learning: An Introduction</a> <span class="muted small">（2022 · 已核验）</span><span class="fr-why">为什么读：Murphy PML 入门卷用现代概率图模型语言重述贝叶斯推断。</span></span></div><div class="fr-item"><span class="fr-tag">理论</span><span class="fr-body"><a href="../resources.html#r-t01">贝叶斯定理</a> <span class="muted small">（1763 · 权威共识）</span><span class="fr-why">为什么读：贝叶斯定理里程碑条目，回到模块 03 的概率原点。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div class="muted small">继续学习下一章，或标记本章完成以记录进度。</div>
+        <button class="btn primary" data-complete-btn="m07">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m06-regression.html"><span class="dir">← 上一篇</span><span class="ttl">06 · 回归分析</span></a>
+        <a class="next" href="m08-experiment.html"><span class="dir">下一篇 →</span><span class="ttl">08 · 实验设计与因果推断</span></a>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索概念、公式、例题…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索章节、概念、公式或例题。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03 · 机器学习 · 统计 · 智能学习体系</title>
+<meta name="description" content="阶段 3 机器学习：学习路径、先修知识、难度层级、核心概念、目标能力、实践任务、评估标准与进阶衔接。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="s3" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+      <article class="module" data-stage="s3">
+      <div class="inner">
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / 阶段 3 · 机器学习</div>
+        <h1>03 · 机器学习</h1>
+        <p class="lead">从推断到预测。独立完成端到端建模，并给出统计上可辩护的评估结论。本页给出该阶段的完整学习路径、先修知识、难度层级、核心概念、目标能力、实践任务、评估标准与进阶衔接。</p>
+        <div class="module-meta">
+          <span class="badge brand">阶段 3</span>
+          <span class="badge info">L2 → L4</span>
+          <span class="badge ok">第 11–15 周</span>
+          <span class="badge ">40 学时</span>
+          <span class="badge accent">2 个专题</span>
+          <span class="badge ">更新 2026-11-07</span>
+        </div>
+      </header>
+
+      <div class="callout note">
+        <div class="callout-title">阶段定位</div>
+        <p><strong>1950 年代至今 · 统计学习范式</strong>。全站按「统计学 → 大数据分析 → 机器学习 → 深度学习 → 神经网络 → 生成式AI」组织。本路线按「先掌握方法与训练范式，再深入网络结构与机制，最后进入生成式系统」的认知顺序组织。深度学习与神经网络互为表里：阶段四聚焦如何把深层模型训练好，阶段五拆解网络结构本身为何有效，因此顺序上先四后五。</p>
+      </div>
+      <h2 id="path">1 · 学习路径</h2>
+      <p>按下列顺序推进，每一步都对应一个可点击的站内专题；未完成当前步的评估标准前，不建议跳步。</p>
+      <div class="table-wrap"><table><thead><tr><th>步骤</th><th>主题</th><th>要点</th><th>对应专题</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>机器学习的统计视角</strong></td><td>ERM、偏差-方差、泛化、双重下降</td><td><a href="../modules/m09-ml-stats.html">09 · 机器学习的统计基础</a></td></tr>
+<tr><td>2</td><td><strong>评估协议</strong></td><td>训练/验证/测试、k 折与分层、数据泄漏、AIC/BIC</td><td><a href="../modules/m09-ml-stats.html">09 · 机器学习的统计基础</a></td></tr>
+<tr><td>3</td><td><strong>经典算法族</strong></td><td>线性/逻辑回归、决策树、SVM、朴素贝叶斯、KNN</td><td><a href="../modules/m12-ml-algorithms.html">12 · 经典机器学习算法</a></td></tr>
+<tr><td>4</td><td><strong>集成与无监督</strong></td><td>Bagging/Boosting、随机森林、XGBoost、聚类与 PCA</td><td><a href="../modules/m12-ml-algorithms.html">12 · 经典机器学习算法</a></td></tr>
+<tr><td>5</td><td><strong>模型选择与校准</strong></td><td>超参搜索、多重比较、概率校准、Brier 分数</td><td><a href="../modules/m09-ml-stats.html">09 · 机器学习的统计基础</a></td></tr>
+<tr><td>6</td><td><strong>工程与上线前检查</strong></td><td>特征管线、版本、监控、公平性与可解释性</td><td><a href="../modules/m12-ml-algorithms.html">12 · 经典机器学习算法</a></td></tr>
+</tbody></table></div>
+      <h2 id="prereq">2 · 先修知识</h2>
+      <div class="callout tip"><div class="callout-title">进入本阶段前应具备</div><ul class="check-list">
+<li>阶段一（尤其回归、最大似然、偏差-方差）</li>
+<li>阶段二的数据管线与 SQL</li>
+<li>线性代数：向量、矩阵乘法、特征值直觉</li>
+<li>Python + NumPy/pandas/scikit-learn</li>
+</ul></div>
+      <h2 id="difficulty">3 · 难度层级</h2>
+      <p>本阶段覆盖 <strong>L2 → L4</strong>。全站统一采用五级难度标尺：</p>
+      <div class="table-wrap"><table><thead><tr><th>层级</th><th>含义</th><th>本阶段</th></tr></thead><tbody>
+<tr><td>L1 入门</td><td>只需基础数学</td><td>—</td></tr>
+<tr><td>L2 基础</td><td>概率与代数</td><td>✓ 覆盖</td></tr>
+<tr><td>L3 进阶</td><td>线代与编程</td><td>✓ 覆盖</td></tr>
+<tr><td>L4 高级</td><td>微积分与框架</td><td>✓ 覆盖</td></tr>
+<tr><td>L5 前沿</td><td>读论文与复现</td><td>—</td></tr>
+</tbody></table></div>
+      <h2 id="concepts">4 · 核心概念</h2>
+      <div class="card-grid two">
+<div class="card"><h3>经验风险最小化</h3><p>训练即估计：用样本平均损失逼近期望损失。</p></div>
+<div class="card"><h3>偏差-方差分解</h3><p>把泛化误差拆成系统性偏差、估计方差与不可约噪声。</p></div>
+<div class="card"><h3>正则化</h3><p>L1/L2 既是复杂度惩罚，也可理解为拉普拉斯/高斯先验（呼应阶段一）。</p></div>
+<div class="card"><h3>交叉验证与数据泄漏</h3><p>任何在切分前用到全数据的操作都会让评估失真。</p></div>
+<div class="card"><h3>集成与Boosting</h3><p>Bagging 降方差、Boosting 降偏差，是偏差-方差权衡的工程化。</p></div>
+<div class="card"><h3>双重下降</h3><p>过参数化后测试误差再次下降，修正经典 U 型曲线认知。</p></div>
+<div class="card"><h3>校准</h3><p>预测概率是否可信；准确率之外必须检查 Brier 分数与可靠性图。</p></div>
+</div>
+      <h2 id="competencies">5 · 目标能力</h2>
+      <p>完成本阶段后，你应当能够：</p><ul class="check-list">
+<li>能把业务目标翻译成可优化的损失函数与可解释的评估指标</li>
+<li>能设计无泄漏的训练/验证/测试协议并说明每一折的用途</li>
+<li>能对同一问题比较 3 类以上模型，并给出带不确定性的结论</li>
+<li>能诊断过拟合、欠拟合、类别不平衡与分布偏移</li>
+<li>能解释正则化、集成与超参选择背后的统计动机</li>
+</ul>
+      <h2 id="tasks">6 · 实践任务</h2>
+      <p>任务按基础 → 进阶 → 挑战分层，均要求提交可复现产物，而非只看结论。</p>
+      <div class="card-grid two">
+<div class="card">
+          <div class="tag-row"><span class="badge ok">基础</span> <span class="badge ">Notebook + 模型卡</span></div>
+          <h3>表格数据端到端</h3>
+          <p>在一份公开表格数据集上完成特征管线、3 类模型对比、5 折分层 CV 与 Bootstrap 置信区间。</p>
+        </div>
+<div class="card">
+          <div class="tag-row"><span class="badge info">进阶</span> <span class="badge ">对照实验 + 说明</span></div>
+          <h3>数据泄漏诊断</h3>
+          <p>复现「先全量标准化再切分」「时间序列随机切分」两类泄漏，量化评估虚高幅度并修正。</p>
+        </div>
+<div class="card">
+          <div class="tag-row"><span class="badge info">进阶</span> <span class="badge ">计算 + 系数路径图</span></div>
+          <h3>AIC/BIC 与正则化路径</h3>
+          <p>手算两个模型的 AIC/BIC，绘制 Ridge/Lasso 系数随 λ 变化路径，解释差异。</p>
+        </div>
+<div class="card">
+          <div class="tag-row"><span class="badge warn">挑战</span> <span class="badge ">可靠性图 + 决策分析</span></div>
+          <h3>校准评估</h3>
+          <p>比较未校准与 Platt/等距回归校准后的 Brier 分数与可靠性图，讨论阈值决策。</p>
+        </div>
+<div class="card">
+          <div class="tag-row"><span class="badge warn">挑战</span> <span class="badge ">实验脚本 + 数值核对</span></div>
+          <h3>偏差-方差数值实验</h3>
+          <p>对同一 x₀ 重复采样训练，实测分解式中的三项并验证等式成立。</p>
+        </div>
+</div>
+      <h2 id="assessment">7 · 评估标准</h2>
+      <div class="callout exam"><div class="callout-title">达标再进阶</div></div>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>可检验标准</th></tr></thead><tbody>
+<tr><td><strong>评估严谨性</strong></td><td>能说明验证集与测试集不得互相污染，且能主动检查泄漏。</td></tr>
+<tr><td><strong>结论带不确定性</strong></td><td>模型对比给出置信区间或显著性检验，而非只比大小。</td></tr>
+<tr><td><strong>统计动机</strong></td><td>能解释每个方法对应哪个统计假设、违背时会怎样。</td></tr>
+<tr><td><strong>工程可复现</strong></td><td>随机种子、版本、特征口径固定，结果可复跑。</td></tr>
+<tr><td><strong>衔接 readiness</strong></td><td>能说清「特征工程成为瓶颈」为何自然导向表示学习与深层网络。</td></tr>
+</tbody></table></div>
+      <h2 id="bridge">8 · 进阶衔接</h2>
+      <div class="callout tip">
+        <div class="callout-title">下一阶段：深度学习</div>
+        <p>当人工特征成为瓶颈，让模型自己学表示就成了下一步。阶段四聚焦深层模型如何被训练出来：计算图、反向传播、优化与规模化训练。</p>
+        <p><a class="btn primary" href="deep-learning.html">进入阶段 4 · 深度学习 →</a>
+        <a class="btn" href="../roadmap.html">查看完整路线图</a></p>
+      </div>
+      <h2 id="resources">9 · 本阶段资源（42 条）</h2>
+      <p>下列条目来自全站资源库，均标注来源、年份、权威性、适用阶段与核验状态。完整可筛选版本见 <a href="../resources.html">资源库</a>。</p>
+      <div class="callout note"><div class="callout-title">构成</div><p>标志性书籍 11 · 经典课程 5 · 数据集 3 · 里程碑模型 2 · 开源资源 6 · 关键论文 2 · 标志性理论 7 · 工具/框架 6</p></div>
+      <div class="res-item" id="r-c01">
+        <div class="res-icon">🎓</div>
+        <div>
+          <div class="res-name"><a href="https://cs229.stanford.edu/" target="_blank" rel="noopener">Stanford CS229 机器学习 ↗</a> <span class="badge info">权威共识</span> <span class="badge ">经典课程</span></div>
+          <p class="res-desc">机器学习数学基础的标准课程，讲义与作业公开。</p>
+          <div class="res-meta">Stanford University · 2025 · 官方课程页 · 一级 · 官方一手 · 机器学习</div>
+          <div class="res-meta verify-note">核验备注：本轮未逐一打开最新学年页面，标注为官方固定入口</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-b07">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning with Python ↗</a> <span class="badge ok">已核验</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">ISLR 的 Python 版本，实验部分改用 Python 生态。</p>
+          <div class="res-meta">James, Witten, Hastie, Tibshirani, Taylor · 2023 · Springer · 一级 · 官方一手 · 统计学 · 机器学习</div>
+          <div class="res-meta verify-note">核验备注：官网写明 Python 版 2023 年出版</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-b11">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name"><a href="https://probml.github.io/pml-book/" target="_blank" rel="noopener">Probabilistic Machine Learning: An Introduction ↗</a> <span class="badge ok">已核验</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">概率视角的现代机器学习教材，覆盖从回归到深度生成模型。</p>
+          <div class="res-meta">Kevin P. Murphy · 2022 · MIT Press · 一级 · 官方一手 · 机器学习 · 生成式AI</div>
+          <div class="res-meta verify-note">核验备注：多所高校课程大纲列为 2022 年出版</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-b20">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">Hands-On Machine Learning（第 3 版） <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">工程实践导向，代码完整，适合作为动手主线。</p>
+          <div class="res-meta">Aurélien Géron · 2022 · O'Reilly · 一级 · 官方一手 · 机器学习 · 深度学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b21">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">Designing Machine Learning Systems <span class="badge ok">已核验</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">从数据管线到部署监控的系统化工程视角。</p>
+          <div class="res-meta">Chip Huyen · 2022 · O'Reilly · 一级 · 官方一手 · 大数据 · 机器学习</div>
+          <div class="res-meta verify-note">核验备注：多所高校课程大纲列为 2022 年参考书</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-c08">
+        <div class="res-icon">🎓</div>
+        <div>
+          <div class="res-name"><a href="https://www.deeplearning.ai/" target="_blank" rel="noopener">Andrew Ng 机器学习专项 ↗</a> <span class="badge info">权威共识</span> <span class="badge ">经典课程</span></div>
+          <p class="res-desc">零基础友好的 ML 入门主线，含编程作业。</p>
+          <div class="res-meta">DeepLearning.AI / Stanford Online · 2022 · Coursera · 一级 · 官方一手 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b06">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning（第 2 版） ↗</a> <span class="badge ok">已核验</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">新增深度学习、生存分析、多重检验与 BART 等章节。</p>
+          <div class="res-meta">James, Witten, Hastie, Tibshirani · 2021 · Springer · 一级 · 官方一手 · 统计学 · 机器学习</div>
+          <div class="res-meta verify-note">核验备注：官网明确写明第 2 版 2021 年出版</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-c13">
+        <div class="res-icon">🎓</div>
+        <div>
+          <div class="res-name">李宏毅机器学习课程 <span class="badge warn">待核验</span> <span class="badge ">经典课程</span></div>
+          <p class="res-desc">中文讲解深入且覆盖面广，含 Transformer 与生成模型专题。</p>
+          <div class="res-meta">台湾大学 李宏毅 · 2021 · 官方课程页 · 一级 · 官方一手 · 机器学习 · 深度学习 · 生成式AI</div>
+          <div class="res-meta verify-note">核验备注：本轮未打开官方课程页核对最新学年 URL</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-t20">
+        <div class="res-icon">🧭</div>
+        <div>
+          <div class="res-name">双重下降 <span class="badge info">权威共识</span> <span class="badge ">标志性理论</span></div>
+          <p class="res-desc">过参数化区域测试误差二次下降，修正经典 U 型偏差-方差曲线。</p>
+          <div class="res-meta">Belkin 等 / Nakkiran 等 · 2019 · PNAS / arXiv · 一级 · 官方一手 · 机器学习 · 深度学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-c14">
+        <div class="res-icon">🎓</div>
+        <div>
+          <div class="res-name"><a href="https://www.kaggle.com/learn" target="_blank" rel="noopener">Kaggle Learn 微课程 ↗</a> <span class="badge info">权威共识</span> <span class="badge ">经典课程</span></div>
+          <p class="res-desc">Python / pandas / 可视化 / ML 的短实践单元。</p>
+          <div class="res-meta">Kaggle · 2018 · 官方平台 · 一级 · 官方一手 · 统计学 · 大数据 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o20">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name">MLflow / Weights &amp; Biases <span class="badge warn">待核验</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">实验参数、指标与产物版本管理，保障可复现性。</p>
+          <div class="res-meta">各开源/商业项目 · 2018 · 官方站点 · 一级 · 官方一手 · 机器学习 · 深度学习</div>
+          <div class="res-meta verify-note">核验备注：本轮未核验起始年份</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-s02">
+        <div class="res-icon">🔓</div>
+        <div>
+          <div class="res-name">Papers with Code <span class="badge warn">待核验</span> <span class="badge ">开源资源</span></div>
+          <p class="res-desc">论文与代码/榜单的对照索引；使用前请确认当前可访问状态。</p>
+          <div class="res-meta">Meta AI / 社区 · 2018 · 聚合站点 · 三级 · 社区维护 · 机器学习 · 深度学习 · 神经网络 · 生成式AI</div>
+          <div class="res-meta verify-note">核验备注：本轮检索到该站点近年服务状态发生变化的说法，当前可用性与归档方式待核验</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-s04">
+        <div class="res-icon">🔓</div>
+        <div>
+          <div class="res-name">Google Colab <span class="badge info">权威共识</span> <span class="badge ">开源资源</span></div>
+          <p class="res-desc">免配置的托管 Notebook 与有限 GPU 算力。</p>
+          <div class="res-meta">Google · 2017 · 官方站点 · 一级 · 官方一手 · 机器学习 · 深度学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b04">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">《机器学习》（西瓜书） <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">中文机器学习全景教材，覆盖主流算法与一点理论。</p>
+          <div class="res-meta">周志华 · 2016 · 清华大学出版社 · 二级 · 学术机构 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b16">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">Computer Age Statistical Inference <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">从频率学派到贝叶斯再到机器学习的统计思想史。</p>
+          <div class="res-meta">Bradley Efron, Trevor Hastie · 2016 · Cambridge University Press · 一级 · 官方一手 · 统计学 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o06">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://jupyter.org/" target="_blank" rel="noopener">Jupyter ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">可复现的交互式实验记录载体。</p>
+          <div class="res-meta">社区开源 · 2014 · 官方站点 · 一级 · 官方一手 · 统计学 · 机器学习 · 深度学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o15">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name">XGBoost / LightGBM <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">梯度提升树的高效实现，表格数据强基线。</p>
+          <div class="res-meta">社区开源 / Microsoft · 2014 · 官方仓库 · 一级 · 官方一手 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b05">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning（第 1 版） ↗</a> <span class="badge ok">已核验</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">统计学习最通行的入门教材；官网提供免费 PDF。</p>
+          <div class="res-meta">James, Witten, Hastie, Tibshirani · 2013 · Springer · 一级 · 官方一手 · 统计学 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b03">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">《统计学习方法》 <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">中文机器学习经典，公式推导紧凑，适合作为统计到 ML 的桥梁。</p>
+          <div class="res-meta">李航 · 2012 · 清华大学出版社 · 二级 · 学术机构 · 统计学 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-d06">
+        <div class="res-icon">🗂</div>
+        <div>
+          <div class="res-name"><a href="https://www.kaggle.com/" target="_blank" rel="noopener">Titanic（Kaggle） ↗</a> <span class="badge warn">待核验</span> <span class="badge ">数据集</span></div>
+          <p class="res-desc">入门分类练习数据，也适合演示数据泄漏与缺失值处理。</p>
+          <div class="res-meta">Kaggle · 2012 · Kaggle · 三级 · 社区维护 · 统计学 · 机器学习</div>
+          <div class="res-meta verify-note">核验备注：竞赛上线年份未核验</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-p02">
+        <div class="res-icon">📄</div>
+        <div>
+          <div class="res-name">A Few Useful Things to Know about Machine Learning <span class="badge info">权威共识</span> <span class="badge ">关键论文</span></div>
+          <p class="res-desc">关于泛化、过拟合与特征工程的十二条经验，适合入门后复盘。</p>
+          <div class="res-meta">Pedro Domingos · 2012 · Communications of the ACM 55(10) · 一级 · 官方一手 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-s03">
+        <div class="res-icon">🔓</div>
+        <div>
+          <div class="res-name"><a href="https://www.kaggle.com/" target="_blank" rel="noopener">Kaggle ↗</a> <span class="badge info">权威共识</span> <span class="badge ">开源资源</span></div>
+          <p class="res-desc">数据集、竞赛、Notebook 与免费微课程。</p>
+          <div class="res-meta">Google / Kaggle · 2010 · 官方站点 · 一级 · 官方一手 · 统计学 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-s08">
+        <div class="res-icon">🔓</div>
+        <div>
+          <div class="res-name"><a href="https://scikit-learn.org/stable/documentation.html" target="_blank" rel="noopener">scikit-learn / PyTorch 官方仓库与文档 ↗</a> <span class="badge info">权威共识</span> <span class="badge ">开源资源</span></div>
+          <p class="res-desc">优先查阅官方文档而非二手教程，是避免 API 过时的主要方法。</p>
+          <div class="res-meta">各开源项目 · 2010 · GitHub / 官方文档 · 一级 · 官方一手 · 机器学习 · 深度学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b08">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name"><a href="https://hastie.su.domains/ElemStatLearn/" target="_blank" rel="noopener">The Elements of Statistical Learning（第 2 版） ↗</a> <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">统计学习理论经典参考书，数学深度显著高于 ISLR。</p>
+          <div class="res-meta">Hastie, Tibshirani, Friedman · 2009 · Springer · 一级 · 官方一手 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o05">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://scikit-learn.org/" target="_blank" rel="noopener">scikit-learn ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">经典机器学习算法与评估协议的统一接口。</p>
+          <div class="res-meta">社区开源 · 2007 · 官方站点 · 一级 · 官方一手 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b09">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">Pattern Recognition and Machine Learning <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">贝叶斯视角的机器学习经典，VAE / 变分推断的重要背景读物。</p>
+          <div class="res-meta">Christopher M. Bishop · 2006 · Springer · 一级 · 官方一手 · 机器学习 · 生成式AI</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o02">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://numpy.org/" target="_blank" rel="noopener">NumPy / SciPy ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">数值数组与科学计算基础，手写算法的起点。</p>
+          <div class="res-meta">社区开源 · 2006 · 官方站点 · 一级 · 官方一手 · 统计学 · 机器学习 · 深度学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-c06">
+        <div class="res-icon">🎓</div>
+        <div>
+          <div class="res-name"><a href="https://ocw.mit.edu/" target="_blank" rel="noopener">MIT 18.06 线性代数 ↗</a> <span class="badge info">权威共识</span> <span class="badge ">经典课程</span></div>
+          <p class="res-desc">理解矩阵、投影与特征值的经典公开课。</p>
+          <div class="res-meta">MIT OCW / Gilbert Strang · 2005 · MIT OpenCourseWare · 一级 · 官方一手 · 机器学习 · 深度学习</div>
+          
+        </div>
+      </div>
+      <p class="muted">本页展示前 28 条，其余 14 条请到 <a href="../resources.html">资源库</a> 按阶段筛选查看。</p>
+      <h2 id="timeline">10 · 本阶段里程碑（1 项）</h2>
+      <div class="timeline">
+      <div class="tl-item">
+          <div class="tl-date">2001</div>
+          <div class="tl-body"><strong>随机森林</strong>
+            <span class="badge info">权威共识</span>
+            <p>Bagging 降方差的代表，表格数据长期强基线。</p>
+            <div class="res-meta">Leo Breiman · Machine Learning</div>
+            
+          </div>
+        </div>
+</div>
+      <p><a class="btn" href="../timeline.html">查看完整时间线 →</a></p>
+      <div class="flex-between mt-6">
+        <div><a class="btn" href="../index.html">← 返回首页</a> <a class="btn" href="../roadmap.html">路线图</a></div>
+        <button class="btn primary" data-complete-btn="s3">标记本阶段完成</button>
+      </div>
+      <nav class="module-nav">
+        <a class="prev" href="big-data.html"><span class="dir">← 上一阶段</span><span class="ttl">02 · 大数据分析</span></a>
+        <a class="next" href="deep-learning.html"><span class="dir">下一阶段 →</span><span class="ttl">04 · 深度学习</span></a>
+      </nav>
+      </div>
+      </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索阶段、概念、资源、论文…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索全站内容。例如：置信区间、Transformer、共形预测、DeepSeek-R1。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

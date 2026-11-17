@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 · AI 前沿：统计学与大模型 · 统计 · 智能学习体系</title>
+<meta name="description" content="统计学视角重读 AI：语言模型与最大似然、交叉熵与 KL 散度、缩放定律、注意力与核回归、VAE/扩散模型、RLHF/DPO、共形预测与 LLM 评测统计。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m10" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 6 · <a href="../stages/generative-ai.html">生成式 AI</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l5">L5 前沿</span> · 12 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 05–09 · 上一篇：<a href="m14-architectures.html">14 · 神经网络架构谱系</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m15-genai-systems.html">15 · 生成式 AI 系统与方法</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m13-deep-training.html">13 深度学习的训练范式</a><span class="dep-arrow">→</span><a class="dep-node" href="m14-architectures.html">14 神经网络架构谱系</a><span class="dep-arrow">→</span><a class="dep-node current" href="m10-ai-stats.html">10 AI 前沿：统计学与大模型</a><span class="dep-arrow">→</span><a class="dep-node" href="m15-genai-systems.html">15 生成式 AI 系统与方法</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：缩放定律, RLHF, DPO, KL 散度, 共形预测, 测试时计算, 概率校准, 基准泄漏</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>缩放定律是经验规律还是理论结论？它的外推边界在哪？ <a class="q-anchor" href="#s5">→ 对应讲解</a></li><li>RLHF / DPO 中的 KL 约束在统计上防止了什么？ <a class="q-anchor" href="#s6">→ 对应讲解</a></li><li>大模型评测分数差 1–2 分，如何判断是否超过随机波动？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li><li>共形预测给 LLM 输出预测集，与「模型说自己不确定」有何本质区别？ <a class="q-anchor" href="#s7">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+    <article class="module" data-module="m10">
+
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/generative-ai.html">阶段 6 · 生成式 AI</a> / 10 · AI 前沿：统计学与大模型</div>
+        <h1>10 · AI 前沿：统计学与大模型</h1>
+        <p class="lead">
+          这是全站的收官之章。你将看到：大语言模型的预训练<strong>就是</strong>最大似然估计，
+          损失函数<strong>就是</strong>交叉熵，缩放定律<strong>就是</strong>幂律回归，
+          RLHF <strong>就是</strong>Bradley-Terry 偏好模型的极大似然，
+          扩散模型<strong>就是</strong>分数匹配与朗之万采样。用统计学语言重读 AI，论文会变得可读、可疑处会变得可见。
+        </p>
+        <div class="module-meta">
+          <span class="badge accent">AI 前沿</span>
+          <span class="badge">12 学时</span>
+          <span class="badge">前置：模块 05–09</span>
+          <span class="badge brand">阶段五 · AI 前沿统计</span>
+          <span class="badge danger">本站重点</span>
+        </div>
+      </header>
+
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>把语言模型训练还原为最大似然估计，说清「预测下一个词」为何等价于「拟合数据分布」</li>
+          <li>掌握交叉熵、困惑度、KL 散度的关系，并解释温度/top-k/top-p 采样的统计含义</li>
+          <li>理解缩放定律的数学形式与拟合方法，了解 2025 年前后的新修正</li>
+          <li>说清注意力机制与核回归的联系、VAE 的 ELBO、扩散模型的分数匹配原理</li>
+          <li>掌握 RLHF 的 Bradley-Terry 统计模型与 DPO 的似然解释</li>
+          <li>会用共形预测等工具为 AI 模型给出分布无关的不确定性保证</li>
+          <li>识别 LLM 评测中的统计陷阱（多重比较、评测污染、报告 p 值缺失）</li>
+        </ul>
+      </div>
+
+      <!-- ========== 1 ========== -->
+      <h2 id="s1">1 · 语言模型 = 最大似然估计</h2>
+
+      <h3 id="s1-1">1.1 自回归语言模型</h3>
+      <p>大语言模型（LLM）的核心任务是<strong>预测下一个词元（token）</strong>。给定前文 $x_1,\dots,x_{t-1}$，模型输出词表上的概率分布：</p>
+      <div class="formula-box">
+        <div class="f-name">自回归分解（链式法则）</div>
+        $$ P(x_1, x_2, \dots, x_T) = \prod_{t=1}^{T} P(x_t \mid x_1, \dots, x_{t-1}) $$
+        <div class="f-note">任何联合分布都能这样分解；神经网络的作用是用参数 $\theta$ 近似每个条件分布：$P_\theta(x_t \mid x_{&lt;t})$。</div>
+      </div>
+
+      <h3 id="s1-2">1.2 训练目标就是最大似然</h3>
+      <p>给定语料 $\mathcal{D}=\{x^{(1)},\dots,x^{(n)}\}$，训练就是找参数使数据的<strong>似然</strong>最大：</p>
+      <div class="formula-box">
+        <div class="f-name">语言模型的极大似然估计</div>
+        $$ \hat{\theta} = \arg\max_{\theta} \prod_{i=1}^{n} P_\theta\!\left(x^{(i)}\right) = \arg\max_{\theta} \sum_{i=1}^{n}\sum_{t=1}^{T_i} \log P_\theta\!\left(x_t^{(i)} \mid x_{&lt;t}^{(i)}\right) $$
+        <div class="f-note">取对数把连乘变连加（模块 05 的标准操作）；取负号变成「最小化负对数似然」，这就是工程上看到的 loss。</div>
+      </div>
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          一条贯穿本章的主线
+        </div>
+        <p>模块 05 讲的最大似然估计（MLE）在此处原封不动地出现：<strong>LLM 的「预训练」不是别的，就是对文本分布的极大似然估计</strong>。后面的交叉熵、KL 散度、困惑度，全部是这一个目标的不同面孔。</p>
+      </div>
+
+      <h3 id="s1-3">1.3 采样：从分布到文本</h3>
+      <p>模型训练好后按 $P_\theta$ 采样生成文本。常用改造手段都有清晰的统计含义：</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>方法</th><th>做法</th><th>统计解释</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>温度采样</strong> Temperature $\tau$</td>
+              <td>$P_\tau(x)\propto P(x)^{1/\tau}$</td>
+              <td>锐化/钝化分布：$\tau&lt;1$ 使分布更集中（更确定），$\tau&gt;1$ 更接近均匀（更随机）；$\tau\to 0$ 退化为贪心</td>
+            </tr>
+            <tr>
+              <td><strong>top-k 采样</strong></td>
+              <td>只在概率最高的 $k$ 个词上重新归一化</td>
+              <td>截断支撑集的条件分布，丢弃长尾</td>
+            </tr>
+            <tr>
+              <td><strong>top-p（核）采样</strong></td>
+              <td>取累计概率达 $p$ 的最小词集合</td>
+              <td>自适应截断：分布尖锐时选少、平坦时选多</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 1.1</span>
+          <span class="ex-title">温度采样：分布、熵与困惑度的数值变化</span>
+        </div>
+        <div class="example-body">
+          <p>某语言模型在某个位置上的输出分布为 $p=(0.50,\ 0.30,\ 0.20)$（三个候选词）。① 分别用温度 $\tau=0.5,\ 1,\ 2$ 计算新分布 $P_\tau\propto P^{1/\tau}$；② 计算各分布的熵 $H(P_\tau)$ 与困惑度 $\exp(H(P_\tau))$；③ 说明 $\tau\to 0$ 的极限；④ 若改用 top-k（$k=2$）截断，分布与熵如何变化？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：温度作用在 logits 上的等价形式</strong></p>
+              <p>先算未归一化的权重再归一化：$w_i=p_i^{1/\tau}$，$P_\tau(i)=w_i/\sum_j w_j$。</p>
+              <ul>
+                <li>$\tau=0.5$（$1/\tau=2$）：$w=(0.25,\ 0.09,\ 0.04)$，$\sum w=0.38$，故 $P_{0.5}=\bigl(0.6579,\ 0.2368,\ 0.1053\bigr)$；</li>
+                <li>$\tau=1$：分布不变，$P_1=\bigl(0.50,\ 0.30,\ 0.20\bigr)$；</li>
+                <li>$\tau=2$（$1/\tau=0.5$）：$w=(0.7071,\ 0.5477,\ 0.4472)$，$\sum w=1.7020$，故 $P_2=\bigl(0.4154,\ 0.3218,\ 0.2628\bigr)$。</li>
+              </ul>
+              <p><strong>第二步：熵与困惑度</strong>（$H=-\sum P\log P$，单位 nats）</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$\tau$</th><th>$P_\tau$</th><th>$H(P_\tau)$</th><th>困惑度</th></tr></thead>
+                  <tbody>
+                    <tr><td>0.5</td><td>0.6579 / 0.2368 / 0.1053</td><td>0.8536</td><td>2.348</td></tr>
+                    <tr><td>1</td><td>0.5000 / 0.3000 / 0.2000</td><td>1.0297</td><td>2.800</td></tr>
+                    <tr><td>2</td><td>0.4154 / 0.3218 / 0.2628</td><td>1.0810</td><td>2.947</td></tr>
+                    <tr><td>0.1</td><td>0.9939 / 0.0060 / 0.0001</td><td>0.0378</td><td>1.039</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>读数：$\tau$ 越小分布越尖锐、熵越小；$\tau$ 越大越接近均匀，上限是 $\log 3=1.0986$（均匀分布的熵），这解释了 $\tau=2$ 时 1.0810 已经很接近天花板。</p>
+              <p><strong>第三步：$\tau\to 0$ 的极限</strong></p>
+              <p>极限分布是「退化分布」$(1,0,0)$：熵 $\to 0$，困惑度 $\to 1$，即<strong>完全确定的贪心解码</strong>。上表 $\tau=0.1$ 已经非常接近这个极限（熵仅 0.0378 nats，困惑度 1.039）。</p>
+              <p><strong>第四步：top-k 截断</strong></p>
+              <p>只保留概率最高的 2 个并重新归一化：$(0.50/0.80,\ 0.30/0.80)=(0.625,\ 0.375)$，第三个词的概率直接变成 0。此时</p>
+              $$ H=-\bigl(0.625\log 0.625+0.375\log 0.375\bigr)=0.6616,\qquad \exp(H)=1.938 $$
+              <p>熵比 $\tau=1$ 时的 1.0297 更小——因为 top-k 是<strong>硬截断</strong>（直接丢弃长尾），温度是<strong>软重加权</strong>（所有词都还在，只是权重变了）。</p>
+              <p><strong>易错提示：</strong>① 温度改变的是<strong>采样分布的熵</strong>，不改变模型的排序能力（top-1 在任何 $\tau$ 下都一样）——调温度不会让模型「更强」，只让它更确定或更发散；② top-k/top-p 与温度的机制不同（截断 vs 重加权），叠加时效果不独立，且 top-p 是自适应的；③ 困惑度只在相同词表、相同分词器下可比，换 tokenizer 后 PPL 不可比；④ 温度作用在 logits 上（等价于 logits 除以 $\tau$）而不是直接作用在概率上，实现时容易搞错。</p>
+              <p><strong>应用/AI 关联：</strong>结构化输出、代码生成、SQL 翻译用低温（$\tau\approx 0$ 或 top-k=1）保证可复现；创意写作、多方案头脑风暴用高温；RAG 与 agent 决策用中等温度。评测时必须固定解码设置，否则「模型分数」里混着采样随机性——这是 LLM 评测可复现性的第一原则，也是第 8 节讲「单次采样的随机性」陷阱的原因。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ========== 2 ========== -->
+      <h2 id="s2">2 · 交叉熵、困惑度与 KL 散度</h2>
+
+      <h3 id="s2-1">2.1 信息量、熵与交叉熵</h3>
+      <p>信息论给出「不确定性」的严格度量（直觉：意外程度的对数刻度）：</p>
+      <div class="formula-box">
+        <div class="f-name">熵与交叉熵</div>
+        $$ H(P) = -\sum_{x} P(x)\log P(x) \qquad H(P, Q) = -\sum_{x} P(x)\log Q(x) $$
+        <div class="f-note">$H(P)$ 是真实分布 $P$ 的平均信息量（不确定度）；$H(P,Q)$ 是「用分布 $Q$ 编码来自 $P$ 的数据」的平均码长。</div>
+      </div>
+
+      <h3 id="s2-2">2.2 KL 散度：两个分布的距离</h3>
+      <div class="formula-box">
+        <div class="f-name">KL 散度与交叉熵的关系</div>
+        $$ \mathrm{KL}(P\,\|\,Q) = \sum_{x} P(x)\log\frac{P(x)}{Q(x)} = H(P,Q) - H(P) $$
+        <div class="f-note">$\mathrm{KL}\ge 0$，当且仅当 $P=Q$ 时取 0。注意<strong>不对称</strong>：$\mathrm{KL}(P\|Q)\neq\mathrm{KL}(Q\|P)$。最小化对数据的交叉熵 ≡ 让模型分布逼近数据分布 ≡ 最小化 $\mathrm{KL}(P_{\text{data}}\|P_\theta)$。</div>
+      </div>
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          为什么训练损失不能当「能力分数」
+        </div>
+        <p>交叉熵损失低只说明模型<strong>分布上像语料</strong>。2025 年的研究（如对交叉熵缩放定律的分解）表明：交叉熵中只有「错误熵」部分随规模幂律下降，其余部分近乎不变；且分布上接近并不保证下游任务（如 Best-of-N 采样）最优——这解释了「预训练损失更低的模型反而答得更差」的常见现象。评测必须用任务指标 + 统计不确定性，不能只看 loss。</p>
+      </div>
+
+      <h3 id="s2-3">2.3 困惑度 Perplexity</h3>
+      <div class="formula-box">
+        <div class="f-name">困惑度</div>
+        $$ \mathrm{PPL} = \exp\!\Big(H(P,Q)\Big) = \exp\!\Big(-\frac{1}{N}\sum_{i=1}^{N}\log P_\theta(x_i \mid x_{&lt;i})\Big) $$
+        <div class="f-note">直觉：模型在每一步平均「犹豫于多少个等可能选项」。PPL 越低越好；PPL=10 ≈ 每步在 10 个候选间犹豫。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 2.1</span>
+          <span class="ex-title">从损失到困惑度：数值换算</span>
+        </div>
+        <div class="example-body">
+          <p>某语言模型在测试集上的平均负对数似然（loss）为 <strong>3.0</strong>（自然对数）。求它的困惑度，并解释含义。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>平均负对数似然即交叉熵 $H=3.0$ nats/词元。于是</p>
+              $$ \mathrm{PPL} = e^{3.0} \approx 20.09 $$
+              <p><strong>含义：</strong>模型对下一个词的不确定性，约等于「在 20 个等可能选项里猜」。</p>
+              <p><strong>对比：</strong>若 loss 降为 2.0，则 $\mathrm{PPL}=e^{2}\approx 7.39$。loss 每降 0.1，PPL 乘以 $e^{-0.1}\approx 0.905$——损失的小幅改善在困惑度尺度上是实打实的。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 2.2</span>
+          <span class="ex-title">KL 散度的非负性验证与「损失 = 熵 + KL」</span>
+        </div>
+        <div class="example-body">
+          <p>真实分布 $P=(0.50,\ 0.30,\ 0.15,\ 0.05)$，模型给出的分布 $Q=(0.20,\ 0.50,\ 0.25,\ 0.05)$。① 计算 $H(P)$、$H(Q)$、$H(P,Q)$；② 计算 $\mathrm{KL}(P\|Q)$ 与 $\mathrm{KL}(Q\|P)$，验证非负性与不对称性；③ 用 Jensen 不等式说明为什么 KL 恒非负；④ 若用 $Q$ 去编码来自 $P$ 的数据，困惑度是多少？它是最优的多少倍？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：三个熵</strong>（自然对数，单位 nats）</p>
+              $$ H(P)=-\bigl(0.5\log 0.5+0.3\log 0.3+0.15\log 0.15+0.05\log 0.05\bigr)=1.1421 $$
+              $$ H(Q)=-\bigl(0.2\log 0.2+0.5\log 0.5+0.25\log 0.25+0.05\log 0.05\bigr)=1.1648 $$
+              $$ H(P,Q)=-\bigl(0.5\log 0.2+0.3\log 0.5+0.15\log 0.25+0.05\log 0.05\bigr)=1.3704 $$
+              <p><strong>第二步：两个方向的 KL</strong></p>
+              $$ \mathrm{KL}(P\|Q)=H(P,Q)-H(P)=1.3704-1.1421=\mathbf{0.2283} $$
+              $$ \mathrm{KL}(Q\|P)=\sum_x Q(x)\log\frac{Q(x)}{P(x)}=0.2\log\frac{0.2}{0.5}+0.5\log\frac{0.5}{0.3}+0.25\log\frac{0.25}{0.15}=\mathbf{0.1999} $$
+              <p>两个数都 $\ge 0$，但不相等（0.2283 vs 0.1999）——<strong>KL 散度不对称</strong>，方向必须写清。另外 $\mathrm{KL}(P\|P)=0$，且 $P$ 与 $Q$ 在第 4 个分量上相同（0.05），该项贡献为 0。</p>
+              <p><strong>第三步：非负性的证明（Jensen 不等式）</strong></p>
+              <p>$\log$ 是凹函数，故</p>
+              $$ \mathrm{E}_Q\Bigl[\log\frac{P}{Q}\Bigr]\le \log\,\mathrm{E}_Q\Bigl[\frac{P}{Q}\Bigr]=\log\sum_x P(x)=\log 1=0 $$
+              <p>即 $\mathrm{KL}(Q\|P)=-\mathrm{E}_Q[\log(P/Q)]\ge 0$；交换 $P,Q$ 同理得 $\mathrm{KL}(P\|Q)\ge 0$。等号成立当且仅当 $P$ 与 $Q$ 处处相等（严格凹函数的等号条件）。</p>
+              <p><strong>第四步：困惑度与「损失的下界」</strong></p>
+              $$ \exp\bigl(H(P,Q)\bigr)=\exp(1.3704)=\mathbf{3.214} $$
+              <p>即「用模型分布 $Q$ 编码真实数据，每步平均在 3.21 个等可能选项间犹豫」。若模型恰好等于真实分布，困惑度是 $\exp(H(P))=3.133$，二者之比</p>
+              $$ \frac{\exp(H(P,Q))}{\exp(H(P))}=\exp\bigl(\mathrm{KL}(P\|Q)\bigr)=\exp(0.2283)=\mathbf{1.256} $$
+              <p>即模型困惑度是最优的 <strong>1.26 倍</strong>。更重要的一条推论：训练损失满足</p>
+              $$ H(P,Q)=H(P)+\mathrm{KL}(P\|Q)\ \ge\ H(P) $$
+              <p>所以<strong>交叉熵损失的下界是数据真实熵 $H(P)$，不是 0</strong>；困惑度的下界是 $\exp(H(P))$。损失越接近这个下界，说明模型分布越贴近数据分布。</p>
+              <p><strong>易错提示：</strong>① KL 不对称，报告时必须写明方向；RLHF 里 $\mathrm{KL}(\pi\|\pi_{ref})$ 与 $\mathrm{KL}(\pi_{ref}\|\pi)$ 行为不同（前者有 mode-covering 倾向），不能混用；② 交叉熵不等于 KL，差一个 $H(P)$；③ 若 $Q$ 在 $P$ 有正概率处取 0（如 top-k 截断后重算），KL 会变成 $+\infty$，所以截断分布上算 KL 要格外小心；④ 「损失下降」可能只是 $H(P)$ 本身在变（数据变了），必须固定同一批评测数据再比。</p>
+              <p><strong>应用/AI 关联：</strong>「损失下界是数据熵」解释了为什么模型足够大后 loss 会进入平台期——剩下的都是数据本身的不可约不确定性；RLHF 的 KL 罚项正是拿这个量做正则，限制策略偏离参考模型，DPO 的隐式奖励 $\beta\log\frac{\pi_\theta}{\pi_{ref}}$ 则是它的对数比；分布外检测（OOD）也常用 KL 或 JS 散度作异常分数。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ========== 3 ========== -->
+      <h2 id="s3">3 · 缩放定律：AI 的幂律物理学</h2>
+
+      <h3 id="s3-1">3.1 什么是缩放定律</h3>
+      <p>缩放定律（Scaling Laws）指出：模型的损失随<strong>参数量 $N$、数据量 $D$、计算量 $C$</strong> 增加而<strong>幂律下降</strong>：</p>
+      <div class="formula-box">
+        <div class="f-name">经典缩放定律（Kaplan 等 2020；Hoffmann 等 2022）</div>
+        $$ L(N) = L_\infty + \left(\frac{N_c}{N}\right)^{\alpha_N}, \qquad L(D) = L_\infty + \left(\frac{D_c}{D}\right)^{\alpha_D} $$
+        <div class="f-note">$L_\infty$ 是不可约损失（数据本身的熵），$N_c, D_c, \alpha$ 为拟合常数。这就是<strong>幂律回归</strong>：对 $\log(L-L_\infty)$ 与 $\log N$ 做线性回归。</div>
+      </div>
+
+      <h3 id="s3-2">3.2 如何拟合：对数空间线性回归</h3>
+      <p>拟合方法是标准最小二乘（模块 06）：取多个规模点 $\{(N_i, L_i)\}$，令 $y_i=\log(L_i-L_\infty)$、$x_i=\log N_i$，回归 $y = b - \alpha x$。斜率的绝对值就是缩放指数 $\alpha$。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.1</span>
+          <span class="ex-title">幂律拟合的手算演练</span>
+        </div>
+        <div class="example-body">
+          <p>假设测得（$L_\infty=1.0$）：</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>参数量 $N$</th><th>损失 $L$</th><th>$L-L_\infty$</th><th>$\log N$</th><th>$\log(L-L_\infty)$</th></tr></thead>
+              <tbody>
+                <tr><td>$10^6$</td><td>2.60</td><td>1.60</td><td>13.82</td><td>0.470</td></tr>
+                <tr><td>$10^8$</td><td>1.25</td><td>0.25</td><td>18.42</td><td>−1.386</td></tr>
+                <tr><td>$10^{10}$</td><td>1.016</td><td>0.016</td><td>23.03</td><td>−4.135</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>验证 $\alpha\approx 0.4$ 的幂律 $L=1+ (10^{2.4}/N)^{0.4}$ 是否与数据一致，并预测 $N=10^{12}$ 时的损失。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>① 验证：</strong>取 $N=10^6$：$(10^{2.4}/10^{6})^{0.4}=(10^{-3.6})^{0.4}=10^{-1.44}\approx0.036$？与 1.60 不符——说明常数不同。直接检验指数：相邻两点损失比</p>
+              $$ \frac{L(10^8)-1}{L(10^6)-1} = \frac{0.25}{1.60} = 0.15625, \qquad \frac{N_1}{N_2}=10^{-2} $$
+              <p>若 $L-1 \propto N^{-\alpha}$，则 $(10^{-2})^{-\alpha} = 0.15625$ 的倒数关系给出</p>
+              $$ 2\alpha \log 10 = \log\frac{1.60}{0.25} \;\Rightarrow\; \alpha = \frac{\log 6.4}{2\log 10} \approx \frac{0.806}{2} \approx 0.403 $$
+              <p><strong>② 同样验证第二段：</strong>$0.016/0.25 = 0.064$，$\alpha=\log(15.625)/(2\log 10)\approx 0.595$？——用更精确数字会发现略有出入，这正是<strong>实验拟合的常态</strong>：真实曲线带噪声，需最小二乘整体拟合而非两点估计。</p>
+              <p><strong>③ 预测：</strong>用 $\alpha\approx0.4$、$N=10^{12}$（再扩大 $10^2$ 倍）：$L-1 \approx 0.016\times 10^{-0.8}\approx 0.0025$，即 $L\approx 1.003$。</p>
+              <p><strong>工程意义：</strong>幂律的可预测性让「用小模型实验外推大模型性能、规划算力预算」成为可能，这是现代大模型研发的决策基础。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s3-3">3.3 前沿修正（2024–2025）</h3>
+      <ul>
+        <li><strong>交叉熵的分解修正</strong>：把交叉熵拆成「错误熵 / 自对齐 / 置信度」三部分后发现，只有错误熵严格服从幂律；小模型时它占主导，超大模型时另两项占比上升——这解释了超大规模处「缩放看起来变慢」。</li>
+        <li><strong>相对排序指标</strong>：交叉熵只看正确词的绝对概率，忽略候选间的<strong>排序</strong>。相对概率指标 $\mathrm{RBP}_k=\Pr(\mathrm{rank}\le k)$ 同样服从幂律，更能解释贪心/ top-k 生成下的「涌现」现象。</li>
+        <li><strong>算力最优分配</strong>（Chinchilla）：固定算力下，参数与训练词元应等比例增长（约每参数 20 词元），纠正了「只堆参数」的路线。</li>
+      </ul>
+
+      <!-- ========== 4 ========== -->
+      <h2 id="s4">4 · 注意力机制的统计面孔：核回归</h2>
+      <p>注意力权重 $\mathrm{softmax}(qk^\top/\sqrt{d})$ 与统计学中的<strong>Nadaraya-Watson 核回归</strong>同构：</p>
+      <div class="formula-box">
+        <div class="f-name">核回归与注意力</div>
+        $$ \hat{y}(x) = \sum_{i=1}^{n} \frac{K(x, x_i)}{\sum_{j} K(x, x_j)}\, y_i \qquad\Longleftrightarrow\qquad \mathrm{Attn}(q) = \sum_{i} \frac{e^{qk_i^\top/\sqrt{d}}}{\sum_j e^{qk_j^\top/\sqrt{d}}}\, v_i $$
+        <div class="f-note">相似度核 $K$ 对应 $e^{qk^\top}$，值 $v_i$ 对应 $y_i$。<strong>注意力就是「按相似度加权的非参数回归」</strong>：查询与键越像，值的权重越大。</div>
+      </div>
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          这个视角有什么用？
+        </div>
+        <p>它把「上下文学习（in-context learning）」理解为<strong>非参数的局部加权拟合</strong>，也解释了为何 softmax 温度（$\sqrt{d}$ 缩放）控制着「注意力的核带宽」——温度越高，加权越平滑、越接近平均。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.1</span>
+          <span class="ex-title">注意力就是核回归：权重、输出与「有效样本量」</span>
+        </div>
+        <div class="example-body">
+          <p>某个注意力头在一次前向传播中：查询与 3 个记忆片段的相似度（已除以 $\sqrt d$）为 $u=(2.0,\ 1.0,\ 0.5)$，这 3 个片段的值向量为 $v=(1.0,\ 0.0,\ 4.0)$。① 写出它对应的核回归形式，并算出 $\tau=1$ 时的注意力权重与输出；② 温度改为 $\tau=0.5$ 与 $\tau=2$ 时，权重、输出如何变化？③ 用「有效样本量」$n_{\text{eff}}=1/\sum_i w_i^2$ 定量解释「温度 = 核带宽」；④ 由此说明注意力输出的一个重要性质。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：核回归对应关系与 $\tau=1$ 的计算</strong></p>
+              <p>核回归写成分数形式：$\hat y(x)=\sum_i \frac{K(x,x_i)}{\sum_j K(x,x_j)}y_i$，注意力是 $K=e^{u_i/\tau}$ 的特例：</p>
+              $$ w_i=\frac{e^{u_i/\tau}}{\sum_j e^{u_j/\tau}},\qquad \mathrm{Attn}(q)=\sum_i w_iv_i $$
+              <p>$\tau=1$：$e^{u}=(7.3891,\ 2.7183,\ 1.6487)$，$\sum=11.7561$，故</p>
+              $$ w=\bigl(0.62853,\ 0.23122,\ 0.14024\bigr),\qquad \mathrm{Attn}=0.62853\times1+0.23122\times0+0.14024\times4=\mathbf{1.1895} $$
+              <p><strong>第二步：三个温度的对照</strong></p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$\tau$</th><th>权重 $w$</th><th>输出</th><th>$H(w)$</th><th>$n_{\text{eff}}$</th></tr></thead>
+                  <tbody>
+                    <tr><td>0.5</td><td>0.84379 / 0.11420 / 0.04201</td><td>1.0118</td><td>0.5243</td><td>1.376</td></tr>
+                    <tr><td>1</td><td>0.62853 / 0.23122 / 0.14024</td><td>1.1895</td><td>0.9060</td><td>2.136</td></tr>
+                    <tr><td>2</td><td>0.48102 / 0.29176 / 0.22722</td><td>1.3899</td><td>1.0481</td><td>2.716</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>例如 $\tau=0.5$ 时 logits 变成 $(4,2,1)$，$e^{u}=(54.598,\ 7.389,\ 2.718)$，$\sum=64.706$，权重如上，输出 $=0.84379+4\times0.04201=1.0118$。</p>
+              <p><strong>第三步：有效样本量 = 带宽的定量刻画</strong></p>
+              $$ n_{\text{eff}}=\frac{1}{\sum_i w_i^2}:\quad 1.376\ (\tau=0.5),\quad 2.136\ (\tau=1),\quad 2.716\ (\tau=2) $$
+              <p>上限是 3（完全均匀时 $\sum w_i^2=1/3$）。温度越低，权重越集中，$n_{\text{eff}}$ 越接近 1——等价于<strong>核带宽越窄、只用最近的那个点</strong>；温度越高，$n_{\text{eff}}$ 越大——等价于<strong>带宽越宽、越多上下文被平均进来</strong>。注意 $\tau\to\infty$ 时输出趋于算术平均 $\frac{1+0+4}{3}=1.6667$，$\tau\to 0$ 时趋于最近邻值 1.0，这与核回归的极限行为完全一致。</p>
+              <p><strong>第四步：注意力输出的一个重要性质</strong></p>
+              <p>因为 $w_i>0$ 且 $\sum_i w_i=1$，注意力输出是 $v$ 的<strong>凸组合</strong>——它永远落在 $\{v_1,v_2,v_3\}$ 张成的凸包内，<strong>不会外推出这个集合之外的值</strong>。这与「回归预测落在训练点张成的范围内」是同一类陈述。</p>
+              <p><strong>易错提示：</strong>① 注意力权重 $\neq$ 重要性解释：权重高不代表该 token 对最终输出贡献大，还要看 $v$ 的方向以及后续层怎么用；② 凸组合性质只对<strong>单层单头</strong>成立，堆叠多层后可以「先混合再外推」，不能据此断言模型不能产生新值；③ softmax 对 logits 的绝对尺度敏感，$\sqrt d$ 缩放不是可有可无的装饰——它保证 logits 尺度不随维度膨胀，核宽度才稳定。</p>
+              <p><strong>应用/AI 关联：</strong>把 in-context learning 看成「用上下文做局部非参数拟合」后，很多现象立刻可解释：上下文越长，$n_{\text{eff}}$ 越大，等价于「有效样本量」增加——这与统计学的「样本越多方差越小」同构；也解释了长上下文的收益递减与「中间遗忘」现象（远处 token 权重被压低 ≈ 核太窄只看邻居）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ========== 5 ========== -->
+      <h2 id="s5">5 · 生成模型：VAE 与扩散模型</h2>
+
+      <h3 id="s5-1">5.1 VAE：变分推断的工程化</h3>
+      <p>变分自编码器（模块 07 的变分推断直接落地）假设隐变量 $z$ 生成数据 $x$，用近似后验 $q_\phi(z\mid x)$ 逼近真后验。训练目标是<strong>ELBO</strong>：</p>
+      <div class="formula-box">
+        <div class="f-name">VAE 的证据下界（回顾模块 07）</div>
+        $$ \log p_\theta(x) \;\ge\; \underbrace{\mathbb{E}_{q_\phi(z\mid x)}\big[\log p_\theta(x\mid z)\big]}_{\text{重构项}} \;-\; \underbrace{\mathrm{KL}\big(q_\phi(z\mid x)\,\|\,p(z)\big)}_{\text{正则项}} = \mathrm{ELBO} $$
+        <div class="f-note">重构项要求隐变量能还原数据，KL 项拉住近似后验不偏离先验。二者之权衡就是「表征质量 vs 平滑采样」。</div>
+      </div>
+
+      <h3 id="s5-2">5.2 扩散模型：分数匹配与朗之万动力学</h3>
+      <p>扩散模型（Diffusion Models，Sora/Stable Diffusion 的统计内核）分两步：</p>
+      <ol>
+        <li><strong>前向加噪</strong>：$x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\varepsilon$，$\varepsilon\sim N(0,I)$，逐步把数据变成纯高斯噪声。</li>
+        <li><strong>反向去噪</strong>：学一个网络预测噪声 $\varepsilon_\theta(x_t,t)$，等价于估计<strong>分数函数</strong>（对数密度的梯度）：</li>
+      </ol>
+      <div class="formula-box">
+        <div class="f-name">分数匹配（Score Matching）</div>
+        $$ s_\theta(x) \approx \nabla_x \log p(x), \qquad \mathcal{L}_{\text{DSM}} = \mathbb{E}\Big[ \big\| \varepsilon_\theta(x_t, t) - \varepsilon \big\|^2 \Big] $$
+        <div class="f-note">去噪分数匹配（DSM）：预测噪声 ≡ 估计分数。生成时沿分数方向做<strong>朗之万动力学</strong>采样：$x \leftarrow x + \eta \nabla_x\log p(x) + \sqrt{2\eta}\,z$，$z\sim N(0,I)$。</div>
+      </div>
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          统计学接口
+        </div>
+        <p>扩散模型 = <strong>分数估计（回归）+ 随机微分方程采样（MCMC 近亲）</strong>。它的训练目标是一个纯粹的均方误差回归（模块 06），采样过程是朗之万 MCMC（模块 07）的连续时间版本。理解这两点，就理解了扩散模型 90% 的机制。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 5.1</span>
+          <span class="ex-title">ELBO 的分解计算与「预测噪声 = 估计分数」</span>
+        </div>
+        <div class="example-body">
+          <p><strong>① VAE。</strong>某样本 $x$ 的重构项为 $\mathrm{E}_{q_\phi}[\log p_\theta(x\mid z)]=-0.7$ nats；近似后验 $q_\phi(z\mid x)=N(\mu,\mathrm{diag}(\sigma^2))$，其中 $\mu=(0.4,\ -0.2)$，$\sigma^2=(0.5,\ 0.25)$；先验 $p(z)=N(0,I)$。求 KL 项、ELBO 及其指数，并说明它与用其他方法估得的 $\log p_\theta(x)\approx-1.05$ 之间的差距意味着什么。</p>
+          <p><strong>② 扩散模型。</strong>某时刻 $\bar\alpha_t=0.9$，真实数据 $x_0=2.0$，抽到的噪声 $\varepsilon=0.5$。求 $x_t$；写出「预测噪声」与「估计分数」的等价关系并算出该点的分数；给出一步朗之万更新式；若网络预测 $\varepsilon_\theta=0.4$，DSM 损失是多少？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：KL 项（对角高斯对标准正态）</strong></p>
+              $$ \mathrm{KL}\bigl(q_\phi(z\mid x)\,\|\,p(z)\bigr)=\frac{1}{2}\sum_{i=1}^{2}\Bigl(\mu_i^2+\sigma_i^2-1-\log\sigma_i^2\Bigr) $$
+              $$ =\frac{1}{2}\Bigl[(0.16+0.5-1-\log 0.5)+(0.04+0.25-1-\log 0.25)\Bigr]=\frac{1}{2}(0.3531+0.6763)=\mathbf{0.5147} $$
+              <p><strong>第二步：ELBO 及其含义</strong></p>
+              $$ \mathrm{ELBO}=-0.7-0.5147=\mathbf{-1.2147}\ \text{nats},\qquad \exp(\mathrm{ELBO})=\mathbf{0.2968} $$
+              <p>所以 $p_\theta(x)\ge e^{\mathrm{ELBO}}\approx 0.297$——这是一个<strong>下界</strong>，不是估计值。用独立方法估得 $\log p_\theta(x)\approx-1.05$，两者相差</p>
+              $$ -1.05-(-1.2147)=\mathbf{0.165}\ \text{nats} $$
+              <p>这就是<strong>变分间隙</strong>：说明近似后验 $q_\phi(z\mid x)$ 与真实后验 $p_\theta(z\mid x)$ 还不一致（0.165 nats 的差距全部来自这里）。改进方向是「更强的编码器 / 更灵活的近似后验」，而不是加大解码器。</p>
+              <p><strong>第三步：扩散的前向加噪</strong></p>
+              $$ x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\varepsilon=0.9487\times2.0+0.3162\times0.5=\mathbf{2.0555} $$
+              <p>此时信号方差 $\bar\alpha_t x_0^2=3.6$，噪声方差 $(1-\bar\alpha_t)\varepsilon^2=0.025$——信噪比很高，所以 $x_t$ 只比 $x_0$ 大了 0.055。</p>
+              <p><strong>第四步：预测噪声 ≡ 估计分数</strong></p>
+              <p>在噪声预测参数化下，网络的输出与分数函数只差一个尺度因子和符号：</p>
+              $$ \nabla_{x_t}\log p_t(x_t)=-\frac{\varepsilon_\theta(x_t,t)}{\sqrt{1-\bar\alpha_t}}=-\frac{0.5}{0.3162}=\mathbf{-1.5811} $$
+              <p>「去噪」就是沿这个方向走。取步长 $\eta=0.01$ 的一步朗之万更新：</p>
+              $$ x\leftarrow x+\eta\nabla\log p_t(x_t)+\sqrt{2\eta}\,z=x-0.0158+0.1414\,z,\qquad z\sim N(0,I) $$
+              <p>若网络预测 $\varepsilon_\theta=0.4$ 而真值 $\varepsilon=0.5$，DSM 损失 $=\bigl(0.4-0.5\bigr)^2=\mathbf{0.01}$。</p>
+              <p><strong>易错提示：</strong>① ELBO 是<strong>下界</strong>不是等式，把 ELBO 当作 $\log p_\theta(x)$ 汇报会高估模型质量；② KL 项不是「越小越好」的独立目标——它与重构项此消彼长，极端时出现<strong>后验塌缩</strong>：KL 把 $q$ 压成先验，解码器什么也学不到；③ 扩散的 DSM 损失是「噪声预测的均方误差」，别与「数据重建的均方误差」混为一谈；④ 分数函数与噪声预测差一个 $\sqrt{1-\bar\alpha_t}$ 因子，$t$ 很大时该因子很小，用「预测噪声」参数化正是为了数值稳定。</p>
+              <p><strong>应用/AI 关联：</strong>Stable Diffusion、Sora 的内核就是分数匹配 + 朗之万采样；多数文生图模型前端仍用 VAE 做编码/解码。理解「ELBO 是下界」「分数匹配是回归」之后再看 RLHF 的 KL 正则与 DPO 的对数比，就会发现它们是同一个「用 KL 控制偏离」的思想在不同层次上的实现。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ========== 6 ========== -->
+      <h2 id="s6">6 · RLHF 与 DPO：偏好学习的统计模型</h2>
+
+      <h3 id="s6-1">6.1 Bradley-Terry 偏好模型</h3>
+      <p>人类反馈以<strong>成对比较</strong>形式给出（回答 A 比 B 好）。Bradley-Terry（1952）模型假设每个回答有潜在奖励 $r$，被偏好的概率是：</p>
+      <div class="formula-box">
+        <div class="f-name">Bradley-Terry-Luce 模型</div>
+        $$ P(y_w \succ y_l \mid x) = \frac{\exp\!\big(r(x, y_w)\big)}{\exp\!\big(r(x, y_w)\big) + \exp\!\big(r(x, y_l)\big)} = \sigma\!\big(r(x,y_w) - r(x,y_l)\big) $$
+        <div class="f-note">$\sigma$ 是 logistic 函数。训练奖励模型 $r_\psi$ 就是对偏好数据做<strong>极大似然</strong>，其负对数似然正是<strong>二元交叉熵</strong>（与模块 06 的逻辑回归完全一致）。</div>
+      </div>
+
+      <h3 id="s6-2">6.2 RLHF 的两阶段</h3>
+      <ol>
+        <li><strong>奖励建模</strong>：用偏好数据 MLE 拟合 $r_\psi$（= 逻辑回归）。</li>
+        <li><strong>强化学习优化</strong>：最大化奖励同时用 KL 罚项不偏离参考策略：
+        $$ \max_{\pi}\; \mathbb{E}_{y\sim\pi}[r_\psi(x,y)] - \beta\,\mathrm{KL}\big(\pi \,\|\, \pi_{\mathrm{ref}}\big) $$
+        KL 罚项是统计正则（模块 06 的正则化思想），防止为刷奖励而「胡言乱语」。</li>
+      </ol>
+
+      <h3 id="s6-3">6.3 DPO：把两步并成一步</h3>
+      <p>直接偏好优化（DPO）利用上述 KL-正则最优解的闭式形式，把奖励函数消去，直接对策略做优化：</p>
+      <div class="formula-box">
+        <div class="f-name">DPO 损失</div>
+        $$ \mathcal{L}_{\mathrm{DPO}} = -\,\mathbb{E}\Big[\log \sigma\Big(\beta \log\frac{\pi_\theta(y_w\mid x)}{\pi_{\mathrm{ref}}(y_w\mid x)} - \beta \log\frac{\pi_\theta(y_l\mid x)}{\pi_{\mathrm{ref}}(y_l\mid x)}\Big)\Big] $$
+        <div class="f-note">又是一个 logistic 回归：隐式奖励 $\hat r = \beta\log\frac{\pi_\theta}{\pi_{\mathrm{ref}}}$。整个 RLHF/DPO 家族在统计上<strong>都归约为带 logistic 链接的偏好似然</strong>。</div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          前沿警示：DPO 是「设定偏误」的估计量（2025）
+        </div>
+        <p>最新理论（2025）指出：DPO 的推导假设策略类无限表达（表格型），而神经网络是<strong>有限维参数模型</strong>——隐式奖励被强制投影到策略梯度张成的低维流形上，可能造成<strong>偏好顺序反转</strong>、对偏好数据分布高度敏感。实践含义：① 偏好对的采样分布要均衡；② 出现 DPO 训练后奖励反而下降时，考虑两阶段 RLHF 或带辅助变量的修正算法；③ 监控指标要包含「相对参考策略的偏好胜率」而非只看训练损失。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.1</span>
+          <span class="ex-title">用 logistic 回归理解奖励模型</span>
+        </div>
+        <div class="example-body">
+          <p>某奖励模型对一对回答的评分差为 $r(y_w)-r(y_l)=1.1$。① 计算标注者偏好 $y_w$ 的模型概率；② 若想让该概率达到 0.9，评分差应是多少？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>①</strong> $P = \sigma(1.1) = \dfrac{1}{1+e^{-1.1}} \approx \dfrac{1}{1+0.3329} \approx 0.7503$，约 <strong>75%</strong>。</p>
+              <p><strong>②</strong> 由 $\sigma(\Delta)=0.9$ 得 $\Delta = \log\frac{0.9}{0.1} = \log 9 \approx 2.197$，即评分差约 <strong>2.20</strong>。</p>
+              <p><strong>启示：</strong>评分差是「对数优势（log-odds）」尺度。差 1 单位 = 优势比 $e\approx 2.72$ 倍——这正是模块 06 逻辑回归系数解释的复现。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ========== 7 ========== -->
+      <h2 id="s7">7 · 不确定性量化：共形预测</h2>
+
+      <h3 id="s7-1">7.1 为什么 AI 需要统计保证</h3>
+      <p>神经网络输出的 softmax 概率<strong>常常过度自信</strong>（校准差）。共形预测（Conformal Prediction）给出<strong>分布无关、有限样本</strong>的覆盖保证：预测集合以至少 $1-\alpha$ 的概率包含真值——不需要对数据分布做任何假设。</p>
+
+      <h3 id="s7-2">7.2 Split Conformal 算法</h3>
+      <div class="algo">
+        <div class="algo-title">分割共形预测（三步）</div>
+        <ol class="algo-steps">
+          <li><strong>训练</strong>：用训练集拟合任意预测模型 $\hat f$（黑盒也行）。</li>
+          <li><strong>校准</strong>：在校准集上算不一致性分数 $s_i$（如 $s_i = 1 - \hat p(y_i)$ 或回归的残差 $|y_i-\hat f(x_i)|$），取其 $\lceil (n+1)(1-\alpha)\rceil$ 分位数为阈值 $\hat q$。</li>
+          <li><strong>预测</strong>：输出集合 $\Gamma(x) = \{y : s(x,y) \le \hat q\}$。则 $\Pr\{Y_{n+1}\in\Gamma(X_{n+1})\}\ge 1-\alpha$。</li>
+        </ol>
+      </div>
+      <div class="formula-box">
+        <div class="f-name">覆盖保证（有限样本、分布无关）</div>
+        $$ \mathbb{P}\big(Y_{n+1} \in \Gamma(X_{n+1})\big) \;\ge\; 1 - \alpha $$
+        <div class="f-note">在「样本可交换」的唯一假设下成立。$\alpha=0.05$ 时保证约 95% 覆盖。</div>
+      </div>
+
+      <h3 id="s7-3">7.3 前沿：为生成式模型做共形（2025）</h3>
+      <ul>
+        <li><strong>开放输出空间的挑战</strong>：LLM 输出近乎无限，传统 CP 假设有限标签集。CPQ 框架（NeurIPS 2025）用经典的<strong>缺失质量（missing mass）</strong> 与 Good-Turing 估计器，自适应决定「查询多少次采样」并加入「其他一切（Everything Else）」兜底标签，仍保持覆盖保证。</li>
+        <li><strong>局部自适应</strong>：用鲁棒回归树对分数做分区，分组校准，使置信带<strong>局部收紧</strong>（难样本区间宽、易样本区间窄），并保留组内条件覆盖。</li>
+        <li><strong>与 LLM 事实性</strong>：对 RAG/事实核查，可用共形集给出「至少 $1-\alpha$ 概率包含正确答案」的答案集合，替代不可靠的 verbalized confidence。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.1</span>
+          <span class="ex-title">手算分割共形阈值</span>
+        </div>
+        <div class="example-body">
+          <p>校准集 $n=9$ 个样本的不一致性分数（分类中 $s=1-\hat p(y)$）从小到大为：<br>
+          0.02, 0.05, 0.08, 0.11, 0.15, 0.20, 0.35, 0.55, 0.80。<br>
+          取 $\alpha=0.2$，求阈值 $\hat q$；新样本分数 $s=0.28$，它会进入预测集吗？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>① 分位数序号：</strong>$k = \lceil (n+1)(1-\alpha)\rceil = \lceil 10\times 0.8 \rceil = 8$。即取第 8 小的分数：$\hat q = 0.55$。</p>
+              <p><strong>② 判定：</strong>$s=0.28 \le 0.55$，<strong>进入预测集</strong>。</p>
+              <p><strong>③ 解读：</strong>该流程在长期中保证约 80% 的真值落进预测集。若想更保守（95%），$\alpha$ 取 0.05，$\hat q$ 会更大、集合更宽——<strong>置信度与集合大小的权衡</strong>是共形预测的核心权衡。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ========== 8 ========== -->
+      <h2 id="s8">8 · LLM 评测中的统计学</h2>
+
+      <h3 id="s8-1">8.1 评测就是统计推断</h3>
+      <p>「模型 A 在基准上 72.4 分、模型 B 71.8 分，A 更强吗？」——这是模块 05 的假设检验问题：基准题集是<strong>样本</strong>，模型的「真实能力」是<strong>参数</strong>，不报告不确定性就是只给点估计。</p>
+
+      <h3 id="s8-2">8.2 必做的四件事</h3>
+      <ol>
+        <li><strong>报告置信区间</strong>：对逐题得分做 <strong>bootstrap 重采样</strong>（模块 09），给出 95% CI。CI 重叠则差异未必可靠。</li>
+        <li><strong>配对检验</strong>：两模型在同一题集上比较，应做<strong>配对</strong>检验（每题之差），而非独立两样本检验——功效高得多。</li>
+        <li><strong>多重比较校正</strong>：同时比 10 个模型 × 5 个基准 = 50 次比较，纯偶然也会出现「显著」。用 Bonferroni/Holm 校正（模块 05/08）或明确报告为探索性结果。</li>
+        <li><strong>效应量</strong>：1 分的胜出是否值得 3 倍成本？报告效应量而非只报 p 值（模块 05/08 的原则原样适用）。</li>
+      </ol>
+
+      <h3 id="s8-3">8.3 LLM 特有的陷阱</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>陷阱</th><th>机制</th><th>对策</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>评测污染</strong></td>
+              <td>训练数据含基准题目 → 分数虚高</td>
+              <td>用私有/时间切分的新基准；报告污染检测结果</td>
+            </tr>
+            <tr>
+              <td><strong>位置与提示敏感</strong></td>
+              <td>选项顺序、提示措辞改变得分</td>
+              <td>多次重排取均值±标准差；报告方差</td>
+            </tr>
+            <tr>
+              <td><strong>LLM-as-a-Judge 偏差</strong></td>
+              <td>评委模型有长度偏好、自我偏好</td>
+              <td>人工校准子集、随机化位置、多评委</td>
+            </tr>
+            <tr>
+              <td><strong>单次采样的随机性</strong></td>
+              <td>温度采样导致得分波动</td>
+              <td>多次采样报均值与区间；固定解码设置</td>
+            </tr>
+            <tr>
+              <td><strong>Best-of-N 刷分</strong></td>
+              <td>采样 N 次取最好，N 不同不可比</td>
+              <td>固定 N；报告 pass@k 的估计方法（无偏估计）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 8.1</span>
+          <span class="ex-title">两模型差异的显著性判断</span>
+        </div>
+        <div class="example-body">
+          <p>在 200 道题的基准上：模型 A 对 144 题（72%），模型 B 对 132 题（66%）。逐题对比发现两模型都答对 110 题、都答错 44 题，A 对 B 错 34 题、A 错 B 对 12 题。判断 A 是否显著优于 B（$\alpha=0.05$）。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>应做配对比较（McNemar 检验）</strong>，只看不一致的题：$b=34$（A 对 B 错）、$c=12$（A 错 B 对）。</p>
+              $$ \chi^2 = \frac{(|b-c|-1)^2}{b+c} = \frac{(22-1)^2}{46} = \frac{441}{46} \approx 9.59 $$
+              <p>自由度 1 的临界值 $\chi^2_{0.05,1}=3.841$。由于 $9.59>3.841$，<strong>拒绝「无差异」</strong>，A 显著优于 B（$p\approx 0.002$）。</p>
+              <p><strong>对比错误做法：</strong>若按独立两比例检验（$z\approx 1.38$，$p\approx0.17$），会因忽略配对结构而<strong>漏检</strong>真实差异——评测设计中检验方法的选择直接决定结论。</p>
+              <p><strong>补一句效应量：</strong>胜出 6 个百分点；再结合成本与业务指标判断「显著」是否「重要」（模块 05 的效应量原则）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 8.2</span>
+          <span class="ex-title">挑战：评测差异的区间、样本量与 pass@k</span>
+        </div>
+        <div class="example-body">
+          <p><strong>① 模型对比。</strong>在 200 道题的基准上，模型 A 答对 145 题、模型 B 答对 140 题；逐题比较：都对 115、都错 30、A 对 B 错 30、A 错 B 对 25。用配对方法给出差值的 95% 置信区间，并与「把两者当独立样本」的做法对比；若想让 2.5 个百分点的领先达到 $5\%$ 显著性，大约需要多少题？</p>
+          <p><strong>② Best-of-N 刷分。</strong>某题采样 10 次、答对 2 次。计算 pass@1、pass@3、pass@5 的无偏估计，并与朴素估计 $1-(1-c/n)^k$ 对比，说明为什么必须报告估计方法。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：配对差值与区间</strong></p>
+              <p>只有不一致的 55 题携带信息：$b=30$（A 独对）、$c=25$（B 独对）。差值估计</p>
+              $$ \hat d=\frac{b-c}{n}=\frac{30-25}{200}=\mathbf{0.025}\ (2.5\ \text{个百分点}) $$
+              <p>配对 bootstrap（对 200 个「题目-结果对」有放回重采样，每次重算 $\hat d$）的标准误近似为</p>
+              $$ \mathrm{SE}_{paired}=\frac{\sqrt{b+c}}{n}=\frac{\sqrt{55}}{200}=\mathbf{0.0371} $$
+              $$ 95\%\ \text{区间}=0.025\pm1.96\times0.0371=\bigl[-0.048,\ 0.098\bigr] $$
+              <p>区间<strong>包含 0</strong> → 差异<strong>不显著</strong>。McNemar 检验同样结论：$\chi^2=\frac{(|30-25|-1)^2}{55}=\frac{16}{55}=0.291\lt 3.841$；精确二项检验 $p\approx 0.59$。</p>
+              <p><strong>第二步：与「当独立样本」对比</strong></p>
+              $$ \mathrm{SE}_{独立}=\sqrt{\frac{0.725\times0.275}{200}+\frac{0.70\times0.30}{200}}=\mathbf{0.0452} $$
+              <p>区间为 $[-0.064,\ 0.114]$，比配对版本更宽。原因很清楚：独立做法把「题目难度」这一共同方差也算进了标准误，而配对做法把它消掉了——<strong>同一批题上比较模型，必须用配对方法</strong>。</p>
+              <p><strong>第三步：要多少题才能显著</strong></p>
+              <p>不一致比例保持 0.275 时，$\mathrm{SE}=\sqrt{0.275}/\sqrt n$。要 $1.96\times\sqrt{0.275}/\sqrt n\le 0.025$，需</p>
+              $$ n\ge \Bigl(\frac{1.96\times\sqrt{0.275}}{0.025}\Bigr)^2\approx\Bigl(\frac{1.028}{0.025}\Bigr)^2\approx \mathbf{1690}\ \text{题} $$
+              <p>也就是说，200 题的题集根本分辨不出 2.5 个百分点的差异——<strong>题数比差值大小更决定能否下结论</strong>。</p>
+              <p><strong>第四步：pass@k 的无偏估计</strong></p>
+              $$ \widehat{\text{pass@}k}=1-\frac{\binom{n-c}{k}}{\binom{n}{k}},\qquad n=10,\ c=2 $$
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$k$</th><th>无偏估计</th><th>朴素估计 $1-0.8^k$</th><th>差</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>$1-\frac{8}{10}=0.200$</td><td>0.200</td><td>0.000</td></tr>
+                    <tr><td>3</td><td>$1-\frac{56}{120}=0.533$</td><td>0.488</td><td>+0.045</td></tr>
+                    <tr><td>5</td><td>$1-\frac{56}{252}=0.778$</td><td>0.672</td><td>+0.106</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>无偏估计系统性高于朴素估计，$k$ 越大差得越多（$k=5$ 时差 10.6 个百分点）。原因：朴素公式相当于假设「无限次独立采样」，在小样本下忽略了「10 次里刚好中了 2 次」的运气成分，会<strong>低估</strong>真实 pass@k。</p>
+              <p>结论：pass@k 的数字只在 $(n,k)$ 与估计方法都相同的时候才可比。论文只写「pass@5 = 78%」而不说采样次数 $n$ 和估计量，是<strong>不可复现的</strong>——换 $n=20$ 同一估计量就会给出完全不同的数。</p>
+              <p><strong>易错提示：</strong>① 不要用「两个 CI 是否重叠」判断差异显著，必须用配对方法（配对 bootstrap / McNemar），因为两模型跑在同一批题上；② pass@k 必须同时报告 $n$、$k$ 与估计量（无偏 or 朴素），三者缺一数字无意义；③ 「多次采样取平均」得到的误差条若不说明解码设置与随机种子，同样不可复现；④ 评测题集上的差异还要考虑污染与题目难度——统计显著不等于能力真实差异。</p>
+              <p><strong>应用/AI 关联：</strong>排行榜上「多 0.5 分」的宣称，往往正是这个统计问题。规范做法固定为四件事：固定解码设置与随机种子、报告题数与配对置信区间、用配对检验判断差异、在多基准横向比较时做多重比较校正（第 8.2 节第 3 条）——顺序不能颠倒，否则再多算力也只是在噪声里挑赢家。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ========== 9 ========== -->
+      <h2 id="s9">9 · 统一视角：AI 的核心目标都是统计目标</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>表 9.1 AI 任务与统计学概念的对应（本章总表）</caption>
+          <thead><tr><th>AI 中的组件</th><th>统计学本质</th><th>对应模块</th></tr></thead>
+          <tbody>
+            <tr><td>语言模型预训练</td><td>极大似然估计 / 经验风险最小化</td><td>05, 09</td></tr>
+            <tr><td>交叉熵损失</td><td>负对数似然 = KL 散度 + 常数</td><td>04, 10</td></tr>
+            <tr><td>困惑度</td><td>交叉熵的指数（有效分支数）</td><td>10</td></tr>
+            <tr><td>缩放定律</td><td>幂律回归 / 非线性最小二乘</td><td>06, 10</td></tr>
+            <tr><td>注意力</td><td>核回归（Nadaraya-Watson）</td><td>06, 10</td></tr>
+            <tr><td>正则化（dropout/权重衰减）</td><td>贝叶斯先验 / 偏差-方差控制</td><td>06, 07, 09</td></tr>
+            <tr><td>VAE</td><td>变分推断（ELBO 最大化）</td><td>07</td></tr>
+            <tr><td>扩散模型</td><td>分数匹配 + 朗之万 MCMC</td><td>06, 07</td></tr>
+            <tr><td>RLHF 奖励模型</td><td>Bradley-Terry 的极大似然（逻辑回归）</td><td>06, 10</td></tr>
+            <tr><td>DPO</td><td>带 KL 约束的偏好似然</td><td>06, 07</td></tr>
+            <tr><td>共形预测</td><td>分布无关的分位数校准</td><td>04, 10</td></tr>
+            <tr><td>模型评测</td><td>假设检验 + bootstrap + 多重比较</td><td>05, 08, 09</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          读 AI 论文的方法论
+        </div>
+        <p>拿到一篇 AI 论文的方法部分，依次问四个统计问题：① <strong>目标函数是哪个似然/损失？</strong>② <strong>假设了什么数据生成过程？</strong>③ <strong>不确定度如何量化？</strong>（p 值/置信区间/bootstrap）④ <strong>结论的效应量有多大、在多少随机种子上成立？</strong>这四个问题能过滤掉大部分「看起来很美」的结论。</p>
+      </div>
+
+      <!-- ========== 10 ========== -->
+      <div id="examples"></div><!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 10 AI 前沿：统计学与大模型 -->
+
+
+<h2 id="d-deep-1">深度专题一 · 缩放定律：从 Kaplan 幂律到 Chinchilla 算力最优修正，以及 N、D 该按什么比例长大</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>固定算力下，「多堆参数」和「多喂数据」必须一起长大，最优比例恰好让两者按 $\sqrt C$ 同步放大</h3></div>
+  <p class="dt-lead">本章正文第 3 节（#s3）已经介绍过大模型的「规模带来能力」现象与几条经验幂律；这里不重复那份现象清单，而是回答两个可计算的问题：把「损失随参数量、数据量下降」写成一条具体的函数后，给定一笔算力预算，到底该买多少参数、买多少 token？以及 2020 年与 2022 年两篇代表作为什么会给出不同的分配答案？整节只用初中就学过的「幂」和「配平方／求最小」。</p>
+
+  <h4>背景：两篇论文，一个被修正的结论</h4>
+  <p>2020 年 Kaplan 等人在《Scaling Laws for Neural Language Models》里系统测量了语言模型损失 $L$ 与参数量 $N$、数据量 $D$、算力 $C$ 的关系，发现三者在双对数坐标下近似是直线，即幂律；并据此主张「在算力增长时，应主要把预算投向更大的模型，数据可以相对少」，给出的指数约为 $N\propto C^{0.73}$。这条结论一度主导了「越大越好」的军备竞赛。</p>
+  <p>2022 年 Hoffmann 等人（论文训练出的模型叫 Chinchilla）在《Training Compute-Optimal Large Language Models》里指出：Kaplan 的实验没有对<strong>每个算力预算都重新调好训练 token 数</strong>，导致大模型普遍「训练不足」。他们用 400 多个不同规模、不同数据量的对照实验重新拟合，结论是：在固定算力下，参数量与数据量应当<strong>大致等比例</strong>增长，经验规则是「每 1 个参数配约 20 个 token」；同样 70B 参数，把训练 token 从 0.3T 提到 1.4T，反而能以更小的模型打败大得多的旧模型。这不是否定幂律，而是把「给定预算下怎么分配」这件事算对了。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把训练想成「用一笔固定经费办补习班」，钱只能花在两处：请更厉害的老师（模型容量 $N$，参数越多越能记住复杂规律），或买更多习题（数据量 $D$，见过的题越多越不容易钻牛角尖）。两边各自都有「收益递减」：老师再厉害，只做三套卷子也考不好；题海再大，老师只会列竖式也讲不透压轴题。</p>
+  <p>关键的一句话：<strong>经费翻倍时，不能只把老师升级一倍、题目原封不动，而应让「老师水平」和「题目数量」各自涨约 $\sqrt 2$ 倍</strong>。因为花费是「老师水平 × 题目数量」的乘积（下面会看到 $C\approx 6ND$），要让乘积翻倍且两项都别偏废，最自然的分配就是各分一半。Kaplan 的做法相当于「经费翻倍、老师翻 1.7 倍、题目只涨一点」，于是模型空有一身容量没被喂饱；Chinchilla 把它掰回各涨一半。谁偏科，谁就在同一笔钱上买到更高的损失。</p>
+
+  <h4>形式化：把「偏科」写成一个约束最小化</h4>
+  <p>先把现象写成可算的函数。大量实验拟合出的损失形如「一个搬不走的地板 + 两块各自递减的项」：</p>
+
+  <div class="formula-box">
+    <div class="f-name">损失的幂律（可加形式）</div>
+    $$ L(N,D) = E \;+\; A\,N^{-\alpha} \;+\; B\,D^{-\beta} $$
+    <div class="f-note">白话：$E$ 是数据本身熵决定的不可约损失，任何模型都到不了它以下；$A N^{-\alpha}$ 是「参数不够、装不下规律」造成的误差，$N$ 越大这项越小；$B D^{-\beta}$ 是「数据不够、没学全」造成的误差，$D$ 越大这项越小。$\alpha,\beta$ 是两条双对数直线的斜率绝对值，恒为正。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">算力 ≈ 参数量 × token 数</div>
+    $$ C \;\approx\; 6\,N\,D $$
+    <div class="f-note">白话：训练一个稠密 Transformer，每个参数每处理 1 个 token，前向约 2 次乘加、反向约 4 次，合计约 6 FLOPs；所以总算力正比于 $N\times D$。于是「固定预算」就是约束 $6ND=C$，$N$ 与 $D$ 此消彼长。</div>
+  </div>
+
+  <p>现在问题变成一个纯数学题：在 $6ND=C$ 的约束下，让 $L$ 最小。用拉格朗日乘子 $\mu$ 把约束并进目标，</p>
+  <div class="formula-box">
+    <div class="f-name">一阶条件：两边「边际收益」必须相等</div>
+    $$ \mathcal L(N,D,\mu) = A N^{-\alpha} + B D^{-\beta} + \mu\,(6ND - C) $$
+    $$ \alpha A N^{-\alpha-1} = 6\mu D,\qquad \beta B D^{-\beta-1} = 6\mu N $$
+    <div class="f-note">白话：分别对 $N,D$ 求导并令其为零。两式相除消去 $\mu$，得到最优时「多花一点钱在参数上的边际下降」恰好等于「多花在 token 上的边际下降」——谁性价比高就往谁挪，直到相等为止。这就是「别偏科」的严格版本。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">一般最优分配的指数</div>
+    $$ \frac{\alpha A N^{-\alpha}}{\beta B D^{-\beta}} = \frac{D}{N},\qquad N_{\mathrm{opt}} \propto C^{\beta/(\alpha+\beta)},\qquad D_{\mathrm{opt}} \propto C^{\alpha/(\alpha+\beta)} $$
+    <div class="f-note">白话：解出 $N,D$ 随预算 $C$ 的幂次。参数量按 $C$ 的 $\beta/(\alpha+\beta)$ 次方长大，数据量按 $\alpha/(\alpha+\beta)$ 次方长大；两者指数相加恒为 1，因为乘积必须正比于 $C$。指数只由两条斜率 $\alpha,\beta$ 决定，与常数 $A,B,E$ 无关。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">史上有名的两个数字：0.73 对 0.5</div>
+    $$ \alpha\approx\beta\ \Longrightarrow\ N_{\mathrm{opt}}\propto C^{0.5},\qquad D_{\mathrm{opt}}\propto C^{0.5} $$
+    <div class="f-note">白话：当两个斜率差不多（Chinchilla 实测 $\alpha\approx0.34,\ \beta\approx0.28$，很接近）时，指数都约等于 $0.5$，即各按 $\sqrt C$ 增长、比例恒定——这就是「每参数约 20 token」的由来。Kaplan 当初主张的 $N\propto C^{0.73},\ D\propto C^{0.27}$ 相当于假设 $\beta$ 远大于 $\alpha$，把大头给了参数；修正的核心不是幂律错了，而是把指数从 0.73 拉回 0.5。</div>
+  </div>
+
+  <h4>数值对账：一笔 $6\times10^{23}$ FLOPs 的预算怎么花</h4>
+  <p>取 $\alpha=\beta=0.5$、$E=1.70$、并把常数调到使「每参数 20 token」成立，预算 $C_0=6\times10^{23}$ FLOPs。由 $6ND=C_0$ 与 $D=20N$ 联立得 $120N^2=C_0$，于是 $N_{\mathrm{opt}}=\sqrt{C_0/120}=7.0711\times10^{10}$（70.71 B 参数），$D_{\mathrm{opt}}=20N_{\mathrm{opt}}=1.4142\times10^{12}$（1.4142 T token）。下图和表格里每个数字都来自下方代码实验，可用笔复核：</p>
+  <div class="formula-box">
+    <div class="f-name">解析最优与对称的 U 形损失</div>
+    $$ N_{\mathrm{opt}} = \sqrt{C/120} = 7.0711\times 10^{10},\qquad D_{\mathrm{opt}} = 20\,N_{\mathrm{opt}} = 1.4142\times 10^{12} $$
+    $$ L - E = A\bigl(t^{-0.5} + t^{0.5}\bigr),\qquad t = N/N_{\mathrm{opt}} $$
+    <div class="f-note">白话：把 $N$ 写成「最优值的 $t$ 倍」，代入 $D=C/(6N)$ 后，参数项变成 $t^{-0.5}$、数据项变成 $t^{0.5}$；两项之和在 $t=1$ 取最小，且关于 $\log t$ 对称（$t$ 与 $1/t$ 损失相同）。这说明偏离最优点无论往哪边偏，代价都一样增长。</div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>同预算下的分配</th><th>$N$（B 参数）</th><th>$D$（T token）</th><th>$D/N$</th><th>损失 $L$</th></tr></thead>
+      <tbody>
+        <tr><td>数据优先 $N^*/4$</td><td>17.678</td><td>5.6569</td><td>320.0</td><td>1.997302</td></tr>
+        <tr><td>数据偏多 $N^*/2$</td><td>35.355</td><td>2.8284</td><td>80.0</td><td>1.952269</td></tr>
+        <tr><td>Chinchilla 最优 $N^*$</td><td>70.711</td><td>1.4142</td><td>20.0</td><td>1.937841</td></tr>
+        <tr><td>参数偏多 $2N^*$</td><td>141.421</td><td>0.7071</td><td>5.0</td><td>1.952269</td></tr>
+        <tr><td>参数优先 $4N^*$</td><td>282.843</td><td>0.3536</td><td>1.2</td><td>1.997302</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>读法：从最优往两头挪，损失从 $1.937841$ 升到 $1.952269$ 再到 $1.997302$，而且 $N^*/4$ 与 $4N^*$、$N^*/2$ 与 $2N^*$ 的损失<strong>逐位相等</strong>——正是上面 $t^{-0.5}+t^{0.5}$ 的对称性。把预算放大 4 倍、16 倍，代码实验测得 $N_{\mathrm{opt}}$ 分别变 2 倍、4 倍，$D_{\mathrm{opt}}$ 同理，双对数斜率 $d\log N/d\log C=0.5000$，与 $C^{0.5}$ 精确一致；换成 $\alpha=0.34,\beta=0.28$ 的实测指数，则得 $N\propto C^{0.4516},\ D\propto C^{0.5484}$，数值核验斜率也逐位吻合。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>在损失可加幂律 $L=E+AN^{-\alpha}+BD^{-\beta}$、算力 $C\approx6ND$、且数据质量不随重复退化这三条前提下，最优分配满足 $N_{\mathrm{opt}}\propto C^{\beta/(\alpha+\beta)},\ D_{\mathrm{opt}}\propto C^{\alpha/(\alpha+\beta)}$；当代实验里 $\alpha\approx\beta$，故<strong>参数与数据应各按 $\sqrt C$ 同步增长、比例恒定（约 20 token/参数）</strong>。Kaplan(2020) 的 $N\propto C^{0.73}$ 是「训练不足」的偏参数分配，Chinchilla(2022) 用等比例修正了它。同一预算下任何单侧偏科都会抬高损失，且偏离倍数 $t$ 与 $1/t$ 的代价对称。</div>
+
+  <p><strong>边界条件：</strong>在两条斜率明显不等（$\alpha\ne\beta$，损失曲线不再对称）、高质量数据已耗尽而必须重复训练（数据受限，重复 token 的边际收益递减，需引入「有效 token」衰减项）、约束来自推理延迟／显存而非训练算力（此时倾向把小模型 over-train 以省推理成本）、或下游任务需微调／检索增强而预训练损失不再是唯一目标的条件下，本结论不成立，应改用带重复惩罚的 data-constrained scaling law、推理感知（inference-aware）的算力分配，或明确区分「预训练最优」与「部署最优」后再定 $N:D$。</p>
+
+  <p>下图把损失随单一维度增长的幂律直线、以及固定预算下「参数—数据」此消彼长的 U 形曲线画在一起：前者是双对数坐标里的直线，后者是本节表格的图形化，最低点正落在 $D/N\approx20$。</p>
+  <figure class="figure" id="fig-curve-scaling-law">
+  <svg class="dia" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="缩放定律：损失随算力 / 参数 / 数据的幂律下降"><line class="dg-grid" x1="62" y1="26.0" x2="654" y2="26.0"/><line class="dg-grid" x1="62" y1="83.0" x2="654" y2="83.0"/><line class="dg-grid" x1="62" y1="140.0" x2="654" y2="140.0"/><line class="dg-grid" x1="62" y1="197.0" x2="654" y2="197.0"/><line class="dg-grid" x1="62" y1="254.0" x2="654" y2="254.0"/><line class="dg-axis" x1="62" y1="26" x2="62" y2="254"/><line class="dg-axis" x1="62" y1="254" x2="654" y2="254"/><path class="dg-curve alt" d="M 62.0 26.0 L 121.2 44.3 L 180.4 61.2 L 239.6 76.7 L 298.8 90.9 L 358.0 103.6 L 417.2 114.9 L 476.4 124.9 L 535.6 133.4 L 594.8 140.6 L 654.0 146.3"/><text class="dg-elabel" x="364.0" y="94.58333333333337" text-anchor="start">早期策略：参数优先</text><path class="dg-curve ok" d="M 62.0 26.0 L 121.2 53.4 L 180.4 79.7 L 239.6 105.0 L 298.8 129.4 L 358.0 152.7 L 417.2 175.0 L 476.4 196.2 L 535.6 216.5 L 594.8 235.8 L 654.0 254.0"/><text class="dg-elabel" x="364.0" y="143.66666666666669" text-anchor="start">Chinchilla：参数与数据同步放大</text><text class="dg-ts" x="358.0" y="290" text-anchor="middle">训练算力 / 数据规模（对数）→</text><text class="dg-ts" x="14" y="140.0" text-anchor="start">损失（对数）</text></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">缩放定律：损失随算力 / 参数 / 数据的幂律下降</span>
+    <span class="fig-note">Kaplan 等给出幂律关系；Hoffmann 等（Chinchilla）指出在固定算力下应同步放大数据，纠正了「只堆参数」的策略。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Kaplan 等 arXiv:2001.08361；Hoffmann 等 arXiv:2203.15556</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 分割共形预测：不假设分布，凭什么敢说「覆盖率至少 $1-\alpha$」</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>保证不来自「猜对了分布」，而来自「新样本与校准样本地位可交换」带来的排名均匀</h3></div>
+  <p class="dt-lead">本章正文第 5 节（#s5）已经给出「给大模型输出配一个置信区间」的动机与共形预测的直观用法；这里补上那份直觉背后唯一真正要紧的证明：为什么一条只用「排序取分位数」的规则，能在<strong>有限样本</strong>、<strong>不对数据分布作任何参数假设</strong>的前提下，给出 $\mathbb{P}(Y\in C(X))\ge 1-\alpha$？以及这个保证到底「保证了什么、没保证什么」。</p>
+
+  <h4>背景：从「假设正态」到「不假设任何分布」</h4>
+  <p>传统的预测区间（例如回归里的 $\hat f(x)\pm 1.96\hat\sigma$）依赖「残差近似正态且方差恒定」这类假设；一旦分布偏斜、厚尾、异方差，或模型是个黑箱大模型，$\hat\sigma$ 根本无从谈起，区间覆盖率就会悄悄失守。Vovk 等人在 1990 年代提出的共形预测（conformal prediction）、以及 Papadopoulos (2002) 与 Lei 等人 (2018) 的「分割／归纳」版本（split conformal），换了一条完全不同的路：不建模误差分布，只用「误差们之间的相对排名」。</p>
+  <p>它换来的保证非常硬：只要数据可交换（i.i.d. 是它的特例），覆盖率就是<strong>有限样本精确</strong>的，不需要「$n\to\infty$」、不需要正态、不需要模型一致。代价是它只保证「平均意义上的覆盖」（marginal coverage），这一点在专题末尾的边界条件里会正式点明。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>想象你要给「模型猜测验分」配一个「允许误差范围」。做法很朴素：先留出 99 条记录当<strong>校准题</strong>，把模型在每条上「猜偏了多少」记下来、从小到大排队；想做到「约 90% 的新题都落在范围内」，就取排在第 90 位的那个偏差当「容忍半径」 $\hat q$。以后来一条新样本，预测集就是「真值只要不超过 $\hat f(X)\pm\hat q$ 都算收进来」。</p>
+  <p>为什么这样就能拍胸脯保证 90%？关键不是「我们猜对了误差分布」，而是一句地位对称的话：<strong>新来的那条样本，和那 99 条校准样本，本质上是同一锅随机抽出来的，谁也不比谁特殊</strong>。于是「新样本的偏差」插进 99 个已排好序的偏差里，它落在第 1、第 2、……、第 100 个位置的<strong>机会完全均等</strong>。取第 90 位当阈值，等于宣布「只有当新样本排在后 10 个位置（偏差特别大）时才漏掉它」——而「排在后 10 位」的概率恰好是 $10/100=0.10$。所以漏掉概率不超过 0.10，覆盖概率不低于 0.90。整个推理只用到了「排名均匀」，没碰过分布长什么样。</p>
+
+  <h4>形式化：把「排名均匀」写成可核对的等式</h4>
+  <p>把数据切成两部分：训练集（用来拟合点预测 $\hat f$）与校准集 $\{(X_i,Y_i)\}_{i=1}^n$；再来一条独立的新样本 $(X_{n+1},Y_{n+1})$。定义不一致性分数（这里取绝对残差，也可用一般化的 score）：</p>
+  <div class="formula-box">
+    <div class="f-name">校准分数与分位数阈值</div>
+    $$ s_i = \bigl|y_i - \hat f(x_i)\bigr|,\quad i=1,\dots,n,\qquad k = \bigl\lceil (n+1)(1-\alpha)\bigr\rceil,\qquad \hat q = s_{(k)} $$
+    <div class="f-note">白话：$s_i$ 是第 $i$ 条校准样本「错得多离谱」；把它们从小到大排成 $s_{(1)}\le\dots\le s_{(n)}$，取第 $k$ 小当阈值。$k=\lceil(n+1)(1-\alpha)\rceil$ 这个向上取整，是为了让后面的覆盖率**至少** $1-\alpha$ 而不是略低于它；$s_{(k)}$ 是第 $k$ 个顺序统计量。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">预测集（回归时就是一个区间）</div>
+    $$ C(X) = \bigl\{\,y : s(X,y) \le \hat q\,\bigr\} = \bigl[\,\hat f(X)-\hat q,\ \ \hat f(X)+\hat q\,\bigr] $$
+    <div class="f-note">白话：凡是让「新误差不超过容忍半径」的候选 $y$，都收进预测集。绝对残差下，它退化成以点预测为中心、半径 $\hat q$ 的区间；分类时则是「分数够低的所有类别」组成的集合。</div>
+  </div>
+
+  <p>现在引入全节的枢纽量：把新样本也放进校准分数里，定义它的<strong>秩</strong>（排名）</p>
+  <div class="formula-box">
+    <div class="f-name">可交换性 ⇒ 秩均匀（全部保证的发动机）</div>
+    $$ R_{n+1} = \sum_{i=1}^{n+1} \mathbf 1\bigl\{s_i \le s_{n+1}\bigr\},\qquad \mathbb{P}\bigl(R_{n+1}=r\bigr) = \frac{1}{n+1},\ \ r=1,\dots,n+1 $$
+    <div class="f-note">白话：若 $n+1$ 个分数可交换（联合分布在任意置换下不变），那么「谁最小、谁第二小……」的每一种排列等可能，新样本的排名 $R_{n+1}$ 在 $1$ 到 $n+1$ 上均匀分布。这是唯一用到的概率假设——比 i.i.d. 还弱一点。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">覆盖事件 = 秩不超过 $k$</div>
+    $$ \bigl\{s_{n+1}\le \hat q\bigr\} = \bigl\{R_{n+1}\le k\bigr\},\qquad \mathbb{P}\bigl(Y_{n+1}\in C(X_{n+1})\bigr) = \mathbb{P}\bigl(R_{n+1}\le k\bigr) = \frac{k}{n+1} $$
+    <div class="f-note">白话：「新误差不超过第 $k$ 小的校准误差」与「新样本排名在前 $k$ 位」是同一件事；而排名均匀，落在前 $k$ 位的概率就是 $k/(n+1)$。这一步把「覆盖率」彻底化成了「数格子」，不再有任何未知分布参数。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">有限样本覆盖保证（无分布假设）</div>
+    $$ 1-\alpha \;\le\; \mathbb{P}\bigl(Y\in C(X)\bigr) \;=\; \frac{\lceil(n+1)(1-\alpha)\rceil}{n+1} \;\le\; 1-\alpha + \frac{1}{n+1} $$
+    <div class="f-note">白话：下界来自 $\lceil x\rceil\ge x$，故 $k/(n+1)\ge 1-\alpha$；上界来自 $\lceil x\rceil \lt x+1$，故最多只比 $1-\alpha$ 高出 $1/(n+1)$。若分数几乎必然无并列（连续分布），覆盖率就被夹在这个窄缝里；有并列时下界依然成立，只会更保守。注意这是<strong>有限 $n$</strong> 的精确陈述，不是大样本近似。</div>
+  </div>
+
+  <p>数值证据见代码实验 Part 2：$(n,\alpha)=(9,0.2)$ 时 $k=8$、覆盖率 $8/10=0.8000$；$(100,0.05)$ 时 $k=96$、$96/101=0.9505$，落在 $[0.95,\ 0.9599]$ 内；当 $\alpha=0.005,\ n=99$ 时 $k=100\gt n$，预测集退化为全集、覆盖率 $=1$（保证成立但信息量为零）。</p>
+
+  <h4>这份保证「没保证」什么</h4>
+  <p>把上式再读一遍：概率是对<strong>所有样本（含 $X$ 的随机性）一起取的边际平均</strong>。它<strong>不</strong>承诺「给定某个具体 $X=x$，覆盖率也 $\ge 1-\alpha$」。代码实验 Part 2 的蒙特卡洛把这一点摆得很清楚：边际覆盖 $0.9015\approx0.90$ 达标，但按噪声大小拆开，「容易子群」覆盖 $0.9834$（过高、区间浪费），「困难子群」只有 $0.6237$（严重不足）——一个全局阈值 $\hat q$ 无法同时适配异方差的两拨人，两者按占比加权平均才凑回 $0.90$。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>分割共形预测的有效性<strong>只依赖校准样本与新样本可交换</strong>：可交换性使新分数的秩在 $1,\dots,n+1$ 上均匀，取 $k=\lceil(n+1)(1-\alpha)\rceil$ 便把覆盖率精确锁定在 $[1-\alpha,\ 1-\alpha+1/(n+1)]$。它无需分布假设、无需大样本、对任意黑箱点预测都成立；但这是<strong>边际</strong>覆盖，不是逐点条件覆盖，且阈值由校准分布决定，一旦分布漂移、样本有依赖或分数并列被忽略，保证即失效。</div>
+
+  <p><strong>边界条件：</strong>在样本非可交换（时间序列自相关、同一用户重复观测、分布随时间漂移）、要求条件覆盖 $\mathbb{P}(Y\in C(X)\mid X=x)\ge1-\alpha$（异方差、子群公平性）、校准集过小导致预测集退化为全集、或数据不再与校准同分布（代码实验 Part 2(c) 把噪声放大 4 倍后覆盖率掉到 $0.4162$）的条件下，本结论不成立，应改用重校准／滚动共形、局部自适应或分组（Mondrian）共形、加权共形（处理已知漂移），或用 jackknife+ 等给出更强训练一致性的变体。</p>
+
+  <p>下图是分割共形预测的完整数据流：训练拟合 → 校准打分排序取 $\hat q$ → 新样本构造预测集 → 上线后监控覆盖率并在漂移时回到重校准。保证的「上游契约」是那批与新样本可交换的校准数据，任何把测试信息倒灌进校准、或让校准分布过期的做法，都会让整条链路失效。</p>
+  <figure class="figure" id="fig-flow-conformal">
+  <svg class="dia" viewBox="0 0 680 464" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="共形预测：从非一致性分数到有覆盖率保证的预测集"><rect class="dg-box alt" x="190.0" y="34" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="57.0" text-anchor="middle">① 留出校准集</text><text class="dg-ts" x="340.0" y="74.0" text-anchor="middle">与训练数据可交换</text><rect class="dg-box" x="190.0" y="120" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="143.0" text-anchor="middle">② 定义非一致性分数 s(x,y)</text><text class="dg-ts" x="340.0" y="160.0" text-anchor="middle">如 1 − f(x)_y</text><line class="dg-edge" x1="340.0" y1="86" x2="340.0" y2="120"/><polygon class="dg-edge" points="340.0,120 336.7379163755234,112.69528847750153 343.2620836244766,112.69528847750153" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="190.0" y="206" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="229.0" text-anchor="middle">③ 取分数的 ⌈(n+1)(1−α)⌉ 分位数 q̂</text><text class="dg-ts" x="340.0" y="246.0" text-anchor="middle">有限样本校正</text><line class="dg-edge" x1="340.0" y1="172" x2="340.0" y2="206"/><polygon class="dg-edge" points="340.0,206 336.7379163755234,198.69528847750152 343.2620836244766,198.69528847750152" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="190.0" y="292" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="315.0" text-anchor="middle">④ 对新样本输出 {y : s ≤ q̂}</text><text class="dg-ts" x="340.0" y="332.0" text-anchor="middle">预测集而非点预测</text><line class="dg-edge" x1="340.0" y1="258" x2="340.0" y2="292"/><polygon class="dg-edge" points="340.0,292 336.7379163755234,284.69528847750155 343.2620836244766,284.69528847750155" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="190.0" y="378" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="401.0" text-anchor="middle">⑤ 验证覆盖率 ≥ 1−α</text><text class="dg-ts" x="340.0" y="418.0" text-anchor="middle">边际保证 / 条件覆盖另议</text><line class="dg-edge" x1="340.0" y1="344" x2="340.0" y2="378"/><polygon class="dg-edge" points="340.0,378 336.7379163755234,370.69528847750155 343.2620836244766,370.69528847750155" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">共形预测：从非一致性分数到有覆盖率保证的预测集</span>
+    <span class="fig-note">只需数据可交换性，即可给出有限样本、分布无关的边际覆盖率保证；预测集大小反映模型不确定性。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="https://arxiv.org/abs/2107.07511" target="_blank" rel="noopener">Angelopoulos &amp; Bates, Conformal Prediction, 2021 · arXiv:2107.07511</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 分割共形预测（Split Conformal Prediction）</h2>
+<div class="algo-spec">
+  <p>上一专题回答的是「凭什么保证覆盖」（证明）；本节回答的是「具体怎么算、代价多大、跟谁比、以及在什么工程条件下选它」。本算法位于「点预测模型 → 不确定性量化 → 决策」链条的<strong>量化环节</strong>，上游契约是「一个已训练好的点预测 $\hat f$ 与一批独立、可交换的校准数据」，下游契约是「一个带有限样本覆盖保证的预测集合 $C(X)$ 及其平均宽度」。选它作经典算法，是因为它<strong>与底层模型完全解耦</strong>：无论 $\hat f$ 是线性回归还是千亿参数大模型，套上同一层校准就能拿到保证，是「统计保证 ↔ 任意黑箱模型」之间最短的一座桥。</p>
+
+  <h3 id="d-algo-principle">一、原理：用「校准误差的分位数」当容忍半径</h3>
+  <p>给定训练集 $\mathcal D_{\mathrm{tr}}$、校准集 $\mathcal D_{\mathrm{cal}}=\{(x_i,y_i)\}_{i=1}^n$、目标覆盖率 $1-\alpha$、以及任意不一致性分数 $s(x,y)$（如 $|y-\hat f(x)|$、分类的 $1-\hat\pi_y(x)$）。算法先只用训练集拟合 $\hat f$，再在<strong>未参与训练</strong>的校准集上算分数并取分位数：</p>
+  <div class="formula-box">
+    <div class="f-name">算法的三行核心</div>
+    $$ \hat f = \mathcal A(\mathcal D_{\mathrm{tr}}),\qquad s_i = s(x_i,y_i),\qquad \hat q = s_{(k)},\quad k = \bigl\lceil (n+1)(1-\alpha)\bigr\rceil $$
+    $$ C(X) = \bigl\{\,y : s(X,y)\le \hat q\,\bigr\},\qquad \mathbb{P}\bigl(Y\in C(X)\bigr)\ge 1-\alpha $$
+    <div class="f-note">白话：训练、打分、取阈值三步彼此干净隔离；$\hat q$ 只由校准分数决定，$\hat f$ 只由训练数据决定。正因为阈值与新样本独立、且分数可交换，上一专题的秩均匀论证才成立。</div>
+  </div>
+  <p>两个常被忽略的细节：其一，$\hat q$ 用的是 $\lceil(n+1)(1-\alpha)\rceil$ 而非 $\lceil n(1-\alpha)\rceil$，多出来的「$+1$」正是把新样本也数进排名，才拿到有限样本下界；其二，若 $k\gt n$（$\alpha$ 太小或 $n$ 太小），规定 $\hat q=+\infty$、$C(X)$ 为全集，覆盖率 $=1$ 但区间无意义——这是「保证」与「有用性」的分界。分数也可换成<strong>标准化</strong>的 $s(x,y)=|y-\hat f(x)|/\hat\sigma(x)$，让区间随 $x$ 自适应宽窄，缓解异方差（对应共形化分位数回归 CQR）。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>切分。</strong>把可用数据随机分成训练集与校准集（常见 70/30 或 80/20）；<strong>切分必须在拟合 $\hat f$ 之前</strong>，校准集全程不得参与训练、特征筛选、调参或早停（呼应 m09 的泄漏判据）。</li>
+    <li><strong>训练点预测。</strong>只用训练集拟合 $\hat f$；若还要给「误差尺度」建模（CQR / 标准化分数），同样只用训练集。</li>
+    <li><strong>校准打分。</strong>对每条校准样本算 $s_i=s(x_i,y_i)$，得到 $n$ 个非负分数；确认分数之间是否可能大量并列（离散标签、整数分数），并列会让保证更保守。</li>
+    <li><strong>排序取阈值。</strong>把 $s_i$ 升序排列，取 $k=\lceil(n+1)(1-\alpha)\rceil$；若 $k\gt n$ 则置 $\hat q=+\infty$ 并报警，否则 $\hat q=s_{(k)}$。</li>
+    <li><strong>构造预测集。</strong>对新 $X$，输出 $C(X)=\{y: s(X,y)\le\hat q\}$；回归时直接展开为 $[\hat f(X)-\hat q,\ \hat f(X)+\hat q]$，分类时枚举候选类别/标签打分后筛选。</li>
+    <li><strong>评估与记账。</strong>在独立测试集上报告实测边际覆盖率、平均集合大小／区间宽度，并按关键子群拆开看条件覆盖；与 $1-\alpha$ 及 $1-\alpha+1/(n+1)$ 对照。</li>
+    <li><strong>监控与重校准。</strong>上线后持续监测覆盖率与输入分布；一旦漂移（如代码实验 (c)），用新校准集重算 $\hat q$，或切换加权／滚动共形，切勿让旧阈值无限期服役。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>数据假设：</strong>校准样本与新样本可交换（i.i.d. 是最常见特例）；对分布族、残差形态、异方差<strong>无要求</strong>。</li>
+    <li><strong>模型假设：</strong>无。$\hat f$ 可以是任意黑箱、任意规模；只要能对新 $X$ 与候选 $y$ 计算 $s(X,y)$ 即可。</li>
+    <li><strong>规模要求：</strong>$n$ 越大，$\hat q$ 越稳、区间越紧；经验上 $n\ge 1000$ 才能让 $1/(n+1)$ 的上界项和分位数噪声都可忽略。$\alpha$ 不能小到让 $k\gt n$。</li>
+    <li><strong>分数选择：</strong>分数须在训练／校准切分之前定好，不能在看过校准结果后反复挑「覆盖最好」的分数；否则选择本身构成泄漏。</li>
+    <li><strong>目标类型：</strong>回归（区间）、分类（标签集合）、结构化输出皆可；集合形式的输出天然适配「宁可给几个候选、也不漏掉真值」的场景。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>一次性校准</b> 计算 $n$ 个分数 $O(n\cdot c_s)$（$c_s$ 为单次打分成本），排序 $O(n\log n)$，取第 $k$ 小可降到 $O(n)$（快速选择）。<b>推理</b> 回归仅 $O(1)$ 次加减得到区间端点；分类需对每个候选类别算一次分数，$O(|Y|\cdot c_s)$。<b>空间</b> 存校准分数 $O(n)$，可只保留前 $k$ 个用堆压到 $O(k)$；不需存储原始训练数据。<b>训练</b> 成本完全由底层 $\hat f$ 决定，共形层本身不增加训练量；这是它相对「重训 $K$ 次」方法（如 jackknife+ 需 $n$ 次留一重训）的最大工程优势。</div>
+  <p>白话：共形层几乎「白送」——不重训模型、只多存一串分数、排序一次；代价是牺牲了一部分统计效率（少用了校准集来训练 $\hat f$），换来的是一条不依赖分布、能写进合同的覆盖保证。$n$ 很大时排序 $O(n\log n)$ 也远小于一次大模型前向。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>分布无关、有限样本有效：$\ge 1-\alpha$ 的覆盖不靠渐近、不靠正态，可交换即成立。</li>
+        <li>与模型解耦：对任意黑箱点预测「即插即用」，不改动、不重训底层模型，工程成本极低。</li>
+        <li>校准只需排序取分位数，实现十余行、可审计；输出是集合／区间，比单个点更诚实。</li>
+        <li>可换分数做自适应（CQR、标准化残差），在不丢保证的前提下让区间随 $x$ 宽窄变化。</li>
+        <li>上界 $1-\alpha+1/(n+1)$ 明确，覆盖率「最多虚高多少」也能量化。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>只保证<strong>边际</strong>覆盖：异方差下子群覆盖可严重失衡（代码实验难子群仅 0.6237）。</li>
+        <li>强依赖可交换性：分布漂移、时间依赖、聚类样本下保证失效（漂移后掉到 0.4162）。</li>
+        <li>需要专门留一批校准数据，牺牲了训练样本量；$n$ 小或 $\alpha$ 极小时预测集退化为全集。</li>
+        <li>单一全局 $\hat q$ 对所有 $X$ 一样宽，平均宽度偏大；区间不附带「某个体」的条件置信。</li>
+        <li>集合可能不连通、可能出现并列保守；对「要一个最优点估计」的下游仍需额外决策规则。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>固定一组可笔算的校准数据。设已用训练集拟合好 $\hat f$，在 $n=9$ 条校准样本上得到绝对残差分数（已升序）：$s_{(1\dots9)} = (0.3,\ 0.5,\ 0.8,\ 1.1,\ 1.4,\ 2.0,\ 2.5,\ 3.1,\ 5.0)$。取 $\alpha=0.2$（目标覆盖 $\ge 0.8$）。以下每一步都能用笔复核，并与代码实验 Part 2(a) 第一行对上。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">算 $k$。</span>$k=\lceil(n+1)(1-\alpha)\rceil=\lceil 10\times0.8\rceil=\lceil 8\rceil=8$。注意用的是 $n+1=10$ 而非 $n=9$——把新样本一起数进去，才拿得到有限样本下界。</div>
+    <div class="solve-step"><span class="ss-k">取阈值。</span>$\hat q=s_{(8)}=3.1$（第 8 小）。故对任意新 $X$，$C(X)=[\hat f(X)-3.1,\ \hat f(X)+3.1]$。</div>
+    <div class="solve-step"><span class="ss-k">翻译覆盖事件。</span>新样本被覆盖 $\iff s_{n+1}\le 3.1 \iff$ 它在 10 个分数里排名 $R_{n+1}\le 8$。由可交换性，$R_{n+1}$ 在 $\{1,\dots,10\}$ 均匀，故 $\mathbb{P}(R\le 8)=8/10=0.8000$。</div>
+    <div class="solve-step"><span class="ss-k">核对上下界。</span>$1-\alpha=0.8$，上界 $1-\alpha+1/(n+1)=0.8+0.1=0.9$；实测 $0.8000$ 落在 $[0.8,\ 0.9]$ 内，与代码表第一行 exact=0.8000、upper=0.9000 逐位一致。</div>
+    <div class="solve-step"><span class="ss-k">换一组看退化。</span>$(n,\alpha)=(99,0.005)$：$k=\lceil100\times0.995\rceil=\lceil99.5\rceil=100\gt n=99$，故 $\hat q=+\infty$、$C(X)$ 为全集、覆盖率 $=1.0000$——保证成立但区间毫无信息，对应代码表末行 degenerate=YES。</div>
+    <div class="solve-step"><span class="ss-k">手算蒙特卡洛的子群加权。</span>代码实验 (b) 中容易子群占比 $0.772$、覆盖 $0.9834$，困难子群占比 $0.228$、覆盖 $0.6237$。边际覆盖 $=0.772\times0.9834+0.228\times0.6237=0.7592+0.1422=0.9014\approx0.9015$，与实测 marginal=0.9015 吻合。这一步说明「总体达标」完全可能由「一子群过高、一子群严重不足」平均而来。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>$\hat q$ 是<strong>一个</strong>全局数字，只能对齐「平均」误差水平；尾部噪声被放大 3 倍时，困难子群的真实误差远超 $\hat q$，覆盖自然掉到 0.6237。要让每个子群都达标，必须改成分组共形（各子群各算一个 $\hat q$）或标准化分数，而这已超出「单一全局阈值」的适用边界。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把分割共形与三种「给预测配不确定性」的同类方法放在一起对照。右侧的「朴素参数区间」是反例式的补充：它也输出区间，但覆盖率依赖分布假设，与共形「无分布保证」的定位形成对照。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>分割共形 Split Conformal</th><th>完全共形 Full Conformal</th><th>Jackknife+</th><th>朴素参数区间 $\hat f\pm1.96\hat\sigma$</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>可交换 + 有独立校准集；任意黑箱点预测；回归/分类皆可</td>
+        <td>可交换；需为新样本每个候选 $y$ 重训模型，模型须可反复拟合</td>
+        <td>可交换；愿做 $n$ 次留一重训，追求训练一致性</td>
+        <td>残差近似正态、方差恒定、$\hat\sigma$ 可估；仅回归</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td class="best">校准 $O(n\log n)$、空间 $O(n)$、推理 $O(1)$；不重训</td>
+        <td>极高：每候选 $y$ 重训一次，$O(n\cdot|Y|\cdot T_{\mathrm{train}})$</td>
+        <td>高：$n$ 次留一重训 $O(n\cdot T_{\mathrm{train}})$，空间 $O(n^2)$ 量级</td>
+        <td>训练 $O(n)$、推理 $O(1)$；最省</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>$\alpha$（目标 miscoverage）、$k=\lceil(n+1)(1-\alpha)\rceil$、分数 $s$、校准集大小 $n$</td>
+        <td>$\alpha$、分数 $s$、候选 $y$ 网格、重训预算</td>
+        <td>$\alpha$、留一折数、分数 $s$</td>
+        <td>置信水平、$\hat\sigma$ 估计方式、正态/$t$ 分位数</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">分布无关、有限样本有效、模型解耦、实现最简、可审计</td>
+        <td>统计效率最高（全数据既训练又校准）、无校准集浪费</td>
+        <td>点预测用上几乎全部数据，区间更紧、有近似的训练一致性保证</td>
+        <td>公式人人会算、区间平滑、计算最轻</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>只保边际覆盖、依赖可交换、需留校准集、$k\gt n$ 退化为全集</td>
+        <td>计算不可行（大模型场景直接排除）、实现复杂、难并行</td>
+        <td>重训代价大、保证是近似而非精确有限样本、实现复杂</td>
+        <td>分布假设一破即失守；厚尾/异方差下覆盖系统性偏低；黑箱大模型无法估 $\hat\sigma$</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>阈值=「第 $k$ 小校准误差」，一句话讲清；改造成本最低，十余行包装</td>
+        <td>「候选 $y$ 反事实重训」难解释；工程改造最大</td>
+        <td>「留一预测分布」较直观；需维护 $n$ 个模型，运维最重</td>
+        <td>系数即边际误差，最易讲；但「覆盖率」不可靠、误导风险最高</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>六维口径由下图统一约定，保证全站各章的「横向对比」在同一套标准下展开，不随章节改变。分割共形之所以成为大模型时代的主流选择，正是因为这一套里只有它同时满足「不碰模型内部」与「有可证明保证」。</p>
+  <figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-code">代码实验 · 缩放定律的算力最优分配、共形覆盖保证与漂移失效的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 10 AI 前沿：统计学与大模型
+# 纯 Python 标准库；固定种子 20261107；复用「知学云」案例数字
+# Part 1: 缩放定律 Kaplan(2020) 幂律 vs Chinchilla(2022) 算力最优分配
+# Part 2: 分割共形预测的有限样本覆盖保证、条件覆盖失效、分布漂移
+import math
+import random
+
+random.seed(20261107)
+
+# ============================================================
+print("=== Part 1: 缩放定律与算力最优分配 ===")
+# 示意性幂律损失（指数取 alpha=beta=0.5 便于手算核对；结论对一般指数同样成立）
+E = 1.70
+NRM = 1e9        # 参数量以「十亿」为单位
+DRM = 1e9        # token 数以「十亿」为单位
+G = 1.0
+H = math.sqrt(20.0)     # 使最优 D/N = 20（Chinchilla 经验规则）
+ALPHA = BETA = 0.5
+
+
+def loss(N, D):
+    return E + G * (N / NRM) ** (-ALPHA) + H * (D / DRM) ** (-BETA)
+
+
+def flops(N, D):
+    return 6.0 * N * D        # C ≈ 6 N D
+
+
+C0 = 6e23
+# alpha=beta=0.5 时，最优满足 D/N = (H/G)^(1/alpha) = 20，配合 6ND=C 解出
+N_STAR = math.sqrt(C0 / 120.0)
+D_STAR = 20.0 * N_STAR
+print("预算 C0 = %.2e FLOPs；C ≈ 6ND，20 tokens/param 规则" % C0)
+print("解析解 N_opt = sqrt(C/120) = %.4e (%.2f B 参数)" % (N_STAR, N_STAR / 1e9))
+print("        D_opt = 20*N_opt  = %.4e (%.4f T tokens)" % (D_STAR, D_STAR / 1e12))
+print("校验 6*N*D = %.4e  (= C0)" % flops(N_STAR, D_STAR))
+print()
+print("同一预算 C0 下，五种『参数/数据』分配的比较（损失越小越好）：")
+allocs = [
+    ("数据优先 N*/4", N_STAR / 4.0),
+    ("数据偏多 N*/2", N_STAR / 2.0),
+    ("Chinchilla 最优 N*", N_STAR),
+    ("参数偏多 2N*", 2.0 * N_STAR),
+    ("参数优先 4N*", 4.0 * N_STAR),
+]
+for name, N in allocs:
+    D = C0 / (6.0 * N)
+    print("  %-20s N=%9.3f B  D=%8.4f T  D/N=%6.1f  L=%.6f" %
+          (name, N / 1e9, D / 1e12, D / N, loss(N, D)))
+print("→ 两头都变差，最优在中间；『只堆参数』在同算力下损失更高。")
+print("  注：alpha=beta=0.5 时 L-E = A(t^-0.5 + t^0.5), t=N/N*，关于 log t 对称，")
+print("      故 N*/4 与 4N* 损失相同；一般 alpha≠beta 时曲线不再对称。")
+print()
+
+# 验证 N_opt ∝ C^0.5, D_opt ∝ C^0.5（理想 alpha=beta 情形）
+print("理想情形 alpha=beta=0.5：预算放大 4 倍 / 16 倍时的最优分配")
+base_N, base_D = N_STAR, D_STAR
+for mult in (1, 4, 16):
+    C = C0 * mult
+    N = math.sqrt(C / 120.0)
+    D = 20.0 * N
+    print("  C=%.0f*C0 : N=%10.4f B (x%.3f)  D=%10.4f T (x%.3f)" %
+          (mult, N / 1e9, N / base_N, D / 1e12, D / base_D))
+sN = math.log(math.sqrt(16.0)) / math.log(16.0)
+print("  log-log 斜率 dlogN/dlogC = %.4f , dlogD/dlogC = %.4f (应为 0.5)" % (sN, sN))
+print()
+
+# 一般情形：N ∝ C^(beta/(a+b)), D ∝ C^(alpha/(a+b))；用解析式核验指数
+print("一般情形：指数只由 a=alpha, b=beta 决定（N∝C^(b/(a+b)), D∝C^(a/(a+b))）")
+for a, b, tag in ((0.5, 0.5, "理想"), (0.34, 0.28, "Chinchilla 实测")):
+    eN, eD = b / (a + b), a / (a + b)
+    print("  a=%.2f b=%.2f (%-14s): N∝C^%.4f  D∝C^%.4f" % (a, b, tag, eN, eD))
+print("  历史主张对比：Kaplan(2020) 主张 N∝C^0.73 / D∝C^0.27（参数优先、训练不足）；")
+print("                Chinchilla(2022) 修正为 ≈C^0.5/C^0.5 与『每参数约 20 tokens』。")
+
+# 用一般损失 L=E+N^-a+D^-b 在两个预算上数值核验斜率（a!=b）
+def general_opt(C, a, b):
+    # a*N^-a = b*(C/(6N))^-b  =&gt;  N = (a/b)^(1/(a+b)) * (C/6)^(b/(a+b))
+    N = (a / b) ** (1.0 / (a + b)) * (C / 6.0) ** (b / (a + b))
+    return N, C / (6.0 * N)
+
+a, b = 0.34, 0.28
+N1, D1 = general_opt(C0, a, b)
+N2, D2 = general_opt(C0 * 16, a, b)
+print("  数值核验 a=0.34,b=0.28: slope_N=%.4f  slope_D=%.4f" %
+      (math.log(N2 / N1) / math.log(16), math.log(D2 / D1) / math.log(16)))
+print()
+
+# ============================================================
+print("=== Part 2: 分割共形预测 split conformal 的覆盖保证 ===")
+B0, B1 = 64.4306, 0.160833
+MU_X, SD_X = 95.2964, 43.4274
+SIGMA0 = 12.7939        # 案例残差标准差
+HARD = 1.2 * SD_X       # 「难」子群：偏离均值 1.2 个标准差之外
+
+
+def f(x):
+    return B0 + B1 * x
+
+
+def noise_sd(x):
+    return SIGMA0 * (3.0 if abs(x - MU_X) &gt; HARD else 1.0)   # 异方差：尾部噪声 3 倍
+
+
+def draw_point(scale=1.0):
+    x = MU_X + SD_X * random.gauss(0, 1)
+    y = f(x) + scale * noise_sd(x) * random.gauss(0, 1)
+    return x, y
+
+
+def conformal_q(n, alpha):
+    scores = []
+    for _ in range(n):
+        x, y = draw_point()
+        scores.append(abs(y - f(x)))        # 不一致性分数 = |y - fhat(x)|, 此处 fhat=f
+    scores.sort()
+    k = math.ceil((n + 1) * (1 - alpha))
+    if k &gt; n:
+        return float("inf"), k
+    return scores[k - 1], k                # 第 k 小
+
+
+def covered(x, y, q):
+    return abs(y - f(x)) &lt;= q
+
+
+# (a) 有限样本精确覆盖率表
+print("(a) 有限样本精确覆盖率 = ceil((n+1)(1-a))/(n+1)，上界 = 1-a+1/(n+1)")
+print("%4s %6s %4s %10s %10s %12s %8s" %
+      ("n", "alpha", "k", "exact", "1-alpha", "1-a+1/(n+1)", "degenerate"))
+for n, alpha in ((9, 0.2), (19, 0.1), (99, 0.1), (100, 0.05), (99, 0.005)):
+    k = math.ceil((n + 1) * (1 - alpha))
+    exact = 1.0 if k &gt; n else k / (n + 1)
+    upper = (1 - alpha) + 1.0 / (n + 1)
+    deg = "YES(q=inf)" if k &gt; n else "no"
+    print("%4d %6.3f %4d %10.4f %10.4f %12.4f %8s" %
+          (n, alpha, k, exact, 1 - alpha, upper, deg))
+print("    每一行的 exact 都落在 [1-a, 1-a+1/(n+1)] 内；k&gt;n 时预测集退化为全集，覆盖率=1。")
+print()
+
+# (b) 蒙特卡洛：边际覆盖成立、条件覆盖对子群失效
+N_CAL, ALPHA, REPS = 99, 0.10, 6000
+k = math.ceil((N_CAL + 1) * (1 - ALPHA))
+tot = hit = 0
+hard_tot = hard_hit = 0
+easy_tot = easy_hit = 0
+q_sum = 0.0
+for _ in range(REPS):
+    q, _ = conformal_q(N_CAL, ALPHA)
+    q_sum += q
+    xt, yt = draw_point()
+    ok = covered(xt, yt, q)
+    tot += 1
+    hit += 1 if ok else 0
+    if abs(xt - MU_X) &gt; HARD:
+        hard_tot += 1
+        hard_hit += 1 if ok else 0
+    else:
+        easy_tot += 1
+        easy_hit += 1 if ok else 0
+print("(b) 蒙特卡洛 n_cal=%d, alpha=%.2f, k=%d, R=%d（异方差：尾部噪声 3 倍）" %
+      (N_CAL, ALPHA, k, REPS))
+print("    marginal coverage = %.4f   (理论 k/(n+1) = %.4f)" % (hit / tot, k / (N_CAL + 1)))
+print("    easy  subgroup     = %.4f   (占比 %.3f, 噪声小 → 覆盖过高)" %
+      (easy_hit / easy_tot, easy_tot / tot))
+print("    hard  subgroup     = %.4f   (占比 %.3f, 噪声大 → 覆盖不足)" %
+      (hard_hit / hard_tot, hard_tot / tot))
+print("    mean q / sigma0    = %.4f   (单一全局阈值，无法适配两个子群)" % (q_sum / REPS / SIGMA0))
+print("    → 边际覆盖 ≈ 1-a 成立，但条件覆盖 P(Y∈C | X=子群) 对难子群显著低于 1-a。")
+print()
+
+# (c) 分布漂移：测试点噪声放大 4 倍，校准集不变 → 可交换性被破坏
+shift_hit, shift_tot = 0, 0
+for _ in range(REPS):
+    q, _ = conformal_q(N_CAL, ALPHA)
+    xt, yt = draw_point(scale=4.0)      # 测试分布漂移：噪声 4 倍
+    shift_tot += 1
+    shift_hit += 1 if covered(xt, yt, q) else 0
+print("(c) 分布漂移（新样本噪声放大 4 倍，校准集仍按原分布）：")
+print("    shifted coverage = %.4f   &lt;&lt; 目标 %.2f" % (shift_hit / shift_tot, 1 - ALPHA))
+print("    → 数据不再可交换，1-a 保证不成立，必须重校准或改用加权共形。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: 缩放定律与算力最优分配 ===
+预算 C0 = 6.00e+23 FLOPs；C ≈ 6ND，20 tokens/param 规则
+解析解 N_opt = sqrt(C/120) = 7.0711e+10 (70.71 B 参数)
+        D_opt = 20*N_opt  = 1.4142e+12 (1.4142 T tokens)
+校验 6*N*D = 6.0000e+23  (= C0)
+
+同一预算 C0 下，五种『参数/数据』分配的比较（损失越小越好）：
+  数据优先 N*/4            N=   17.678 B  D=  5.6569 T  D/N= 320.0  L=1.997302
+  数据偏多 N*/2            N=   35.355 B  D=  2.8284 T  D/N=  80.0  L=1.952269
+  Chinchilla 最优 N*     N=   70.711 B  D=  1.4142 T  D/N=  20.0  L=1.937841
+  参数偏多 2N*             N=  141.421 B  D=  0.7071 T  D/N=   5.0  L=1.952269
+  参数优先 4N*             N=  282.843 B  D=  0.3536 T  D/N=   1.2  L=1.997302
+→ 两头都变差，最优在中间；『只堆参数』在同算力下损失更高。
+  注：alpha=beta=0.5 时 L-E = A(t^-0.5 + t^0.5), t=N/N*，关于 log t 对称，
+      故 N*/4 与 4N* 损失相同；一般 alpha≠beta 时曲线不再对称。
+
+理想情形 alpha=beta=0.5：预算放大 4 倍 / 16 倍时的最优分配
+  C=1*C0 : N=   70.7107 B (x1.000)  D=    1.4142 T (x1.000)
+  C=4*C0 : N=  141.4214 B (x2.000)  D=    2.8284 T (x2.000)
+  C=16*C0 : N=  282.8427 B (x4.000)  D=    5.6569 T (x4.000)
+  log-log 斜率 dlogN/dlogC = 0.5000 , dlogD/dlogC = 0.5000 (应为 0.5)
+
+一般情形：指数只由 a=alpha, b=beta 决定（N∝C^(b/(a+b)), D∝C^(a/(a+b))）
+  a=0.50 b=0.50 (理想            ): N∝C^0.5000  D∝C^0.5000
+  a=0.34 b=0.28 (Chinchilla 实测 ): N∝C^0.4516  D∝C^0.5484
+  历史主张对比：Kaplan(2020) 主张 N∝C^0.73 / D∝C^0.27（参数优先、训练不足）；
+                Chinchilla(2022) 修正为 ≈C^0.5/C^0.5 与『每参数约 20 tokens』。
+  数值核验 a=0.34,b=0.28: slope_N=0.4516  slope_D=0.5484
+
+=== Part 2: 分割共形预测 split conformal 的覆盖保证 ===
+(a) 有限样本精确覆盖率 = ceil((n+1)(1-a))/(n+1)，上界 = 1-a+1/(n+1)
+   n  alpha    k      exact    1-alpha  1-a+1/(n+1) degenerate
+   9  0.200    8     0.8000     0.8000       0.9000       no
+  19  0.100   18     0.9000     0.9000       0.9500       no
+  99  0.100   90     0.9000     0.9000       0.9100       no
+ 100  0.050   96     0.9505     0.9500       0.9599       no
+  99  0.005  100     1.0000     0.9950       1.0050 YES(q=inf)
+    每一行的 exact 都落在 [1-a, 1-a+1/(n+1)] 内；k&gt;n 时预测集退化为全集，覆盖率=1。
+
+(b) 蒙特卡洛 n_cal=99, alpha=0.10, k=90, R=6000（异方差：尾部噪声 3 倍）
+    marginal coverage = 0.9015   (理论 k/(n+1) = 0.9000)
+    easy  subgroup     = 0.9834   (占比 0.772, 噪声小 → 覆盖过高)
+    hard  subgroup     = 0.6237   (占比 0.228, 噪声大 → 覆盖不足)
+    mean q / sigma0    = 2.6516   (单一全局阈值，无法适配两个子群)
+    → 边际覆盖 ≈ 1-a 成立，但条件覆盖 P(Y∈C | X=子群) 对难子群显著低于 1-a。
+
+(c) 分布漂移（新样本噪声放大 4 倍，校准集仍按原分布）：
+    shifted coverage = 0.4162   &lt;&lt; 目标 0.90
+    → 数据不再可交换，1-a 保证不成立，必须重校准或改用加权共形。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">N_opt = 7.0711e+10 (70.71 B)、D_opt = 1.4142e+12 (1.4142 T)</span>：由 $120N^2=C_0=6\times10^{23}$ 解出（$D=20N$ 代入 $6ND=C$）。<span class="ci-k">校验 6*N*D = 6.0000e+23</span> 逐位回到预算，说明解析解没有算错。常数 $H=\sqrt{20}$ 是为了让最优比 $D/N=(H/G)^{1/\alpha}=20$ 恰好等于 Chinchilla 的「每参数约 20 token」，改 $H$ 会整体挪动最优点，但「两头对称变差」的结构不变。</p>
+    <p><span class="ci-k">五种分配的 L：1.997302 / 1.952269 / 1.937841 / 1.952269 / 1.997302</span>：最低点落在 $N^*$（$D/N=20$），且 $N^*/4$ 与 $4N^*$、$N^*/2$ 与 $2N^*$ 的损失<strong>逐位相等</strong>，验证的是 $L-E=A(t^{-0.5}+t^{0.5})$ 关于 $\log t$ 的对称性。「只堆参数」（$4N^*$，282.843 B / 0.3536 T）在同算力下比最优损失更高，正是 Kaplan 式偏参数分配被修正的定量证据。把 <code>ALPHA/BETA</code> 改成不相等，这条对称会被打破，但最低点仍由 $\beta/(\alpha+\beta)$ 决定。</p>
+    <p><span class="ci-k">log-log 斜率 0.5000 / 0.5000</span>：预算放大 16 倍时 $N$、$D$ 各变 4 倍，$\log 4/\log 16=0.5$，与 $N_{\mathrm{opt}}\propto C^{0.5},D_{\mathrm{opt}}\propto C^{0.5}$ 精确一致。<span class="ci-k">a=0.34,b=0.28 → N∝C^0.4516, D∝C^0.5484</span>：代入一般式 $N\propto C^{\beta/(\alpha+\beta)}$、$D\propto C^{\alpha/(\alpha+\beta)}$ 得 $0.28/0.62=0.4516$、$0.34/0.62=0.5484$，末行数值核验 <code>slope_N=0.4516 / slope_D=0.5484</code> 与解析指数逐位吻合——注意这组实测指数已很接近 0.5，故历史对比写成「Kaplan 0.73/0.27 → Chinchilla ≈0.5/0.5」。</p>
+    <p><span class="ci-k">Part 2(a) 的 exact 列</span>：$k=\lceil(n+1)(1-\alpha)\rceil$，覆盖率 $k/(n+1)$。$(9,0.2)$ 得 $0.8000$、$(100,0.05)$ 得 $96/101=0.9505$，每行都夹在 $[1-\alpha,\ 1-\alpha+1/(n+1)]$ 内；末行 $(99,0.005)$ 因 $k=100\gt n$ 触发 <code>degenerate=YES</code>、覆盖率 $=1.0000$——保证成立但区间退化为全集。这几行是「有限样本、无分布假设」最硬的数值证据，不依赖任何蒙特卡洛。</p>
+    <p><span class="ci-k">marginal=0.9015 对理论 0.9000</span>：$n_{\mathrm{cal}}=99,\alpha=0.10$ 时 $k=90$、理论 $90/100=0.90$，6000 次重复实测 0.9015，差 0.0015 是蒙特卡洛抖动。<span class="ci-k">easy 0.9834 / hard 0.6237</span> 与占比 0.772/0.228 加权平均 $\approx0.9014$ 回到边际值，说明「总体达标」掩盖了子群失衡；<span class="ci-k">mean q/sigma0 = 2.6516</span> 是单一全局阈值，它对齐的是「平均」噪声，故对尾部 3 倍噪声的困难子群系统性偏窄。</p>
+    <p><span class="ci-k">shifted coverage = 0.4162</span>：把新样本噪声放大 4 倍、校准集仍按原分布，可交换性被破坏，覆盖率从 0.90 崩到 0.4162，远低于目标。这不是「$q$ 没调好」，而是上一专题证明的前提（秩均匀）不再成立——修复只能靠重校准或加权共形，加大校准集于事无补。案例数值 $\mu=95.2964,\sigma_x=43.4274,\sigma_0=12.7939$ 全部来自 <code>case.json</code>，与全站共用同一套真源。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组方法给出两件东西：在给定算力预算下，把损失幂律解成 $N_{\mathrm{opt}},D_{\mathrm{opt}}$ 的比例（缩放定律）；以及不假设分布、仅凭可交换性就给出 $\ge1-\alpha$ 有限样本覆盖的预测集合（分割共形）。<strong>不做</strong>因果识别、不提升点预测本身的精度，也不承诺逐点条件覆盖。</td></tr>
+    <tr><th>输入 / 输出</th><td>缩放定律输入：预算 $C$、拟合指数 $\alpha,\beta$ 与常数；输出：最优参数量 $N$（个）、token 数 $D$、预计损失 $L$。共形输入：校准分数 $\{s_i\}$、目标 $\alpha$、点预测 $\hat f$；输出：阈值 $\hat q$、预测集 $C(X)$（回归为区间，量纲与 $y$ 相同）、实测覆盖率与平均宽度。</td></tr>
+    <tr><th>适用场景</th><td>训练预算分配与「模型该做多大、喂多少数据」的规划；大模型／任意黑箱输出的不确定性量化、风险敏感决策（医疗、金融、审核）的兜底候选集；A/B 之外需要「可写进合同的覆盖率」的合规场景；监控分布漂移并触发重校准。</td></tr>
+    <tr><th>关键参数</th><td>$\alpha$（目标 miscoverage，越小区间越宽）；$k=\lceil(n+1)(1-\alpha)\rceil$；校准集大小 $n$（决定 $1/(n+1)$ 上界与阈值稳定性）；不一致性分数 $s$（绝对残差 / CQR / 标准化残差）；缩放侧 $\alpha,\beta,E,A,B$ 与 $C\approx6ND$ 的系数 6。</td></tr>
+    <tr><th>边界条件</th><td>在 $\alpha\ne\beta$、数据受限需重复、约束来自推理成本、或下游需微调的条件下，等比例缩放结论不成立，应改用 data-constrained / inference-aware scaling；在样本非可交换（漂移、时间序列、聚类）、要求条件覆盖、$\alpha$ 过小致 $k\gt n$、或分数大量并列的条件下，边际覆盖结论不足以支撑逐点结论，应改用重校准、分组／局部／加权共形或 jackknife+，并重新核对可交换性。</td></tr>
+    <tr><th>常见问题</th><td>① 把「边际覆盖达标」当成「每个子群都达标」；② 校准集参与训练或特征／超参选择造成泄漏；③ 分布已漂移仍沿用旧 $\hat q$；④ 以为覆盖率越接近 $1-\alpha+1/(n+1)$ 越好、忽视区间宽度；⑤ 把 Chinchilla 的 20 token/参数当成普适常数。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>算力翻倍，是不是把参数量翻倍、数据不变就行？</summary><div class="faq-a">不行。最优解是 $N\propto C^{0.5},D\propto C^{0.5}$：算力翻倍时两者各涨约 $\sqrt2$ 倍。代码实验里 $C$ 放大 16 倍，$N,D$ 各变 4 倍而不是一个变 16 倍、另一个不动。只堆参数会把数据项 $BD^{-\beta}$ 留在高位，同预算下损失更高（表格里 $4N^*$ 的 1.997302 对最优 1.937841）。</div></details>
+  <details><summary>Chinchilla 说「每参数 20 token」，这是放之四海皆准的常数吗？</summary><div class="faq-a">不是。$D/N=(H/G)^{1/\alpha}$、以及 20 这个具体数字，来自当前数据分布、模型族与拟合出的 $\alpha,\beta,A,B$；换语料、换架构、换 tokenizer 都会变。它是「这一代实验下的经验最优点」，不是理论常数。真正普适的是结构结论：$N,D$ 按 $C^{\beta/(\alpha+\beta)},C^{\alpha/(\alpha+\beta)}$ 同步增长、比例恒定。</div></details>
+  <details><summary>共形预测为什么不需要假设误差服从正态分布？</summary><div class="faq-a">因为保证来自「秩均匀」而非分布积分。可交换性使新样本误差在 $n+1$ 个分数里的排名均匀分布，覆盖事件等价于「排名 $\le k$」，概率就是 $k/(n+1)$——整个推导没出现过密度函数、均值或方差。代价是结论只对「所有样本平均」成立，且强依赖可交换性；一旦漂移，代码实验 (c) 的覆盖率会掉到 0.4162。</div></details>
+  <details><summary>实测边际覆盖率 0.90 达标，是不是可以放心上线了？</summary><div class="faq-a">还不行，要看子群。代码实验 (b) 里边际 0.9015 达标，但容易子群 0.9834（区间浪费）、困难子群仅 0.6237（大量漏报），二者按占比加权才凑回 0.90。若困难子群恰是高风险人群，这个「达标」会掩盖严重问题。应改成分组共形（各子群各算 $\hat q$）或标准化／CQR 分数，并分别报告各子群覆盖与宽度。</div></details>
+  <details><summary>上线一段时间后覆盖率掉了，是不是该把校准集加大？</summary><div class="faq-a">先查是不是分布漂移，而不是先加大 $n$。漂移破坏的是「可交换性」这个前提，加大同分布校准集救不回来；代码实验 (c) 把噪声放大 4 倍后覆盖率崩到 0.4162，正是此因。正确做法是用<strong>当前</strong>分布的新数据重算 $\hat q$（滚动／重校准），或改用加权共形给近样本更高权重，并持续监控输入分布。</div></details>
+  <details><summary>为何有时 $\alpha$ 设得很小，预测集就变成「什么都可能」？</summary><div class="faq-a">因为 $k=\lceil(n+1)(1-\alpha)\rceil$ 可能超过 $n$。例如 $n=99,\alpha=0.005$ 时 $k=100\gt99$，按约定 $\hat q=+\infty$、$C(X)$ 为全集，覆盖率 $=1$ 但毫无信息。这是有限样本下的硬限制：想要 99.5% 覆盖，校准集至少要能让 $k\le n$，即 $n$ 需远大于 $1/\alpha$。要么放宽 $\alpha$，要么收集更多校准数据。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">在 $C\approx6ND$ 与 $\alpha\approx\beta$ 的条件下，算力预算 $C$ 放大 16 倍时，Chinchilla 最优分配会怎样变？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. $N$ 变 16 倍、$D$ 不变</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. $N$、$D$ 各变 4 倍，比例 $D/N$ 保持不变</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. $D$ 变 16 倍、$N$ 不变</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. $N$ 变 8 倍、$D$ 变 2 倍</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$N_{\mathrm{opt}}\propto C^{\beta/(\alpha+\beta)},D_{\mathrm{opt}}\propto C^{\alpha/(\alpha+\beta)}$，$\alpha=\beta=0.5$ 时两指数都是 0.5，故 $16^{0.5}=4$，两者同步放大 4 倍、比例恒定（约 20 token/参数）。代码实验 log-log 斜率 0.5000/0.5000 正是它。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">Kaplan(2020) 与 Chinchilla(2022) 在算力分配上的核心分歧是什么？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 是否承认损失随规模服从幂律</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 是否使用 Transformer 架构</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. Kaplan 主张 $N\propto C^{0.73}$（偏参数、训练不足），Chinchilla 修正为参数与数据各按 $\approx C^{0.5}$ 同步增长</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. Chinchilla 认为数据越多损失必然单调下降、与参数无关</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：两篇都承认幂律，分歧在「给定预算怎么分」。Kaplan 的指数约 0.73/0.27 把大头给参数，导致大模型训练不足；Chinchilla 用 400 多个对照实验把指数拉回约 0.5/0.5，并给出每参数约 20 token 的经验规则。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">分割共形预测的有限样本覆盖保证，最根本依赖哪一条假设？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 残差服从正态分布且方差恒定</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 点预测模型 $\hat f$ 是真实函数的相合估计</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 校准样本与新样本可交换，使新分数的秩在 $1,\dots,n+1$ 上均匀</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 样本量 $n\to\infty$ 的大样本渐近性</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：保证来自可交换性 ⇒ 秩均匀 ⇒ $\mathbb{P}(R\le k)=k/(n+1)\ge1-\alpha$，全程不需要分布假设、模型相合性，也不是渐近结论。可交换一旦被漂移或时间依赖破坏，代码实验 (c) 的覆盖率就从 0.90 掉到 0.4162。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$n=9$、$\alpha=0.2$ 时，分割共形取 $k=\lceil(9+1)(1-0.2)\rceil=8$，得到的覆盖率是多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. $8/9\approx0.889$</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. $8/10=0.8000$，恰为下界 $1-\alpha$</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. $9/10=0.9000$，即上界</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. $7/10=0.7000$，因为要预留一位给新样本</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：用的是 $n+1=10$ 个分数（含新样本），覆盖率 $=k/(n+1)=8/10=0.8000=1-\alpha$，上界 $1-\alpha+1/(n+1)=0.9$；代码实验 (a) 第一行 exact=0.8000、upper=0.9000 逐位一致。注意不是 $8/9$。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">代码实验 (b) 中边际覆盖 0.9015 达标，但困难子群只有 0.6237。正确的解读是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 共形保证被推翻了，因为理论说覆盖应 $\ge0.90$</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 蒙特卡洛次数不够，多跑几次困难子群就会回到 0.90</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 应该把 $\alpha$ 调得更小来提高困难子群覆盖</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 保证是边际覆盖：容易子群 0.9834 与困难子群 0.6237 按占比加权凑回 0.90，需分组共形或标准化分数</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：有限样本保证的是对所有 $X$ 平均的边际覆盖，不是逐点条件覆盖。$0.772\times0.9834+0.228\times0.6237\approx0.9014$ 正是加权还原。要每个子群都达标，须改成分组（Mondrian）共形、局部自适应或标准化 CQR 分数，让 $\hat q$ 随 $x$ 变化。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure class="figure-placeholder" id="fig-classic-m10-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 10-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">Kaplan 等 (2020) 缩放定律：损失随参数量 / 数据量 / 算力的幂律曲线</span>
+    <span class="fig-note">双对数坐标下测试损失与三个规模变量近似线性，是「堆规模能稳定换性能」这一信念的原始证据图。</span>
+    <span class="fig-src">来源：Kaplan et al., Scaling Laws for Neural Language Models, arXiv:2001.08361（本站资源库 p14） · 查看：<a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">https://arxiv.org/abs/2001.08361</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+<h2 id="d-frontier">最新理论突破 · 背景 / 核心思想 / 结论 / 影响 / 局限</h2>
+<div class="callout tip"><div class="callout-title">阅读提示</div><p>下列条目按「背景 → 核心思想 → 关键结论 → 影响 → 局限」五栏固定展开，来源指向资源库中带核验状态的原始论文。局限一栏与结论同等重要：多数突破性结论只在特定数据分布、算力口径或任务族内成立。</p></div>
+<div class="breakthrough" id="d-frontier-1">
+  <div class="bt-head"><span class="bt-year">2022</span><h3>Chinchilla 最优：算力约束下参数与数据应等比例放大</h3></div>
+  <div class="bt-grid"><div class="bt-field"><span class="bf-k">背景与动机</span><div class="bf-v">Kaplan 等 (2020) 的缩放定律给出幂律后，业界普遍沿「尽量堆参数」的路线扩张，但训练 token 数与参数量的最优配比从未在固定算力下被系统求解。</div></div><div class="bt-field"><span class="bf-k">核心思想</span><div class="bf-v">把损失建模为参数量 N 与训练 token 数 D 的联合函数，在固定算力 C≈6ND 下重新求最优分配。</div></div><div class="bt-field"><span class="bf-k">关键结论</span><div class="bf-v">当时多数大模型严重「训练不足」；同等算力下，更小模型配更多数据优于更大模型配更少数据。</div></div><div class="bt-field"><span class="bf-k">影响</span><div class="bf-v">直接改变了 2022 年后主流大模型的规模规划与数据工程投入。</div></div><div class="bt-field"><span class="bf-k">局限与边界</span><div class="bf-v">结论依赖特定数据混合与算力核算口径；数据重复训练、质量权重、推理成本最优化均不在原结论内。</div></div></div>
+  <div class="bt-src">来源（资源库条目，含核验状态）：<a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Training Compute-Optimal Large Language Models</a> · <a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Scaling Laws for Neural Language Models</a> · 数据更新 2026-11-07</div>
+</div>
+<div class="breakthrough" id="d-frontier-2">
+  <div class="bt-head"><span class="bt-year">2023</span><h3>DPO：把 RLHF 的 KL 约束最优解写成闭式分类损失</h3></div>
+  <div class="bt-grid"><div class="bt-field"><span class="bf-k">背景与动机</span><div class="bf-v">InstructGPT 式的 RLHF 需显式训练奖励模型并做在线 PPO 采样，工程链长、超参敏感、训练不稳定，开源社区难以复现。</div></div><div class="bt-field"><span class="bf-k">核心思想</span><div class="bf-v">利用 KL 正则化 RL 目标的最优策略与奖励函数的解析关系，消去显式奖励模型与在线采样。</div></div><div class="bt-field"><span class="bf-k">关键结论</span><div class="bf-v">偏好对上的简单二分类损失即可复现 RLHF 效果，训练稳定性显著提升。</div></div><div class="bt-field"><span class="bf-k">影响</span><div class="bf-v">成为开源对齐流水线的事实标配，并催生 IPO / KTO / ORPO / SimPO 等变体。</div></div><div class="bt-field"><span class="bf-k">局限与边界</span><div class="bf-v">对偏好数据噪声与分布偏移敏感；易过拟合偏好对；离线性质使其难以超越数据覆盖的策略。</div></div></div>
+  <div class="bt-src">来源（资源库条目，含核验状态）：<a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Direct Preference Optimization</a> · <a href="https://arxiv.org/html/2509.11298v2" target="_blank" rel="noopener">SimPO / IPO / KTO / ORPO 等偏好优化变体</a> · <a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Training Language Models to Follow Instructions with Human Feedback</a> · 数据更新 2026-11-07</div>
+</div>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s10">10 · 本章例题与练习</h2>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 10.1</span>
+          <span class="ex-title">综合：从损失到评测</span>
+        </div>
+        <div class="example-body">
+          <p>某团队训练了语言模型，报告：「测试 loss 从 2.8 降至 2.5；基准得分从 61% 升到 64%（单次运行）」。请用统计学视角给出评审意见。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>① 换算困惑度：</strong>$e^{2.8}\approx 16.4$ → $e^{2.5}\approx 12.2$，PPL 降约 26%，是实质性改进。</p>
+              <p><strong>② 但「loss 低 ≠ 任务好」：</strong>需确认基准提升与 loss 下降是否同源（见 §2 的交叉熵分解）。</p>
+              <p><strong>③ 单次运行不足：</strong>3 分的提升需要不确定性刻画——同一模型多种子/多提示重跑报均值±标准差，或逐题 bootstrap CI。</p>
+              <p><strong>④ 显著性：</strong>200 题量级上 3 个百分点常在噪声范围内，应做配对检验（如例 8.1）。</p>
+              <p><strong>⑤ 其他核查：</strong>评测污染、解码设置是否一致、是否做了多重比较（若还看过其他基准）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>某模型平均 loss=2.3，求困惑度；若希望 PPL 降到 8，loss 需降到多少？</li>
+          <li>解释为什么「在训练分布上做最大似然」会导致模型对罕见事实过度自信，并说明共形预测如何补救。</li>
+          <li>两个缩放点：$(N=10^7, L=2.0)$、$(N=10^9, L=1.2)$，$L_\infty=1.0$。估算缩放指数 $\alpha$（提示：$(L-L_\infty)\propto N^{-\alpha}$）。</li>
+          <li>在 DPO 损失中，若 $\beta$ 取得过大，训练会有什么统计后果？（提示：logistic 回归的可分数据问题）</li>
+          <li>团队报告「模型 X 在 12 个基准中的 7 个取得第一」。用本章知识给出三条质疑。</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> $\mathrm{PPL}=e^{2.3}\approx 9.97$；PPL=8 需 loss $=\ln 8 \approx 2.079$。</p>
+            <p><strong>2.</strong> MLE 只匹配平均分布质量，对稀有事件的概率估计方差大且无下界保证；共形预测以校准集分位数给出有限样本覆盖保证，把「点估计」变成「带保证的集合」。</p>
+            <p><strong>3.</strong> $\frac{L_2-1}{L_1-1}=\frac{0.2}{1.0}=0.2$，$\frac{N_2}{N_1}=100$。由 $0.2 = 100^{-\alpha}$ 得 $\alpha = \frac{\log(1/0.2)}{\log 100} = \frac{\log 5}{2} \approx 0.70$。</p>
+            <p><strong>4.</strong> $\beta$ 大 → 对权重比值的尺度放大 → 逻辑回归在可分数据上系数发散（无有限 MLE），奖励过度自信、训练不稳定。实践中用 IPO/正则、早停或减小 $\beta$。</p>
+            <p><strong>5.</strong> ① 12 个基准是多重比较，「7 个第一」可能接近随机期望（每基准 10 模型时期望 1.2 个第一，但若有 30 个模型期望 0.4，需给零假设分布）；② 是否报告了每题/每种子方差与显著性；③ 基准间相关性、污染与难度不同，「个数」不是好统计量；④ 效应量与成本；⑤ 是否公开了全部尝试的基准（选择性报告）。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ========== 11 ========== -->
+      <h2 id="s11">11 · 本章小结</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>主题</th><th>统计学本质</th><th>关键公式/概念</th></tr></thead>
+          <tbody>
+            <tr><td>语言模型预训练</td><td>极大似然估计</td><td>$\max\sum\log P_\theta(x_t\mid x_{&lt;t})$</td></tr>
+            <tr><td>训练损失</td><td>交叉熵 / KL 散度</td><td>$H(P,Q)=H(P)+\mathrm{KL}(P\|Q)$，$\mathrm{PPL}=e^H$</td></tr>
+            <tr><td>缩放定律</td><td>幂律回归</td><td>$L(N)=L_\infty+(N_c/N)^\alpha$</td></tr>
+            <tr><td>注意力</td><td>核回归</td><td>Nadaraya-Watson 加权</td></tr>
+            <tr><td>VAE / 扩散</td><td>变分推断 / 分数匹配</td><td>ELBO、$\nabla_x\log p(x)$、朗之万采样</td></tr>
+            <tr><td>RLHF / DPO</td><td>偏好似然（logistic 回归）</td><td>Bradley-Terry、$\sigma(\Delta r)$、KL 罚</td></tr>
+            <tr><td>不确定性</td><td>共形预测</td><td>分位数阈值、$1-\alpha$ 覆盖</td></tr>
+            <tr><td>评测</td><td>假设检验 / bootstrap</td><td>配对检验、多重比较、效应量</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：AI 前沿统计。</strong>用共形预测输出带覆盖率保证的预测集；检查概率校准与评测不确定性。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="current" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">论文</span><span class="fr-body"><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Scaling Laws for Neural Language Models</a> <span class="muted small">（2020 · 权威共识）</span><span class="fr-why">为什么读：缩放定律原始论文，本章幂律形式的直接出处。</span></span></div><div class="fr-item"><span class="fr-tag">论文</span><span class="fr-body"><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Training Compute-Optimal Large Language Models</a> <span class="muted small">（2022 · 已核验）</span><span class="fr-why">为什么读：Chinchilla 修正：固定算力下参数与数据应同步放大。</span></span></div><div class="fr-item"><span class="fr-tag">论文</span><span class="fr-body"><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Direct Preference Optimization</a> <span class="muted small">（2023 · 已核验）</span><span class="fr-why">为什么读：DPO 原始论文：把 RLHF 化为闭式分类损失。</span></span></div><div class="fr-item"><span class="fr-tag">论文</span><span class="fr-body"><a href="https://arxiv.org/abs/2107.07511" target="_blank" rel="noopener">A Gentle Introduction to Conformal Prediction</a> <span class="muted small">（2021 · 已核验）</span><span class="fr-why">为什么读：共形预测综述，本章不确定性量化的依据。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div class="muted small">恭喜完成全部课程！可回到路线图查看检验清单，或去资料库继续深造。</div>
+        <button class="btn primary" data-complete-btn="m10">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m14-architectures.html"><span class="dir">← 阶段 5 · 上一篇</span><span class="ttl">14 · 神经网络架构谱系</span></a>
+        <a class="next" href="m15-genai-systems.html"><span class="dir">下一篇 →</span><span class="ttl">15 · 生成式 AI 系统与方法</span></a>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索概念、公式、例题…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索章节、概念、公式或例题。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

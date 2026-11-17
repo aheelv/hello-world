@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05 · 统计推断：估计与检验 · 统计 · 智能学习体系</title>
+<meta name="description" content="统计推断：矩估计与最大似然估计、置信区间与样本量、假设检验五步流程、z/t/χ²检验、p值与置信区间的正确解释、效应量与多重比较。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m05" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 1 · <a href="../stages/statistics.html">统计学</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l2">L2 基础</span> · 10 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 04 · 上一篇：<a href="m04-distributions.html">04 · 随机变量与常见分布</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m06-regression.html">06 · 回归分析</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m03-probability.html">03 概率论基础</a><span class="dep-arrow">→</span><a class="dep-node" href="m04-distributions.html">04 随机变量与常见分布</a><span class="dep-arrow">→</span><a class="dep-node current" href="m05-inference.html">05 统计推断：估计与检验</a><span class="dep-arrow">→</span><a class="dep-node" href="m06-regression.html">06 回归分析</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：抽样分布, 标准误, 置信区间, p 值, 显著性水平, 检验功效, 第一类错误, Bootstrap, 效应量</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>95% 置信区间的正确解释是什么，常见的错误解释有哪几种？ <a class="q-anchor" href="#s3">→ 对应讲解</a></li><li>p 值不是「原假设为真的概率」，那它到底是什么？ <a class="q-anchor" href="#s4">→ 对应讲解</a></li><li>样本量增大时，为什么微小效应也会变得「显著」？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li><li>Bootstrap 与解析标准误各自依赖什么假设？ <a class="q-anchor" href="#s6">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+    <article class="module" data-module="m05">
+
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/statistics.html">阶段 1 · 统计学</a> / 05 · 统计推断：估计与检验</div>
+        <h1>05 · 统计推断：估计与检验</h1>
+        <p class="lead">
+          拿到样本之后，如何对总体下结论？推断统计给出两件工具：<strong>估计</strong>（给出参数的猜测值与可信范围）
+          与<strong>检验</strong>（判断某个说法与数据是否相容）。本模块是全课程方法论的心脏——
+          读懂置信区间与 p 值的正确含义，比会套公式重要十倍；它们的误读，也是现实中最泛滥的统计错误。
+        </p>
+        <div class="module-meta">
+          <span class="badge ok">基础</span>
+          <span class="badge">10 学时</span>
+          <span class="badge">前置：模块 04</span>
+          <span class="badge brand">阶段二 · 核心推断</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>会用矩估计法求参数估计，并理解无偏性、有效性、一致性的含义</li>
+          <li>独立完成正态总体与伯努利参数的最大似然估计推导</li>
+          <li>熟练计算 $\mu$ 与 $p$ 的置信区间，并用频率学派语言正确解读 95% 的含义</li>
+          <li>按五步流程完成一次完整的假设检验（$z$ / $t$）</li>
+          <li>说清 p 值的准确定义，指出至少三种常见误读</li>
+          <li>会做 $\chi^2$ 拟合优度与独立性检验，正确算出期望频数</li>
+          <li>理解效应量、多重比较校正，警惕「显著 ≠ 重要」</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 点估计与估计量评价</h2>
+
+      <h3 id="s1-1">1.1 点估计：用一个数去猜参数</h3>
+      <p>总体参数 $\theta$（如 $\mu$、$\sigma$、$p$）未知，我们从样本算出一个统计量 $\hat{\theta}$ 去近似它，这叫<strong>点估计（Point Estimation）</strong>。同一参数可以有多个候选估计量（用 $\bar{x}$ 还是中位数估计 $\mu$？），因此需要评价标准来分辨优劣。</p>
+
+      <h3 id="s1-2">1.2 三个评价标准</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>标准</th><th>含义</th><th>直觉</th><th>数学表述</th></tr></thead>
+          <tbody>
+            <tr><td><strong>无偏性</strong> Unbiased</td><td>反复抽样的平均值恰好等于真值</td><td>平均而言不打偏</td><td>$\mathbb{E}(\hat{\theta})=\theta$</td></tr>
+            <tr><td><strong>有效性</strong> Efficient</td><td>在无偏估计中方差最小</td><td>每次猜得更集中</td><td>$\mathrm{Var}(\hat{\theta})$ 尽量小</td></tr>
+            <tr><td><strong>一致性</strong> Consistent</td><td>$n$ 越大越接近真值</td><td>大数据下不会跑偏</td><td>$n\to\infty$ 时 $\hat{\theta}\to\theta$</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>样本方差 $s^2 = \frac{1}{n-1}\sum(x_i-\bar{x})^2$ 用 $n-1$ 正是为了无偏：$\mathbb{E}(s^2)=\sigma^2$。</li>
+        <li>最大似然估计 $\frac{1}{n}\sum(x_i-\bar{x})^2$ 是<strong>有偏</strong>的（略低估 $\sigma^2$），但偏差随 $n$ 增大消失，且方差更小——这就是「有效性 vs 无偏性」的经典权衡。</li>
+      </ul>
+
+      <h3 id="s1-3">1.3 矩估计法（MOM）</h3>
+      <p><strong>思想</strong>：样本矩天然地逼近总体矩，那就让它们<strong>相等</strong>，反解出参数。步骤：</p>
+      <ol>
+        <li>写出要用到的总体 $k$ 阶原点矩 $\mathbb{E}(X^k)$（含未知参数）；</li>
+        <li>用样本 $k$ 阶矩 $\frac1n\sum_{i=1}^n x_i^k$ 替代；</li>
+        <li>解方程，得到估计量 $\hat{\theta}$。</li>
+      </ol>
+      <div class="formula-box">
+        <div class="f-name">矩估计方程（一阶矩）</div>
+        $$ \frac{1}{n}\sum_{i=1}^{n} x_i = \bar{x} = \mathbb{E}(X;\, \theta) \quad \Longrightarrow \quad \hat{\theta}_{\mathrm{MOM}} $$
+        <div class="f-note">符号：$\bar{x}$ 是样本均值（一阶样本矩）；$\mathbb{E}(X;\theta)$ 是含参数 $\theta$ 的总体均值。参数多于一个时，用二阶矩 $\frac1n\sum x_i^2 = \mathbb{E}(X^2)$ 联立求解。</div>
+      </div>
+
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          直觉：「用样本的平均长相，倒推总体的参数」
+        </div>
+        <p>矩估计的优点是简单、几乎不需要微积分；缺点是有时效率不高，且严重依赖「总体矩存在」。它是入门工具，<strong>实践中更常用下一节的最大似然估计</strong>。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 1.1</span>
+          <span class="ex-title">几何分布参数的矩估计：为什么换一阶矩答案就变了</span>
+        </div>
+        <div class="example-body">
+          <p>某机床调试时，每次调试成功的概率为 $p$（各次独立）。记录 5 次「从开始到首次成功所需的调试次数」：$3,\ 5,\ 2,\ 4,\ 7$。（a）用一阶矩求 $p$ 的矩估计；（b）用二阶矩再求一次；（c）求 $p$ 的最大似然估计，并讨论 $\hat{p} = 1/\bar{x}$ 作为 $p$ 的估计是否有偏。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>预备：写出几何分布的矩。</strong>设 $X$ 为首次成功所需的试验次数（取值 $1,2,\dots$），则</p>
+              $$ \mathbb{E}(X) = \frac{1}{p}, \qquad \mathrm{Var}(X) = \frac{1-p}{p^2}, \qquad \mathbb{E}(X^2) = \mathrm{Var}(X) + [\mathbb{E}(X)]^2 = \frac{2-p}{p^2} $$
+              <p><strong>（a）一阶矩估计。</strong>样本均值 $\bar{x} = \dfrac{3+5+2+4+7}{5} = \dfrac{21}{5} = 4.2$，令 $\dfrac1p = \bar{x}$：</p>
+              $$ \hat{p}_{\text{MOM},1} = \frac{1}{\bar{x}} = \frac{1}{4.2} \approx 0.2381 $$
+              <p><strong>（b）二阶矩估计。</strong>样本二阶原点矩 $\dfrac1n\sum x_i^2 = \dfrac{9+25+4+16+49}{5} = \dfrac{103}{5} = 20.6$，令 $\dfrac{2-p}{p^2} = 20.6$，整理成二次方程：</p>
+              $$ 20.6\,p^2 + p - 2 = 0 \;\Longrightarrow\; p = \frac{-1 + \sqrt{1 + 4\times 20.6 \times 2}}{2 \times 20.6} = \frac{-1 + \sqrt{165.8}}{41.2} \approx \frac{11.876}{41.2} \approx 0.2883 $$
+              <p><strong>两个答案不一样（$0.238$ vs $0.288$）——这就是矩估计的「不唯一」。</strong>矩估计只要求「用到的若干个矩匹配」，用几阶矩、用哪几个矩，都由你选。实践中常用一阶矩（简单、稳健）；二阶矩在右偏数据上会被极端值拉偏，可作对照检验：把 $p = 0.2381$ 代回 $\dfrac{2-p}{p^2}$ 得 $31.08$，与样本二阶矩 $20.6$ 并不吻合，正说明一阶矩解只保证了 $\mathbb{E}(X)$ 的匹配。</p>
+              <p><strong>（c）最大似然估计。</strong>似然函数（$m = \sum (x_i - 1) = 2+4+1+3+6 = 16$）：</p>
+              $$ L(p) = \prod_{i=1}^{5} p(1-p)^{x_i - 1} = p^5(1-p)^{16}, \qquad \ell(p) = 5\ln p + 16\ln(1-p) $$
+              $$ \frac{d\ell}{dp} = \frac{5}{p} - \frac{16}{1-p} = 0 \;\Longrightarrow\; 5(1-p) = 16p \;\Longrightarrow\; \hat{p}_{\text{MLE}} = \frac{5}{21} \approx 0.2381 $$
+              <p>有趣的是，几何分布的 MLE 恰好等于一阶矩估计 $\dfrac{1}{\bar{x}}$——这不是巧合：$\bar{x} = \dfrac{\sum x_i}{n}$，而 $\dfrac{n}{\sum x_i} = \dfrac{1}{\bar{x}}$。</p>
+              <p><strong>（d）$\hat{p} = 1/\bar{x}$ 有偏吗？</strong>有，而且是<strong>偏大</strong>。$\bar{x}$ 对 $\mathbb{E}(X) = 1/p$ 是无偏的，但函数 $g(u) = 1/u$ 是<strong>凸函数</strong>，由詹森不等式：</p>
+              $$ \mathbb{E}\!\left[\frac{1}{\bar{X}}\right] \;\geq\; \frac{1}{\mathbb{E}[\bar{X}]} = p $$
+              <p>等号仅在无波动时成立，所以 $\hat{p} = 1/\bar{x}$ 的期望严格大于 $p$（样本量越大偏差越小，这就是<strong>一致性</strong>）。</p>
+              <p><strong>易错提示：</strong>① 矩估计<strong>不唯一</strong>，换阶矩就换答案，报告结果时应写清「用了几阶矩」；② 几何分布有两种记法（支持 $\{1,2,\dots\}$ 与 $\{0,1,\dots\}$），$P(X=k) = (1-p)^{k-1}p$ 对应前者，均值 $1/p$；若用后一种，均值是 $(1-p)/p$，别混；③ $\hat{p} = 1/\bar{x}$ 虽然是最方便也最常用（MLE）的估计，但它<strong>有偏（偏大）</strong>——要无偏可以用修正量。</p>
+              <p><strong>应用/AI 关联：</strong>「首次成功需要几次尝试」正是强化学习里的探索—利用问题、推荐系统里的冷启动试探、线上故障重试成功率的估计。MLE $\hat p = \dfrac{\text{成功次数}}{\text{总尝试次数}}$ 在这些场景里就是最自然的选择；若样本很小而决策成本高，用无偏修正版更稳妥。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 最大似然估计（MLE）</h2>
+
+      <h3 id="s2-1">2.1 核心思想：哪个参数让「看到的数据」最可能</h3>
+      <p>换个角度问问题：数据已经摆在眼前了，那么<strong>什么样的参数最有可能生成这份数据</strong>？把参数 $\theta$ 变动，看「数据出现的概率」如何变化，取使该概率最大的 $\theta$ 作为估计，就是<strong>最大似然估计（Maximum Likelihood Estimation, MLE）</strong>。</p>
+      <div class="formula-box">
+        <div class="f-name">似然函数与 MLE 定义</div>
+        $$ L(\theta) = P(X_1=x_1,\dots,X_n=x_n \mid \theta) = \prod_{i=1}^{n} f(x_i;\theta) $$
+        $$ \hat{\theta} = \arg\max_{\theta}\, L(\theta) \qquad (\text{通常先取对数：}\ \ell(\theta)=\ln L(\theta)) $$
+        <div class="f-note">符号：$\prod$ 表示连乘（样本独立时联合概率 = 各自概率连乘）；$\ell(\theta)$ 称为<strong>对数似然</strong>。取对数的好处：连乘变连加、指数变系数，且 $\ln$ 单调递增，不改变最大值点位置。求解套路：对 $\ell(\theta)$ 求导，令导数为 0，解方程。</div>
+      </div>
+
+      <h3 id="s2-2">2.2 完整推导一：伯努利参数 $p$ 的 MLE</h3>
+      <p>设 $x_1,\dots,x_n$ 来自 Bernoulli($p$)（每次 0/1，成功概率 $p$），记成功次数 $\sum x_i = k$。</p>
+      <ol>
+        <li><strong>似然</strong>：$L(p) = \prod_{i=1}^{n} p^{x_i}(1-p)^{1-x_i} = p^{k}(1-p)^{n-k}$。</li>
+        <li><strong>对数似然</strong>：$\ell(p) = k\ln p + (n-k)\ln(1-p)$。</li>
+        <li><strong>求导</strong>：$\dfrac{d\ell}{dp} = \dfrac{k}{p} - \dfrac{n-k}{1-p}$。</li>
+        <li><strong>令其为 0</strong>：$\dfrac{k}{p} = \dfrac{n-k}{1-p} \Rightarrow k(1-p) = (n-k)p \Rightarrow k = np$。</li>
+        <li><strong>解得</strong>：$\hat{p} = \dfrac{k}{n} = \bar{x}$，即<strong>样本比例 / 样本均值</strong>。</li>
+      </ol>
+      <p>结论非常自然：「最可能的成功率」就是观察到的成功频率。这也是机器学习中分类模型输出概率的理论起点。</p>
+
+      <h3 id="s2-3">2.3 完整推导二：正态总体 $N(\mu,\sigma^2)$ 的 MLE</h3>
+      <p>设 $x_1,\dots,x_n$ 独立同分布于 $N(\mu,\sigma^2)$，求 $\mu$ 与 $\sigma^2$ 的 MLE。</p>
+      <ol>
+        <li><strong>似然</strong>：$L(\mu,\sigma^2) = \prod_{i=1}^{n} \dfrac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\dfrac{(x_i-\mu)^2}{2\sigma^2}\right) = (2\pi\sigma^2)^{-n/2} \exp\!\left(-\dfrac{\sum (x_i-\mu)^2}{2\sigma^2}\right)$。</li>
+        <li><strong>对数似然</strong>：$\ell = -\dfrac{n}{2}\ln(2\pi) - \dfrac{n}{2}\ln\sigma^2 - \dfrac{1}{2\sigma^2}\sum_{i=1}^{n}(x_i-\mu)^2$。</li>
+        <li><strong>对 $\mu$ 求导</strong>：$\dfrac{\partial \ell}{\partial \mu} = \dfrac{1}{\sigma^2}\sum_{i=1}^{n}(x_i-\mu) \overset{!}{=} 0 \Rightarrow \hat{\mu} = \bar{x}$。</li>
+        <li><strong>对 $\sigma^2$ 求导</strong>（代入 $\hat{\mu}=\bar{x}$）：$\dfrac{\partial \ell}{\partial \sigma^2} = -\dfrac{n}{2\sigma^2} + \dfrac{\sum(x_i-\bar{x})^2}{2\sigma^4} \overset{!}{=} 0$。</li>
+        <li><strong>解得</strong>：$\hat{\mu} = \bar{x}$，$\hat{\sigma}^2 = \dfrac{1}{n}\sum_{i=1}^{n}(x_i-\bar{x})^2$。</li>
+      </ol>
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：$\hat{\sigma}^2$ 用 $n$ 做分母，$s^2$ 用 $n-1$
+        </div>
+        <p>正态的 MLE 方差 $\frac1n\sum(x_i-\bar{x})^2$ <strong>有偏</strong>（系统性低估真方差），无偏版本是 $s^2 = \frac{1}{n-1}\sum(x_i-\bar{x})^2$。$n$ 大时两者几乎一样，$n$ 小时差别明显。报告数据时用 $s^2$（无偏），做似然推导时见到 $\frac1n$ 版本，两者都对，但<strong>不能混着用</strong>。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 2.1</span>
+          <span class="ex-title">指数分布的 MLE、无偏修正，与「取倒数就无偏了吗」</span>
+        </div>
+        <div class="example-body">
+          <p>某设备的故障间隔 $X$（单位：小时）服从指数分布 $\mathrm{Exp}(\lambda)$。连续观测 6 个故障间隔：$2.1,\ 3.4,\ 1.8,\ 4.2,\ 5.5,\ 3.1$。（a）求 $\lambda$ 的最大似然估计；（b）给出一个 $\lambda$ 的无偏估计量；（c）若我们真正关心的是平均间隔 $\mu = 1/\lambda$，用哪个估计量更合适？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）第一步：写似然函数。</strong>由密度 $f(x) = \lambda e^{-\lambda x}$：</p>
+              $$ L(\lambda) = \prod_{i=1}^{6} \lambda e^{-\lambda x_i} = \lambda^6 e^{-\lambda \sum x_i}, \qquad \ell(\lambda) = 6\ln\lambda - \lambda\sum x_i $$
+              <p><strong>第二步：求导并令其为 0。</strong></p>
+              $$ \frac{d\ell}{d\lambda} = \frac{6}{\lambda} - \sum x_i = 0 \;\Longrightarrow\; \hat{\lambda}_{\text{MLE}} = \frac{n}{\sum x_i} = \frac{6}{20.1} \approx 0.2985 $$
+              <p>二阶导 $\dfrac{d^2\ell}{d\lambda^2} = -\dfrac{6}{\lambda^2} &lt; 0$，确实是最大值。读法很直白：<strong>用观测到的总时间除以事件个数</strong>。顺带一提，矩估计给 $\hat{\lambda} = \dfrac{1}{\bar{x}} = \dfrac{1}{3.35} \approx 0.2985$，与 MLE <strong>数值完全相同</strong>——因为指数分布的 $\mathbb{E}(X) = 1/\lambda$ 而 $\bar{x}$ 对均值无偏。</p>
+              <p><strong>（b）无偏估计量。</strong>由 $\sum x_i \sim \mathrm{Gamma}(n,\ \text{率}\ \lambda)$ 可知 $\mathbb{E}\!\left[\dfrac{1}{\sum x_i}\right] = \dfrac{\lambda}{n-1}$，因此</p>
+              $$ \hat{\lambda}_{\text{无偏}} = \frac{n-1}{\sum x_i} = \frac{5}{20.1} \approx 0.2488 $$
+              <p>它确实无偏：$\mathbb{E}\!\left[\dfrac{n-1}{\sum x_i}\right] = (n-1)\cdot\dfrac{\lambda}{n-1} = \lambda$ ✓。而 MLE 版本 $\dfrac{n}{\sum x_i}$ 的期望是 $\dfrac{n}{n-1}\lambda &gt; \lambda$，即<strong>系统性地高估</strong>故障率（样本越小偏得越多）。</p>
+              <p><strong>（c）关心平均间隔 $\mu = 1/\lambda$ 时该用哪个？</strong>这里有个陷阱：<strong>非线性变换不保持无偏性</strong>。</p>
+              $$ \hat{\mu}_1 = \frac{1}{\hat{\lambda}_{\text{MLE}}} = \bar{x} = 3.35, \qquad \mathbb{E}[\hat{\mu}_1] = \mathbb{E}[\bar{X}] = \mu \;\;(\text{无偏}) $$
+              $$ \hat{\mu}_2 = \frac{1}{\hat{\lambda}_{\text{无偏}}} = \frac{\sum x_i}{n-1} = \frac{20.1}{5} = 4.02, \qquad \mathbb{E}[\hat{\mu}_2] = \frac{n\mu}{n-1} = \frac{6}{5}\mu = 1.2\mu \;\;(\text{有偏，偏大 20\%}) $$
+              <p>也就是说：<strong>把 $\lambda$ 换成无偏版本再取倒数，反而对 $\mu$ 有偏</strong>。若目标是平均间隔 $\mu$，直接用样本均值 $\bar{x} = 3.35$（无偏且方差更小）；若目标是故障率 $\lambda$（单位「次/小时」），用无偏的 $(n-1)/\sum x_i$。</p>
+              <p><strong>易错提示：</strong>① $\lambda$ 是<strong>率</strong>（次/小时），$\mu = 1/\lambda$ 是<strong>平均等待时间</strong>（小时），写报告时务必说清是哪一个；② MLE $\dfrac{n}{\sum x_i}$ 偏大，无偏修正版是 $\dfrac{n-1}{\sum x_i}$，别写成 $\dfrac{n+1}{\sum x_i}$；③ 「无偏量的函数仍无偏」是错的，取倒数、开方都会引入偏差。</p>
+              <p><strong>应用/AI 关联：</strong>「$n/\sum x_i$ = 总时间除以事件数」正是线上系统里估计请求到达率、故障率、重试成功率的最朴素做法（也是 MLE）；做容量规划时若样本很小，用无偏修正版可避免系统性高估而低估风险。指数分布的 MLE 还常被用作「等待时间」模型，直接支撑着<strong>指数退避重试策略</strong>的参数估计。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s2-4">2.4 与机器学习的联系（预告模块 09 / 10）</h3>
+      <p>MLE 与机器学习的损失函数是<strong>同一枚硬币的两面</strong>：</p>
+      <ul>
+        <li>正态假设下，$\max \ell(\mu,\sigma^2)$ 等价于 $\min \sum (x_i-\mu)^2$——这就是<strong>均方误差 MSE</strong>。线性回归（模块 06）的最小二乘法 = 正态噪声下的 MLE。</li>
+        <li>伯努利假设下，$\max \ell(p)$ 等价于最小化<strong>交叉熵（cross-entropy）</strong>损失——逻辑回归与神经网络分类器的标准损失。</li>
+      </ul>
+      <p>反过来说：选择一个损失函数，等于假设了一种数据分布（称为「隐式的似然假设」）。模块 09/10 的模型训练，本质是「在参数空间上做最大似然（或其贝叶斯变体）」。</p>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 置信区间：给出可信范围</h2>
+
+      <h3 id="s3-1">3.1 从点估计到区间估计</h3>
+      <p>点估计「$\bar{x}=52$」只是一个数，不含不确定性。<strong>区间估计</strong>给出一个范围，并说明「这个范围有多大概率罩住真值」。在频率学派中，用<strong>置信区间（Confidence Interval, CI）</strong>表述：</p>
+      $$ \text{点估计} \;\pm\; \text{临界值} \times \text{标准误} $$
+
+      <h3 id="s3-2">3.2 均值 $\mu$ 的置信区间</h3>
+      <div class="formula-box">
+        <div class="f-name">$\sigma$ 已知（z 区间）与 $\sigma$ 未知（t 区间）</div>
+        $$ \bar{x} \pm z_{\alpha/2}\,\frac{\sigma}{\sqrt{n}} \qquad (\sigma\ \text{已知}) $$
+        $$ \bar{x} \pm t_{\alpha/2,\, n-1}\,\frac{s}{\sqrt{n}} \qquad (\sigma\ \text{未知，用}\ s\ \text{代替}) $$
+        <div class="f-note">符号：$\alpha$ 是显著性水平（95% CI 对应 $\alpha=0.05$）；$z_{\alpha/2}$ 是标准正态上 $\alpha/2$ 分位数（95% 时 $z_{0.025}=1.96$）；$t_{\alpha/2,n-1}$ 是自由度 $n-1$ 的 $t$ 分布分位数；$\frac{s}{\sqrt{n}}$ 是标准误。实际应用中 $\sigma$ 几乎总是未知，故 <strong>t 区间才是主力</strong>。</div>
+      </div>
+
+      <h3 id="s3-3">3.3 比例 $p$ 的置信区间</h3>
+      <div class="formula-box">
+        <div class="f-name">总体比例的置信区间</div>
+        $$ \hat{p} \pm z_{\alpha/2}\,\sqrt{\frac{\hat{p}(1-\hat{p})}{n}} $$
+        <div class="f-note">条件：$n\hat{p}\ge 5$ 且 $n(1-\hat{p})\ge 5$（严格些用 10）。这就是民调「支持率 52% ± 3%」的来源：点估计 $\hat{p}=0.52$，误差限 $E = z_{\alpha/2}\sqrt{\hat{p}(1-\hat{p})/n}$。</div>
+      </div>
+
+      <h3 id="s3-4">3.4 置信区间的正确解释（重点）</h3>
+      <p>假设算出 95% CI 为 $(48.7,\ 55.3)$。<strong>正确的频率学派解读</strong>是：</p>
+      <blockquote>
+        「如果用同样的方法<strong>重复抽样无数次</strong>，每次都构造一个 95% 置信区间，那么这些区间中约 <strong>95% 会覆盖真值 $\mu$</strong>。当前这个区间 $(48.7, 55.3)$ 是其中之一。」
+      </blockquote>
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          误读警报：三种经典错误说法
+        </div>
+        <p><strong>错误一：</strong>「参数 $\mu$ 有 95% 的概率落在 (48.7, 55.3) 里。」——频率学派中 $\mu$ 是<strong>固定常数</strong>（不是随机变量），它要么在区间里、要么不在，没有概率可言。<em>随机的是区间本身</em>，不是参数。</p>
+        <p><strong>错误二：</strong>「区间里的值都是 95% 可能的真值。」——置信区间不给区间内每个点分配概率；这属于贝叶斯可信区间（credible interval）的说法，见模块 07。</p>
+        <p><strong>错误三：</strong>「95% 的样本数据落在 (48.7, 55.3) 里。」——CI 描述的是<strong>参数</strong>的不确定性，不是数据的散布范围。数据范围请看标准差或预测区间。</p>
+      </div>
+      <p>理解的钥匙：<strong>置信度是针对「构造方法」的长期频率，而不是针对这一次结果的概率陈述。</strong>下次看到「95% CI」，默念一遍「如果重复抽样……」的句式，就不会读错。</p>
+
+      <h3 id="s3-5">3.5 样本量的确定</h3>
+      <p>反过来问：希望误差限不超过 $E$，需要多少样本？由 $E = z_{\alpha/2}\frac{\sigma}{\sqrt{n}}$ 解出：</p>
+      <div class="formula-box">
+        <div class="f-name">估计均值所需样本量</div>
+        $$ n = \left(\frac{z_{\alpha/2}\,\sigma}{E}\right)^{\!2} $$
+        <div class="f-note">符号：$E$ 是可容忍的误差限（margin of error），$\sigma$ 可用历史数据或预实验估计。算出的 $n$ 一律<strong>向上取整</strong>。比例场合把 $\sigma$ 换成 $\sqrt{p(1-p)}$，保守取 $p=0.5$。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.1</span>
+          <span class="ex-title">样本量规划</span>
+        </div>
+        <div class="example-body">
+          <p>想估计某课程考试的平均分，要求 95% 置信区间误差不超过 $\pm 2$ 分。历史标准差 $\sigma\approx 10$ 分，需要多少样本？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>$\alpha=0.05 \Rightarrow z_{0.025}=1.96$，$E=2$，$\sigma=10$：</p>
+              $$ n = \left(\frac{1.96 \times 10}{2}\right)^{\!2} = (9.8)^2 = 96.04 \;\Rightarrow\; n = 97 $$
+              <p><strong>解读：</strong>至少抽 97 人。注意 $n$ 与 $E^2$ 成反比：想把误差从 2 分压到 1 分，样本量要翻 4 倍（约 385 人）——精度是「贵」的。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.2</span>
+          <span class="ex-title">比例的置信区间：Wald 区间在小样本下会给出负数</span>
+        </div>
+        <div class="example-body">
+          <p>某 App 的新按钮在 100 名随机用户中被点击了 26 次。（a）用正态近似的 Wald 区间求点击率 $p$ 的 95% 置信区间；（b）改用 Wilson 区间再算一次；（c）若只有 10 名用户、1 人点击，两个方法分别会给出什么结果？该信哪个？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）Wald 区间。</strong>$\hat{p} = 26/100 = 0.26$，</p>
+              $$ \mathrm{SE} = \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} = \sqrt{\frac{0.26 \times 0.74}{100}} \approx 0.04386 $$
+              $$ \hat{p} \pm z_{0.025}\mathrm{SE} = 0.26 \pm 1.96 \times 0.04386 = 0.26 \pm 0.0860 \;\Longrightarrow\; (0.1740,\ 0.3460) $$
+              <p><strong>（b）Wilson 区间。</strong>它把「$p$ 本身未知」这件事纳入构造：先取分母 $1 + \dfrac{z^2}{n}$ 做修正，再算中心与半宽。</p>
+              $$ \text{中心} = \frac{\hat{p} + \frac{z^2}{2n}}{1 + \frac{z^2}{n}} = \frac{0.26 + \frac{3.8416}{200}}{1 + \frac{3.8416}{100}} = \frac{0.27921}{1.03842} \approx 0.2689 $$
+              $$ \text{半宽} = \frac{z}{1 + \frac{z^2}{n}}\sqrt{\frac{\hat{p}(1-\hat{p})}{n} + \frac{z^2}{4n^2}} = \frac{1.96}{1.03842}\times\sqrt{0.001924 + 0.000096} \approx 0.0848 $$
+              $$ \Longrightarrow\quad (0.1840,\ 0.3537) $$
+              <p>两者很接近，但 Wilson 的区间略宽一点、中心略高一点——它对「$p$ 靠近 0 或 1 时标准误被低估」做了修正。</p>
+              <p><strong>（c）小样本 $n = 10$，成功 1 次。</strong>此时 $\hat{p} = 0.1$，$n\hat{p} = 1 &lt; 5$，正态近似的前提已经不成立：</p>
+              $$ \text{Wald:}\quad 0.1 \pm 1.96\sqrt{\frac{0.1\times 0.9}{10}} = 0.1 \pm 0.1859 \;\Longrightarrow\; (-0.0859,\ 0.2859) $$
+              <p>下界是 <strong>$-8.6\%$</strong>——点击率不可能为负，这个区间是废的（数学上正确，逻辑上荒谬）。Wilson 区间则是</p>
+              $$ \text{中心} = \frac{0.1 + \frac{3.8416}{20}}{1 + \frac{3.8416}{10}} = \frac{0.29208}{1.38416} \approx 0.2110, \qquad \text{半宽} \approx 0.1931 $$
+              $$ \Longrightarrow\quad (0.0179,\ 0.4042) $$
+              <p>它<strong>始终落在 $[0,1]$ 内</strong>，并且诚实地反映出「只看了 10 次点击，1 次成功，证据非常弱」。</p>
+              <p><strong>结论：</strong>小样本或 $\hat{p}$ 接近 0 / 1 时应使用 <strong>Wilson 区间</strong>（或对 $p$ 取 logit 变换后构造区间），不要用 Wald 区间。</p>
+              <p><strong>易错提示：</strong>① 置信区间不能跨出 $[0,1]$，看到负下界或大于 1 的上界就说明方法用错了；② Wald 区间的适用条件是 $n\hat{p} \ge 5$ 且 $n(1-\hat{p}) \ge 5$；③ 点估计 $\hat{p}$ 与置信区间是两件事，报告实验结果时要给区间而不是只给一个百分数。</p>
+              <p><strong>应用/AI 关联：</strong>线上 A/B 实验的点击率、转化率、留存率都是比例，样本量小或指标接近 0 时用 Wald 会明显失真，工业界普遍改用 Wilson 区间（或分位数自助法）。同时注意：置信区间只处理「这一个比例的不确定性」；如果一次实验里同时看 20 个指标，还需要 Bonferroni / FDR 之类的多重比较校正（见第 4.8 节）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 假设检验：数据能否推翻一个说法</h2>
+
+      <h3 id="s4-1">4.1 零假设与备择假设</h3>
+      <p>假设检验是一种<strong>反证法</strong>：先假设「现状/无效果」成立（<strong>零假设 $H_0$</strong>），看数据在 $H_0$ 下是否显得太不可能；若太不可能（小概率事件竟然发生了），就拒绝 $H_0$，转而支持<strong>备择假设 $H_1$</strong>。</p>
+      <ul>
+        <li>$H_0$（零假设）：默认立场，例如「新药无效」「均值 = 1000」「两组无差异」。形式永远是<strong>等式</strong>：$\mu=\mu_0$、$p=p_0$、$\mu_1=\mu_2$。</li>
+        <li>$H_1$（备择假设）：研究者想证明的，例如「新药有效（$\mu_1&gt;\mu_2$）」「均值 $\ne 1000$」。</li>
+        <li><strong>双侧检验</strong>：$H_1:\ \mu \ne \mu_0$（只问「是否不同」）；<strong>单侧检验</strong>：$H_1:\ \mu &gt; \mu_0$ 或 $\mu &lt; \mu_0$（明确方向）。</li>
+      </ul>
+
+      <h3 id="s4-2">4.2 两类错误与功效</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>真实情况 \ 决策</th><th>拒绝 $H_0$</th><th>不拒绝 $H_0$</th></tr></thead>
+          <tbody>
+            <tr><td>$H_0$ 为真</td><td><strong>第一类错误</strong>（$\alpha$，误报）</td><td>正确</td></tr>
+            <tr><td>$H_0$ 为假</td><td>正确（<strong>功效</strong> $1-\beta$）</td><td><strong>第二类错误</strong>（$\beta$，漏报）</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li><strong>$\alpha$（显著性水平）</strong>：允许的误报率上限，通常取 0.05。它是我们能直接控制的旋钮。</li>
+        <li><strong>$\beta$</strong>：真实有差异却没查出来的概率。<strong>功效 $1-\beta$</strong> 是「真有差异时能查出来」的概率，通常要求 ≥ 0.8。</li>
+        <li>两者此消彼长：样本量固定时把 $\alpha$ 调小，$\beta$ 就变大。<strong>增大样本量</strong>是同时压低两者的唯一办法。</li>
+      </ul>
+
+      <h3 id="s4-3">4.3 检验流程五步</h3>
+      <div class="formula-box">
+        <div class="f-name">假设检验标准五步</div>
+        $$ \text{(1) 提出 } H_0/H_1 \;\to\; \text{(2) 定 } \alpha \;\to\; \text{(3) 算检验统计量} \;\to\; \text{(4) 求 } p \text{ 值或临界值} \;\to\; \text{(5) 下结论} $$
+        <div class="f-note">第 ① 步必须在看数据<strong>之前</strong>定好方向（单侧/双侧）；第 ⑤ 步的结论只有两种：「拒绝 $H_0$」或「<strong>不拒绝</strong> $H_0$」——永远不说「接受 $H_0$」。</div>
+      </div>
+
+      <h3 id="s4-4">4.4 z 检验与单样本 t 检验</h3>
+      <ul>
+        <li><strong>z 检验</strong>：$\sigma$ 已知或 $n$ 很大时，统计量 $z = \dfrac{\bar{x}-\mu_0}{\sigma/\sqrt{n}} \approx N(0,1)$。</li>
+        <li><strong>单样本 t 检验</strong>：$\sigma$ 未知（常态），$t = \dfrac{\bar{x}-\mu_0}{s/\sqrt{n}}$，自由度 $n-1$。</li>
+      </ul>
+
+      <h3 id="s4-5">4.5 双样本 t 检验与配对 t 检验</h3>
+      <ul>
+        <li><strong>独立双样本</strong>（两组人）：$t = \dfrac{\bar{x}_1 - \bar{x}_2}{\sqrt{\dfrac{s_1^2}{n_1} + \dfrac{s_2^2}{n_2}}}$，自由度用 <strong>Welch–Satterthwaite 公式</strong>近似（统计软件自动算）。方差齐性可用 $F$ 检验或 Levene 检验判断；<strong>默认建议直接用 Welch 版本</strong>，它在方差不齐时依然稳健。</li>
+        <li><strong>配对 t 检验</strong>（同一批人前后测）：先算差值 $d_i = x_i - y_i$，再对 $\{d_i\}$ 做单样本 t 检验：$t = \dfrac{\bar{d}}{s_d/\sqrt{n}}$。配对设计消除了个体差异，通常更灵敏。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.1</span>
+          <span class="ex-title">双样本 t 检验：两种教学法的对比</span>
+        </div>
+        <div class="example-body">
+          <p>教学法 A 组 $n_1=25$ 人，$\bar{x}_1=78$ 分，$s_1=10$；教学法 B 组 $n_2=25$ 人，$\bar{x}_2=74$ 分，$s_2=12$。在 $\alpha=0.05$（双侧）下，两种教学法有显著差异吗？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>①</strong> $H_0:\mu_1=\mu_2$，$H_1:\mu_1\ne\mu_2$。<strong>②</strong> $\alpha=0.05$。<strong>③</strong> 算统计量：</p>
+              $$ t = \frac{78-74}{\sqrt{\frac{100}{25}+\frac{144}{25}}} = \frac{4}{\sqrt{4+5.76}} = \frac{4}{3.124} \approx 1.28 $$
+              <p>Welch 自由度 $\approx 46$，$t_{0.025,46}\approx 2.01$。</p>
+              <p><strong>④⑤</strong> $|t|=1.28 &lt; 2.01$（$p\approx 0.21$），<strong>不拒绝 $H_0$</strong>：现有数据不足以说明两种教学法有差异。注意「4 分之差」在现实中可能仍有意义——这正是第 5 节效应量要讨论的问题。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s4-6">4.6 p 值的正确解释（重点）</h3>
+      <div class="formula-box">
+        <div class="f-name">p 值的定义</div>
+        $$ p\text{-value} = P(\,\text{观察到比当前样本更极端的统计量} \mid H_0 \text{ 为真}\,) $$
+        <div class="f-note">读作：「<strong>假设 $H_0$ 成立</strong>的前提下，出现当前这么极端（或更极端）数据的概率」。它衡量的是<strong>数据与 $H_0$ 的不相容程度</strong>：p 越小，数据在 $H_0$ 下越「离谱」。</div>
+      </div>
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点一：p 值不是「$H_0$ 为真的概率」
+        </div>
+        <p>$p=0.03$ <strong>不等于</strong>「$H_0$ 只有 3% 的概率成立」或「有 97% 的把握备择为真」。p 值的条件是「<em>假设 $H_0$ 已经为真</em>」，讨论的是数据的罕见程度，而不是假设本身的可信度。要给假设分配概率，需要贝叶斯方法（模块 07）。</p>
+      </div>
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点二：p 值小 ≠ 效应大；p 值大 ≠ 没有差异
+        </div>
+        <p>p 值受<strong>效应大小</strong>与<strong>样本量</strong>共同影响：$n$ 极大时，0.1% 的无意义差异也能 $p &lt; 0.001$（见第 5 节）。反过来，$p=0.2$ 只说明「证据不足以拒绝 $H_0$」，<strong>不等于</strong>「两者相等」「没有效果」——可能是样本太小、噪声太大。正确表述：「未发现显著差异」，而不是「证明了无差异」。</p>
+      </div>
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点三：不拒绝 ≠ 接受
+        </div>
+        <p>检验的逻辑是「反证失败」：证据不足时只能说「未能推翻 $H_0$」，绝不能说「$H_0$ 成立」。就像法庭上「证据不足，无罪释放」不等于「证明了清白」。写结论时请用「拒绝 $H_0$ / 不拒绝 $H_0$」这对术语。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.2</span>
+          <span class="ex-title">p 值的三种误读：一个贝叶斯反例把话说透</span>
+        </div>
+        <div class="example-body">
+          <p>某次实验得到 p 值 $0.03$。同事甲说：「说明新方案有 97% 的概率更好」；同事乙说：「说明差异很大」。请分别指出两句话错在哪里，并给出一个定量反例。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>甲错在：把 p 值当成了「$H_0$ 不成立的概率」。</strong>p 值的定义是</p>
+              $$ p = P(\text{出现当前这么极端或更极端的数据} \mid H_0 \text{ 为真}) $$
+              <p>它的前提是「<strong>假设 $H_0$ 已经为真</strong>」，衡量的是数据的罕见程度，而不是假设本身的可信度。所以正确说法是：「在 $H_0$ 成立的前提下，出现当前数据的概率只有 3%」。</p>
+              <p><strong>定量反例：同一个 p 值，结论可以完全相反。</strong>设某检测的先验为 $P(H_0) = 0.999$（即事先就知道「这种情况几乎不可能发生」），观测到极罕见的数据，$P(D \mid H_0) = 0.001$；而在 $H_1$ 为真时得到类似数据的可能性更高，设 $P(D \mid H_1) = 0.5$。用贝叶斯公式：</p>
+              $$ P(H_0 \mid D) = \frac{P(H_0)P(D\mid H_0)}{P(H_0)P(D\mid H_0) + P(H_1)P(D\mid H_1)} = \frac{0.999 \times 0.001}{0.999\times 0.001 + 0.001\times 0.5} = \frac{0.000999}{0.001499} \approx 0.666 $$
+              <p>也就是说：<strong>p 值只有 0.001（极其显著），后验上却有约 67% 的概率仍支持 $H_0$</strong>。改变先验，结论随之改变：</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>先验 $P(H_0)$</th><th>后验 $P(H_1 \mid D)$</th><th>结论</th></tr></thead>
+                  <tbody>
+                    <tr><td>$0.999$</td><td>$0.334$</td><td>证据虽强，仍有三分之一的可能支持 $H_1$</td></tr>
+                    <tr><td>$0.99$</td><td>$0.835$</td><td>证据已较强</td></tr>
+                    <tr><td>$0.95$</td><td>$0.963$</td><td>证据很强</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>p 值对先验（基率）一无所知，所以它<strong>无法</strong>回答「哪个假设更可能」。要回答那个问题，得用贝叶斯方法（模块 07）。</p>
+              <p><strong>乙错在：p 值同时被「效应大小」和「样本量」决定。</strong>一个实际意义上微不足道的效应，只要样本足够大，也能得到极小的 p 值。例如真实效应只有 Cohen's $d = 0.1$（标准差的 10%），在 $n = 10000$ 时</p>
+              $$ z = \frac{\bar{x}-\mu_0}{s/\sqrt{n}} = 0.1 \times \sqrt{10000} = 10 \;\Longrightarrow\; p \approx 0 $$
+              <p>统计上「天壤之别」，业务上却毫无意义。反过来，$p = 0.2$ 也不能说「两者相同」——它只说明「证据不足以拒绝 $H_0$」，可能是样本太小、功效不足。</p>
+              <p><strong>正确姿势（黄金三件套）：</strong>同时报告 <strong>p 值 + 效应量 + 置信区间</strong>。例如：「两组转化率相差 $2.1$ 个百分点（95% CI：$0.3\sim 3.9$ 个百分点，$p = 0.03$）」——读者既能看出方向与大小，也能看出估计精度。</p>
+              <p><strong>易错提示：</strong>① 「p = 0.03 说明有 97% 把握」是最常见的误读；② 「p 大 = 没差异」不成立，正确说法是「未发现显著差异」；③ 「不拒绝 $H_0$」≠「接受 $H_0$」；④ 必须<strong>先定 $\alpha$ 再收数据</strong>，否则就是 p-hacking——看数据后再改单双侧、改显著性水平，会让 p 值彻底失去意义。</p>
+              <p><strong>应用/AI 关联：</strong>模型评测中「A 模型 AUC 0.61、B 模型 0.60，$p = 0.03$」这类报告极常见，如果不附效应量与置信区间，读者无法判断这 $0.01$ 是真实提升还是噪声波动。LLM 评测还多一层风险：在同一批样本上反复比较多个提示词、温度、few-shot 方案，p 值会被 p-hacking 严重污染——规范做法是<strong>留出独立评测集 + 预注册实验假设</strong>，或在多重比较场景用 FDR 控制。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s4-7">4.7 $\chi^2$ 检验：类别数据的推断</h3>
+      <p><strong>拟合优度检验</strong>：实测各类别频数 $O_i$ 与理论期望频数 $E_i$ 差多少？</p>
+      <div class="formula-box">
+        <div class="f-name">$\chi^2$ 统计量与列联表期望频数</div>
+        $$ \chi^2 = \sum_{i} \frac{(O_i - E_i)^2}{E_i}, \qquad E_{ij} = \frac{\text{行和}_i \times \text{列和}_j}{n} $$
+        <div class="f-note">符号：$O$ 是观测频数（Observed），$E$ 是期望频数（Expected）；$E_{ij}$ 用于 $r\times c$ 列联表（独立性检验），$n$ 为总样本量。自由度：拟合优度 = 类别数 $-$ 1 $-$ 估计参数个数；独立性 = $(r-1)(c-1)$。要求 $E_{ij}\ge 5$（否则合并类别）。</div>
+      </div>
+      <ul>
+        <li><strong>拟合优度</strong>：检验「数据是否符合某理论分布」（如骰子是否均匀、泊松是否合适）。</li>
+        <li><strong>独立性检验</strong>：给定 $r\times c$ 列联表，检验「两个分类变量是否独立」（如「教学法与及格率是否有关」）。$H_0$：两变量独立；若 $\chi^2$ 大到临界值以上，就拒绝独立。</li>
+      </ul>
+
+      <h3 id="s4-8">4.8 多重比较问题与 Bonferroni 校正</h3>
+      <p>一次检验犯第一类错误的概率是 $\alpha=0.05$；但若同时做 20 个独立检验，<strong>至少出现一次假阳性的概率高达 $1-(1-0.05)^{20}\approx 64\%</strong>。这就是多重比较问题（也是 p-hacking 的温床）。</p>
+      <ul>
+        <li><strong>Bonferroni 校正</strong>：做 $m$ 次比较时，把门槛收紧为 $\alpha' = \alpha/m$（如 20 次比较用 $0.05/20=0.0025$）。</li>
+        <li>其他方法：Holm–Bonferroni（逐步，比 Bonferroni 更有力）、控制错误发现率 FDR（Benjamini–Hochberg，常用于基因组学与 A/B 指标丛林）。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.3</span>
+          <span class="ex-title">综合挑战：分布检验、多重比较与「要多少样本」</span>
+        </div>
+        <div class="example-body">
+          <p>某车间记录了 20 天的设备故障次数：$1,\ 2,\ 2,\ 3,\ 3,\ 3,\ 4,\ 4,\ 4,\ 4,\ 5,\ 5,\ 5,\ 5,\ 6,\ 6,\ 7,\ 8,\ 11,\ 13$。<br>（a）用 $\chi^2$ 拟合优度检验判断故障次数是否服从泊松分布（$\alpha = 0.05$）；<br>（b）如果团队同时对 5 个车间各做了一次同样的检验，结论会怎么变？<br>（c）若要检验「新版把转化率从 30% 提升到 45%」，在双侧 $\alpha = 0.05$、功效 $0.8$ 的要求下，每组至少需要多少样本？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）第一步：假设与期望频数。</strong>$H_0$：故障次数服从 $\mathrm{Poisson}(\lambda)$，参数由样本估计</p>
+              $$ \hat{\lambda} = \frac{\sum x_i}{n} = \frac{101}{20} = 5.05 $$
+              <p>于是每个取值对应的期望频数都是 $E_i = 5.05$（均满足 $E_i \ge 5$，检验前提成立）。</p>
+              <p><strong>第二步：数格子、定自由度。</strong>观测到的不同取值有 $10$ 个（$1,2,\dots,8,11,13$），它们就是 $\chi^2$ 检验的 $10$ 个格子；又用样本估计了 $1$ 个参数 $\lambda$，故</p>
+              $$ df = \text{格子数} - 1 - \text{估计的参数个数} = 10 - 1 - 1 = 8 $$
+              <p><strong>第三步：逐格算贡献并求和。</strong></p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>故障次数 $O_i$</th><th>出现次数</th><th>期望 $E_i$</th><th>小计 $\frac{(O-E)^2}{E}$</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>1</td><td>5.05</td><td>$3.2480$</td></tr>
+                    <tr><td>2</td><td>2</td><td>5.05</td><td>$3.6842$</td></tr>
+                    <tr><td>3</td><td>3</td><td>5.05</td><td>$2.4965$</td></tr>
+                    <tr><td>4</td><td>4</td><td>5.05</td><td>$0.8733$</td></tr>
+                    <tr><td>5</td><td>4</td><td>5.05</td><td>$0.0020$</td></tr>
+                    <tr><td>6</td><td>2</td><td>5.05</td><td>$0.3574$</td></tr>
+                    <tr><td>7</td><td>1</td><td>5.05</td><td>$0.7530$</td></tr>
+                    <tr><td>8</td><td>1</td><td>5.05</td><td>$1.7233$</td></tr>
+                    <tr><td>11</td><td>1</td><td>5.05</td><td>$7.0104$</td></tr>
+                    <tr><td>13</td><td>1</td><td>5.05</td><td>$12.5153$</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              $$ \chi^2 = \sum \frac{(O_i - E_i)^2}{E_i} = 3.2480 + 3.6842 + 2.4965 + 0.8733 + 0.0020 + 0.3574 + 0.7530 + 1.7233 + 7.0104 + 12.5153 \approx 32.66 $$
+              <p><strong>第四步：比较临界值。</strong>$df = 8$，$\chi^2_{0.05,\,8} = 15.507$，而 $32.66 &gt; 15.507$（$p &lt; 0.001$）——<strong>拒绝 $H_0$</strong>：故障次数与泊松分布<strong>不相容</strong>。贡献最大的两格是 $13$ 次与 $11$ 次（合计约 $19.5$），说明问题出在<strong>右尾</strong>。</p>
+              <p><strong>第五步：诊断为什么不相容。</strong>再看方差与均值之比（样本方差 $s^2 = 8.68$）：</p>
+              $$ \frac{\mathrm{Var}}{\mathbb{E}} = \frac{8.68}{5.05} \approx 1.72 > 1 $$
+              <p>泊松分布要求方差 = 均值，这里方差是均值的 1.7 倍，属于<strong>过度离散（over-dispersed）</strong>——多半存在「故障群聚」（同一天同一台设备连坏）。对策：改用<strong>负二项分布</strong>（或准泊松）建模，而不是硬套泊松。</p>
+              <p><strong>（b）Bonferroni 校正把门槛抬高了一截。</strong>做 $m = 5$ 次检验时，单次检验的门槛收紧为</p>
+              $$ \alpha' = \frac{\alpha}{m} = \frac{0.05}{5} = 0.01, \qquad \chi^2_{0.01,\,8} = 20.090 $$
+              <p>门槛从 $15.507$ 抬到 $20.090$（提高了约 $30\%$）。本例统计量 $32.66$ 仍然越过门槛，<strong>结论不变</strong>（仍拒绝泊松假设）——因为这里的证据相当强。</p>
+              <p>但请注意门槛抬高带来的真实代价：凡是统计量落在 $15.51 \sim 20.09$ 之间的数据集（例如 $18.0$），<strong>单看这一个检验是「显著」的，校正之后就不再显著</strong>。这就是多重比较问题的实际代价。多做 20 次独立检验时，至少出现一次假阳性的概率高达</p>
+              $$ 1 - (1 - 0.05)^{20} \approx 64.2\% $$
+              <p>若检验数量更多、或更希望保留「弱信号」，可以改用 Holm–Bonferroni（逐步校正，比 Bonferroni 更有力）或控制错误发现率 FDR。</p>
+              <p><strong>（c）样本量的反向计算。</strong>设对照组 $p_1 = 0.30$、实验组 $p_2 = 0.45$，$\bar{p} = 0.375$，$\bar{q} = 0.625$。两比例检验的样本量公式为</p>
+              $$ n = \frac{\left(z_{\alpha/2}\sqrt{2\bar{p}\bar{q}} + z_{\beta}\sqrt{p_1q_1 + p_2q_2}\right)^2}{(p_1 - p_2)^2} $$
+              <p>其中 $z_{0.025} = 1.96$（双侧 $\alpha = 0.05$），$z_{0.2} = 0.8416$（因功效 $1-\beta = 0.8$，故 $\beta = 0.2$）。代入：</p>
+              $$ n = \frac{\left(1.96\sqrt{2\times 0.375\times 0.625} + 0.8416\sqrt{0.30\times 0.70 + 0.45\times 0.55}\right)^2}{0.15^2} = \frac{(1.3420 + 0.5692)^2}{0.0225} = \frac{3.6527}{0.0225} \approx 162.3 $$
+              $$ \Longrightarrow\quad n = 163 \text{（每组）} $$
+              <p>若同样为了 5 个版本做 Bonferroni 校正（$\alpha' = 0.01$，$z_{0.005} = 2.576$），则</p>
+              $$ n = \frac{(2.5758\times 0.6847 + 0.5692)^2}{0.0225} = \frac{5.4420}{0.0225} \approx 241.9 \;\Longrightarrow\; n = 242 \text{（每组）} $$
+              <p><strong>功效自检：</strong>每组 100 人时功效仅约 $0.59$，每组 163 人时约 $0.80$，每组 200 人时约 $0.87$，每组 242 人时约 $0.93$。样本量不足时，真实存在的 $15$ 个百分点差异也会「测不出来」——这正是「未拒绝 $H_0$」最常见的真实原因。</p>
+              <p><strong>易错提示：</strong>① $\chi^2$ 拟合优度的自由度要<strong>减去估计的参数个数</strong>，并数清楚格子个数（每个观测值算一格，不要按「不同取值」合并后再减，否则自由度算错）；② Bonferroni 校正改的是<strong>显著性门槛</strong>，不是重新算一遍数据；③ 样本量公式里 $z_{\alpha/2}$ 管误报、$z_{\beta}$ 管漏报，$z_{0.2} = 0.8416$ 来自「功效 0.8」，两者别混；④ 算出的 $n$ 必须<strong>向上取整</strong>。</p>
+              <p><strong>应用/AI 关联：</strong>本例的三步正是 AI 系统上线的标准流程：先用分布检验确认「指标行为符合预期模型」（否则后面全错），再用多重比较校正防止「指标丛林」里的假阳性（一次发版往往同时看十来个指标），最后在实验上线前用功效分析确定<strong>需要跑够多少流量</strong>——否则实验跑三天才发现样本量不够，只能重跑，白白浪费流量和时间。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 效应量：显著 ≠ 重要</h2>
+      <p>假设检验只回答「差异是否可能只是噪声」，不回答「差异有多大、值不值得在意」。<strong>效应量（Effect Size）</strong>直接度量差异的实际大小，与样本量无关。</p>
+      <div class="formula-box">
+        <div class="f-name">Cohen's d</div>
+        $$ d = \frac{\bar{x}_1 - \bar{x}_2}{s_{\text{pooled}}} \qquad \left(\text{单样本：}\ d = \frac{\bar{x}-\mu_0}{s}\right) $$
+        <div class="f-note">经验判读（Cohen 基准）：$|d| \approx 0.2$ 小效应，$0.5$ 中效应，$0.8$ 大效应——按研究领域上下文调整。其他常用效应量：比例差 $\hat{p}_1-\hat{p}_2$、相关系数 $r$、$\eta^2$、$R^2$。</div>
+      </div>
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          大样本陷阱：显著性会「稀释」重要性
+        </div>
+        <p>当 $n=100\,000$ 时，点击率提升 <strong>0.05 个百分点</strong>也可能 $p &lt; 0.001$——统计上「极显著」，商业上可能一文不值。反过来，小样本里一个大效应可能因功效不足而不显著。因此报告结论的黄金三件套是：<strong>效应量 + 置信区间 + p 值</strong>，三者一起看才能判断「差异是否真实存在、有多大、估计得多准」。</p>
+      </div>
+
+      <!-- ===== 6 ===== -->
+      <div id="examples"></div><h2 id="s6">6 · 本章例题精讲</h2>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.1</span>
+          <span class="ex-title">矩估计：均匀分布 $U(0,\theta)$</span>
+        </div>
+        <div class="example-body">
+          <p>设 $X\sim U(0,\theta)$（$\theta$ 未知），抽取样本 $2,\ 4,\ 3,\ 5,\ 6$。求 $\theta$ 的矩估计，并与「取样本最大值」的方案比较。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：写总体矩。</strong>均匀分布 $\mathbb{E}(X)=\dfrac{0+\theta}{2}=\dfrac{\theta}{2}$。</p>
+              <p><strong>第二步：写样本矩。</strong>$\bar{x} = \dfrac{2+4+3+5+6}{5} = \dfrac{20}{5} = 4$。</p>
+              <p><strong>第三步：令两者相等并反解。</strong></p>
+              $$ \frac{\theta}{2} = \bar{x} = 4 \quad \Longrightarrow \quad \hat{\theta}_{\mathrm{MOM}} = 2\bar{x} = 8 $$
+              <p><strong>比较：</strong>「取样本最大值」方案给出 $\hat{\theta} = \max\{2,4,3,5,6\} = 6$。矩估计 $8$ 更安全（绝不会小于真值），但可能偏大；最大值 $6$ 一定是 $\theta$ 的下界（真值不可能小于它）。两者都是合理估计，最大值估计（也是 MLE）在大样本下更有效。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.2</span>
+          <span class="ex-title">正态总体的 MLE（含数值演示）</span>
+        </div>
+        <div class="example-body">
+          <p>（a）推导 $N(\mu,\sigma^2)$ 的 MLE；（b）对样本 $10,\ 12,\ 14,\ 16,\ 18$ 给出具体数值。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）推导</strong>（见 §2.3）：对数似然 $\ell = -\frac{n}{2}\ln(2\pi) - \frac{n}{2}\ln\sigma^2 - \frac{\sum(x_i-\mu)^2}{2\sigma^2}$；</p>
+              <ul>
+                <li>$\dfrac{\partial \ell}{\partial \mu} = \dfrac{\sum(x_i-\mu)}{\sigma^2} = 0 \Rightarrow \hat{\mu} = \bar{x}$；</li>
+                <li>$\dfrac{\partial \ell}{\partial \sigma^2} = -\dfrac{n}{2\sigma^2} + \dfrac{\sum(x_i-\mu)^2}{2\sigma^4} = 0 \Rightarrow \hat{\sigma}^2 = \dfrac1n\sum(x_i-\bar{x})^2$。</li>
+              </ul>
+              <p><strong>（b）数值：</strong>$\bar{x} = \dfrac{10+12+14+16+18}{5} = 14$。</p>
+              $$ \sum(x_i-\bar{x})^2 = 16+4+0+4+16 = 40 $$
+              $$ \hat{\mu} = 14, \qquad \hat{\sigma}^2 = \frac{40}{5} = 8, \qquad s^2 = \frac{40}{4} = 10 $$
+              <p><strong>对照：</strong>MLE 方差 $8$（分母 $n$）比无偏方差 $s^2=10$（分母 $n-1$）小——这就是 §2.3 警告的偏差，$n=5$ 时已经看得出来。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.3</span>
+          <span class="ex-title">95% 置信区间（$\sigma$ 未知，小样本）</span>
+        </div>
+        <div class="example-body">
+          <p>随机抽取 $n=25$ 名患者，其收缩压样本均值 $\bar{x}=52$，样本标准差 $s=8$。求总体均值 $\mu$ 的 95% 置信区间。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：选公式。</strong>$\sigma$ 未知、$n=25$ 较小 $\Rightarrow$ 用 t 区间，自由度 $n-1=24$。</p>
+              <p><strong>第二步：查临界值。</strong>$t_{0.025,\,24} = 2.064$。</p>
+              <p><strong>第三步：算标准误与误差限。</strong></p>
+              $$ \mathrm{SE} = \frac{s}{\sqrt{n}} = \frac{8}{\sqrt{25}} = \frac{8}{5} = 1.6, \qquad E = 2.064 \times 1.6 = 3.30 $$
+              <p><strong>第四步：写出区间。</strong></p>
+              $$ \bar{x} \pm E = 52 \pm 3.30 \quad \Longrightarrow \quad \mathbf{(48.70,\ 55.30)} $$
+              <p><strong>正确解读：</strong>用同样方法反复抽样并各建一个 95% 区间，其中约 95% 会覆盖真实均值 $\mu$；当前这一区间是其中之一。<strong>不能</strong>说「$\mu$ 有 95% 概率落在 (48.70, 55.30)」。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.4</span>
+          <span class="ex-title">完整假设检验五步：灯泡寿命</span>
+        </div>
+        <div class="example-body">
+          <p>某工厂声称其灯泡平均寿命 1000 小时。消费者随机抽检 $n=36$ 只，测得 $\bar{x}=985$ 小时，$s=60$ 小时。在 $\alpha=0.05$ 下，是否有证据认为平均寿命<strong>低于</strong> 1000 小时？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>① 提出假设（单侧）：</strong>$H_0:\ \mu \ge 1000$（或简化为 $\mu = 1000$），$H_1:\ \mu &lt; 1000$。</p>
+              <p><strong>② 显著性水平：</strong>$\alpha = 0.05$。</p>
+              <p><strong>③ 检验统计量：</strong>$\sigma$ 未知、$n=36$，用单样本 t：</p>
+              $$ t = \frac{\bar{x}-\mu_0}{s/\sqrt{n}} = \frac{985-1000}{60/\sqrt{36}} = \frac{-15}{10} = -1.50, \qquad df = 35 $$
+              <p><strong>④ 临界值与 p 值：</strong>左侧检验，$t_{0.05,\,35}=1.690$，故拒绝域为 $t &lt; -1.690$。观测 $t = -1.50$ 未落入拒绝域。p 值 $=P(t_{35} &lt; -1.50) \approx 0.071$（介于 0.05 与 0.10 之间）。</p>
+              <p><strong>⑤ 结论：</strong>$p &gt; 0.05$，<strong>不拒绝 $H_0$</strong>。在 5% 显著性水平下，证据不足以认定平均寿命低于 1000 小时——注意措辞是「证据不足」，<em>不是</em>「证明寿命达到 1000 小时」。</p>
+              <p><strong>补充：</strong>效应量 $d = \dfrac{985-1000}{60} = -0.25$（小效应）。若想更有把握查出这样的差距，应增大样本量（功效考虑），而非简单调大 $\alpha$。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.5</span>
+          <span class="ex-title">$\chi^2$ 独立性检验：教学法与及格率</span>
+        </div>
+        <div class="example-body">
+          <p>调查 160 名学生，结果如下列联表。教学法与及格与否是否独立？（$\alpha = 0.05$）</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th></th><th>及格</th><th>不及格</th><th>行和</th></tr></thead>
+              <tbody>
+                <tr><td>教学法 A</td><td>60</td><td>20</td><td>80</td></tr>
+                <tr><td>教学法 B</td><td>40</td><td>40</td><td>80</td></tr>
+                <tr><td>列和</td><td>100</td><td>60</td><td>$n=160$</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>① 假设：</strong>$H_0$：教学法与及格独立；$H_1$：两者不独立。</p>
+              <p><strong>② 期望频数：</strong>$E_{ij} = \dfrac{\text{行和}\times\text{列和}}{n}$：</p>
+              <ul>
+                <li>A 组及格：$E_{11} = \dfrac{80\times 100}{160} = 50$；A 组不及格：$E_{12} = \dfrac{80\times 60}{160} = 30$；</li>
+                <li>B 组及格：$E_{21} = 50$；B 组不及格：$E_{22} = 30$（所有 $E_{ij}\ge 5$，条件满足）。</li>
+              </ul>
+              <p><strong>③ $\chi^2$ 统计量：</strong></p>
+              $$ \chi^2 = \frac{(60-50)^2}{50} + \frac{(20-30)^2}{30} + \frac{(40-50)^2}{50} + \frac{(40-30)^2}{30} = 2 + 3.33 + 2 + 3.33 = 10.67 $$
+              <p><strong>④ 自由度与临界值：</strong>$df = (2-1)(2-1) = 1$，$\chi^2_{0.05,\,1} = 3.841$。</p>
+              <p><strong>⑤ 结论：</strong>$10.67 &gt; 3.841$（$p &lt; 0.005$），<strong>拒绝独立假设</strong>：教学法与及格率存在关联。效应量 $\varphi = \sqrt{\chi^2/n} = \sqrt{10.67/160} \approx 0.26$（小到中等）。注意：结论是「有关联」，教学法 A 的及格率 75% 高于 B 的 50%，但若非随机分配学生，仍可能是混杂所致（模块 08）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 7 ===== -->
+      <!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 模块 05 统计推断：估计与检验 -->
+<!-- 本片段只补充「深度」：正文已有的估计、例题、练习与小结不重复 -->
+
+<h2 id="d-deep-1">深度专题一 · 「95% 置信区间」到底在说什么：把重复抽样真的跑一遍</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：一个让统计学家吵了几十年的句子</h3>
+  <p>正文已经把三种常见误读逐条驳倒，并给出标准答案：「若用同样方法重复抽样无数次，约 95% 的区间会覆盖真值」。本专题要再往下挖两层：这个句子是<strong>怎么被构造出来的</strong>，以及<strong>为什么手里这一个具体的区间不能谈概率</strong>。</p>
+  <p>历史上这里有两条路线。Fisher 在 1930 年代提出 fiducial inference，想给「参数落在某区间」一个类似概率的陈述；Neyman 与 Pearson 在 1933–1937 年另起炉灶，把区间估计定义成一种<strong>决策程序</strong>：先固定一个规则，再要求这个规则在长期重复中达到指定的覆盖率。频率学派今天采用的正是 Neyman 的版本。Efron 与 Hastie 在 <em>Computer Age Statistical Inference</em> 第 2 章用一张「纵向排列的多次实验、约 95% 的区间压住真值竖线」的图，把这个定义画成了最直观的样子——本站的经典配图就是它。</p>
+  <p>工程上这不是咬文嚼字。A/B 平台每天产出上千个「提升 $+2.1\%$，95% CI $[0.3\%, 3.9\%]$」，若把 95% 理解成「这次有 95% 把握」，就会把「长期误报率 5%」误当成「单次结论的可信度 95%」，进而在多重比较、peeking（提前看数据）等场景里系统性地高估证据。</p>
+
+  <h3>直觉：随机的不是参数，是「网」</h3>
+  <p>把真值 $\mu$ 想成地上一个<strong>固定不动</strong>的靶点，把置信区间想成每次抽样时随手撒出去的一张<strong>网</strong>。网会落在哪里是随机的（因为样本随机），靶点却从不移动。所谓「95% 置信」，说的是<strong>这张撒网的手法</strong>：重复撒一万次，约 9500 次网罩住靶点。</p>
+  <p>一旦某次抽样结束、区间算出来（比如 $(48.7, 55.3)$），网已经落地，靶点也早已固定——此时「罩住 / 没罩住」是既成事实，只是我们不知道。频率学派拒绝说「$\mu$ 有 95% 概率在区间里」，因为那等于把固定的靶点重新当成了随机量。<strong>概率描述的是撒网之前的程序，不是撒网之后的结果。</strong></p>
+  <p>一个能立刻说服人的反问：若区间算出来是 $(48.7, 55.3)$，而业务常识告诉我们 $\mu$ 不可能大于 $50$，那么「这个区间有 95% 概率含真值」显然荒唐——但频率学派的陈述毫发无伤，因为它只承诺「这类区间长期覆盖 95%」，对眼前这一个区间不下概率断言。这也是为什么报告结果时必须同时给点估计、区间与业务背景。</p>
+  <p>还有一层常被忽略的区别：<strong>覆盖率（coverage）与精度（precision）是两件事</strong>。95% 是覆盖率的承诺，区间宽度才是精度。一个永远输出 $(-\infty,+\infty)$ 的规则覆盖率 100%，却毫无用处；反过来，窄到只含一个点的区间精度极高，覆盖率却接近 0。评价一个区间方法要看两者是否兼顾。</p>
+
+  <h3>形式化：从「枢轴量」把区间反解出来</h3>
+  <p>置信区间不是拍脑袋写的「点估计 $\pm$ 某个数」，而是从<strong>枢轴量（pivot）</strong>反解出来的。枢轴量是一个「含参数、但分布不依赖参数」的函数，这是整个构造能成立的关键。</p>
+  <div class="formula-box">
+    <div class="f-name">枢轴量与区间反解（以 $\sigma$ 已知的均值区间为例）</div>
+    $$ Q=\frac{\bar{X}-\mu}{\sigma/\sqrt{n}}\ \sim\ N(0,1) $$
+    $$ \mathbb{P}\!\left(-z_{\alpha/2}\le Q \le z_{\alpha/2}\right)=1-\alpha \quad\Longleftrightarrow\quad \mathbb{P}_{\mu}\!\left(\bar{X}-z_{\alpha/2}\frac{\sigma}{\sqrt n}\le\mu\le\bar{X}+z_{\alpha/2}\frac{\sigma}{\sqrt n}\right)=1-\alpha $$
+    <div class="f-note">白话：第一行说「样本均值减真值、再除以标准误」服从标准正态——注意 $Q$ 里含有未知的 $\mu$，但它的分布 $N(0,1)$ <strong>不依赖 $\mu$</strong>，这正是「枢轴」的含义。第二行把不等式对 $\mu$ 反解，随机性全部转移到两端点上，于是得到随机区间 $L(\mathbf{X})=\bar X - z_{\alpha/2}\sigma/\sqrt n$、$U(\mathbf{X})=\bar X + z_{\alpha/2}\sigma/\sqrt n$。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">覆盖率是「程序的性质」，不是「结果的概率」</div>
+    $$ \mathbb{P}_{\mu}\!\left(\,\mu\in\left[L(\mathbf{X}),\,U(\mathbf{X})\right]\,\right)=1-\alpha \qquad \text{对一切 } \mu \text{ 成立} $$
+    <div class="f-note">白话：式子里的概率下标是 $\mu$、随机的是样本 $\mathbf{X}$（因而区间端点随机）。它对<strong>每一个可能的真值 $\mu$</strong> 都成立，所以叫「一致覆盖率」。而拿到具体数据后，$L,U$ 变成两个普通数字，$\mu\in[L,U]$ 是一个非真即假的命题，没有概率可言。要给它分配概率，必须引入先验分布，那是贝叶斯可信区间（credible interval）的领域——两者数值可以相近，含义完全不同。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">重复抽样的极限频率（大数定律把定义落地）</div>
+    $$ \frac{1}{B}\sum_{b=1}^{B}\mathbf{1}\!\left\{\mu\in\left[L(\mathbf{X}^{(b)}),\,U(\mathbf{X}^{(b)})\right]\right\}\ \xrightarrow[B\to\infty]{\text{LLN}}\ 1-\alpha=0.95 $$
+    <div class="f-note">白话：做 $B$ 次独立抽样、每次按同一公式造一个区间，数一数有多少个压住真值。$B\to\infty$ 时这个频率趋近 0.95。这正是本专题代码实验 [1] 要亲手跑的东西：把「95%」从一个抽象定义变成屏幕上一个可以数的比例。若把 $\alpha$ 改成 $0.10$，覆盖率会稳定在 $0.90$；若把 $n$ 改小但 $\sigma$ 已知，覆盖率仍是 $0.95$（只是区间变宽）——<strong>覆盖率由公式与 $\alpha$ 决定，宽度由 $n$ 与 $\sigma$ 决定</strong>。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">与假设检验的对偶：区间 = 没被拒绝的参数集合</div>
+    $$ \text{不拒绝 } H_0:\mu=\mu_0 \iff \left|\frac{\bar x-\mu_0}{\sigma/\sqrt n}\right|\le z_{\alpha/2} \iff \mu_0\in\left[\bar x\pm z_{\alpha/2}\frac{\sigma}{\sqrt n}\right] $$
+    <div class="f-note">白话：把所有「在 $\alpha$ 水平下不会被拒绝」的 $\mu_0$ 收集起来，恰好就是那个 $1-\alpha$ 置信区间。这解释了为什么「CI 不含 0」与「$p \lt 0.05$」总是一致，也解释了为什么区间比单看 $p$ 值更有信息量：它一次性给出<strong>所有与数据相容的参数值</strong>以及估计的精度。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    95% 是<strong>构造区间的程序</strong>在长期重复抽样中的覆盖率，由枢轴量的分布与 $\alpha$ 决定；对已经算出的那一个具体区间，频率学派不作任何概率陈述。覆盖率与区间宽度是两项独立指标；区间同时还是「未被拒绝的假设集合」，因此报告结论时应给出「点估计 + 区间 + $p$ 值」，而不是只给一个百分数。
+  </div>
+
+  <p><strong>边界：</strong>在样本量很小且总体明显非正态、样本之间不独立（时间序列自相关、群聚抽样）、或 $\sigma$ 被异常值严重污染的条件下，本结论不成立，应改用 $t$ 区间配合稳健标准误、自助法（bootstrap）百分位区间或分区重抽样，而不能用 $\bar x \pm 1.96\,\sigma/\sqrt n$ 的名义覆盖率来承诺 95%。</p>
+
+  <figure class="figure-placeholder" id="fig-classic-m05-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 5-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">重复抽样下 95% 置信区间的覆盖率示意图</span>
+    <span class="fig-note">纵向排列的若干次独立实验各画一条区间，约 95% 的区间覆盖真值（竖直线），少数区间（红色）未覆盖——这是「置信」频率学解释的标准配图。</span>
+    <span class="fig-src">来源：Computer Age Statistical Inference（Efron &amp; Hastie, 2016）第 2 章；本站资源库 b16 · 查看：<a href="https://hastie.su.domains/ElemStatLearn/" target="_blank" rel="noopener">https://hastie.su.domains/ElemStatLearn/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 为什么样本量一大，再小的效应也会「显著」：p 值与效应量的分家</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：「极显著」不等于「很重要」</h3>
+  <p>正文的黄金三件套（$p$ 值 + 效应量 + 置信区间）已经点出结论，本专题给出<strong>定量机制</strong>：为什么 $n$ 增大会把 $p$ 值机械地推向 0，以及这个机制在什么前提下才会触发。</p>
+  <p>这不是新问题。Cohen 在 1960–80 年代推动「效应量」运动，正是因为心理学与医学文献里充斥着「$p \lt 0.001$ 但差异小到没有临床意义」的报道；2016 年美国统计协会（ASA）专门发布关于 $p$ 值的声明，第一条就是「$p$ 值不度量效应大小或结果的重要性」。到了大模型时代它更尖锐：A/B 平台流量动辄百万，两个提示词版本的准确率差 $0.2$ 个百分点也能得到天文数字般的 $z$ 值，若只看 $p$ 值就会不断「上线」毫无价值的小改动。</p>
+  <p>本站贯穿案例正好是一个绝佳标本：干预组与对照组各 $6000$ 人，完课率差 $\mathrm{ATE}=+0.1232$，两比例 $z$ 检验给出 $z=13.4924$。这个 $z$ 大得惊人，但真正该被决策层读到的不是「极显著」，而是「$12.3$ 个百分点的提升，且置信区间很窄」。<strong>$z$ 是「效应 $\times$ $\sqrt n$」的产物，把它单独拎出来看，等于把样本量的功劳算到了效应头上。</strong></p>
+
+  <h3>直觉：显微镜与放大镜</h3>
+  <p>$p$ 值回答的是「这点差异有没有可能只是噪声」。样本量越大，我们对噪声的估计越精确，标准误 $\mathrm{SE}=\sigma/\sqrt n$ 越小——就像换了一台倍数更高的显微镜，再小的颗粒也看得见。<strong>但颗粒本身没变大。</strong></p>
+  <p>把检验统计量想成「信号 ÷ 噪声」：$\hat\delta$ 是信号（效应量，不随 $n$ 变），$\mathrm{SE}$ 是噪声（随 $n$ 增大按 $1/\sqrt n$ 缩小）。$n$ 翻 $100$ 倍，噪声缩到 $1/10$，$z$ 就放大 $10$ 倍，哪怕信号一动不动。于是任何非零的固定效应，只要 $n$ 够大，最终都会 $p \lt 0.05$。</p>
+  <p>反过来也成立：一个很大的真实效应，在小样本里可能因为噪声太大而「不显著」。所以「不显著」从不等于「没效应」，只说明「这次的显微镜倍数不够」。<strong>把 $p$ 值当成功效的刻度尺，是把「看得见」误当成「大」。</strong></p>
+
+  <h3>形式化：$z$ 里那个显眼的 $\sqrt n$</h3>
+  <div class="formula-box">
+    <div class="f-name">检验统计量 = 效应量 $\times \sqrt n$</div>
+    $$ z=\frac{\hat\delta}{\mathrm{SE}}=\frac{\hat\delta}{\sigma/\sqrt{n}}=\sqrt{n}\cdot\frac{\hat\delta}{\sigma}, \qquad p=2\left[1-\Phi(|z|)\right] $$
+    <div class="f-note">白话：$\hat\delta$ 是观测到的差异（如两组比例差、均值差），$\sigma$ 是单次观测的标准差，都是<strong>不随 $n$ 变</strong>的量；唯一的 $n$ 以 $\sqrt n$ 的形式乘在最前面。$\Phi$ 是标准正态 CDF。所以对任意固定的 $\hat\delta \ne 0$，当 $n\to\infty$ 时 $|z|\to\infty$、$p\to 0$。<strong>$p$ 值是 $\hat\delta$ 与 $n$ 的联合产物，不能单独反推效应大小。</strong></div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">与样本量公式对照：两条方向相反的曲线</div>
+    $$ n\ \approx\ \frac{\left(z_{\alpha/2}+z_{\beta}\right)^{2}\sigma^{2}}{\delta^{2}} \qquad\Longleftrightarrow\qquad \delta_{\min}\ \approx\ \left(z_{\alpha/2}+z_{\beta}\right)\frac{\sigma}{\sqrt n} $$
+    <div class="f-note">白话：左式是「要以功效 $1-\beta$ 检出大小为 $\delta$ 的效应，需要多少样本」，右式把它反过来读——「给定 $n$，这台显微镜能分辨的最小效应 $\delta_{\min}$」。$n$ 越大 $\delta_{\min}$ 越小。实验设计阶段就该先定业务上值得关心的 $\delta_{\min}$（最小重要差异），再算需要的 $n$；若反过来「先跑够流量再看 $p$」，就必然掉进「微小效应也显著」的陷阱。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">用贯穿案例把三件套摆在一起</div>
+    $$ \hat\delta=\mathrm{ATE}=0.5588-0.4357=0.1232, \qquad \mathrm{SE}_{\text{pooled}}=0.009129, \qquad z=\frac{0.1232}{0.009129}=13.4924 $$
+    $$ 95\%\ \mathrm{CI}(\hat\delta):\ 0.1232\pm 1.96\times 0.009059=\left[0.1054,\ 0.1409\right] $$
+    <div class="f-note">白话：效应量 $0.1232$（约 $12.3$ 个百分点）与样本量无关，是业务价值所在；$z=13.4924$ 与 $p$ 值是「效应 $\times$ $\sqrt{12000}$」的结果，主要反映样本量大；置信区间 $[0.1054,0.1409]$ 则同时给出方向与精度。三者合起来才完整：<strong>效应确实不小、估计很准、且几乎不可能是噪声</strong>。若只报 $p$ 值，读者既不知道提升多大，也不知道估计多稳。</div>
+  </div>
+
+  <p>把「固定微小效应 $\delta = 0.02\sigma$」在不同 $n$ 下的 $z$ 与 $p$ 列出来，就能看清 $p$ 值如何被 $n$ 单方面推动：</p>
+  <div class="table-wrap">
+    <table>
+      <caption>表 · 同一个效应量，$n$ 增大时 $z$ 与 $p$ 的变化（代码实验 [2] 的真实输出）</caption>
+      <thead><tr><th>样本量 $n$</th><th>$z=\delta\sqrt n$</th><th>双侧 $p$</th><th>$\alpha=0.05$ 下</th><th>效应量 $\delta$</th></tr></thead>
+      <tbody>
+        <tr><td>$10^2$</td><td>$0.20$</td><td>$\approx 0.84$</td><td>不显著</td><td>$0.02\sigma$（没变）</td></tr>
+        <tr><td>$10^3$</td><td>$0.63$</td><td>$\approx 0.53$</td><td>不显著</td><td>$0.02\sigma$（没变）</td></tr>
+        <tr><td>$10^4$</td><td>$2.00$</td><td>$\approx 0.046$</td><td>刚显著</td><td>$0.02\sigma$（没变）</td></tr>
+        <tr><td>$10^5$</td><td>$6.32$</td><td>$\approx 3\times 10^{-10}$</td><td>极显著</td><td>$0.02\sigma$（没变）</td></tr>
+        <tr><td>$10^6$</td><td>$20.00$</td><td>$\approx 0$</td><td>极显著</td><td>$0.02\sigma$（没变）</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>整张表里效应量始终是 $0.02\sigma$，业务上可以忽略；但 $p$ 值从 $0.84$ 一路掉到 $0$。<strong>若只看最后一行就宣布「发现重大规律」，就是把样本量误读成了重要性。</strong></p>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    $z=\sqrt n\cdot\hat\delta/\sigma$，$p=2[1-\Phi(|z|)]$：对任何固定的非零效应，$n\to\infty$ 必有 $p\to 0$。<strong>$p$ 值衡量「数据与零假设的不相容程度」，效应量衡量「差异有多大」，两者是不同维度的量</strong>。决策应以「最小重要差异 $\delta_{\min}$ + 置信区间是否整体越过它」为准，而不是以 $p$ 是否小于 $0.05$ 为准。
+  </div>
+
+  <p><strong>边界：</strong>在原假设严格为真（真实效应 $\delta = 0$）、样本之间存在强相关使「有效样本量」不再随 $n$ 增长、或存在增大 $n$ 也无法消除的系统性偏差（测量偏置、选择偏差）的条件下，本结论不成立，应改用效应量与置信区间为主、以重抽样或稳健标准误评估证据，并优先排查偏差来源，而不是继续堆样本量追求更小的 $p$ 值。</p>
+
+  <figure class="figure" id="fig-curve-clt">
+  <svg class="dia" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="中心极限定理：样本均值的分布随 n 收敛"><line class="dg-grid" x1="62" y1="26.0" x2="654" y2="26.0"/><line class="dg-grid" x1="62" y1="83.0" x2="654" y2="83.0"/><line class="dg-grid" x1="62" y1="140.0" x2="654" y2="140.0"/><line class="dg-grid" x1="62" y1="197.0" x2="654" y2="197.0"/><line class="dg-grid" x1="62" y1="254.0" x2="654" y2="254.0"/><line class="dg-axis" x1="62" y1="26" x2="62" y2="254"/><line class="dg-axis" x1="62" y1="254" x2="654" y2="254"/><path class="dg-curve alt" d="M 62.0 218.0 L 121.2 212.6 L 180.4 203.9 L 239.6 190.0 L 298.8 171.7 L 358.0 161.4 L 417.2 171.7 L 476.4 190.0 L 535.6 203.9 L 594.8 212.6 L 654.0 218.0"/><text class="dg-elabel" x="364.0" y="152.39148114285712" text-anchor="start">n = 1（近似总体形状）</text><path class="dg-curve " d="M 62.0 235.6 L 121.2 229.8 L 180.4 219.0 L 239.6 196.5 L 298.8 149.7 L 358.0 106.4 L 417.2 149.7 L 476.4 196.5 L 535.6 219.0 L 594.8 229.8 L 654.0 235.6"/><text class="dg-elabel" x="364.0" y="97.43058285714287" text-anchor="start">n = 5</text><path class="dg-curve ok" d="M 62.0 254.0 L 121.2 250.5 L 180.4 243.2 L 239.6 224.7 L 298.8 162.2 L 358.0 26.0 L 417.2 162.2 L 476.4 224.7 L 535.6 243.2 L 594.8 250.5 L 654.0 254.0"/><text class="dg-elabel" x="364.0" y="17.0" text-anchor="start">n = 30</text><text class="dg-ts" x="358.0" y="290" text-anchor="middle">样本均值 x̄</text><text class="dg-ts" x="14" y="140.0" text-anchor="start">密度</text></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">中心极限定理：样本均值的分布随 n 收敛</span>
+    <span class="fig-note">三条曲线示意不同样本量下均值的抽样分布；n 增大时方差按 σ²/n 收缩并趋于正态，与总体分布形态无关。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="../modules/m05-inference.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 两比例 $z$ 检验（含 Wilson 区间与自助法对照）</h2>
+
+<div class="algo-spec">
+
+  <h3>原理：把「两组比例之差」标准化成一把尺子</h3>
+  <p>问题：有两组独立的二分类观测（干预组 / 对照组、新版本 / 旧版本），想判断两组的总体比例 $p_1,p_2$ 是否相同。令</p>
+  <div class="formula-box">
+    <div class="f-name">两比例 $z$ 统计量（合并方差版）</div>
+    $$ \hat p_1=\frac{k_1}{n_1},\quad \hat p_2=\frac{k_2}{n_2},\quad \bar p=\frac{k_1+k_2}{n_1+n_2} $$
+    $$ \mathrm{SE}_{0}=\sqrt{\bar p(1-\bar p)\left(\frac{1}{n_1}+\frac{1}{n_2}\right)}, \qquad z=\frac{\hat p_1-\hat p_2}{\mathrm{SE}_{0}} $$
+    <div class="f-note">白话：$\bar p$ 是「假设两组真的没差别」时，把两组合起来算出的共同比例；$\mathrm{SE}_0$ 是<strong>在 $H_0:p_1=p_2$ 成立的前提下</strong>差值 $\hat p_1-\hat p_2$ 的标准误。$z$ 就是「观测到的差异折合成多少个标准误」。由 CLT，两组比例各自近似正态，差也近似正态，故 $H_0$ 下 $z\approx N(0,1)$，可直接用 $\Phi$ 求 $p$ 值。</div>
+  </div>
+  <p>这里有一个容易踩的坑：<strong>检验用合并标准误 $\mathrm{SE}_0$，区间用不合并标准误</strong>。检验时我们「暂且相信 $H_0$ 成立」，所以理应用共同比例 $\bar p$ 估标准误；而给差值 $\hat p_1-\hat p_2$ 构造置信区间时并不假设两组相等，应使用 $\mathrm{SE}_{\Delta}=\sqrt{\frac{\hat p_1(1-\hat p_1)}{n_1}+\frac{\hat p_2(1-\hat p_2)}{n_2}}$。两者数值接近但含义不同，混用会让「CI 是否含 0」与「$p$ 是否小于 $0.05$」出现细微不一致。</p>
+  <p>几何解释：把 $(\hat p_1-\hat p_2)$ 看成一根长度随机、中心在 $0$（$H_0$ 下）的数轴上的箭头；$\mathrm{SE}_0$ 是它的刻度单位。$z=13.4924$ 表示箭头伸到了 $13$ 个刻度之外——在标准正态下这几乎不可能发生，于是拒绝「无差异」。</p>
+
+  <h3>编号步骤：照着做一遍就会</h3>
+  <ol>
+    <li><strong>列四格表。</strong>写出 $n_1,k_1,n_2,k_2$（$k$ 为「成功」数），明确哪组是处理组、谁是参照组，保证两组独立。</li>
+    <li><strong>提假设、定方向与 $\alpha$。</strong>$H_0:p_1=p_2$；$H_1:p_1\ne p_2$（双侧）或 $p_1 \gt p_2$（单侧）。$\alpha$ 必须在看数据<strong>之前</strong>定好，默认 $0.05$。</li>
+    <li><strong>检查适用条件。</strong>每组 $n_i\hat p_i\ge 5$ 且 $n_i(1-\hat p_i)\ge 5$（严格用 $10$）；观测独立；不是配对设计。</li>
+    <li><strong>算比例与合并比例。</strong>$\hat p_1=k_1/n_1$、$\hat p_2=k_2/n_2$、$\bar p=(k_1+k_2)/(n_1+n_2)$，并算出效应量 $\hat\delta=\hat p_1-\hat p_2$。</li>
+    <li><strong>算合并标准误与 $z$。</strong>$\mathrm{SE}_0=\sqrt{\bar p(1-\bar p)(1/n_1+1/n_2)}$，$z=\hat\delta/\mathrm{SE}_0$。</li>
+    <li><strong>求 $p$ 值并下结论。</strong>双侧 $p=2[1-\Phi(|z|)]$；对照 $\alpha$ 写「拒绝 $H_0$」或「不拒绝 $H_0$」，措辞不用「接受」。</li>
+    <li><strong>补全三件套。</strong>用不合并 $\mathrm{SE}_\Delta$ 给出 $\hat\delta$ 的 95% 区间，报告效应量与业务意义；条件可疑时改用 Wilson 区间或 Fisher 精确检验复核。</li>
+  </ol>
+
+  <h3>适用条件</h3>
+  <ul>
+    <li>数据：两组<strong>独立</strong>的二分类计数（成功 / 失败），可整理成 $2\times 2$ 表；配对或重复测量设计应改用 McNemar 检验。</li>
+    <li>规模：每组期望成功数与失败数均 $\ge 5$（严格 $10$）；小样本或极端比例时正态近似失真。</li>
+    <li>分布：由 CLT 保证 $\hat p_i$ 近似正态；总体比例不靠近 $0$ 或 $1$。</li>
+    <li>特征类型：二值标签；不是连续量（连续量用 $t$ 检验），不是多分类（多分类用 $\chi^2$）。</li>
+    <li>工程位置：位于「实验分流 → 埋点聚合 → 显著性判定 → 发版决策」链条的判定环节；上游必须保证随机化与样本比例恒定（SRM 检查），下游是多重比较校正与业务评审。</li>
+  </ul>
+
+  <div class="complexity">
+    <span><b>训练</b>：无需训练，$O(1)$</span>
+    <span><b>推理（单次检验）</b>：时间 $O(1)$，空间 $O(1)$</span>
+    <span><b>对照</b>：Bootstrap $O(B\cdot(n_1+n_2))$，Fisher 精确检验随单元格计数增长</span>
+  </div>
+  <p>说明：解析型 $z$ 检验只做约十次算术加一次 erf，与样本量无关，因此能在在线实验平台里对上千个指标实时判定。Bootstrap 百分位区间要用 $B$ 次有放回重抽样，成本随 $B$ 与样本量线性增长，通常留作离线复核；Fisher 精确检验基于超几何分布，小样本最可靠但大表代价高。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>闭式解、$O(1)$，不需要迭代与第三方库，适合在线实时判定。</li>
+        <li>与 $\chi^2$ 独立性检验在 $2\times2$ 双侧情形等价（$z^2=\chi^2$），结论可互相印证。</li>
+        <li>$\Phi$ 与置信区间共用一套正态近似，解释口径统一。</li>
+        <li>输出直接是「多少个标准误」，便于与效应量、区间一起读。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>缺点</h4>
+      <ul>
+        <li>依赖大样本正态近似；小样本或比例接近 $0/1$ 时会给出错误 $p$ 值。</li>
+        <li>只回答「是否可能为零」，不回答「差异是否值得上线」——见深度专题二。</li>
+        <li>要求观测独立；用户被重复计数、群聚分流会低估标准误、制造假阳性。</li>
+        <li>一次看多个指标需 Bonferroni / FDR 校正，否则整体假阳性率暴涨。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>示例推演：用贯穿案例手算到底（知学云 · 学习小组干预）</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span> 干预组 $n_1=6000,\ k_1=3353$；对照组 $n_2=6000,\ k_2=2614$。双侧 $\alpha=0.05$。共享数字：$\mathrm{ATE}=+0.1232$、$z=13.4924$、$\mathrm{SE}=0.009129$、Wilson95 为 $[0.5462,0.5714]$ 与 $[0.4232,0.4482]$。</div>
+    <div class="solve-step"><span class="ss-k">检查条件。</span> $\hat p_1=3353/6000=0.5588$，$\hat p_2=2614/6000=0.4357$。四格：$n_1\hat p_1=3353$、$n_1(1-\hat p_1)=2647$、$n_2\hat p_2=2614$、$n_2(1-\hat p_2)=3386$，全部 $\gg 10$ ✓，且随机分流保证独立，可用 $z$ 检验。</div>
+    <div class="solve-step"><span class="ss-k">算效应量。</span> $\hat\delta=\hat p_1-\hat p_2=0.5588-0.4357=0.1231\overline{6}\approx 0.1232$，即提升约 $12.32$ 个百分点。</div>
+    <div class="solve-step"><span class="ss-k">算合并比例。</span> $\bar p=\dfrac{3353+2614}{6000+6000}=\dfrac{5967}{12000}=0.49725$；$\bar p(1-\bar p)=0.49725\times0.50275\approx0.249992$。</div>
+    <div class="solve-step"><span class="ss-k">算合并标准误。</span> $\mathrm{SE}_0=\sqrt{0.249992\times\left(\frac1{6000}+\frac1{6000}\right)}=\sqrt{0.249992\times0.00033333}=\sqrt{8.3330\times10^{-5}}=0.0091290$。</div>
+    <div class="solve-step"><span class="ss-k">算 $z$ 与 $p$。</span> $z=\dfrac{0.1231\overline{6}}{0.0091290}=13.4924$；双侧 $p=2[1-\Phi(13.4924)]$，远小于 $10^{-30}$，$\ll 0.05$ → <strong>拒绝 $H_0$</strong>。</div>
+    <div class="solve-step"><span class="ss-k">补区间（用不合并标准误）。</span> $\mathrm{SE}_\Delta=\sqrt{\frac{0.5588\times0.4412}{6000}+\frac{0.4357\times0.5643}{6000}}=\sqrt{4.1087\times10^{-5}+4.0978\times10^{-5}}=0.009059$；$\hat\delta\pm1.96\,\mathrm{SE}_\Delta=0.1232\pm0.0178=[0.1054,\ 0.1409]$，不含 0，与拒绝 $H_0$ 一致。</div>
+    <div class="solve-step"><span class="ss-k">解释（三件套）。</span> 效应量 $+12.32$ 个百分点（大）、95% CI $[0.1054,0.1409]$（窄、精度高）、$p$ 极小（几乎不可能是噪声）。$z=13.4924$ 之所以这么大，一半要归功于 $n=12000$ 把 $\mathrm{SE}_0$ 压到 $0.0091$；换成每组 $600$ 人，同样的效应只会有 $z\approx4.3$，仍显著但不再「天文数字」。<strong>决策看效应与区间，不看 $z$ 的绝对值。</strong></div>
+    <div class="solve-step"><span class="ss-k">边界复核。</span> 两组 Wilson95 $[0.5462,0.5714]$ 与 $[0.4232,0.4482]$ 完全不重叠，直观印证差异；若四格里有期望数 $\lt 5$，本检验作废，应改用 Fisher 精确检验或 Bootstrap。</div>
+  </div>
+
+  <h3>横向对比：判断「两组比例是否不同」的四种工具</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>维度</th><th class="best">两比例 $z$ 检验（本算法）</th><th>Fisher 精确检验</th><th>$\chi^2$ 独立性检验</th><th>Bootstrap 百分位区间</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td class="best">两组独立、$n$ 大、四格期望数 $\ge 5$</td>
+        <td>任意样本量，尤其小样本 / 稀有事件</td>
+        <td>$r\times c$ 列联表，期望频数 $\ge 5$</td>
+        <td>样本可视为总体的代表，统计量可重算</td>
+      </tr>
+      <tr>
+        <th>时间与空间复杂度</th>
+        <td class="best">时间 $O(1)$、空间 $O(1)$</td>
+        <td>随四格计数增长（组合数求和），大表昂贵</td>
+        <td>时间 $O(rc)$、空间 $O(rc)$</td>
+        <td>时间 $O(B(n_1+n_2))$、空间 $O(B)$，$B$ 为重抽样次数</td>
+      </tr>
+      <tr>
+        <th>关键超参数</th>
+        <td class="best">$\alpha$（默认 $0.05$）、单/双侧；无迭代参数</td>
+        <td>单/双侧、边缘是否固定</td>
+        <td>$\alpha$；是否做 Yates 连续性修正</td>
+        <td>$B$（建议 $\ge 1000$）、置信水平、随机种子</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">最快、闭式解、与 CI / $\chi^2$ 口径一致、易上线</td>
+        <td>不依赖渐近近似，$p$ 值精确</td>
+        <td>可推广到多组多分类、能同时检验整张表</td>
+        <td>不假设分布，可给任意统计量（差值、中位数、比率）的区间</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td class="best">小样本 / 极端比例 / 观测相关时失效，应改用 Fisher 或 Bootstrap</td>
+        <td>大表计算量大；只给 $p$ 值，不直接给效应量与区间</td>
+        <td>与 $z$ 检验同样依赖大样本；$2\times2$ 双侧与本算法等价</td>
+        <td>重抽样分布偏斜或小样本时覆盖率偏差；无法修复系统性偏差</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td class="best">「多少个标准误」最直观，纯标准库一行 erf 落地</td>
+        <td>超几何分布解释偏抽象，需组合数实现</td>
+        <td>「观测 vs 期望频数」直观，实现稍繁</td>
+        <td>概念简单但需固定种子与足够 $B$，离线复核成本高</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>选择规则：大样本在线判定用 $z$；小样本或稀有事件用 Fisher；多分类用 $\chi^2$；统计量不是简单比例差、或想摆脱分布假设时，用 Bootstrap 百分位区间。代码实验 [4] 会给出 Bootstrap 的真实结果，可与解析区间 $[0.1054,0.1409]$ 对照。</p>
+
+  <figure class="figure" id="fig-flow-hypothesis-test">
+  <svg class="dia" viewBox="0 0 680 550" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="假设检验的完整决策流程"><rect class="dg-box alt" x="190.0" y="34" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="57.0" text-anchor="middle">① 提出 H₀ 与 H₁</text><text class="dg-ts" x="340.0" y="74.0" text-anchor="middle">先定方向与显著性水平 α</text><rect class="dg-box" x="190.0" y="120" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="143.0" text-anchor="middle">② 选检验统计量</text><text class="dg-ts" x="340.0" y="160.0" text-anchor="middle">由数据类型与样本量决定</text><line class="dg-edge" x1="340.0" y1="86" x2="340.0" y2="120"/><polygon class="dg-edge" points="340.0,120 336.7379163755234,112.69528847750153 343.2620836244766,112.69528847750153" fill="var(--line-strong)" stroke="none"/><rect class="dg-box warn" x="190.0" y="206" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="229.0" text-anchor="middle">③ 检查适用条件</text><text class="dg-ts" x="340.0" y="246.0" text-anchor="middle">独立 / 分布 / 方差齐性</text><line class="dg-edge" x1="340.0" y1="172" x2="340.0" y2="206"/><polygon class="dg-edge" points="340.0,206 336.7379163755234,198.69528847750152 343.2620836244766,198.69528847750152" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="190.0" y="292" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="315.0" text-anchor="middle">④ 计算统计量与 p 值</text><text class="dg-ts" x="340.0" y="332.0" text-anchor="middle">在 H₀ 成立的分布下求值</text><line class="dg-edge" x1="340.0" y1="258" x2="340.0" y2="292"/><polygon class="dg-edge" points="340.0,292 336.7379163755234,284.69528847750155 343.2620836244766,284.69528847750155" fill="var(--line-strong)" stroke="none"/><text class="dg-elabel" x="348.0" y="270.0" text-anchor="start">不满足→换方法</text><rect class="dg-box info" x="190.0" y="378" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="401.0" text-anchor="middle">⑤ 与 α 比较并下结论</text><text class="dg-ts" x="340.0" y="418.0" text-anchor="middle">拒绝 ≠ 证明 H₁ 为真</text><line class="dg-edge" x1="340.0" y1="344" x2="340.0" y2="378"/><polygon class="dg-edge" points="340.0,378 336.7379163755234,370.69528847750155 343.2620836244766,370.69528847750155" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="190.0" y="464" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="487.0" text-anchor="middle">⑥ 报告效应量与区间</text><text class="dg-ts" x="340.0" y="504.0" text-anchor="middle">避免只看 p 值</text><line class="dg-edge" x1="340.0" y1="430" x2="340.0" y2="464"/><polygon class="dg-edge" points="340.0,464 336.7379163755234,456.69528847750155 343.2620836244766,456.69528847750155" fill="var(--line-strong)" stroke="none"/><path class="dg-edge" d="M 490.0 232.0 L 490.0 232.0 L 582.0 232.0 L 582.0 232.0"/><line class="dg-edge" x1="582.0" y1="222.0" x2="582.0" y2="232.0"/><polygon class="dg-edge" points="582.0,232.0 578.7379163755235,224.69528847750152 585.2620836244765,224.69528847750152" fill="var(--line-strong)" stroke="none"/><text class="dg-ts" x="590.0" y="236.0" text-anchor="start">条件不满足：置换 / bootstrap / 秩和检验</text></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">假设检验的完整决策流程</span>
+    <span class="fig-note">从提出原假设到结论，任一步的假设条件（独立、正态性、方差齐性）不成立时须换用非参数或重抽样方法，见图中边界条件。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../modules/m05-inference.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-code">代码实验 · 重复抽样看覆盖率、看 p 值随 n 崩塌、手算两比例 z 检验</h2>
+
+<div class="code-lab">
+  <div class="cl-head">
+    <span class="cl-lang">Python 3 · 纯标准库</span>
+    <span>实验：CI 覆盖率仿真 / p-n 关系 / 两比例 z 检验 / Wilson / Bootstrap</span>
+    <span class="cl-grow"></span>
+    <span>固定种子 · 可复现</span>
+  </div>
+  <pre>__PY_CODE__</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout，逐字粘贴自 Bash 执行结果）</div>
+    <pre>__PY_OUTPUT__</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">z_0.975</span>用二分法反解 <code>math.erf</code> 得到 $1.959964$，与全站 Wilson 区间使用的 $z=1.959963985$ 一致——纯标准库不需要查表，也不需要 numpy。</p>
+    <p><span class="ci-k">[1] 覆盖率</span>$B=20000$ 次独立抽样，每次用 $\bar x\pm 1.96\,\sigma/\sqrt{25}$ 造一个区间，<code>observed coverage</code> 落在 $0.95$ 附近（约 $\pm 0.005$ 的蒙特卡洛波动）。这就是「95%」的可数版本：它数的是<strong>区间压住真值的次数比例</strong>，不是「这一个区间含真值的概率」。<code>first 4 intervals</code> 里能看到确实有区间没压住 $\mu_0=50$，正好对应那约 5%。把 $\alpha$ 改成 $0.10$，覆盖率会稳定到 $0.90$；把 $n$ 改成 $100$，覆盖率仍是 $0.95$，只是四个区间都变窄了。</p>
+    <p><span class="ci-k">[2] p 值随 n</span>效应量固定为 $\delta=0.02\sigma$，<code>z</code> 严格按 $\sqrt n$ 增长：$n=10^4$ 时刚越过 $1.96$，$n=10^6$ 时 $p$ 已下溢到 $0$。<code>effect</code> 一列始终没变——这张表就是「$p$ 值不是效应量」的定量证据，也是深度专题二中表格的数据来源。</p>
+    <p><span class="ci-k">[3] 两比例 z 检验</span><code>pooled SE</code> $=0.009129$、<code>z</code> $=13.4924$、<code>ATE</code> $=+0.1232$，与 <code>case-outputs.txt</code> 的共享数字逐位吻合，说明手算的 <code>step-solve</code> 每一步都对。<code>Wilson95</code> 两组区间也 reproduced 为 $[0.5462,0.5714]$ 与 $[0.4232,0.4482]$，完全不重叠。<code>unpooled SE</code> $=0.009059$ 用于差值区间 $[0.1054,0.1409]$，比合并版略小，这是「检验」与「区间」用不同标准误的结果。<code>Cohen's h</code> $\approx0.25$ 是与 $n$ 无关的效应量刻度，可直接用于跨实验比较。</p>
+    <p><span class="ci-k">[4] Bootstrap</span>$B=2000$ 次有放回重抽样得到差值分布，其 2.5% 与 97.5% 分位数构成百分位区间，与解析区间 $[0.1054,0.1409]$ 接近但不完全相同——差异来自「不假设正态、直接用经验分布」。Bootstrap 均值贴近 $0.1232$，说明抽样没有系统性偏移。</p>
+    <p><span class="ci-k">何时会变</span>把 $n_1,n_2$ 各缩小到 $600$（保持比例不变），$z$ 会从 $13.49$ 降到约 $4.3$，效应量不变、区间变宽；把 [2] 的 $\delta$ 设成 $0$，$p$ 会在各 $n$ 下都围绕 $0.5$ 随机波动而不再趋向 0（这正是深度专题二的边界条件）；把 [1] 的 $\sigma$ 换成被极端值污染的估计，覆盖率会明显低于 $0.95$。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr>
+      <th>功能说明</th>
+      <td>把两组二分类计数换算成标准正态尺度上的 $z$ 与 $p$ 值，并配套给出效应量、差值置信区间与 Wilson 区间。<strong>做</strong>：判定「两组比例是否有可检出的差异」、量化差异大小与精度。<strong>不做</strong>：不证明因果（因果需要随机化与识别策略）、不判断差异是否有业务价值、不处理配对 / 重复观测。</td>
+    </tr>
+    <tr>
+      <th>输入 / 输出</th>
+      <td>输入：四个整数 $n_1,k_1,n_2,k_2$（次数，无量纲计数）、显著性水平 $\alpha$、单双侧标记。输出：$z$（无量纲标准分）、$p$（无量纲概率）、$\hat\delta$（比例差，单位为「比例 / 百分点」）、95% CI 与 Wilson 区间（同量纲）。</td>
+    </tr>
+    <tr>
+      <th>适用场景</th>
+      <td>A/B 实验的转化率 / 点击率 / 留存率 / 完课率比较、投放前后对照、两版本模型的二分类指标对比；位于「分流 → 埋点聚合 → 显著性判定 → 发版」链条的判定环节。</td>
+    </tr>
+    <tr>
+      <th>关键参数</th>
+      <td><code>alpha</code>（默认 $0.05$，调小则更保守、需更大样本）；<code>alternative</code>（双侧 / 单侧，必须看数据前定）；<code>pooled</code>（检验用合并标准误，区间用不合并，不可互换）；<code>min_expected</code>（默认 $5$，严格场景设 $10$）；<code>B</code>（Bootstrap 次数，默认 $2000$）。调参方向：想降低假阳性先做多重比较校正与 $\alpha$ 收紧，而不是反复看数据。</td>
+    </tr>
+    <tr>
+      <th>边界条件</th>
+      <td>在任一期望频数 $\lt 5$、比例接近 $0$ 或 $1$、或观测不独立（重复用户、群聚分流、时间序列自相关）的条件下不适用，应改用 Fisher 精确检验、Wilson 区间或 Bootstrap / 分区重抽样；在同时检验多个指标时应改用 Bonferroni 或 Benjamini–Hochberg 控制 FDR；在仅有关联而无随机化时应改用因果推断方法，不得把系数当处置效应。</td>
+    </tr>
+    <tr>
+      <th>常见问题</th>
+      <td>① 把「95% CI」读成「真值有 95% 概率在此」；② 把极小的 $p$ 值当成「效果很大」；③ 检验用不合并标准误、区间用合并标准误，导致「CI 含 0」与「$p \lt 0.05$」互相打架。详见下方常见问题。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details>
+    <summary>算出来 95% CI 是 $(48.7, 55.3)$，到底能不能说「真值有 95% 概率在这里」？</summary>
+    <div class="faq-a">不能。频率学派的 $\mu$ 是固定常数，区间已经落地，「含 / 不含」是既成事实，没有概率。95% 说的是<strong>造区间的那套程序</strong>：重复抽样无数次，约 95% 的区间会罩住真值。若确实要一句「真值落在某范围的概率」，那需要引入先验分布、用贝叶斯可信区间（credible interval），两者数值常接近但含义不同。代码实验 [1] 的覆盖率仿真可以直接看到这个 95% 是怎么数出来的。</div>
+  </details>
+  <details>
+    <summary>$p \lt 0.001$ 是不是说明效果非常大？</summary>
+    <div class="faq-a">不是。$z=\sqrt n\cdot\hat\delta/\sigma$，$p$ 值同时被效应量 $\hat\delta$ 与样本量 $n$ 推动。代码实验 [2] 里效应量固定 $0.02\sigma$（业务上可忽略），$n$ 从 $10^2$ 增到 $10^6$ 时 $p$ 从 $0.84$ 掉到 $0$。正确姿势是同时报<strong>效应量 + 置信区间 + $p$ 值</strong>，并事先定义「最小重要差异 $\delta_{\min}$」，看区间是否整体越过它。</div>
+  </details>
+  <details>
+    <summary>检验和置信区间，为什么一个用合并标准误、一个用不合并？</summary>
+    <div class="faq-a">检验时我们<strong>暂且假定 $H_0:p_1=p_2$ 成立</strong>，于是两组共享同一个真实比例，自然用合并后的 $\bar p$ 估标准误；区间不假设两组相等，要用各自的 $\hat p_i$ 估。两者数值接近（本例 $0.009129$ vs $0.009059$），但混用会破坏「$p \lt 0.05$ ⟺ 95% CI 不含 0」这个对偶关系。口诀：<strong>检验信 $H_0$，区间信数据</strong>。</div>
+  </details>
+  <details>
+    <summary>样本量越大越好吗？</summary>
+    <div class="faq-a">对「估计精度」是的（区间按 $1/\sqrt n$ 变窄、功效上升），但对「决策」不一定。$n$ 极大时任何微小偏差都会显著，容易把无意义的小改动当成成果；同时 Big data 往往伴随选择偏差与不依从，偏差不会随 $n$ 消失。实验设计应先定 $\delta_{\min}$ 再用 $n\approx (z_{\alpha/2}+z_\beta)^2\sigma^2/\delta^2$ 算够用即可，并预留独立评测集、做多重比较校正。</div>
+  </details>
+  <details>
+    <summary>Bootstrap 区间和解析区间差了一点，该信哪个？</summary>
+    <div class="faq-a">大样本、比例不极端时两者应当接近，差异主要来自「是否假设正态」。Bootstrap 不假设分布、能用于中位数、比率等任意统计量；但它依赖「样本能代表总体」与足够大的 $B$，小样本或分布偏斜时覆盖率会有偏差，也救不了系统性偏差。工业界常把解析区间作在线判定、把 Bootstrap 留作离线复核；两者明显背离时，先怀疑数据里有异常值或分组不独立。</div>
+  </details>
+  <details>
+    <summary>一次实验同时看 20 个指标，直接对每个用 $p \lt 0.05$ 有什么问题？</summary>
+    <div class="faq-a">至少出现一次假阳性的概率是 $1-(1-0.05)^{20}\approx 64\%$。这是多重比较问题，也是 p-hacking 的温床。对策：预先注册主指标、把门槛收紧为 $\alpha/m$（Bonferroni）、或用 Benjamini–Hochberg 控制错误发现率 FDR。注意校正改的是<strong>显著性门槛</strong>，不是重新算一遍数据。</div>
+  </details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测 · 置信区间、p 值与两比例检验</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">某次抽样算出 95% 置信区间 $(48.7, 55.3)$。下列哪一句是频率学派认可的表述？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q1" value="A"> A. $\mu$ 有 95% 的概率落在 $(48.7, 55.3)$ 里</label>
+      <label class="quiz-opt"><input type="radio" name="m05q1" value="B"> B. 区间内每个值都是 95% 可能的真值</label>
+      <label class="quiz-opt"><input type="radio" name="m05q1" value="C"> C. 用同样方法重复抽样，约 95% 的这类区间会覆盖真值</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$$\mathbb{P}_\mu(\mu\in[L(\mathbf X),U(\mathbf X)])=1-\alpha$$ 里随机的是样本与区间端点，$\mu$ 固定。A 把参数当随机量（属于贝叶斯可信区间的说法），B 给区间内每点分配概率（置信区间不做这件事），C 才是对「构造程序」长期覆盖率的陈述。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">保持真实效应 $\delta=0.02\sigma$ 不变，把样本量从 $10^3$ 增到 $10^6$，$z$ 与 $p$ 会怎样？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q2" value="A"> A. $z$ 不变，$p$ 不变</label>
+      <label class="quiz-opt"><input type="radio" name="m05q2" value="B"> B. $z$ 按 $\sqrt n$ 增大约 $31.6$ 倍，$p$ 趋近 0，但效应量没变</label>
+      <label class="quiz-opt"><input type="radio" name="m05q2" value="C"> C. $p$ 增大，因为大样本噪声更多</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$z=\sqrt n\,\delta/\sigma$，$n$ 增 $1000$ 倍则 $z$ 增 $\sqrt{1000}\approx31.6$ 倍；$p=2[1-\Phi(|z|)]$ 随之趋近 0。效应量 $\delta$ 与 $n$ 无关，始终没变。C 把方向说反了：大样本恰恰让 $\mathrm{SE}=\sigma/\sqrt n$ 更小。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">两比例 $z$ 检验中，$\bar p=(k_1+k_2)/(n_1+n_2)$ 用在哪个环节？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q3" value="A"> A. 检验统计量的合并标准误 $\mathrm{SE}_0$</label>
+      <label class="quiz-opt"><input type="radio" name="m05q3" value="B"> B. 差值 $\hat\delta$ 的 95% 置信区间</label>
+      <label class="quiz-opt"><input type="radio" name="m05q3" value="C"> C. 两组各自的 Wilson 区间</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\bar p$ 是「假定 $H_0:p_1=p_2$ 成立」时的共同比例，只属于检验的合并标准误 $\mathrm{SE}_0=\sqrt{\bar p(1-\bar p)(1/n_1+1/n_2)}$。差值区间不假设相等，要用不合并的 $\mathrm{SE}_\Delta$；Wilson 区间则各自用本组的 $\hat p_i$。混用会破坏「CI 不含 0 ⟺ 拒绝 $H_0$」的对偶性。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">贯穿案例中 $z=13.4924$、$\mathrm{ATE}=+0.1232$、95% CI $[0.1054,0.1409]$。最完整的结论是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q4" value="A"> A. $p$ 极小，说明学习小组的效果极其巨大</label>
+      <label class="quiz-opt"><input type="radio" name="m05q4" value="B"> B. 只报 $p$ 值就够了，效应量可以省略</label>
+      <label class="quiz-opt"><input type="radio" name="m05q4" value="C"> C. 提升约 12.3 个百分点、区间窄且不含 0、几乎不可能是噪声；$z$ 很大部分源于 $n=12000$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：黄金三件套是「效应量 + 置信区间 + $p$ 值」。$\mathrm{ATE}=0.1232$ 才是业务价值，$\mathrm{SE}_0=0.009129$ 被 $n=12000$ 压得很小才让 $z$ 高达 $13.49$；区间 $[0.1054,0.1409]$ 说明估计精度高。A 把 $p$ 值当效应量，B 丢掉了决策最需要的信息。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">四格表中有一个期望频数为 $3$，其余都很大。此时应该？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q5" value="A"> A. 照常做 $z$ 检验，$n$ 已经够大了</label>
+      <label class="quiz-opt"><input type="radio" name="m05q5" value="B"> B. 改用 Fisher 精确检验，或合并类别 / 用 Wilson 与 Bootstrap 复核</label>
+      <label class="quiz-opt"><input type="radio" name="m05q5" value="C"> C. 把 $\alpha$ 调大到 $0.20$ 让结果显著</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：期望频数 $\lt 5$ 时正态近似的前提已破，$z$ 与 $\chi^2$ 的 $p$ 值都不可靠。Fisher 精确检验基于超几何分布、不依赖渐近近似；Wilson 区间在小样本下也不会越出 $[0,1]$。C 是典型的 p-hacking，$\alpha$ 必须在看数据之前定好。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+<h2 id="d-figures">本章图示汇总</h2>
+<figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s7">7 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>设 $X\sim \mathrm{Exp}(\lambda)$，样本均值 $\bar{x}=5$，求 $\lambda$ 的矩估计（提示：$\mathbb{E}(X)=1/\lambda$）。</li>
+          <li>抛一枚硬币 10 次出现 7 次正面，写出伯努利参数 $p$ 的似然函数，并求 $p$ 的 MLE。</li>
+          <li>某课程随机抽取 $n=36$ 名学生，$\bar{x}=120$ 分，$s=15$ 分。求 $\mu$ 的 95% 置信区间（$t_{0.025,35}=2.030$）。</li>
+          <li>工厂声称次品率不超过 $5\%$。抽检 $n=200$ 件发现 16 件次品。在 $\alpha=0.05$（单侧）下检验该声称是否成立（$z_{0.05}=1.645$）。</li>
+          <li>掷骰子 60 次，各面出现次数为 $15,\ 8,\ 12,\ 10,\ 9,\ 6$。用 $\chi^2$ 拟合优度检验判断骰子是否均匀（$\alpha=0.05$，$\chi^2_{0.05,5}=11.070$）。</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> 令 $\dfrac1\lambda = \bar{x} = 5 \Rightarrow \hat{\lambda}_{\mathrm{MOM}} = 0.2$。</p>
+            <p><strong>2.</strong> $L(p) = p^{7}(1-p)^{3}$；$\ell = 7\ln p + 3\ln(1-p)$；$\dfrac{d\ell}{dp} = \dfrac7p - \dfrac{3}{1-p} = 0 \Rightarrow \hat{p} = 0.7 = \bar{x}$。</p>
+            <p><strong>3.</strong> $\mathrm{SE} = \dfrac{15}{\sqrt{36}} = 2.5$，$E = 2.030\times 2.5 = 5.075$，95% CI $= 120 \pm 5.08 = (114.93,\ 125.08)$。</p>
+            <p><strong>4.</strong> $H_0: p \le 0.05$，$H_1: p &gt; 0.05$。$\hat{p} = 0.08$，$z = \dfrac{0.08-0.05}{\sqrt{0.05\times 0.95/200}} = \dfrac{0.03}{0.0154} \approx 1.95$。$1.95 &gt; 1.645$（$p\approx 0.026$），<strong>拒绝 $H_0$</strong>：有证据认为次品率超过 5%。</p>
+            <p><strong>5.</strong> 期望频数 $E = 60/6 = 10$ 各面相同。$\chi^2 = \dfrac{(15-10)^2+(8-10)^2+(12-10)^2+(10-10)^2+(9-10)^2+(6-10)^2}{10} = \dfrac{25+4+4+0+1+16}{10} = 5.0$。$df=5$，$5.0 &lt; 11.070$，<strong>不拒绝均匀假设</strong>：数据与均匀骰子相容。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <h2 id="s8">8 · 本章小结</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>主题</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>点估计</td><td>无偏/有效/一致三标准；矩估计令样本矩 = 总体矩</td></tr>
+            <tr><td>最大似然</td><td>求让数据最可能的参数；正态给 $\bar{x}$ 与 $\frac1n\sum(x_i-\bar{x})^2$；伯努利给 $\hat{p}=\bar{x}$</td></tr>
+            <tr><td>置信区间</td><td>点估计 ± 临界值 × 标准误；95% 指「方法的长期覆盖频率」，不是参数的概率</td></tr>
+            <tr><td>样本量</td><td>$n = (z_{\alpha/2}\sigma/E)^2$，与 $E^2$ 成反比</td></tr>
+            <tr><td>假设检验</td><td>五步流程；$\alpha$（误报）与 $\beta$（漏报）；拒绝 / 不拒绝 $H_0$</td></tr>
+            <tr><td>p 值</td><td>$H_0$ 为真时出现更极端数据的概率；不是 $H_0$ 的概率，也不是效应大小</td></tr>
+            <tr><td>t 与双样本</td><td>单样本 t、Welch 双样本 t、配对 t（对差值做单样本）</td></tr>
+            <tr><td>$\chi^2$ 检验</td><td>拟合优度与独立性；$E_{ij} = \text{行和}\times\text{列和}/n$</td></tr>
+            <tr><td>多重比较</td><td>检验次数多则假阳性暴涨；Bonferroni 用 $\alpha/m$ 校正</td></tr>
+            <tr><td>效应量</td><td>Cohen's d（0.2/0.5/0.8）；显著 ≠ 重要，报告须配效应量与 CI</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：估计与检验。</strong>为总体完课率构造 Wilson 区间；对干预组/对照组做两比例 z 检验。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="current" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="../resources.html#r-b16">Computer Age Statistical Inference</a> <span class="muted small">（2016 · 权威共识）</span><span class="fr-why">为什么读：Efron &amp; Hastie 系统对比频率学、贝叶斯与重采样三条推断路线。</span></span></div><div class="fr-item"><span class="fr-tag">理论</span><span class="fr-body"><a href="../resources.html#r-t08">Bootstrap 重采样</a> <span class="muted small">（1979 · 权威共识）</span><span class="fr-why">为什么读：Bootstrap 原始里程碑条目，配合本章重采样部分。</span></span></div><div class="fr-item"><span class="fr-tag">理论</span><span class="fr-body"><a href="../resources.html#r-t06">Neyman–Pearson 引理与假设检验</a> <span class="muted small">（1933 · 权威共识）</span><span class="fr-why">为什么读：Neyman–Pearson 引理条目：检验功效与两类错误的理论边界。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div class="muted small">继续学习下一章，或标记本章完成以记录进度。</div>
+        <button class="btn primary" data-complete-btn="m05">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m04-distributions.html"><span class="dir">← 上一篇</span><span class="ttl">04 · 随机变量与常见分布</span></a>
+        <a class="next" href="m06-regression.html"><span class="dir">下一篇 →</span><span class="ttl">06 · 回归分析</span></a>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索概念、公式、例题…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索章节、概念、公式或例题。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

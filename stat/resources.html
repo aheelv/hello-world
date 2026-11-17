@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>资源库 · 统计 · 智能学习体系</title>
+<meta name="description" content="可筛选的统计学、大数据、机器学习、深度学习、神经网络与生成式 AI 资源库，含来源、年份、权威性与核验状态。">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/learning.css">
+<link rel="stylesheet" href="assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="resources" data-prefix="">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="roadmap.html">路线图</a>
+    <a class="icon-btn" href="resources.html">资源库</a>
+    <a class="icon-btn" href="timeline.html">时间线</a>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+      <article class="module">
+      <div class="inner">
+      <header class="module-header">
+        <div class="crumbs"><a href="index.html">首页</a> / 资源库</div>
+        <h1>资源库 · 可检索可筛选</h1>
+        <p class="lead">八类共 168 条资源，覆盖标志性书籍、标志性理论、关键论文、里程碑模型、经典课程、数据集、通用工具/框架与开源资源。每条标注来源、年份、权威性、适用阶段、核验状态与更新时间。</p>
+        <div class="module-meta">
+          <span class="badge brand">168 条资源</span> <span class="badge info">8 个类型</span>
+          <span class="badge ok">42 条已核验</span> <span class="badge warn">23 条待核验</span>
+          <span class="badge ">更新 2026-11-07</span>
+        </div>
+      </header>
+
+      <h2 id="policy">1 · 收录与核验规则</h2>
+      <div class="callout note">
+        <div class="callout-title">为什么有的条目标「待核验」</div>
+        <p>本轮构建对每条资源区分三种状态。<strong>已核验</strong>表示检索命中官方论文页、出版社页、官方仓库或官方公告；<strong>权威共识</strong>表示学界通行引用的经典条目，链接为官方固定入口，年份按通行引用，但未在本轮逐条打开复核；<strong>待核验</strong>表示年份、版次、出处或服务状态存在不确定，卡片中会写明具体不确定点。</p>
+        <p>权威等级另分三级：一级官方一手、二级学术机构、三级社区维护。任何「待核验」条目都不应作为定论引用。</p>
+      </div>
+      <div class="legend-grid"><div class="legend-item"><strong>已核验</strong>已核验：本轮检索命中官方论文页 / 出版社页 / 官方仓库 / 官方公告</div><div class="legend-item"><strong>权威共识</strong>权威共识：学界通行引用的经典条目，链接为官方固定入口，年份按通行引用；未在本轮逐条打开复核</div><div class="legend-item"><strong>待核验</strong>待核验：年份、版次、出处或状态存在不确定，暂不作为定论引用</div><div class="legend-item"><strong>一级</strong>一级 · 官方一手（出版社 / 期刊 / 会议 / 官方仓库 / 官方公告）</div><div class="legend-item"><strong>二级</strong>二级 · 学术机构（大学课程页 / 综述 / 研究机构）</div><div class="legend-item"><strong>三级</strong>三级 · 社区维护（开源社区 / 百科 / 聚合站点）</div></div>
+      <div class="callout tip">
+        <div class="callout-title">按阶段或年代直达</div>
+        <p>阶段页中已内置本阶段资源切片；也可直接打开： <a class="chip" href="resources.html?stage=s1">统计学</a> <a class="chip" href="resources.html?stage=s2">大数据</a> <a class="chip" href="resources.html?stage=s3">机器学习</a> <a class="chip" href="resources.html?stage=s4">深度学习</a> <a class="chip" href="resources.html?stage=s5">神经网络</a> <a class="chip" href="resources.html?stage=s6">生成式AI</a></p>
+        <p>年代： <a class="chip" href="resources.html?era=2025%2B">2025 年后</a>
+          <a class="chip" href="resources.html?era=2020s">2020–2024</a>
+          <a class="chip" href="resources.html?era=2010s">2010s</a>
+          <a class="chip" href="resources.html?type=paper">全部论文</a>
+          <a class="chip" href="resources.html?verify=pending">待核验清单</a></p>
+      </div>
+
+      <h2 id="browse">2 · 筛选浏览</h2>
+      <div id="library-app">
+        <div class="filter-bar">
+          <div class="filter-row"><span class="filter-label">关键词</span>
+            <input class="field grow" id="lib-q" type="search" placeholder="名称 / 作者 / 出处 / 年份 / 说明，例如：Transformer、共形、DeepSeek、教材">
+          </div>
+          <div class="filter-row"><span class="filter-label">类型</span><div class="chips" id="lib-types"></div></div>
+          <div class="filter-row">
+            <span class="filter-label">条件</span>
+            <select class="field" id="lib-stage"><option value="all">全部阶段</option><option value="s1">阶段 1 · 统计学</option><option value="s2">阶段 2 · 大数据分析</option><option value="s3">阶段 3 · 机器学习</option><option value="s4">阶段 4 · 深度学习</option><option value="s5">阶段 5 · 神经网络</option><option value="s6">阶段 6 · 生成式 AI</option></select>
+            <select class="field" id="lib-verify">
+              <option value="all">全部核验状态</option>
+              <option value="verified">仅已核验</option>
+              <option value="canonical">仅权威共识</option>
+              <option value="pending">仅待核验</option>
+            </select>
+            <select class="field" id="lib-era">
+              <option value="all">全部年代</option>
+              <option value="-2000">2000 年前</option>
+              <option value="2000s">2000–2009</option>
+              <option value="2010s">2010–2019</option>
+              <option value="2020s">2020–2024</option>
+              <option value="2025+">2025 年后</option>
+            </select>
+            <select class="field" id="lib-sort">
+              <option value="year-desc">年份：新 → 旧</option>
+              <option value="year-asc">年份：旧 → 新</option>
+              <option value="verify">核验状态优先</option>
+              <option value="name">按名称</option>
+            </select>
+            <button class="btn" id="lib-reset">重置筛选</button>
+          </div>
+        </div>
+        <div class="filter-summary" id="lib-count"></div>
+        <div id="lib-list"></div>
+      </div>
+      <noscript><div class="callout warn"><p>筛选功能需要 JavaScript。本站为纯静态页面，浏览器启用脚本后即可使用（离线环境同样有效）。</p></div></noscript>
+
+      <h2 id="update">3 · 如何持续更新</h2>
+      <p>所有资源记录集中存放在 <code>data/resources.json</code>，阶段与时间线分别在 <code>data/core.json</code>、<code>data/timeline.json</code>。新增一条资源只需追加一条 JSON 记录，然后运行：</p>
+      <pre><code>python assets/js/build-site.py</code></pre>
+      <p>生成器会重建配置、运行时数据、六个阶段页与本页依赖的搜索索引。完整字段说明见 <a href="DATA-GUIDE.md">数据维护说明</a>。</p>
+
+      <div class="flex-between mt-6">
+        <div><a class="btn" href="index.html">← 返回首页</a> <a class="btn" href="roadmap.html">路线图</a> <a class="btn" href="timeline.html">时间线</a></div>
+        <a class="btn primary" href="stages/statistics.html">从阶段 1 开始 →</a>
+      </div>
+      </div>
+      </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="resources.html">资源库</a> · <a href="timeline.html">时间线</a> · <a href="glossary.html">术语表</a> · <a href="roadmap.html">学习路线图</a> · <a href="DATA-GUIDE.md">数据维护说明</a> · <a href="TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索阶段、概念、资源、论文…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索全站内容。例如：置信区间、Transformer、共形预测、DeepSeek-R1。</div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendor/katex/dist/katex.min.js"></script>
+<script src="assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/site-data.js"></script>
+<script src="assets/js/search-index.js"></script>
+<script src="assets/js/learning-index.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/site-ui.js"></script>
+<script src="assets/js/learning.js"></script>
+</body>
+</html>

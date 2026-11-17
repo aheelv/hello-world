@@ -1,0 +1,386 @@
+<!-- 深度片段 · 模块 05 统计推断：估计与检验 -->
+<!-- 本片段只补充「深度」：正文已有的估计、例题、练习与小结不重复 -->
+
+<h2 id="d-deep-1">深度专题一 · 「95% 置信区间」到底在说什么：把重复抽样真的跑一遍</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：一个让统计学家吵了几十年的句子</h3>
+  <p>正文已经把三种常见误读逐条驳倒，并给出标准答案：「若用同样方法重复抽样无数次，约 95% 的区间会覆盖真值」。本专题要再往下挖两层：这个句子是<strong>怎么被构造出来的</strong>，以及<strong>为什么手里这一个具体的区间不能谈概率</strong>。</p>
+  <p>历史上这里有两条路线。Fisher 在 1930 年代提出 fiducial inference，想给「参数落在某区间」一个类似概率的陈述；Neyman 与 Pearson 在 1933–1937 年另起炉灶，把区间估计定义成一种<strong>决策程序</strong>：先固定一个规则，再要求这个规则在长期重复中达到指定的覆盖率。频率学派今天采用的正是 Neyman 的版本。Efron 与 Hastie 在 <em>Computer Age Statistical Inference</em> 第 2 章用一张「纵向排列的多次实验、约 95% 的区间压住真值竖线」的图，把这个定义画成了最直观的样子——本站的经典配图就是它。</p>
+  <p>工程上这不是咬文嚼字。A/B 平台每天产出上千个「提升 $+2.1\%$，95% CI $[0.3\%, 3.9\%]$」，若把 95% 理解成「这次有 95% 把握」，就会把「长期误报率 5%」误当成「单次结论的可信度 95%」，进而在多重比较、peeking（提前看数据）等场景里系统性地高估证据。</p>
+
+  <h3>直觉：随机的不是参数，是「网」</h3>
+  <p>把真值 $\mu$ 想成地上一个<strong>固定不动</strong>的靶点，把置信区间想成每次抽样时随手撒出去的一张<strong>网</strong>。网会落在哪里是随机的（因为样本随机），靶点却从不移动。所谓「95% 置信」，说的是<strong>这张撒网的手法</strong>：重复撒一万次，约 9500 次网罩住靶点。</p>
+  <p>一旦某次抽样结束、区间算出来（比如 $(48.7, 55.3)$），网已经落地，靶点也早已固定——此时「罩住 / 没罩住」是既成事实，只是我们不知道。频率学派拒绝说「$\mu$ 有 95% 概率在区间里」，因为那等于把固定的靶点重新当成了随机量。<strong>概率描述的是撒网之前的程序，不是撒网之后的结果。</strong></p>
+  <p>一个能立刻说服人的反问：若区间算出来是 $(48.7, 55.3)$，而业务常识告诉我们 $\mu$ 不可能大于 $50$，那么「这个区间有 95% 概率含真值」显然荒唐——但频率学派的陈述毫发无伤，因为它只承诺「这类区间长期覆盖 95%」，对眼前这一个区间不下概率断言。这也是为什么报告结果时必须同时给点估计、区间与业务背景。</p>
+  <p>还有一层常被忽略的区别：<strong>覆盖率（coverage）与精度（precision）是两件事</strong>。95% 是覆盖率的承诺，区间宽度才是精度。一个永远输出 $(-\infty,+\infty)$ 的规则覆盖率 100%，却毫无用处；反过来，窄到只含一个点的区间精度极高，覆盖率却接近 0。评价一个区间方法要看两者是否兼顾。</p>
+
+  <h3>形式化：从「枢轴量」把区间反解出来</h3>
+  <p>置信区间不是拍脑袋写的「点估计 $\pm$ 某个数」，而是从<strong>枢轴量（pivot）</strong>反解出来的。枢轴量是一个「含参数、但分布不依赖参数」的函数，这是整个构造能成立的关键。</p>
+  <div class="formula-box">
+    <div class="f-name">枢轴量与区间反解（以 $\sigma$ 已知的均值区间为例）</div>
+    $$ Q=\frac{\bar{X}-\mu}{\sigma/\sqrt{n}}\ \sim\ N(0,1) $$
+    $$ \mathbb{P}\!\left(-z_{\alpha/2}\le Q \le z_{\alpha/2}\right)=1-\alpha \quad\Longleftrightarrow\quad \mathbb{P}_{\mu}\!\left(\bar{X}-z_{\alpha/2}\frac{\sigma}{\sqrt n}\le\mu\le\bar{X}+z_{\alpha/2}\frac{\sigma}{\sqrt n}\right)=1-\alpha $$
+    <div class="f-note">白话：第一行说「样本均值减真值、再除以标准误」服从标准正态——注意 $Q$ 里含有未知的 $\mu$，但它的分布 $N(0,1)$ <strong>不依赖 $\mu$</strong>，这正是「枢轴」的含义。第二行把不等式对 $\mu$ 反解，随机性全部转移到两端点上，于是得到随机区间 $L(\mathbf{X})=\bar X - z_{\alpha/2}\sigma/\sqrt n$、$U(\mathbf{X})=\bar X + z_{\alpha/2}\sigma/\sqrt n$。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">覆盖率是「程序的性质」，不是「结果的概率」</div>
+    $$ \mathbb{P}_{\mu}\!\left(\,\mu\in\left[L(\mathbf{X}),\,U(\mathbf{X})\right]\,\right)=1-\alpha \qquad \text{对一切 } \mu \text{ 成立} $$
+    <div class="f-note">白话：式子里的概率下标是 $\mu$、随机的是样本 $\mathbf{X}$（因而区间端点随机）。它对<strong>每一个可能的真值 $\mu$</strong> 都成立，所以叫「一致覆盖率」。而拿到具体数据后，$L,U$ 变成两个普通数字，$\mu\in[L,U]$ 是一个非真即假的命题，没有概率可言。要给它分配概率，必须引入先验分布，那是贝叶斯可信区间（credible interval）的领域——两者数值可以相近，含义完全不同。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">重复抽样的极限频率（大数定律把定义落地）</div>
+    $$ \frac{1}{B}\sum_{b=1}^{B}\mathbf{1}\!\left\{\mu\in\left[L(\mathbf{X}^{(b)}),\,U(\mathbf{X}^{(b)})\right]\right\}\ \xrightarrow[B\to\infty]{\text{LLN}}\ 1-\alpha=0.95 $$
+    <div class="f-note">白话：做 $B$ 次独立抽样、每次按同一公式造一个区间，数一数有多少个压住真值。$B\to\infty$ 时这个频率趋近 0.95。这正是本专题代码实验 [1] 要亲手跑的东西：把「95%」从一个抽象定义变成屏幕上一个可以数的比例。若把 $\alpha$ 改成 $0.10$，覆盖率会稳定在 $0.90$；若把 $n$ 改小但 $\sigma$ 已知，覆盖率仍是 $0.95$（只是区间变宽）——<strong>覆盖率由公式与 $\alpha$ 决定，宽度由 $n$ 与 $\sigma$ 决定</strong>。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">与假设检验的对偶：区间 = 没被拒绝的参数集合</div>
+    $$ \text{不拒绝 } H_0:\mu=\mu_0 \iff \left|\frac{\bar x-\mu_0}{\sigma/\sqrt n}\right|\le z_{\alpha/2} \iff \mu_0\in\left[\bar x\pm z_{\alpha/2}\frac{\sigma}{\sqrt n}\right] $$
+    <div class="f-note">白话：把所有「在 $\alpha$ 水平下不会被拒绝」的 $\mu_0$ 收集起来，恰好就是那个 $1-\alpha$ 置信区间。这解释了为什么「CI 不含 0」与「$p \lt 0.05$」总是一致，也解释了为什么区间比单看 $p$ 值更有信息量：它一次性给出<strong>所有与数据相容的参数值</strong>以及估计的精度。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    95% 是<strong>构造区间的程序</strong>在长期重复抽样中的覆盖率，由枢轴量的分布与 $\alpha$ 决定；对已经算出的那一个具体区间，频率学派不作任何概率陈述。覆盖率与区间宽度是两项独立指标；区间同时还是「未被拒绝的假设集合」，因此报告结论时应给出「点估计 + 区间 + $p$ 值」，而不是只给一个百分数。
+  </div>
+
+  <p><strong>边界：</strong>在样本量很小且总体明显非正态、样本之间不独立（时间序列自相关、群聚抽样）、或 $\sigma$ 被异常值严重污染的条件下，本结论不成立，应改用 $t$ 区间配合稳健标准误、自助法（bootstrap）百分位区间或分区重抽样，而不能用 $\bar x \pm 1.96\,\sigma/\sqrt n$ 的名义覆盖率来承诺 95%。</p>
+
+  <figure data-classic="0"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 为什么样本量一大，再小的效应也会「显著」：p 值与效应量的分家</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：「极显著」不等于「很重要」</h3>
+  <p>正文的黄金三件套（$p$ 值 + 效应量 + 置信区间）已经点出结论，本专题给出<strong>定量机制</strong>：为什么 $n$ 增大会把 $p$ 值机械地推向 0，以及这个机制在什么前提下才会触发。</p>
+  <p>这不是新问题。Cohen 在 1960–80 年代推动「效应量」运动，正是因为心理学与医学文献里充斥着「$p \lt 0.001$ 但差异小到没有临床意义」的报道；2016 年美国统计协会（ASA）专门发布关于 $p$ 值的声明，第一条就是「$p$ 值不度量效应大小或结果的重要性」。到了大模型时代它更尖锐：A/B 平台流量动辄百万，两个提示词版本的准确率差 $0.2$ 个百分点也能得到天文数字般的 $z$ 值，若只看 $p$ 值就会不断「上线」毫无价值的小改动。</p>
+  <p>本站贯穿案例正好是一个绝佳标本：干预组与对照组各 $6000$ 人，完课率差 $\mathrm{ATE}=+0.1232$，两比例 $z$ 检验给出 $z=13.4924$。这个 $z$ 大得惊人，但真正该被决策层读到的不是「极显著」，而是「$12.3$ 个百分点的提升，且置信区间很窄」。<strong>$z$ 是「效应 $\times$ $\sqrt n$」的产物，把它单独拎出来看，等于把样本量的功劳算到了效应头上。</strong></p>
+
+  <h3>直觉：显微镜与放大镜</h3>
+  <p>$p$ 值回答的是「这点差异有没有可能只是噪声」。样本量越大，我们对噪声的估计越精确，标准误 $\mathrm{SE}=\sigma/\sqrt n$ 越小——就像换了一台倍数更高的显微镜，再小的颗粒也看得见。<strong>但颗粒本身没变大。</strong></p>
+  <p>把检验统计量想成「信号 ÷ 噪声」：$\hat\delta$ 是信号（效应量，不随 $n$ 变），$\mathrm{SE}$ 是噪声（随 $n$ 增大按 $1/\sqrt n$ 缩小）。$n$ 翻 $100$ 倍，噪声缩到 $1/10$，$z$ 就放大 $10$ 倍，哪怕信号一动不动。于是任何非零的固定效应，只要 $n$ 够大，最终都会 $p \lt 0.05$。</p>
+  <p>反过来也成立：一个很大的真实效应，在小样本里可能因为噪声太大而「不显著」。所以「不显著」从不等于「没效应」，只说明「这次的显微镜倍数不够」。<strong>把 $p$ 值当成功效的刻度尺，是把「看得见」误当成「大」。</strong></p>
+
+  <h3>形式化：$z$ 里那个显眼的 $\sqrt n$</h3>
+  <div class="formula-box">
+    <div class="f-name">检验统计量 = 效应量 $\times \sqrt n$</div>
+    $$ z=\frac{\hat\delta}{\mathrm{SE}}=\frac{\hat\delta}{\sigma/\sqrt{n}}=\sqrt{n}\cdot\frac{\hat\delta}{\sigma}, \qquad p=2\left[1-\Phi(|z|)\right] $$
+    <div class="f-note">白话：$\hat\delta$ 是观测到的差异（如两组比例差、均值差），$\sigma$ 是单次观测的标准差，都是<strong>不随 $n$ 变</strong>的量；唯一的 $n$ 以 $\sqrt n$ 的形式乘在最前面。$\Phi$ 是标准正态 CDF。所以对任意固定的 $\hat\delta \ne 0$，当 $n\to\infty$ 时 $|z|\to\infty$、$p\to 0$。<strong>$p$ 值是 $\hat\delta$ 与 $n$ 的联合产物，不能单独反推效应大小。</strong></div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">与样本量公式对照：两条方向相反的曲线</div>
+    $$ n\ \approx\ \frac{\left(z_{\alpha/2}+z_{\beta}\right)^{2}\sigma^{2}}{\delta^{2}} \qquad\Longleftrightarrow\qquad \delta_{\min}\ \approx\ \left(z_{\alpha/2}+z_{\beta}\right)\frac{\sigma}{\sqrt n} $$
+    <div class="f-note">白话：左式是「要以功效 $1-\beta$ 检出大小为 $\delta$ 的效应，需要多少样本」，右式把它反过来读——「给定 $n$，这台显微镜能分辨的最小效应 $\delta_{\min}$」。$n$ 越大 $\delta_{\min}$ 越小。实验设计阶段就该先定业务上值得关心的 $\delta_{\min}$（最小重要差异），再算需要的 $n$；若反过来「先跑够流量再看 $p$」，就必然掉进「微小效应也显著」的陷阱。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">用贯穿案例把三件套摆在一起</div>
+    $$ \hat\delta=\mathrm{ATE}=0.5588-0.4357=0.1232, \qquad \mathrm{SE}_{\text{pooled}}=0.009129, \qquad z=\frac{0.1232}{0.009129}=13.4924 $$
+    $$ 95\%\ \mathrm{CI}(\hat\delta):\ 0.1232\pm 1.96\times 0.009059=\left[0.1054,\ 0.1409\right] $$
+    <div class="f-note">白话：效应量 $0.1232$（约 $12.3$ 个百分点）与样本量无关，是业务价值所在；$z=13.4924$ 与 $p$ 值是「效应 $\times$ $\sqrt{12000}$」的结果，主要反映样本量大；置信区间 $[0.1054,0.1409]$ 则同时给出方向与精度。三者合起来才完整：<strong>效应确实不小、估计很准、且几乎不可能是噪声</strong>。若只报 $p$ 值，读者既不知道提升多大，也不知道估计多稳。</div>
+  </div>
+
+  <p>把「固定微小效应 $\delta = 0.02\sigma$」在不同 $n$ 下的 $z$ 与 $p$ 列出来，就能看清 $p$ 值如何被 $n$ 单方面推动：</p>
+  <div class="table-wrap">
+    <table>
+      <caption>表 · 同一个效应量，$n$ 增大时 $z$ 与 $p$ 的变化（代码实验 [2] 的真实输出）</caption>
+      <thead><tr><th>样本量 $n$</th><th>$z=\delta\sqrt n$</th><th>双侧 $p$</th><th>$\alpha=0.05$ 下</th><th>效应量 $\delta$</th></tr></thead>
+      <tbody>
+        <tr><td>$10^2$</td><td>$0.20$</td><td>$\approx 0.84$</td><td>不显著</td><td>$0.02\sigma$（没变）</td></tr>
+        <tr><td>$10^3$</td><td>$0.63$</td><td>$\approx 0.53$</td><td>不显著</td><td>$0.02\sigma$（没变）</td></tr>
+        <tr><td>$10^4$</td><td>$2.00$</td><td>$\approx 0.046$</td><td>刚显著</td><td>$0.02\sigma$（没变）</td></tr>
+        <tr><td>$10^5$</td><td>$6.32$</td><td>$\approx 3\times 10^{-10}$</td><td>极显著</td><td>$0.02\sigma$（没变）</td></tr>
+        <tr><td>$10^6$</td><td>$20.00$</td><td>$\approx 0$</td><td>极显著</td><td>$0.02\sigma$（没变）</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>整张表里效应量始终是 $0.02\sigma$，业务上可以忽略；但 $p$ 值从 $0.84$ 一路掉到 $0$。<strong>若只看最后一行就宣布「发现重大规律」，就是把样本量误读成了重要性。</strong></p>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    $z=\sqrt n\cdot\hat\delta/\sigma$，$p=2[1-\Phi(|z|)]$：对任何固定的非零效应，$n\to\infty$ 必有 $p\to 0$。<strong>$p$ 值衡量「数据与零假设的不相容程度」，效应量衡量「差异有多大」，两者是不同维度的量</strong>。决策应以「最小重要差异 $\delta_{\min}$ + 置信区间是否整体越过它」为准，而不是以 $p$ 是否小于 $0.05$ 为准。
+  </div>
+
+  <p><strong>边界：</strong>在原假设严格为真（真实效应 $\delta = 0$）、样本之间存在强相关使「有效样本量」不再随 $n$ 增长、或存在增大 $n$ 也无法消除的系统性偏差（测量偏置、选择偏差）的条件下，本结论不成立，应改用效应量与置信区间为主、以重抽样或稳健标准误评估证据，并优先排查偏差来源，而不是继续堆样本量追求更小的 $p$ 值。</p>
+
+  <figure data-figure="curve-clt"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 两比例 $z$ 检验（含 Wilson 区间与自助法对照）</h2>
+
+<div class="algo-spec">
+
+  <h3>原理：把「两组比例之差」标准化成一把尺子</h3>
+  <p>问题：有两组独立的二分类观测（干预组 / 对照组、新版本 / 旧版本），想判断两组的总体比例 $p_1,p_2$ 是否相同。令</p>
+  <div class="formula-box">
+    <div class="f-name">两比例 $z$ 统计量（合并方差版）</div>
+    $$ \hat p_1=\frac{k_1}{n_1},\quad \hat p_2=\frac{k_2}{n_2},\quad \bar p=\frac{k_1+k_2}{n_1+n_2} $$
+    $$ \mathrm{SE}_{0}=\sqrt{\bar p(1-\bar p)\left(\frac{1}{n_1}+\frac{1}{n_2}\right)}, \qquad z=\frac{\hat p_1-\hat p_2}{\mathrm{SE}_{0}} $$
+    <div class="f-note">白话：$\bar p$ 是「假设两组真的没差别」时，把两组合起来算出的共同比例；$\mathrm{SE}_0$ 是<strong>在 $H_0:p_1=p_2$ 成立的前提下</strong>差值 $\hat p_1-\hat p_2$ 的标准误。$z$ 就是「观测到的差异折合成多少个标准误」。由 CLT，两组比例各自近似正态，差也近似正态，故 $H_0$ 下 $z\approx N(0,1)$，可直接用 $\Phi$ 求 $p$ 值。</div>
+  </div>
+  <p>这里有一个容易踩的坑：<strong>检验用合并标准误 $\mathrm{SE}_0$，区间用不合并标准误</strong>。检验时我们「暂且相信 $H_0$ 成立」，所以理应用共同比例 $\bar p$ 估标准误；而给差值 $\hat p_1-\hat p_2$ 构造置信区间时并不假设两组相等，应使用 $\mathrm{SE}_{\Delta}=\sqrt{\frac{\hat p_1(1-\hat p_1)}{n_1}+\frac{\hat p_2(1-\hat p_2)}{n_2}}$。两者数值接近但含义不同，混用会让「CI 是否含 0」与「$p$ 是否小于 $0.05$」出现细微不一致。</p>
+  <p>几何解释：把 $(\hat p_1-\hat p_2)$ 看成一根长度随机、中心在 $0$（$H_0$ 下）的数轴上的箭头；$\mathrm{SE}_0$ 是它的刻度单位。$z=13.4924$ 表示箭头伸到了 $13$ 个刻度之外——在标准正态下这几乎不可能发生，于是拒绝「无差异」。</p>
+
+  <h3>编号步骤：照着做一遍就会</h3>
+  <ol>
+    <li><strong>列四格表。</strong>写出 $n_1,k_1,n_2,k_2$（$k$ 为「成功」数），明确哪组是处理组、谁是参照组，保证两组独立。</li>
+    <li><strong>提假设、定方向与 $\alpha$。</strong>$H_0:p_1=p_2$；$H_1:p_1\ne p_2$（双侧）或 $p_1 \gt p_2$（单侧）。$\alpha$ 必须在看数据<strong>之前</strong>定好，默认 $0.05$。</li>
+    <li><strong>检查适用条件。</strong>每组 $n_i\hat p_i\ge 5$ 且 $n_i(1-\hat p_i)\ge 5$（严格用 $10$）；观测独立；不是配对设计。</li>
+    <li><strong>算比例与合并比例。</strong>$\hat p_1=k_1/n_1$、$\hat p_2=k_2/n_2$、$\bar p=(k_1+k_2)/(n_1+n_2)$，并算出效应量 $\hat\delta=\hat p_1-\hat p_2$。</li>
+    <li><strong>算合并标准误与 $z$。</strong>$\mathrm{SE}_0=\sqrt{\bar p(1-\bar p)(1/n_1+1/n_2)}$，$z=\hat\delta/\mathrm{SE}_0$。</li>
+    <li><strong>求 $p$ 值并下结论。</strong>双侧 $p=2[1-\Phi(|z|)]$；对照 $\alpha$ 写「拒绝 $H_0$」或「不拒绝 $H_0$」，措辞不用「接受」。</li>
+    <li><strong>补全三件套。</strong>用不合并 $\mathrm{SE}_\Delta$ 给出 $\hat\delta$ 的 95% 区间，报告效应量与业务意义；条件可疑时改用 Wilson 区间或 Fisher 精确检验复核。</li>
+  </ol>
+
+  <h3>适用条件</h3>
+  <ul>
+    <li>数据：两组<strong>独立</strong>的二分类计数（成功 / 失败），可整理成 $2\times 2$ 表；配对或重复测量设计应改用 McNemar 检验。</li>
+    <li>规模：每组期望成功数与失败数均 $\ge 5$（严格 $10$）；小样本或极端比例时正态近似失真。</li>
+    <li>分布：由 CLT 保证 $\hat p_i$ 近似正态；总体比例不靠近 $0$ 或 $1$。</li>
+    <li>特征类型：二值标签；不是连续量（连续量用 $t$ 检验），不是多分类（多分类用 $\chi^2$）。</li>
+    <li>工程位置：位于「实验分流 → 埋点聚合 → 显著性判定 → 发版决策」链条的判定环节；上游必须保证随机化与样本比例恒定（SRM 检查），下游是多重比较校正与业务评审。</li>
+  </ul>
+
+  <div class="complexity">
+    <span><b>训练</b>：无需训练，$O(1)$</span>
+    <span><b>推理（单次检验）</b>：时间 $O(1)$，空间 $O(1)$</span>
+    <span><b>对照</b>：Bootstrap $O(B\cdot(n_1+n_2))$，Fisher 精确检验随单元格计数增长</span>
+  </div>
+  <p>说明：解析型 $z$ 检验只做约十次算术加一次 erf，与样本量无关，因此能在在线实验平台里对上千个指标实时判定。Bootstrap 百分位区间要用 $B$ 次有放回重抽样，成本随 $B$ 与样本量线性增长，通常留作离线复核；Fisher 精确检验基于超几何分布，小样本最可靠但大表代价高。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>闭式解、$O(1)$，不需要迭代与第三方库，适合在线实时判定。</li>
+        <li>与 $\chi^2$ 独立性检验在 $2\times2$ 双侧情形等价（$z^2=\chi^2$），结论可互相印证。</li>
+        <li>$\Phi$ 与置信区间共用一套正态近似，解释口径统一。</li>
+        <li>输出直接是「多少个标准误」，便于与效应量、区间一起读。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>缺点</h4>
+      <ul>
+        <li>依赖大样本正态近似；小样本或比例接近 $0/1$ 时会给出错误 $p$ 值。</li>
+        <li>只回答「是否可能为零」，不回答「差异是否值得上线」——见深度专题二。</li>
+        <li>要求观测独立；用户被重复计数、群聚分流会低估标准误、制造假阳性。</li>
+        <li>一次看多个指标需 Bonferroni / FDR 校正，否则整体假阳性率暴涨。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>示例推演：用贯穿案例手算到底（知学云 · 学习小组干预）</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span> 干预组 $n_1=6000,\ k_1=3353$；对照组 $n_2=6000,\ k_2=2614$。双侧 $\alpha=0.05$。共享数字：$\mathrm{ATE}=+0.1232$、$z=13.4924$、$\mathrm{SE}=0.009129$、Wilson95 为 $[0.5462,0.5714]$ 与 $[0.4232,0.4482]$。</div>
+    <div class="solve-step"><span class="ss-k">检查条件。</span> $\hat p_1=3353/6000=0.5588$，$\hat p_2=2614/6000=0.4357$。四格：$n_1\hat p_1=3353$、$n_1(1-\hat p_1)=2647$、$n_2\hat p_2=2614$、$n_2(1-\hat p_2)=3386$，全部 $\gg 10$ ✓，且随机分流保证独立，可用 $z$ 检验。</div>
+    <div class="solve-step"><span class="ss-k">算效应量。</span> $\hat\delta=\hat p_1-\hat p_2=0.5588-0.4357=0.1231\overline{6}\approx 0.1232$，即提升约 $12.32$ 个百分点。</div>
+    <div class="solve-step"><span class="ss-k">算合并比例。</span> $\bar p=\dfrac{3353+2614}{6000+6000}=\dfrac{5967}{12000}=0.49725$；$\bar p(1-\bar p)=0.49725\times0.50275\approx0.249992$。</div>
+    <div class="solve-step"><span class="ss-k">算合并标准误。</span> $\mathrm{SE}_0=\sqrt{0.249992\times\left(\frac1{6000}+\frac1{6000}\right)}=\sqrt{0.249992\times0.00033333}=\sqrt{8.3330\times10^{-5}}=0.0091290$。</div>
+    <div class="solve-step"><span class="ss-k">算 $z$ 与 $p$。</span> $z=\dfrac{0.1231\overline{6}}{0.0091290}=13.4924$；双侧 $p=2[1-\Phi(13.4924)]$，远小于 $10^{-30}$，$\ll 0.05$ → <strong>拒绝 $H_0$</strong>。</div>
+    <div class="solve-step"><span class="ss-k">补区间（用不合并标准误）。</span> $\mathrm{SE}_\Delta=\sqrt{\frac{0.5588\times0.4412}{6000}+\frac{0.4357\times0.5643}{6000}}=\sqrt{4.1087\times10^{-5}+4.0978\times10^{-5}}=0.009059$；$\hat\delta\pm1.96\,\mathrm{SE}_\Delta=0.1232\pm0.0178=[0.1054,\ 0.1409]$，不含 0，与拒绝 $H_0$ 一致。</div>
+    <div class="solve-step"><span class="ss-k">解释（三件套）。</span> 效应量 $+12.32$ 个百分点（大）、95% CI $[0.1054,0.1409]$（窄、精度高）、$p$ 极小（几乎不可能是噪声）。$z=13.4924$ 之所以这么大，一半要归功于 $n=12000$ 把 $\mathrm{SE}_0$ 压到 $0.0091$；换成每组 $600$ 人，同样的效应只会有 $z\approx4.3$，仍显著但不再「天文数字」。<strong>决策看效应与区间，不看 $z$ 的绝对值。</strong></div>
+    <div class="solve-step"><span class="ss-k">边界复核。</span> 两组 Wilson95 $[0.5462,0.5714]$ 与 $[0.4232,0.4482]$ 完全不重叠，直观印证差异；若四格里有期望数 $\lt 5$，本检验作废，应改用 Fisher 精确检验或 Bootstrap。</div>
+  </div>
+
+  <h3>横向对比：判断「两组比例是否不同」的四种工具</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>维度</th><th class="best">两比例 $z$ 检验（本算法）</th><th>Fisher 精确检验</th><th>$\chi^2$ 独立性检验</th><th>Bootstrap 百分位区间</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td class="best">两组独立、$n$ 大、四格期望数 $\ge 5$</td>
+        <td>任意样本量，尤其小样本 / 稀有事件</td>
+        <td>$r\times c$ 列联表，期望频数 $\ge 5$</td>
+        <td>样本可视为总体的代表，统计量可重算</td>
+      </tr>
+      <tr>
+        <th>时间与空间复杂度</th>
+        <td class="best">时间 $O(1)$、空间 $O(1)$</td>
+        <td>随四格计数增长（组合数求和），大表昂贵</td>
+        <td>时间 $O(rc)$、空间 $O(rc)$</td>
+        <td>时间 $O(B(n_1+n_2))$、空间 $O(B)$，$B$ 为重抽样次数</td>
+      </tr>
+      <tr>
+        <th>关键超参数</th>
+        <td class="best">$\alpha$（默认 $0.05$）、单/双侧；无迭代参数</td>
+        <td>单/双侧、边缘是否固定</td>
+        <td>$\alpha$；是否做 Yates 连续性修正</td>
+        <td>$B$（建议 $\ge 1000$）、置信水平、随机种子</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">最快、闭式解、与 CI / $\chi^2$ 口径一致、易上线</td>
+        <td>不依赖渐近近似，$p$ 值精确</td>
+        <td>可推广到多组多分类、能同时检验整张表</td>
+        <td>不假设分布，可给任意统计量（差值、中位数、比率）的区间</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td class="best">小样本 / 极端比例 / 观测相关时失效，应改用 Fisher 或 Bootstrap</td>
+        <td>大表计算量大；只给 $p$ 值，不直接给效应量与区间</td>
+        <td>与 $z$ 检验同样依赖大样本；$2\times2$ 双侧与本算法等价</td>
+        <td>重抽样分布偏斜或小样本时覆盖率偏差；无法修复系统性偏差</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td class="best">「多少个标准误」最直观，纯标准库一行 erf 落地</td>
+        <td>超几何分布解释偏抽象，需组合数实现</td>
+        <td>「观测 vs 期望频数」直观，实现稍繁</td>
+        <td>概念简单但需固定种子与足够 $B$，离线复核成本高</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>选择规则：大样本在线判定用 $z$；小样本或稀有事件用 Fisher；多分类用 $\chi^2$；统计量不是简单比例差、或想摆脱分布假设时，用 Bootstrap 百分位区间。代码实验 [4] 会给出 Bootstrap 的真实结果，可与解析区间 $[0.1054,0.1409]$ 对照。</p>
+
+  <figure data-figure="flow-hypothesis-test"></figure>
+</div>
+
+<h2 id="d-code">代码实验 · 重复抽样看覆盖率、看 p 值随 n 崩塌、手算两比例 z 检验</h2>
+
+<div class="code-lab">
+  <div class="cl-head">
+    <span class="cl-lang">Python 3 · 纯标准库</span>
+    <span>实验：CI 覆盖率仿真 / p-n 关系 / 两比例 z 检验 / Wilson / Bootstrap</span>
+    <span class="cl-grow"></span>
+    <span>固定种子 · 可复现</span>
+  </div>
+  <pre>__PY_CODE__</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout，逐字粘贴自 Bash 执行结果）</div>
+    <pre>__PY_OUTPUT__</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">z_0.975</span>用二分法反解 <code>math.erf</code> 得到 $1.959964$，与全站 Wilson 区间使用的 $z=1.959963985$ 一致——纯标准库不需要查表，也不需要 numpy。</p>
+    <p><span class="ci-k">[1] 覆盖率</span>$B=20000$ 次独立抽样，每次用 $\bar x\pm 1.96\,\sigma/\sqrt{25}$ 造一个区间，<code>observed coverage</code> 落在 $0.95$ 附近（约 $\pm 0.005$ 的蒙特卡洛波动）。这就是「95%」的可数版本：它数的是<strong>区间压住真值的次数比例</strong>，不是「这一个区间含真值的概率」。<code>first 4 intervals</code> 里能看到确实有区间没压住 $\mu_0=50$，正好对应那约 5%。把 $\alpha$ 改成 $0.10$，覆盖率会稳定到 $0.90$；把 $n$ 改成 $100$，覆盖率仍是 $0.95$，只是四个区间都变窄了。</p>
+    <p><span class="ci-k">[2] p 值随 n</span>效应量固定为 $\delta=0.02\sigma$，<code>z</code> 严格按 $\sqrt n$ 增长：$n=10^4$ 时刚越过 $1.96$，$n=10^6$ 时 $p$ 已下溢到 $0$。<code>effect</code> 一列始终没变——这张表就是「$p$ 值不是效应量」的定量证据，也是深度专题二中表格的数据来源。</p>
+    <p><span class="ci-k">[3] 两比例 z 检验</span><code>pooled SE</code> $=0.009129$、<code>z</code> $=13.4924$、<code>ATE</code> $=+0.1232$，与 <code>case-outputs.txt</code> 的共享数字逐位吻合，说明手算的 <code>step-solve</code> 每一步都对。<code>Wilson95</code> 两组区间也 reproduced 为 $[0.5462,0.5714]$ 与 $[0.4232,0.4482]$，完全不重叠。<code>unpooled SE</code> $=0.009059$ 用于差值区间 $[0.1054,0.1409]$，比合并版略小，这是「检验」与「区间」用不同标准误的结果。<code>Cohen's h</code> $\approx0.25$ 是与 $n$ 无关的效应量刻度，可直接用于跨实验比较。</p>
+    <p><span class="ci-k">[4] Bootstrap</span>$B=2000$ 次有放回重抽样得到差值分布，其 2.5% 与 97.5% 分位数构成百分位区间，与解析区间 $[0.1054,0.1409]$ 接近但不完全相同——差异来自「不假设正态、直接用经验分布」。Bootstrap 均值贴近 $0.1232$，说明抽样没有系统性偏移。</p>
+    <p><span class="ci-k">何时会变</span>把 $n_1,n_2$ 各缩小到 $600$（保持比例不变），$z$ 会从 $13.49$ 降到约 $4.3$，效应量不变、区间变宽；把 [2] 的 $\delta$ 设成 $0$，$p$ 会在各 $n$ 下都围绕 $0.5$ 随机波动而不再趋向 0（这正是深度专题二的边界条件）；把 [1] 的 $\sigma$ 换成被极端值污染的估计，覆盖率会明显低于 $0.95$。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr>
+      <th>功能说明</th>
+      <td>把两组二分类计数换算成标准正态尺度上的 $z$ 与 $p$ 值，并配套给出效应量、差值置信区间与 Wilson 区间。<strong>做</strong>：判定「两组比例是否有可检出的差异」、量化差异大小与精度。<strong>不做</strong>：不证明因果（因果需要随机化与识别策略）、不判断差异是否有业务价值、不处理配对 / 重复观测。</td>
+    </tr>
+    <tr>
+      <th>输入 / 输出</th>
+      <td>输入：四个整数 $n_1,k_1,n_2,k_2$（次数，无量纲计数）、显著性水平 $\alpha$、单双侧标记。输出：$z$（无量纲标准分）、$p$（无量纲概率）、$\hat\delta$（比例差，单位为「比例 / 百分点」）、95% CI 与 Wilson 区间（同量纲）。</td>
+    </tr>
+    <tr>
+      <th>适用场景</th>
+      <td>A/B 实验的转化率 / 点击率 / 留存率 / 完课率比较、投放前后对照、两版本模型的二分类指标对比；位于「分流 → 埋点聚合 → 显著性判定 → 发版」链条的判定环节。</td>
+    </tr>
+    <tr>
+      <th>关键参数</th>
+      <td><code>alpha</code>（默认 $0.05$，调小则更保守、需更大样本）；<code>alternative</code>（双侧 / 单侧，必须看数据前定）；<code>pooled</code>（检验用合并标准误，区间用不合并，不可互换）；<code>min_expected</code>（默认 $5$，严格场景设 $10$）；<code>B</code>（Bootstrap 次数，默认 $2000$）。调参方向：想降低假阳性先做多重比较校正与 $\alpha$ 收紧，而不是反复看数据。</td>
+    </tr>
+    <tr>
+      <th>边界条件</th>
+      <td>在任一期望频数 $\lt 5$、比例接近 $0$ 或 $1$、或观测不独立（重复用户、群聚分流、时间序列自相关）的条件下不适用，应改用 Fisher 精确检验、Wilson 区间或 Bootstrap / 分区重抽样；在同时检验多个指标时应改用 Bonferroni 或 Benjamini–Hochberg 控制 FDR；在仅有关联而无随机化时应改用因果推断方法，不得把系数当处置效应。</td>
+    </tr>
+    <tr>
+      <th>常见问题</th>
+      <td>① 把「95% CI」读成「真值有 95% 概率在此」；② 把极小的 $p$ 值当成「效果很大」；③ 检验用不合并标准误、区间用合并标准误，导致「CI 含 0」与「$p \lt 0.05$」互相打架。详见下方常见问题。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details>
+    <summary>算出来 95% CI 是 $(48.7, 55.3)$，到底能不能说「真值有 95% 概率在这里」？</summary>
+    <div class="faq-a">不能。频率学派的 $\mu$ 是固定常数，区间已经落地，「含 / 不含」是既成事实，没有概率。95% 说的是<strong>造区间的那套程序</strong>：重复抽样无数次，约 95% 的区间会罩住真值。若确实要一句「真值落在某范围的概率」，那需要引入先验分布、用贝叶斯可信区间（credible interval），两者数值常接近但含义不同。代码实验 [1] 的覆盖率仿真可以直接看到这个 95% 是怎么数出来的。</div>
+  </details>
+  <details>
+    <summary>$p \lt 0.001$ 是不是说明效果非常大？</summary>
+    <div class="faq-a">不是。$z=\sqrt n\cdot\hat\delta/\sigma$，$p$ 值同时被效应量 $\hat\delta$ 与样本量 $n$ 推动。代码实验 [2] 里效应量固定 $0.02\sigma$（业务上可忽略），$n$ 从 $10^2$ 增到 $10^6$ 时 $p$ 从 $0.84$ 掉到 $0$。正确姿势是同时报<strong>效应量 + 置信区间 + $p$ 值</strong>，并事先定义「最小重要差异 $\delta_{\min}$」，看区间是否整体越过它。</div>
+  </details>
+  <details>
+    <summary>检验和置信区间，为什么一个用合并标准误、一个用不合并？</summary>
+    <div class="faq-a">检验时我们<strong>暂且假定 $H_0:p_1=p_2$ 成立</strong>，于是两组共享同一个真实比例，自然用合并后的 $\bar p$ 估标准误；区间不假设两组相等，要用各自的 $\hat p_i$ 估。两者数值接近（本例 $0.009129$ vs $0.009059$），但混用会破坏「$p \lt 0.05$ ⟺ 95% CI 不含 0」这个对偶关系。口诀：<strong>检验信 $H_0$，区间信数据</strong>。</div>
+  </details>
+  <details>
+    <summary>样本量越大越好吗？</summary>
+    <div class="faq-a">对「估计精度」是的（区间按 $1/\sqrt n$ 变窄、功效上升），但对「决策」不一定。$n$ 极大时任何微小偏差都会显著，容易把无意义的小改动当成成果；同时 Big data 往往伴随选择偏差与不依从，偏差不会随 $n$ 消失。实验设计应先定 $\delta_{\min}$ 再用 $n\approx (z_{\alpha/2}+z_\beta)^2\sigma^2/\delta^2$ 算够用即可，并预留独立评测集、做多重比较校正。</div>
+  </details>
+  <details>
+    <summary>Bootstrap 区间和解析区间差了一点，该信哪个？</summary>
+    <div class="faq-a">大样本、比例不极端时两者应当接近，差异主要来自「是否假设正态」。Bootstrap 不假设分布、能用于中位数、比率等任意统计量；但它依赖「样本能代表总体」与足够大的 $B$，小样本或分布偏斜时覆盖率会有偏差，也救不了系统性偏差。工业界常把解析区间作在线判定、把 Bootstrap 留作离线复核；两者明显背离时，先怀疑数据里有异常值或分组不独立。</div>
+  </details>
+  <details>
+    <summary>一次实验同时看 20 个指标，直接对每个用 $p \lt 0.05$ 有什么问题？</summary>
+    <div class="faq-a">至少出现一次假阳性的概率是 $1-(1-0.05)^{20}\approx 64\%$。这是多重比较问题，也是 p-hacking 的温床。对策：预先注册主指标、把门槛收紧为 $\alpha/m$（Bonferroni）、或用 Benjamini–Hochberg 控制错误发现率 FDR。注意校正改的是<strong>显著性门槛</strong>，不是重新算一遍数据。</div>
+  </details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测 · 置信区间、p 值与两比例检验</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">某次抽样算出 95% 置信区间 $(48.7, 55.3)$。下列哪一句是频率学派认可的表述？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q1" value="A"> A. $\mu$ 有 95% 的概率落在 $(48.7, 55.3)$ 里</label>
+      <label class="quiz-opt"><input type="radio" name="m05q1" value="B"> B. 区间内每个值都是 95% 可能的真值</label>
+      <label class="quiz-opt"><input type="radio" name="m05q1" value="C"> C. 用同样方法重复抽样，约 95% 的这类区间会覆盖真值</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$$\mathbb{P}_\mu(\mu\in[L(\mathbf X),U(\mathbf X)])=1-\alpha$$ 里随机的是样本与区间端点，$\mu$ 固定。A 把参数当随机量（属于贝叶斯可信区间的说法），B 给区间内每点分配概率（置信区间不做这件事），C 才是对「构造程序」长期覆盖率的陈述。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">保持真实效应 $\delta=0.02\sigma$ 不变，把样本量从 $10^3$ 增到 $10^6$，$z$ 与 $p$ 会怎样？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q2" value="A"> A. $z$ 不变，$p$ 不变</label>
+      <label class="quiz-opt"><input type="radio" name="m05q2" value="B"> B. $z$ 按 $\sqrt n$ 增大约 $31.6$ 倍，$p$ 趋近 0，但效应量没变</label>
+      <label class="quiz-opt"><input type="radio" name="m05q2" value="C"> C. $p$ 增大，因为大样本噪声更多</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$z=\sqrt n\,\delta/\sigma$，$n$ 增 $1000$ 倍则 $z$ 增 $\sqrt{1000}\approx31.6$ 倍；$p=2[1-\Phi(|z|)]$ 随之趋近 0。效应量 $\delta$ 与 $n$ 无关，始终没变。C 把方向说反了：大样本恰恰让 $\mathrm{SE}=\sigma/\sqrt n$ 更小。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">两比例 $z$ 检验中，$\bar p=(k_1+k_2)/(n_1+n_2)$ 用在哪个环节？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q3" value="A"> A. 检验统计量的合并标准误 $\mathrm{SE}_0$</label>
+      <label class="quiz-opt"><input type="radio" name="m05q3" value="B"> B. 差值 $\hat\delta$ 的 95% 置信区间</label>
+      <label class="quiz-opt"><input type="radio" name="m05q3" value="C"> C. 两组各自的 Wilson 区间</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\bar p$ 是「假定 $H_0:p_1=p_2$ 成立」时的共同比例，只属于检验的合并标准误 $\mathrm{SE}_0=\sqrt{\bar p(1-\bar p)(1/n_1+1/n_2)}$。差值区间不假设相等，要用不合并的 $\mathrm{SE}_\Delta$；Wilson 区间则各自用本组的 $\hat p_i$。混用会破坏「CI 不含 0 ⟺ 拒绝 $H_0$」的对偶性。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">贯穿案例中 $z=13.4924$、$\mathrm{ATE}=+0.1232$、95% CI $[0.1054,0.1409]$。最完整的结论是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q4" value="A"> A. $p$ 极小，说明学习小组的效果极其巨大</label>
+      <label class="quiz-opt"><input type="radio" name="m05q4" value="B"> B. 只报 $p$ 值就够了，效应量可以省略</label>
+      <label class="quiz-opt"><input type="radio" name="m05q4" value="C"> C. 提升约 12.3 个百分点、区间窄且不含 0、几乎不可能是噪声；$z$ 很大部分源于 $n=12000$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：黄金三件套是「效应量 + 置信区间 + $p$ 值」。$\mathrm{ATE}=0.1232$ 才是业务价值，$\mathrm{SE}_0=0.009129$ 被 $n=12000$ 压得很小才让 $z$ 高达 $13.49$；区间 $[0.1054,0.1409]$ 说明估计精度高。A 把 $p$ 值当效应量，B 丢掉了决策最需要的信息。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">四格表中有一个期望频数为 $3$，其余都很大。此时应该？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m05q5" value="A"> A. 照常做 $z$ 检验，$n$ 已经够大了</label>
+      <label class="quiz-opt"><input type="radio" name="m05q5" value="B"> B. 改用 Fisher 精确检验，或合并类别 / 用 Wilson 与 Bootstrap 复核</label>
+      <label class="quiz-opt"><input type="radio" name="m05q5" value="C"> C. 把 $\alpha$ 调大到 $0.20$ 让结果显著</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：期望频数 $\lt 5$ 时正态近似的前提已破，$z$ 与 $\chi^2$ 的 $p$ 值都不可靠。Fisher 精确检验基于超几何分布、不依赖渐近近似；Wilson 区间在小样本下也不会越出 $[0,1]$。C 是典型的 p-hacking，$\alpha$ 必须在看数据之前定好。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>

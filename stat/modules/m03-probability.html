@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03 · 概率论基础 · 统计 · 智能学习体系</title>
+<meta name="description" content="概率论基础：样本空间与事件、概率公理、加法法则、条件概率与独立性、全概率公式与贝叶斯公式、期望方差与协方差性质。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m03" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 1 · <a href="../stages/statistics.html">统计学</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l1">L1 入门</span> · 8 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 01–02 · 上一篇：<a href="m02-descriptive.html">02 · 描述统计与可视化</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m04-distributions.html">04 · 随机变量与常见分布</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m01-data.html">01 数据与统计思维</a><span class="dep-arrow">→</span><a class="dep-node" href="m02-descriptive.html">02 描述统计与可视化</a><span class="dep-arrow">→</span><a class="dep-node current" href="m03-probability.html">03 概率论基础</a><span class="dep-arrow">→</span><a class="dep-node" href="m04-distributions.html">04 随机变量与常见分布</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：样本空间, 条件概率, 独立性, 互斥, 全概率公式, 贝叶斯公式, 基础率, 随机变量</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>条件概率 P(A|B) 与 P(B|A) 为什么不能互换？ <a class="q-anchor" href="#s3">→ 对应讲解</a></li><li>「独立」与「互斥」在什么条件下可能同时成立？ <a class="q-anchor" href="#s2">→ 对应讲解</a></li><li>全概率公式如何把一个复杂事件拆成可算的分块？ <a class="q-anchor" href="#s4">→ 对应讲解</a></li><li>基础率极低时，为什么高灵敏度的检测仍会产生大量误报？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+    <article class="module" data-module="m03">
+
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/statistics.html">阶段 1 · 统计学</a> / 03 · 概率论基础</div>
+        <h1>03 · 概率论基础</h1>
+        <p class="lead">
+          概率是描述「不确定性有多大」的通用语言。从明天会不会下雨，到医学检测是否可信，
+          再到 AI 模型输出的 0.97 是什么意思，背后都是同一套运算规则。
+          本模块只用初中代数，建立样本空间、条件概率、独立性与贝叶斯的完整工具箱——
+          这些规则直觉上常常是反的，务必用例子把它们钉死。
+        </p>
+        <div class="module-meta">
+          <span class="badge ok">入门</span>
+          <span class="badge">8 学时</span>
+          <span class="badge">前置：模块 01–02，初中代数</span>
+          <span class="badge brand">阶段一 · 入门筑基</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>写出简单试验的样本空间与事件，用组合数 $\binom{n}{k}$ 算古典概型</li>
+          <li>说清概率三条公理，理解频率稳定于概率（大数定律直觉）</li>
+          <li>熟练运用并、交、补、互斥、对立与加法法则</li>
+          <li>掌握条件概率与乘法法则，彻底分清「互斥」与「独立」</li>
+          <li>用全概率公式与贝叶斯公式解决检测类问题，看穿基础比率谬误</li>
+          <li>计算期望 $E(X)$、方差 $Var(X)$，并用线性性质化简 $E(aX+b)$、$Var(aX+b)$</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 随机试验、样本空间与概率</h2>
+
+      <h3 id="s1-1">1.1 基本词汇</h3>
+      <ul>
+        <li><strong>随机试验（Random experiment）</strong>：事先不能确定结果、且可重复进行的过程。如掷一枚骰子、抽一名用户、观测明天气温。</li>
+        <li><strong>样本空间 $\Omega$（Sample space）</strong>：试验所有可能结果的集合。</li>
+        <li><strong>样本点 $\omega$</strong>：$\Omega$ 中的单个结果（如「掷出 3 点」）。</li>
+        <li><strong>事件 $A$（Event）</strong>：样本空间的子集，即「某些结果的集合」（如「点数为偶数」$\{2,4,6\}$）。事件发生 = 试验结果落在该子集内。</li>
+      </ul>
+
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          直觉：样本空间是「舞台」，事件是「剧情」
+        </div>
+        <p>概率的所有讨论都<strong>相对于某个样本空间</strong>。「明天是否下雨」的样本空间是 $\{\text{下雨}, \text{不下雨}\}$；若细化为 $\{\text{晴}, \text{多云}, \text{小雨}, \text{大雨}\}$，同一个问题的概率数字会变化。定义样本空间是建模的第一步。</p>
+      </div>
+
+      <h3 id="s1-2">1.2 频率与概率：大数定律直觉</h3>
+      <p>在相同条件下重复试验 $n$ 次，事件 $A$ 发生 $m$ 次，则<strong>频率</strong>为 $m/n$。频率会随试验波动，但试验次数极多时会稳定下来：</p>
+
+      <div class="formula-box">
+        <div class="f-name">大数定律（直觉形式）</div>
+        $$ \bar{f}_n(A) = \frac{m}{n} \ \xrightarrow[\ n \to \infty\ ]{}\ P(A) $$
+        <div class="f-note">频率稳定值就是<strong>概率</strong> $P(A)$。抛硬币 10 次可能 7 次正面，抛 10000 次几乎必然接近 50%。这是「用频率估计概率」（也是机器学习中用经验频率拟合分布）的理论根据。</div>
+      </div>
+
+      <h3 id="s1-3">1.3 概率的三条公理</h3>
+      <p>1933 年柯尔莫哥洛夫把概率严格化为三条公理。设 $A$、$A_i$ 为事件：</p>
+      <ol>
+        <li><strong>非负性</strong>：$P(A) \geq 0$；</li>
+        <li><strong>规范性</strong>：$P(\Omega) = 1$（必然事件概率为 1）；</li>
+        <li><strong>可列可加性</strong>：若 $A_1, A_2, \dots$ 两两互斥（不能同时发生），则</li>
+      </ol>
+
+      <div class="formula-box">
+        <div class="f-name">可列可加性</div>
+        $$ P\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} P(A_i) \qquad (\text{当 } A_i \cap A_j = \varnothing,\ i \neq j) $$
+        <div class="f-note">由此可推出：$P(\varnothing) = 0$、$0 \leq P(A) \leq 1$、$P(A^c) = 1 - P(A)$（补事件公式，解题利器）。</div>
+      </div>
+
+      <h3 id="s1-4">1.4 古典概型：等可能情形</h3>
+      <p>当样本空间<strong>有限且每个样本点等可能</strong>时，概率就是「数个数」：</p>
+
+      <div class="formula-box">
+        <div class="f-name">古典概型</div>
+        $$ P(A) = \frac{|A|}{|\Omega|} = \frac{\text{A 包含的样本点数}}{\text{样本点总数}} $$
+        <div class="f-note">只适用于<strong>等可能</strong>假设成立的情形。「数个数」常用排列组合：不计顺序的取法用组合数 $\binom{n}{k} = \frac{n!}{k!(n-k)!}$。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 1.1</span>
+          <span class="ex-title">掷两枚骰子：样本空间与点数和</span>
+        </div>
+        <div class="example-body">
+          <p>同时掷两枚均匀骰子。求（a）样本点总数；（b）点数和为 7 的概率；（c）点数和为 8 的概率。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>（a）每枚骰子 6 种结果，由乘法原理 $|\Omega| = 6 \times 6 = 36$（把结果写成有序对 $(i,j)$）。</p>
+              <p>（b）点数和为 7 的组合：$(1,6),(2,5),(3,4),(4,3),(5,2),(6,1)$ 共 6 种，</p>
+              $$ P(\text{和为 }7) = \frac{6}{36} = \frac{1}{6} \approx 16.7\% $$
+              <p>（c）点数和为 8：$(2,6),(3,5),(4,4),(5,3),(6,2)$ 共 5 种，$P = 5/36 \approx 13.9\%$。</p>
+              <p><strong>要点：</strong>样本空间写成有序对（区分「第一枚」「第二枚」）才能保证等可能。若错误地把「和」当作样本点（$\{2,3,\dots,12\}$ 共 11 个），会得到 $1/11$ 的错误答案——因为「和为 7」与「和为 8」并不等可能。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 事件的运算与加法法则</h2>
+
+      <h3 id="s2-1">2.1 并、交、补</h3>
+      <ul>
+        <li><strong>并（Union）</strong>：$A \cup B$ = 「$A$ 或 $B$ 至少一个发生」。</li>
+        <li><strong>交（Intersection）</strong>：$A \cap B$ = 「$A$ 与 $B$ 同时发生」。</li>
+        <li><strong>补（Complement）</strong>：$A^c$ = 「$A$ 不发生」。</li>
+      </ul>
+
+      <h3 id="s2-2">2.2 互斥与对立</h3>
+      <ul>
+        <li><strong>互斥（Mutually exclusive）</strong>：$A \cap B = \varnothing$，两者不能同时发生。</li>
+        <li><strong>对立（Complementary）</strong>：更强的关系——$A$ 与 $B$ 互斥<strong>且</strong>必有一个发生，即 $B = A^c$（如「下雨」与「不下雨」）。</li>
+      </ul>
+      <p>对立一定互斥，互斥不一定对立（「掷出 1 点」与「掷出 2 点」互斥，但可以掷出 3 点）。</p>
+
+      <h3 id="s2-3">2.3 加法法则</h3>
+
+      <div class="formula-box">
+        <div class="f-name">加法法则</div>
+        $$ P(A \cup B) = P(A) + P(B) - P(A \cap B) $$
+        <div class="f-note">$P(A \cap B)$ 被加了两次，必须减掉一次。若 $A$、$B$ <strong>互斥</strong>，则 $P(A \cap B) = 0$，公式简化为 $P(A \cup B) = P(A) + P(B)$。</div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：「或」不是简单相加
+        </div>
+        <p>「选修数学或物理的学生占多少」不能直接把两个百分比相加——两科都选的人会被数两遍。除非确认<strong>互斥</strong>，否则必须减去交集。反过来，把互斥误当独立（或反之）是概率题最常见的翻车点，见 3.4 节。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 2.1</span>
+          <span class="ex-title">加法法则：从「至少满足其一」到互斥特例</span>
+        </div>
+        <div class="example-body">
+          <p>（a）某电商平台 10000 名用户中，30% 下过单，20% 使用过优惠券，其中 8% <strong>两者都做过</strong>。求「至少做过一件」的比例，以及「只下单不用券」「只用券没下单」「两件都没做」的比例。<br>
+          （b）掷一颗均匀骰子，$A$ =「点数为偶数」，$B$ =「点数大于 4」。求 $P(A \cup B)$，并说明 $A$ 与 $B$ 是互斥还是独立。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）用加法法则，注意减掉交集：</strong></p>
+              $$ P(A \cup B) = P(A) + P(B) - P(A \cap B) = 0.30 + 0.20 - 0.08 = 0.42 $$
+              <p>即 42% 的用户至少做过一件（对应 4200 人）。四个互不重叠的区域分别是：</p>
+              <ul>
+                <li><strong>只下单不用券</strong>：$P(A \cap B^c) = P(A) - P(A \cap B) = 0.30 - 0.08 = 0.22$；</li>
+                <li><strong>只用券没下单</strong>：$P(A^c \cap B) = P(B) - P(A \cap B) = 0.20 - 0.08 = 0.12$；</li>
+                <li><strong>两件都没做</strong>：$P(A^c \cap B^c) = 1 - P(A \cup B) = 1 - 0.42 = 0.58$。</li>
+              </ul>
+              <p><strong>校验：</strong>$0.22 + 0.12 + 0.08 + 0.58 = 1.00$，四个区域正好把样本空间填满。常见错误是直接写 $0.30 + 0.20 = 0.50$——这会把「两者都做过」的 8% 重复计算一次，<strong>高估了 8 个百分点</strong>。</p>
+              <p><strong>（b）先算交集，再套公式：</strong>点数为偶数是 $\{2,4,6\}$，$P(A) = 3/6 = 1/2$；点数大于 4 是 $\{5,6\}$，$P(B) = 2/6 = 1/3$；同时满足的是 $\{6\}$，$P(A \cap B) = 1/6$。</p>
+              $$ P(A \cup B) = \frac{1}{2} + \frac{1}{3} - \frac{1}{6} = \frac{3 + 2 - 1}{6} = \frac{4}{6} = \frac{2}{3} $$
+              <p><strong>用补事件验证：</strong>「既不是偶数又不大于 4」只剩下 $\{1,3\}$，概率 $2/6 = 1/3$，所以 $P(A \cup B) = 1 - 1/3 = 2/3$。✓</p>
+              <p><strong>互斥还是独立？</strong>$P(A \cap B) = 1/6 \neq 0$，说明掷出 6 点时两个事件<strong>同时发生</strong>，所以<strong>不互斥</strong>。再看独立性：$P(A)P(B) = \frac{1}{2} \times \frac{1}{3} = \frac{1}{6}$，恰好等于 $P(A \cap B) = 1/6$——按 $P(A \cap B) = P(A)P(B)$ 的判据，<strong>$A$ 与 $B$ 竟然独立</strong>。</p>
+              <p>这个结果值得停下来想一想，因为直觉上它们<em>应该</em>不独立：$B$ 发生意味着点数是 5 或 6，此时「偶数」发生的概率是 $1/2$（只有 6 是偶数）……听起来变小了？让我们用条件概率算一遍：</p>
+              $$ P(A \mid B) = \frac{P(A \cap B)}{P(B)} = \frac{1/6}{1/3} = \frac{1}{2} = P(A) $$
+              <p>果然一点没变！原因在于：$B$ 的两个结果 $\{5,6\}$ 里，<strong>恰好有一个是偶数</strong>——而 $A$ 本身也恰好覆盖 6 个点中的 3 个（一半）。「$B$ 发生后 $A$ 的概率」与「$A$ 本身的概率」都是 $1/2$，所以「知道 $B$ 发生」确实没有给 $A$ 带来任何新信息。同理 $P(B \mid A) = \frac{1/6}{1/2} = \frac{1}{3} = P(B)$。</p>
+              <p>这个「巧合」来自「偶数」这个分类恰好把 $\{5,6\}$ 中的 6 号点分给了两边，使得<strong>联合分布恰好等于边缘分布的乘积</strong>——这是小样本空间的特殊巧合，不是普遍规律。<strong>判定独立必须用数值验证，不能靠直觉</strong>（3.4 节的「互斥且概率为正必不独立」是必背的结论，但「不互斥」并不意味着「独立」）。</p>
+              <p><strong>易错提示：</strong>① 「至少一个」直接相加而不减交集——这是加法法则最经典的翻车点；② 互斥与独立混用（把 $P(A \cap B) = 0$ 写成 $P(A)P(B)$）；③ 漏掉「都不满足」这一块，导致四块加起来不等于 1；④ 认为 $P(A \cap B) = 0$ 就一定是互斥（$P(A \cap B) = 0$ 也可能只是概率为 0 的巧合）；⑤ 把「至少一个」（并集）与「恰好一个」（对称差）搞混——「恰好一个」是 $P(A) + P(B) - 2P(A \cap B)$，本例为 $0.30 + 0.20 - 0.16 = 0.34$。</p>
+              <p><strong>应用/AI 关联：</strong>「至少一个」在工程与 AI 中无处不在：推荐系统的<strong>覆盖率</strong>（至少被一个策略召回的用户占比）、模型评估中的<strong>至少命中一个缺陷类别</strong>的样本比例、用户行为的<strong>留存或付费</strong>（两件事做了任一即算留存）、以及 A/B 实验里「至少有一个指标显著」的判定。日常写代码时也常犯同一个错：把两个集合的<strong>size 直接相加</strong>来当并集大小，忘了减去<strong>交集</strong>——数据库里的 <code>UNION</code> 会自动去重，而 <code>UNION ALL</code> 不会，这个差异正是概率里的加法法则。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 条件概率、乘法法则与独立性</h2>
+
+      <h3 id="s3-1">3.1 条件概率</h3>
+      <p>「已知某事件发生」会改变我们对另一事件的判断。设 $P(B) &gt; 0$：</p>
+
+      <div class="formula-box">
+        <div class="f-name">条件概率定义</div>
+        $$ P(A \mid B) = \frac{P(A \cap B)}{P(B)} $$
+        <div class="f-note">竖线 $\mid$ 读作「在……发生的条件下」。直觉：把样本空间<strong>缩小</strong>到 $B$（新的分母是 $P(B)$），问其中有多大比例同时也属于 $A$。</div>
+      </div>
+
+      <h3 id="s3-2">3.2 乘法法则</h3>
+      <p>把条件概率定义式两边同乘 $P(B)$，立刻得到：</p>
+
+      <div class="formula-box">
+        <div class="f-name">乘法法则</div>
+        $$ P(A \cap B) = P(A \mid B)\, P(B) = P(B \mid A)\, P(A) $$
+        <div class="f-note">求「同时发生」的概率 = 一路连乘。概率树（tree diagram）正是按这条规则一枝一枝乘出来的。</div>
+      </div>
+
+      <h3 id="s3-3">3.3 独立性</h3>
+      <p>若「$B$ 是否发生」不影响「$A$ 的概率」，称 $A$、$B$ <strong>独立（Independent）</strong>：</p>
+
+      <div class="formula-box">
+        <div class="f-name">独立的定义与判据</div>
+        $$ A \text{ 与 } B \text{ 独立} \iff P(A \cap B) = P(A)\, P(B) $$
+        <div class="f-note">等价表述：$P(A \mid B) = P(A)$（且 $P(B) &gt; 0$）。判定独立不能靠感觉，要用数据或机制（如放回抽样）验证。</div>
+      </div>
+
+      <h3 id="s3-4">3.4 互斥 vs 独立：必须讲透的一对概念</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>对比</th><th>互斥</th><th>独立</th></tr></thead>
+          <tbody>
+            <tr><td>含义</td><td>不能同时发生</td><td>一个是否发生不影响另一个</td></tr>
+            <tr><td>数学表达</td><td>$P(A \cap B) = 0$</td><td>$P(A \cap B) = P(A)P(B)$</td></tr>
+            <tr><td>知道 $B$ 发生后</td><td>$P(A \mid B) = 0$</td><td>$P(A \mid B) = P(A)$</td></tr>
+            <tr><td>典型例子</td><td>一次投掷「出 1 点」与「出 2 点」</td><td>两次独立抛硬币「都是正面」</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          关键结论：互斥且概率都为正的两个事件，必然不独立
+        </div>
+        <p>若 $A$、$B$ 互斥且 $P(A) &gt; 0$、$P(B) &gt; 0$，则 $P(A \cap B) = 0 \neq P(A)P(B) &gt; 0$。直觉上更好记：<strong>互斥是「一发生另一个就不可能」，独立是「一个发生另一个完全不受影响」</strong>——两者正相反，绝不可以混用。考试高频陷阱：把「互不相容」当成「相互独立」而写成 $P(A \cap B) = P(A)P(B)$。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.1</span>
+          <span class="ex-title">判断独立还是互斥（三小问）</span>
+        </div>
+        <div class="example-body">
+          <p>（a）连抛两次均匀硬币，$A$ =「第一次正面」，$B$ =「第二次正面」；<br>
+          （b）袋中 3 红 2 白，不放回连抽两球，$A$ =「第一球红」，$B$ =「第二球红」；<br>
+          （c）一颗骰子，$A$ =「出 1 点」，$B$ =「出 2 点」。分别判断 $A$、$B$ 是独立还是互斥。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>（a）<strong>独立且不互斥。</strong>$P(A) = P(B) = 1/2$，$P(A \cap B) = 1/4 = 1/2 \times 1/2$。第一次的结果不改变第二次的概率（可同时发生：两次都是正面）。</p>
+              <p>（b）<strong>不独立、也不互斥。</strong>$P(A) = 3/5$；$P(A \cap B) = \frac{3}{5}\times\frac{2}{4} = \frac{3}{10} = 0.3$（不放回，第二球概率已被第一次影响）。若独立应有 $(3/5)^2 = 0.36 \neq 0.3$，故<strong>不独立</strong>。两球可同为红，故不互斥。</p>
+              <p>（c）<strong>互斥且不独立。</strong>一次投掷不可能既是 1 点又是 2 点，$P(A \cap B) = 0$；而 $P(A)P(B) = 1/36 \neq 0$，故不独立。这正是「互斥 ⇒ 不独立」的典型。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.2</span>
+          <span class="ex-title">链式法则与独立性判定：把三个事件串起来</span>
+        </div>
+        <div class="example-body">
+          <p>某内容平台做用户调研，定义三个事件：$A$ =「用户点击了推荐内容」，$B$ =「用户此前有活跃行为」，$C$ =「用户完成了观看」。已知：</p>
+          <ul>
+            <li>$P(A) = 0.60$（60% 的用户点击了推荐内容）；</li>
+            <li>$P(B \mid A) = 0.40$（点击的用户中 40% 此前有活跃行为）；</li>
+            <li>$P(B \mid A^c) = 0.05$（没点击的用户中只有 5% 此前有活跃行为）；</li>
+            <li>$P(C \mid B) = 0.70$（此前有活跃行为的用户中 70% 完成观看）；</li>
+            <li>$P(C \mid B^c) = 0.10$（此前无活跃行为的用户中 10% 完成观看）。</li>
+          </ul>
+          <p>求：（a）$P(A \cap B)$ 与 $P(B)$；（b）$P(A \mid B)$，并判断 $A$ 与 $B$ 是否独立；（c）$P(A \cap B \cap C)$ 与 $P(C)$。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 用乘法法则算交集：</strong></p>
+              $$ P(A \cap B) = P(B \mid A)\, P(A) = 0.40 \times 0.60 = 0.24 $$
+              <p><strong>第 2 步 用全概率公式算 $P(B)$（这里 $A$ 与 $A^c$ 构成一个划分）：</strong></p>
+              $$ P(B) = P(B \mid A)P(A) + P(B \mid A^c)P(A^c) = 0.40 \times 0.60 + 0.05 \times 0.40 = 0.24 + 0.02 = 0.26 $$
+              <p><strong>第 3 步 求条件概率 $P(A \mid B)$：</strong></p>
+              $$ P(A \mid B) = \frac{P(A \cap B)}{P(B)} = \frac{0.24}{0.26} \approx 0.923 $$
+              <p><strong>第 4 步 判断独立性：用两种判据交叉验证。</strong></p>
+              <ul>
+                <li><strong>判据一（乘积判据）：</strong>$P(A \cap B) = 0.24$，而 $P(A)P(B) = 0.60 \times 0.26 = 0.156$。$0.24 \neq 0.156$ ⟹ <strong>不独立</strong>。</li>
+                <li><strong>判据二（条件概率不变）：</strong>$P(A \mid B) \approx 0.923$，而 $P(A) = 0.60$。$0.923 \neq 0.60$ ⟹ <strong>不独立</strong>。</li>
+              </ul>
+              <p>两个判据结论一致，这正是它们的等价性。直观解释：<strong>「用户点了推荐」这件事，极大提高了「此前有活跃行为」的概率（从 60% 升到 92.3%）</strong>——反过来看，知道用户此前活跃，就能把他点击推荐的概率从 60% 上调到 92.3%。两者<strong>强正相关</strong>，绝不是独立事件。</p>
+              <p><strong>第 5 步 三事件链式法则：</strong></p>
+              $$ P(A \cap B \cap C) = P(C \mid B)\, P(B \mid A)\, P(A) = 0.70 \times 0.40 \times 0.60 = 0.168 $$
+              <p>这是「一枝一枝连乘」的直接应用：先算「$A$ 且 $B$」的概率，再乘上「在此基础上还发生 $C$」的条件概率。</p>
+              <p><strong>第 6 步 求 $P(C)$：以 $B$ 与 $B^c$ 为划分用全概率公式。</strong></p>
+              $$ P(C) = P(C \mid B)P(B) + P(C \mid B^c)P(B^c) = 0.70 \times 0.26 + 0.10 \times 0.74 = 0.182 + 0.074 = 0.256 $$
+              <p><strong>交叉验证：</strong>$P(B \cap C) = P(C \mid B)P(B) = 0.70 \times 0.26 = 0.182$；于是 $P(B \mid C) = \frac{0.182}{0.256} \approx 0.711$，远高于 $P(B) = 0.26$——「完成观看」同样强烈暗示「此前有活跃行为」。</p>
+              <p><strong>第 7 步 把样本空间完整拆成八格（深度校验）：</strong>先用 $A$ 与 $A^c$ 划分：$P(A \cap B) = 0.24$、$P(A \cap B^c) = 0.60 - 0.24 = 0.36$、$P(A^c \cap B) = 0.05 \times 0.40 = 0.02$、$P(A^c \cap B^c) = 0.40 - 0.02 = 0.38$。再对每一格按 $C$ 与 $C^c$ 细分：</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>区域</th><th>计算</th><th>概率</th></tr></thead>
+                  <tbody>
+                    <tr><td>$A \cap B \cap C$</td><td>$0.70 \times 0.24$</td><td>0.168</td></tr>
+                    <tr><td>$A \cap B \cap C^c$</td><td>$0.30 \times 0.24$</td><td>0.072</td></tr>
+                    <tr><td>$A \cap B^c \cap C$</td><td>$0.10 \times 0.36$</td><td>0.036</td></tr>
+                    <tr><td>$A \cap B^c \cap C^c$</td><td>$0.90 \times 0.36$</td><td>0.324</td></tr>
+                    <tr><td>$A^c \cap B \cap C$</td><td>$0.70 \times 0.02$</td><td>0.014</td></tr>
+                    <tr><td>$A^c \cap B \cap C^c$</td><td>$0.30 \times 0.02$</td><td>0.006</td></tr>
+                    <tr><td>$A^c \cap B^c \cap C$</td><td>$0.10 \times 0.38$</td><td>0.038</td></tr>
+                    <tr><td>$A^c \cap B^c \cap C^c$</td><td>$0.90 \times 0.38$</td><td>0.342</td></tr>
+                    <tr><td><strong>合计</strong></td><td>—</td><td><strong>1.000</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>八格之和 $= 1.000$，验证无误。把所有含 $C$ 的四格加起来：$P(C) = 0.168 + 0.036 + 0.014 + 0.038 = 0.256$，与第 6 步全概率公式的结果完全一致 ✓。</p>
+              <p><strong>一个必须点破的隐含假设：</strong>在 $A \cap B^c$ 那一格里，我用的是 $P(C \mid A \cap B^c) = 0.10$，这等于 $P(C \mid B^c)$。但严格来说，题面只给了 $P(C \mid B)$ 与 $P(C \mid B^c)$，它<strong>默认了「$C$ 的条件概率只取决于 $B$，与 $A$ 无关」</strong>（即 $C$ 与 $A$ 在给定 $B$ 后条件独立）。若这个假设不成立——比如「不点击的用户里，有活跃行为的人完成观看的比例远高于没活跃行为的人」——那么 $A^c \cap B \cap C$ 这一格就不能填 0.014，$P(C)$ 也就不能仅凭题面信息算出。</p>
+              <p><strong>这是本例最重要的一课：</strong>全概率公式和链式法则都不是「自动成立」的公式，而是<strong>带着假设的工具</strong>。用之前要问一句：「我用的这个条件概率，真的只依赖于我划分时用的那个事件吗？」这与模块 01 里「混杂因素」的判断是同一件事——$A$ 之所以「不干扰」$C$ 的条件概率，正是因为 $A$ 不是 $B$ 与 $C$ 之间的混杂因素。</p>
+              <p><strong>易错提示：</strong>① 用全概率公式时，选的划分必须<strong>穷尽且互斥</strong>，且每一格的条件概率必须是<strong>真实已知</strong>的——本例若 $P(C \mid A^c \cap B)$ 与 $P(C \mid B)$ 不同，$P(C)$ 就算不出来；② 判断独立时<strong>两个判据要交叉验证</strong>（$P(A \cap B) = P(A)P(B)$ 与 $P(A \mid B) = P(A)$），只用一个容易出错；③ 把 $P(A \mid B)$ 与 $P(B \mid A)$ 搞反（$0.923$ vs $0.40$），这是条件概率最常见的混淆；④ 链式法则中每个条件概率的分母要对准<strong>已经发生的那件事</strong>；⑤ <strong>在分解样本空间时偷换假设</strong>——第 7 步之所以能填出八格，正是因为默认了「$C$ 的条件概率只取决于 $B$」；⑥ 把「不独立」误解为「负相关」——本例是强<strong>正</strong>相关。</p>
+              <p><strong>应用/AI 关联：</strong>① <strong>特征工程中的共线性诊断</strong>：「点击」和「此前活跃」高度相关（$P(A \mid B) = 0.92$），同时放进模型会导致系数不稳定——这就是共线性的概率学根源（模块 06 的 VIF）；② <strong>漏斗分析</strong>：曝光 → 点击 → 完播的每一层转化率，正是链式法则 $P(\text{完播}) = P(\text{完播} \mid \text{点击}) \times P(\text{点击} \mid \text{曝光}) \times P(\text{曝光})$ 的直接应用；③ <strong>归一化与校准</strong>：模型输出的概率只有在「联合分布 = 边缘分布乘积」时才是校准的，若训练数据有偏（各特征间存在依赖），模型就会系统性高估或低估——这正是贝叶斯公式与共形预测（模块 10）要解决的问题；④ <strong>A/B 实验</strong>：如果处理组和对照组在「用户此前活跃」这一基线特征上分布不同，实验结果就会被混杂污染（模块 08）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 全概率公式与贝叶斯公式</h2>
+
+      <h3 id="s4-1">4.1 划分</h3>
+      <p>设 $A_1, A_2, \dots, A_m$ <strong>两两互斥</strong>，且它们的并是整个样本空间 $\Omega$，则称 $\{A_i\}$ 是一个<strong>划分（Partition）</strong>——把世界切成互不重叠、加起来完整的情形。</p>
+
+      <h3 id="s4-2">4.2 全概率公式</h3>
+
+      <div class="formula-box">
+        <div class="f-name">全概率公式</div>
+        $$ P(B) = \sum_{i=1}^{m} P(B \mid A_i)\, P(A_i) $$
+        <div class="f-note">直觉：「$B$ 发生的总概率」= 按各种情形分别算再加权求和。像把一杯混合果汁按配方还原：每种果汁（$A_i$）占的比例 $\times$ 该果汁里含果肉的比例（$P(B|A_i)$）。</div>
+      </div>
+
+      <h3 id="s4-3">4.3 贝叶斯公式</h3>
+      <p>把条件概率定义与全概率公式结合，就得到本课程最重要的公式之一：</p>
+
+      <div class="formula-box">
+        <div class="f-name">贝叶斯公式</div>
+        $$ P(A_i \mid B) = \frac{P(B \mid A_i)\, P(A_i)}{\displaystyle\sum_{j=1}^{m} P(B \mid A_j)\, P(A_j)} $$
+        <div class="f-note">记忆口诀：<strong>后验 = 似然 × 先验 ÷ 证据</strong>。$P(A_i)$ 是<em>先验</em>（看到证据前的判断），$P(B \mid A_i)$ 是<em>似然</em>（在 $A_i$ 下看到证据 $B$ 的可能性），$P(A_i \mid B)$ 是<em>后验</em>（看到证据后的更新判断），分母是<em>证据</em> $P(B)$。</div>
+      </div>
+
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          直觉：贝叶斯就是「用新证据改主意」
+        </div>
+        <p>先验是旧认识，似然衡量「如果旧认识为真，新证据有多常见」，后验是更新后的认识。垃圾邮件过滤、医学诊断、AI 的概率校准、法庭上的 DNA 证据，全是这一条公式的应用。</p>
+      </div>
+
+      <h3 id="s4-4">4.4 基础比率谬误：为什么直觉会错</h3>
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：忽略先验（基础比率）
+        </div>
+        <p>听到「检测准确率 90%」，多数人直觉认为阳性者「九成真的患病」。错在哪里？<strong>忽略了患病率（基础比率）本身极低</strong>。当健康人基数远大于病人时，即便假阳性率只有 5%，假阳性的绝对人数也会淹没真阳性。必须先算全概率（分母 $P(B)$），再算后验。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.1</span>
+          <span class="ex-title">疾病检测：经典的贝叶斯算例</span>
+        </div>
+        <div class="example-body">
+          <p>某病人群患病率 $1\%$。检测方法：患者呈阳性的概率（灵敏度）为 $90\%$，健康者呈阳性（假阳性率）为 $5\%$。若某人检测阳性，他真正患病的概率是多少？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>设 $D$ = 患病，$D^c$ = 健康，$+$ = 检测阳性。已知：$P(D) = 0.01$，$P(+ \mid D) = 0.90$，$P(+ \mid D^c) = 0.05$。</p>
+              <p><strong>第 1 步 全概率算「阳性」的总概率：</strong></p>
+              $$ P(+) = P(+ \mid D)P(D) + P(+ \mid D^c)P(D^c) = 0.90\times 0.01 + 0.05\times 0.99 = 0.009 + 0.0495 = 0.0585 $$
+              <p><strong>第 2 步 贝叶斯算后验：</strong></p>
+              $$ P(D \mid +) = \frac{P(+ \mid D) P(D)}{P(+)} = \frac{0.009}{0.0585} = \frac{2}{13} \approx 15.4\% $$
+              <p><strong>第 3 步 用「10000 人表格」验证（推荐）：</strong></p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>人群</th><th>人数</th><th>检测阳性</th><th>检测阴性</th></tr></thead>
+                  <tbody>
+                    <tr><td>患病（1%）</td><td>100</td><td>90（真阳性）</td><td>10</td></tr>
+                    <tr><td>健康（99%）</td><td>9900</td><td>495（假阳性）</td><td>9405</td></tr>
+                    <tr><td><strong>合计</strong></td><td>10000</td><td><strong>585</strong></td><td>9415</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>585 个阳性者中只有 90 人真患病：$90/585 = 2/13 \approx 15.4\%$。<strong>直觉错在哪：</strong>人们盯着「灵敏度 90%」，却忘了健康人是病人的 99 倍——495 个假阳性在人数上压倒了 90 个真阳性。这就是<strong>基础比率谬误</strong>。</p>
+              <p><strong>实践启示：</strong>罕见病筛查阳性后不要恐慌，应做更特异的复检（复检会大幅更新先验）；同理，AI 内容审核、欺诈检测中「高准确率模型」在低基率场景下也会产生大量误报。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.2</span>
+          <span class="ex-title">挑战题：贝叶斯公式的多次更新（复检与翻案）</span>
+        </div>
+        <div class="example-body">
+          <p>承接例 4.1。某病人群患病率 $P(D) = 1\%$，初检的灵敏度为 90%、假阳性率为 5%。<strong>初检阳性后，病人可以做一次更精确的复检</strong>（灵敏度 99%、假阳性率 1%）。请回答：</p>
+          <p>（a）初检阳性者中，真正患病的概率是多少？（b）若复检<strong>也阳性</strong>，此时真正患病的概率是多少？（c）若复检<strong>阴性</strong>呢？（d）为什么两次检测的组合会出现如此巨大的差别？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 初检阳性后的后验（回顾例 4.1）：</strong></p>
+              $$ P(+) = 0.90\times 0.01 + 0.05 \times 0.99 = 0.009 + 0.0495 = 0.0585 $$
+              $$ P(D \mid +) = \frac{0.009}{0.0585} = \frac{2}{13} \approx 15.4\% $$
+              <p><strong>第 2 步 复检也阳性：把复检当作新的证据，<em>更新后验</em>。</strong>现在把「已经初检阳性」当作已知条件（此时患病的后验是 15.4%），再套一次贝叶斯公式：</p>
+              $$ P(D \mid +,+) = \frac{P(+ \mid D)\, P(D \mid +)}{P(+ \mid D)\, P(D \mid +) + P(+ \mid D^c)\, P(D^c \mid +)} = \frac{0.99 \times 0.153846}{0.99 \times 0.153846 + 0.01 \times 0.846154} $$
+              $$ = \frac{0.152308}{0.152308 + 0.008462} = \frac{0.152308}{0.160769} \approx 94.7\% $$
+              <p><strong>第 3 步 用「10000 人表格」验证（推荐用这个方法自查）：</strong></p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>人群</th><th>人数</th><th>初检阳性</th><th>复检阳性（灵敏度 99% / 假阳性 1%）</th></tr></thead>
+                  <tbody>
+                    <tr><td>患病（1%）</td><td>100</td><td>90</td><td>89.10</td></tr>
+                    <tr><td>健康（99%）</td><td>9900</td><td>495</td><td>4.95</td></tr>
+                    <tr><td><strong>合计</strong></td><td>10000</td><td><strong>585</strong></td><td><strong>94.05</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>复检阳性者共 94.05 人，其中真患病 89.10 人：$89.10/94.05 \approx 94.7\%$ ✓ 与公式结果一致。</p>
+              <p><strong>第 4 步 复检阴性：</strong></p>
+              $$ P(- \mid D, +) = 1 - 0.99 = 0.01, \qquad P(- \mid D^c, +) = 1 - 0.01 = 0.99 $$
+              $$ P(D \mid +, -) = \frac{0.01 \times 0.153846}{0.01 \times 0.153846 + 0.99 \times 0.846154} = \frac{0.001538}{0.001538 + 0.837692} = \frac{0.001538}{0.839231} \approx 0.18\% $$
+              <p>表格验证：初检阳性的 585 人中，真患病 90 人里复检阴性 $90 \times 0.01 = 0.9$ 人；假阳性 495 人里复检阴性 $495 \times 0.99 = 490.05$ 人，共 490.95 人复检阴性，其中真患病仅 0.9 人：$0.9/490.95 \approx 0.18\%$ ✓</p>
+              <p><strong>第 5 步 顺序更新法（更简洁的算法）：</strong>贝叶斯更新可以<strong>反复迭代</strong>——每次拿到新证据，就用当前后验当作下一次的先验：</p>
+              <ul>
+                <li>初始先验：$p_0 = 1\%$；</li>
+                <li>初检阳性后：$p_1 = \frac{0.90 \times 0.01}{0.90 \times 0.01 + 0.05 \times 0.99} = 15.4\%$；</li>
+                <li>复检阳性后：$p_2 = \frac{0.99 \times 0.153846}{0.99 \times 0.153846 + 0.01 \times 0.846154} = 94.7\%$。</li>
+              </ul>
+              <p>注意 $p_1$ 既扮演「初检的后验」，又扮演「复检的先验」——<strong>贝叶斯更新就是这样一棒接一棒地推下去的</strong>（模块 07 会系统展开这个框架）。</p>
+              <p><strong>第 6 步 为什么会差这么多？关键在「似然比」。</strong>把贝叶斯公式改写成<strong>优势比（odds）</strong>的形式就一目了然：</p>
+              $$ \frac{P(D \mid E)}{P(D^c \mid E)} = \frac{P(E \mid D)}{P(E \mid D^c)} \times \frac{P(D)}{P(D^c)} $$
+              <p>先验优势比 $\frac{0.01}{0.99} \approx 0.0101$。</p>
+              <ul>
+                <li><strong>初检</strong>的似然比 $= \frac{0.90}{0.05} = 18$：$0.0101 \times 18 \approx 0.182$，转回概率 $\approx 15.4\%$。<strong>似然比 18 看着大，但乘上极小的先验优势比后仍然很小</strong>——基础比率在起作用。</li>
+                <li><strong>复检</strong>的似然比 $= \frac{0.99}{0.01} = 99$：$0.182 \times 99 \approx 18.0$，转回概率 $\approx 94.7\%$。<strong>这次似然比足够大，一举扭转了局面</strong>。</li>
+                <li><strong>复检阴性</strong>的似然比 $= \frac{0.01}{0.99} \approx 0.0101$：$0.182 \times 0.0101 \approx 0.00184$，转回概率 $\approx 0.18\%$。<strong>阴性证据的似然比远小于 1，等于强力地把概率往 0 推</strong>。</li>
+              </ul>
+              <p><strong>结论：</strong>复检之所以能把 15.4% 拉到 94.7%，是因为复检的<strong>灵敏度与假阳性率都远优于初检</strong>（似然比 99 vs 18）；而复检阴性之所以能把概率压到 0.18%，是因为「患病却复检阴性」的概率极低（1%），这 1% 的灵敏度损失是<strong>极其有力的反向证据</strong>。</p>
+              <p><strong>易错提示：</strong>① 把「复检阳性」当成新的独立事件重新从头算（那样会用 1% 的原始患病率，得出 $0.99\times 0.01/(0.99\times 0.01 + 0.01\times 0.99) = 50\%$，错得离谱）——<strong>第二次检测必须用第一次的后验作为先验</strong>；② 复检阴性就完全排除患病（0.18% 虽低但非 0，且这里假设两次检测结果相互独立，若同一次采血同时做两项检测则不独立）；③ 认为「复检阳性 = 确诊」（94.7% 仍不是 100%，且这里假设检测在技术上无系统性偏差）；④ 忽略检测本身的假阳性率——本例复检的假阳性率只有 1%，如果复检设计得同样粗糙（假阳性 5%），似然比仍是 18，效果就会小得多；⑤ 假设两次检测<strong>相互独立</strong>——若两次检测存在同源偏差（如同一批试剂、同一操作者），似然比会被高估。</p>
+              <p><strong>应用/AI 关联：</strong>① <strong>多轮标注与仲裁</strong>：多个标注员逐条标注并逐轮修正，等价于这里的多次贝叶斯更新——每一轮用上一轮的后验作为先验，用本轮标注者的可靠性（似然比）更新；② <strong>垃圾邮件过滤</strong>：先按「含关键词」粗筛（弱证据，似然比小），再用贝叶斯分类器给出更精细的似然比（如「发件人是否在通讯录」「链接是否短链」），联合起来才能把后验推高；③ <strong>医学影像 AI 辅助诊断</strong>：模型输出的「恶性概率」不是终点，而是需要与影像科医生判断做<strong>贝叶斯组合</strong>的证据之一——关键同样是似然比（模型在良恶性上的区分能力）与基础比率（该科室的患病率）；④ <strong>LLM 自我改进</strong>：用模型自己的输出作为反馈信号时，若反馈来自的分布与目标分布不同，会把后验推向错误方向——这正是<strong>分布偏移</strong>在概率层面的表现（模块 10）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 期望、方差与协方差</h2>
+
+      <h3 id="s5-1">5.1 期望</h3>
+      <p>期望（expectation）是随机变量的<strong>概率加权平均</strong>——长期重复试验的平均结果：</p>
+
+      <div class="formula-box">
+        <div class="f-name">离散型随机变量的期望</div>
+        $$ E(X) = \sum_{k} x_k \, P(X = x_k) $$
+        <div class="f-note">对所有可能取值 $x_k$ 求和。连续型对应积分 $E(X) = \int x f(x)\,dx$（模块 04）。期望可以不是任何实际取值（如「期望点数 3.5」）。</div>
+      </div>
+
+      <h3 id="s5-2">5.2 方差</h3>
+
+      <div class="formula-box">
+        <div class="f-name">方差</div>
+        $$ Var(X) = E\left[(X - \mu)^2\right] = E(X^2) - [E(X)]^2 $$
+        <div class="f-note">$\mu = E(X)$。方差衡量取值围绕期望的波动，单位是原单位的平方；标准差 $\sigma = \sqrt{Var(X)}$ 与原单位一致。右侧的计算式通常更易算。</div>
+      </div>
+
+      <h3 id="s5-3">5.3 期望与方差的性质</h3>
+      <div class="formula-box">
+        <div class="f-name">线性性质</div>
+        $$ E(aX + b) = a\,E(X) + b, \qquad Var(aX + b) = a^2\, Var(X) $$
+        <div class="f-note">$a$、$b$ 为常数。注意方差<strong>对平移不敏感</strong>（加常数 $b$ 不改变波动），缩放 $a$ 倍则方差变为 $a^2$ 倍。</div>
+      </div>
+
+      <div class="formula-box">
+        <div class="f-name">两个随机变量</div>
+        $$ E(X + Y) = E(X) + E(Y), \qquad Var(X + Y) = Var(X) + Var(Y)\ \ (\text{当 } X, Y \text{ 独立}) $$
+        <div class="f-note">期望对<strong>任意</strong> $X,Y$ 都可加；方差<strong>只有独立时</strong>才可加。一般情形：$Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)$。</div>
+      </div>
+
+      <h3 id="s5-4">5.4 协方差</h3>
+      <div class="formula-box">
+        <div class="f-name">协方差</div>
+        $$ Cov(X, Y) = E\left[(X - E(X))(Y - E(Y))\right] = E(XY) - E(X)E(Y) $$
+        <div class="f-note">$Cov(X,Y) &gt; 0$ 同向变动，$&lt; 0$ 反向变动。若 $X,Y$ 独立，则 $Cov(X,Y) = 0$（反之不成立：不相关未必独立）。相关系数是标准化后的协方差（模块 02）。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 5.1</span>
+          <span class="ex-title">求期望、方差，并化简 $E(3X-2)$、$Var(2X+5)$</span>
+        </div>
+        <div class="example-body">
+          <p>随机变量 $X$ 的分布为 $P(X=0)=0.2$，$P(X=1)=0.5$，$P(X=2)=0.3$。求 $E(X)$、$Var(X)$，以及 $E(3X-2)$、$Var(2X+5)$。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 期望：</strong></p>
+              $$ E(X) = 0\times 0.2 + 1\times 0.5 + 2\times 0.3 = 1.1 $$
+              <p><strong>第 2 步 二阶矩：</strong></p>
+              $$ E(X^2) = 0^2\times 0.2 + 1^2\times 0.5 + 2^2\times 0.3 = 1.7 $$
+              <p><strong>第 3 步 方差：</strong></p>
+              $$ Var(X) = E(X^2) - [E(X)]^2 = 1.7 - 1.1^2 = 1.7 - 1.21 = 0.49 $$
+              <p><strong>第 4 步 用性质化简：</strong></p>
+              $$ E(3X - 2) = 3\times 1.1 - 2 = 1.3 $$
+              $$ Var(2X + 5) = 2^2 \times Var(X) = 4 \times 0.49 = 1.96 $$
+              <p><strong>要点：</strong>平移（$-2$、$+5$）影响期望但不影响方差；缩放使方差乘以系数的<strong>平方</strong>。常见错误是写成 $Var(2X+5) = 2 Var(X)$。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 5.2</span>
+          <span class="ex-title">挑战题：放回 vs 不放回，与期望方差的综合运用</span>
+        </div>
+        <div class="example-body">
+          <p>袋中有 4 个红球、6 个白球，除颜色外完全相同。随机从中抽出 2 个球，令 $X$ = 抽到的红球个数。分别求：</p>
+          <p>（a）<strong>不放回</strong>抽样时 $X$ 的分布、$E(X)$、$Var(X)$；（b）<strong>放回</strong>抽样时同样的三个量；（c）令 $Y = 2X + 1$，求 $E(Y)$ 与 $Var(Y)$；（d）两次<strong>独立重复</strong>实验（每次放回抽 2 球），$X_1 + X_2$ 的方差是多少？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 不放回：古典概型逐格数。</strong>从 10 个球中取 2 个的等可能取法共 $\binom{10}{2} = 45$ 种。</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$X$（红球数）</th><th>计数</th><th>概率</th><th>贡献到 $E(X)$</th><th>贡献到 $E(X^2)$</th></tr></thead>
+                  <tbody>
+                    <tr><td>0</td><td>$\binom{4}{0}\binom{6}{2} = 15$</td><td>$\frac{15}{45} = \frac{1}{3}$</td><td>0</td><td>0</td></tr>
+                    <tr><td>1</td><td>$\binom{4}{1}\binom{6}{1} = 24$</td><td>$\frac{24}{45} = \frac{8}{15}$</td><td>$\frac{8}{15}$</td><td>$\frac{8}{15}$</td></tr>
+                    <tr><td>2</td><td>$\binom{4}{2}\binom{6}{0} = 6$</td><td>$\frac{6}{45} = \frac{2}{15}$</td><td>$\frac{4}{15}$</td><td>$\frac{8}{15}$</td></tr>
+                    <tr><td><strong>合计</strong></td><td><strong>45</strong></td><td><strong>1</strong></td><td>$\frac{12}{15} = 0.8$</td><td>$\frac{16}{15} \approx 1.0667$</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>（也可以用逐次相乘的乘法法则验证：$P(X=0) = \frac{6}{10}\times\frac{5}{9} = \frac{1}{3}$，$P(X=2) = \frac{4}{10}\times\frac{3}{9} = \frac{2}{15}$。）</p>
+              $$ E(X) = \frac{8}{15} + \frac{4}{15} = 0.8, \qquad E(X^2) = \frac{8}{15} + \frac{8}{15} = \frac{16}{15} $$
+              $$ Var(X) = E(X^2) - [E(X)]^2 = \frac{16}{15} - 0.64 = \frac{16}{15} - \frac{16}{25} = \frac{16(25-15)}{375} = \frac{160}{375} \approx 0.4267 $$
+              <p><strong>第 2 步 放回：二项分布。</strong>每次抽中红球的概率恒为 $p = \frac{4}{10} = 0.4$ 且两次独立，故 $X \sim B(2, 0.4)$：</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$X$</th><th>概率</th><th>$x \cdot P$</th><th>$x^2 \cdot P$</th></tr></thead>
+                  <tbody>
+                    <tr><td>0</td><td>$0.6^2 = 0.36$</td><td>0</td><td>0</td></tr>
+                    <tr><td>1</td><td>$2 \times 0.4 \times 0.6 = 0.48$</td><td>0.48</td><td>0.48</td></tr>
+                    <tr><td>2</td><td>$0.4^2 = 0.16$</td><td>0.32</td><td>0.64</td></tr>
+                    <tr><td><strong>合计</strong></td><td><strong>1.00</strong></td><td><strong>0.80</strong></td><td><strong>1.12</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              $$ E(X) = 0.8, \qquad E(X^2) = 1.12, \qquad Var(X) = 1.12 - 0.64 = 0.48 $$
+              <p><strong>关键观察：两种抽样方式的期望完全相同（都是 0.8），但方差不同（0.4267 vs 0.48）。</strong>为什么？</p>
+              <ul>
+                <li><strong>期望只取决于边际概率</strong>：不论放不放回，每一球是红球的概率都是 0.4，两球红球数的期望自然都是 $2 \times 0.4 = 0.8$。</li>
+                <li><strong>方差取决于两球是否独立</strong>：不放回时，抽走一个红球会<strong>降低</strong>第二球为红的概率（$P(\text{第二球红} \mid \text{第一球红}) = 3/9 < 0.4$），两球<strong>负相关</strong>，这会「对冲」掉一部分波动，使总方差变小。</li>
+              </ul>
+              <p>用协方差精确验证：令 $X_1, X_2$ 分别指示第一、二球是否为红。两种方式下 $Var(X_1) = Var(X_2) = 0.4 \times 0.6 = 0.24$。</p>
+              <ul>
+                <li><strong>放回</strong>：$Cov(X_1, X_2) = 0$（独立），故 $Var(X_1 + X_2) = 0.24 + 0.24 = 0.48$ ✓</li>
+                <li><strong>不放回</strong>：$P(X_1 = 1, X_2 = 1) = \frac{4}{10}\times\frac{3}{9} = \frac{2}{15} \approx 0.1333$，而 $E(X_1)E(X_2) = 0.16$，故 $Cov(X_1, X_2) = \frac{2}{15} - 0.16 \approx -0.0267 < 0$，于是 $Var(X_1 + X_2) = 0.24 + 0.24 + 2(-0.0267) = 0.4267$ ✓</li>
+              </ul>
+              <p>这正是 5.3 节公式 $Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)$ 的应用：<strong>方差只有在独立时才能直接相加</strong>，不放回时必须补上负的协方差项。</p>
+              <p><strong>第 3 步 随机变量的函数 $Y = 2X + 1$。</strong>用 5.3 节的线性性质，不必重新展开分布：</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>抽样方式</th><th>$E(Y) = 2E(X) + 1$</th><th>$Var(Y) = 4\,Var(X)$</th></tr></thead>
+                  <tbody>
+                    <tr><td>不放回</td><td>$2 \times 0.8 + 1 = 2.6$</td><td>$4 \times 0.4267 \approx 1.7067$</td></tr>
+                    <tr><td>放回</td><td>$2 \times 0.8 + 1 = 2.6$</td><td>$4 \times 0.48 = 1.92$</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p><strong>第 4 步 两次独立重复实验。</strong>$X_1$、$X_2$ 来自两次<strong>独立</strong>的实验（第一次抽完放回、重新混匀、第二次再抽），所以 $Cov(X_1, X_2) = 0$，方差直接相加：</p>
+              $$ Var(X_1 + X_2) = Var(X_1) + Var(X_2) = 0.48 + 0.48 = 0.96 $$
+              <p>（$E(X_1 + X_2) = 1.6$。）这里要特别区分：<strong>「两次独立重复实验」与「一次实验里抽两个球」是完全不同的两件事</strong>——前者 $Var = 0.96$，后者（放回）$Var = 0.48$。因为前者是 4 次独立的抽取，后者只有 2 次且第 2 次依赖第 1 次。</p>
+              <p><strong>易错提示：</strong>① 不放回抽样时套用二项分布——二项分布要求<strong>独立且概率不变</strong>，不放回时第二球概率会变，正确的分布是<strong>超几何分布</strong>（本例 $P(X=1) = \frac{8}{15} \approx 0.533$ 而二项给出 $0.48$，差别明显）；② 把「不放回」和「放回」的期望记混（两者期望确实相同，但方差不同，容易误以为完全一样）；③ 计算方差时直接用 $Var(X_1 + X_2) = Var(X_1) + Var(X_2)$ 而忘了不独立时要加 $2Cov$ 项；④ 把 $Var(aX+b)$ 写成 $a\,Var(X)$（忘了平方）；⑤ 混淆「一次抽 2 球」与「抽 2 次各 1 球」——前者 2 次抽取不独立，后者若每次放回则独立；⑥ 用 $E(X^2) - [E(X)]^2$ 时把 $E(X^2)$ 算成 $E(X)^2$（前者是平方的期望，后者是期望的平方，一般不等）；⑦ 忘记 $Var$ 不可加的例外：<strong>独立</strong>才可加。</p>
+              <p><strong>应用/AI 关联：</strong>① <strong>小样本上的 softmax / 采样</strong>：从 10 个候选中<strong>不放回</strong>抽 2 个（top-2 采样）与<strong>放回</strong>抽 2 次，期望相同但方差不同——放回版本会重复选中同一个候选，导致结果分布「过于集中」，这就是需要在采样时加温度或用 Gumbel top-k 修正的原因；② <strong>训练集构造</strong>：从标注池中「不放回」抽样本 vs 「放回」（bootstrap）抽样，后者会使部分样本被重复抽取、另一些缺席，直接影响集成模型（bagging）的误差结构；③ <strong>模型评估中的多轮采样</strong>：LLM 用温度 $\tau > 0$ 生成 $n$ 个样本时本质是放回式的独立重复，方差随 $n$ 缩小——这正是自洽性（self-consistency）方法有效的原因；④ <strong>有限总体校正因子</strong>：不放回抽样时标准误要乘 $\sqrt{\frac{N-n}{N-1}}$，本例即 $\sqrt{\frac{10-2}{10-1}} = \sqrt{\frac{8}{9}} \approx 0.943$——抽得越多，这个校正越接近 1（抽完全体时方差为 0），而在 AI 领域「用尽整个池子」与「反复抽同一池子」的区别正是模块 08 中「探索/利用」权衡的具体体现。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 6 ===== -->
+      <div id="examples"></div><h2 id="s6">6 · 本章例题精讲</h2>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.1</span>
+          <span class="ex-title">抽球问题：用组合数算古典概型</span>
+        </div>
+        <div class="example-body">
+          <p>袋中有 5 个红球、3 个白球，除颜色外完全相同。从中<strong>一次随机取出 3 个</strong>（不放回），求恰好取到 2 红 1 白的概率。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 分母：</strong>从 8 个球中任取 3 个的等可能取法共 $\binom{8}{3} = \frac{8\times 7\times 6}{3\times 2\times 1} = 56$ 种。</p>
+              <p><strong>第 2 步 分子：</strong>从 5 红中取 2 个有 $\binom{5}{2} = 10$ 种，从 3 白中取 1 个有 $\binom{3}{1} = 3$ 种，由乘法原理共 $10 \times 3 = 30$ 种。</p>
+              <p><strong>第 3 步 相除：</strong></p>
+              $$ P(\text{2 红 1 白}) = \frac{\binom{5}{2}\binom{3}{1}}{\binom{8}{3}} = \frac{10 \times 3}{56} = \frac{30}{56} = \frac{15}{28} \approx 53.6\% $$
+              <p><strong>对比（逐个取的乘法视角）：</strong>「红红白」顺序概率 $\frac{5}{8}\times\frac{4}{7}\times\frac{3}{6}$，而 2 红 1 白有「红红白、红白红、白红红」3 种顺序，合计 $3\times\frac{60}{336} = \frac{180}{336} = \frac{15}{28}$——两种方法结果一致。组合数法把顺序打包，更不易漏。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.2</span>
+          <span class="ex-title">全概率 + 贝叶斯：产品来自哪个车间</span>
+        </div>
+        <div class="example-body">
+          <p>某厂两个车间产量分别占 60% 与 40%，次品率分别为 2% 与 5%。（a）随机抽一件产品，是次品的概率？（b）若抽到次品，它来自一车间的概率？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>设 $A_1$、$A_2$ 为「来自一/二车间」，$D$ =「次品」。已知 $P(A_1)=0.6$，$P(A_2)=0.4$，$P(D \mid A_1)=0.02$，$P(D \mid A_2)=0.05$。</p>
+              <p>（a）<strong>全概率公式：</strong></p>
+              $$ P(D) = 0.02\times 0.6 + 0.05\times 0.4 = 0.012 + 0.02 = 0.032 $$
+              <p>（b）<strong>贝叶斯公式：</strong></p>
+              $$ P(A_1 \mid D) = \frac{P(D \mid A_1)P(A_1)}{P(D)} = \frac{0.012}{0.032} = 0.375 $$
+              <p><strong>解读：</strong>虽然一车间次品率更低（2% &lt; 5%），但因产量占比大，次品中仍有 37.5% 来自一车间。若二车间产量占比升到 80%，后验会明显转向二车间——先验（产量构成）在贝叶斯推理中始终起作用。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 7 ===== -->
+      <!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 03 概率论基础 -->
+
+
+<h2 id="d-deep-1">深度专题一 · 基础率谬误：为什么「99% 准确」的检测仍会大量误报</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把阳性预测值写成基础率的函数，并解出可用的阈值</h3></div>
+  <p class="dt-lead">对应本章第 3 节（#s3）「条件概率为什么不能互换」与第 4 节（#s4）「全概率公式如何拆分」，并回答本章提问「基础率极低时，为什么高灵敏度的检测仍会产生大量误报」。正文例 4.1 已用患病率 1%、灵敏度 90%、假阳性率 5% 算出后验 15.4%，例 4.2 讲了复检与似然比；这里换一组更极端的数字，把结论写成一般函数与可操作的阈值公式。</p>
+
+  <h4>背景：一个让医生也翻车的问卷</h4>
+  <p>1978 年 Casscells 等人给哈佛医学院的学生与医生出了一道题：某病患病率 $1/1000$，检测对患者 100% 阳性、对健康人仍有 5% 假阳性，问「检测阳性者真患病的概率」。多数人答 95%，正确答案约 2%。此后 Gigerenzer 等人用「自然频数」（把概率改写成「1000 人里有几人」）反复证明：只要把数字换成人数，错误率大幅下降。问题不在算术，而在人们默认把 $P(+\mid D)$ 当成了 $P(D\mid +)$，并且忽略了那个极小的先验。</p>
+  <p>正文已经演示过一次（15.4%），本专题要再推一步：即便把检测做到「灵敏度 99%、特异度 99%」这种近乎完美的水平，只要基础率足够低，阳性里绝大多数仍会是误报。这不是检测不行，是<strong>乘法结构</strong>决定的。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>「检测准确率 99%」听起来像是「阳性者九成九真患病」，但这句广告词其实混了两个方向的概率：它说的是<strong>病人有多大概率被检出</strong>、<strong>健康人有多大概率被误报</strong>；你真正想要的是反过来那个——<strong>阳性的人里有多大比例真患病</strong>。方向一反过来，中间就隔着一个基础率。</p>
+  <p>打个比方：在一百万粒白沙里找一粒红沙，筛子再准，只要它每筛一百粒白沙就误留一粒，漏进来的白沙也是一万粒，远多过那一粒红沙。病人极少、健康人极多时，<strong>健康人的巨大基数乘以一个很小的假阳性率</strong>，乘出来的人数照样淹没真阳性。所以提高灵敏度（别漏掉红沙）帮助有限，提高特异度（别误留白沙）才是关键——因为它直接缩小那个巨大的乘数。</p>
+  <p>于是「这个检测准不准」根本没有唯一答案：必须连同「在什么样的人群里用」一起回答。同一个检测，在专科门诊（基础率高）很可靠，在全民筛查（基础率极低）就会制造海量误报。</p>
+
+  <h4>形式化</h4>
+  <p>记号：$D$ = 患病，$D^c$ = 健康，$+$ = 检测阳性。基础率（患病率）$p=P(D)$，灵敏度 $Se=P(+\mid D)$，特异度 $Sp = P(-\mid D^c)$，假阳性率 $FPR = 1 - Sp$。下面每个公式配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">全概率：所有阳性从哪来</div>
+    $$ P(+) = Se\cdot p + (1-Sp)(1-p) $$
+    <div class="f-note">白话：阳性总数 = 病人里被检出的（真阳性）+ 健康人里被误报的（假阳性）；第二项里 $(1-p)$ 是健康人的巨大占比。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">贝叶斯：阳性预测值 PPV</div>
+    $$ \mathrm{PPV} = P(D\mid +) = \frac{Se\cdot p}{Se\cdot p + (1-Sp)(1-p)} $$
+    <div class="f-note">白话：真阳性占全部阳性的比例。分子分母都含 $p$，但分母还额外挂着一个乘着 $(1-p)$ 的假阳性项；$p$ 越小，这一项越压倒分子。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">优势比形式：基础率如何「压倒」检测</div>
+    $$ \frac{P(D\mid +)}{P(D^c\mid +)} = \underbrace{\frac{Se}{1-Sp}}_{\text{似然比 } LR_+}\ \times\ \underbrace{\frac{p}{1-p}}_{\text{先验优势比}} $$
+    <div class="f-note">白话：后验优势比 = 似然比 × 先验优势比。检测只贡献一个乘数 $LR_+$，基础率贡献被乘的那个数；后者极小，乘积就仍然小。这也解释了正文例 4.2 里「似然比 18 看着大、乘上 0.0101 后仍然很小」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">可操作的阈值：阳性更可能是真病的条件</div>
+    $$ \mathrm{PPV} \gt \tfrac12 \iff Se\cdot p \gt (1-Sp)(1-p) \iff p \gt \frac{1-Sp}{Se + 1 - Sp} $$
+    <div class="f-note">白话：解一次不等式就得到基础率的最低门槛。当 $Se=Sp=0.99$ 时门槛为 $0.01/1.00 = 0.01$，即患病率必须超过 1%，一次阳性才更可能是真病而非误报。</div>
+  </div>
+
+  <p>数值演示见代码实验 Part 1：$Se=Sp=0.99$ 给出 $LR_+=99$、先验优势比阈值 $0.010101$、患病率门槛 $0.010000$。表中 $p$ 从 $0.0001$ 升到 $0.5$，PPV 从 $0.009804$ 升到 $0.990000$；$p=0.01$ 时恰好 $0.500000$，逐位验证阈值；而 $p=0.001$（千分之一）时 PPV 只有 $0.090164$——约 91% 的阳性是误报，比正文例 4.1 的 15.4% 更极端。这说明「把灵敏度从 90% 提到 99%」并不能解决问题，真正起作用的是把假阳性率从 5% 压到 1%。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>阳性预测值不是检测的固有属性，而是「检测性能 × 基础率」的联合结果：$P(D\mid +) = \dfrac{Se\,p}{Se\,p + (1-Sp)(1-p)}$。基础率通过先验优势比进入后验，且存在硬门槛 $p \gt \dfrac{1-Sp}{Se+1-Sp}$；低于门槛时，无论灵敏度多高，阳性里都是误报占多数。低基础率场景下，提升特异度比提升灵敏度有效得多。</div>
+
+  <p><strong>边界条件：</strong>在基础率已知且稳定、灵敏度／特异度可从标定人群迁移到待筛人群（无谱偏倚 spectrum bias）、且多次检测相互独立的条件下，本结论成立；在待筛人群基础率与标定人群不同、两次检测同源相关（同批试剂、同一操作者）、或存在未观测亚群异质性的条件下，本结论不成立，应改用分层基础率下的贝叶斯更新、带协变量的 logistic 校准模型，或直接估计各亚群的条件概率，而不是套用单一的 $Se$／$Sp$。</p>
+
+  <p>下图把「先验 → 似然 → 后验 → 下一轮先验」的序贯更新画出来：基础率就是最左边那个先验，它每轮都在场，永远不会被证据「覆盖」掉。</p>
+  <figure class="figure" id="fig-flow-bayes-update">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="贝叶斯更新：先验 → 似然 → 后验"><rect class="dg-box muted" x="20.0" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="73.6" y="94.0" text-anchor="middle">先验 p(θ)</text><text class="dg-ts" x="73.6" y="111.0" text-anchor="middle">已有信念</text><rect class="dg-box alt" x="153.2" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="206.79999999999998" y="94.0" text-anchor="middle">观测数据 D</text><text class="dg-ts" x="206.79999999999998" y="111.0" text-anchor="middle">似然 p(D|θ)</text><line class="dg-edge" x1="127.19999999999999" y1="97.0" x2="153.2" y2="97.0"/><polygon class="dg-edge" points="153.2,97.0 145.8952884775015,100.26208362447656 145.8952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="286.4" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">贝叶斯公式</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">归一化证据</text><line class="dg-edge" x1="260.4" y1="97.0" x2="286.4" y2="97.0"/><polygon class="dg-edge" points="286.4,97.0 279.0952884775015,100.26208362447656 279.0952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="419.59999999999997" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="473.2" y="94.0" text-anchor="middle">后验 p(θ|D)</text><text class="dg-ts" x="473.2" y="111.0" text-anchor="middle">更新后的信念</text><line class="dg-edge" x1="393.59999999999997" y1="97.0" x2="419.59999999999997" y2="97.0"/><polygon class="dg-edge" points="419.59999999999997,97.0 412.2952884775015,100.26208362447656 412.2952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="552.8" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="606.4" y="94.0" text-anchor="middle">下一轮先验</text><text class="dg-ts" x="606.4" y="111.0" text-anchor="middle">序贯更新</text><line class="dg-edge" x1="526.8" y1="97.0" x2="552.8" y2="97.0"/><polygon class="dg-edge" points="552.8,97.0 545.4952884775015,100.26208362447656 545.4952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">贝叶斯更新：先验 → 似然 → 后验</span>
+    <span class="fig-note">后验 ∝ 先验 × 似然；本轮后验可作为下一轮的先验，形成序贯学习。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../modules/m07-bayesian.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 独立 vs 互斥，以及「在什么条件下独立」</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>两个几乎相反的概念，和一个必须说清的「给定谁」</h3></div>
+  <p class="dt-lead">对应本章第 2 节（#s2）「独立与互斥在什么条件下可能同时成立」与第 3 节（#s3）「条件概率为什么不能互换」。正文 2.2 / 3.4 节已给出「互斥且概率为正 ⇒ 必不独立」，并用骰子展示了「不互斥也可能独立」的巧合；这里补齐三处留白：两者究竟何时能共存、条件独立的严格定义、以及「边缘相关但给定 $Z$ 独立」的数值构造。</p>
+
+  <h4>背景：一个高频混淆，以及它背后的因果结构</h4>
+  <p>「互斥」（mutually exclusive）与「独立」（independent）是概率题里最常被互换的一对词，连教材都常要靠「必背结论」来压住。它们其实来自两种完全不同的提问：互斥问「能不能一起发生」，独立问「知道一个发生，会不会改变另一个的概率」。1933 年柯尔莫哥洛夫公理化之后，独立被定义为乘积关系，而互斥只是交集为空；二者的张力用一行代数就能讲清。</p>
+  <p>更深的留白是「条件独立」。正文例 3.2 第 7 步曾点破一个隐含假设：<em>「$C$ 的条件概率只取决于 $B$，与 $A$ 无关」</em>——那其实就是条件独立。把它写清楚，才能明白为什么全概率公式和链式法则不是自动成立的公式，而是<strong>带着假设的工具</strong>；这也正是模块 01 混杂因素在概率层面的对应物。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>互斥说的是「两件事不能一起发生」——一旦知道 A 发生，就能断定 B <strong>绝不可能</strong>发生。这明明是 A 对 B 产生了<strong>最强的影响</strong>，怎么可能叫「毫无影响」？所以只要两件事都有可能发生（概率为正），互斥就一定不独立。唯一的例外是某件事概率为 0（几乎不会发生）：此时「不能一起发生」和「乘积相等」在数值上都是 0，两个定义可以同时满足，但这是退化情形，没有实际意义。</p>
+  <p>条件独立则要换个问法：<strong>「在什么条件下、相对哪个变量独立？」</strong>冰淇淋销量与溺水事故整体上高度相关，只是因为气温这个共同原因同时推高了两者；一旦把气温固定住（只看同为 35℃ 的日子），两者就互不相干了——这叫「给定气温条件独立」。反过来也成立：边缘上互不相干的两个变量，一旦以它们的共同结果作为条件（对撞结构），反而会表现出相关。所以「独立」永远不是一个可以默认的事实，而是需要写明条件集合、并用数据或机制验证的假设。</p>
+
+  <h4>形式化</h4>
+  <div class="formula-box">
+    <div class="f-name">两个定义</div>
+    $$ A\cap B = \varnothing \iff P(A\cap B) = 0, \qquad A \perp B \iff P(A\cap B) = P(A)P(B) $$
+    <div class="f-note">白话：互斥是「交集为空」；独立是「交集的概率恰好等于两个边缘概率的乘积」。前者是集合关系，后者是数值关系。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">两者何时能同时成立</div>
+    $$ P(A\cap B) = 0 \ \text{且}\ P(A\cap B) = P(A)P(B) \iff P(A) = 0 \ \text{或}\ P(B) = 0 $$
+    <div class="f-note">白话：两式同时成立，只能是至少一个事件概率为 0。只要 $P(A) \gt 0$ 且 $P(B) \gt 0$，就有 $P(A)P(B) \gt 0 = P(A\cap B)$，于是必定不独立——这正是正文 3.4 的必背结论，也精准回答了本章第 2 节的提问。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">条件独立的严格定义</div>
+    $$ A \perp B \mid Z \iff P(A\cap B\mid Z) = P(A\mid Z)\,P(B\mid Z) $$
+    <div class="f-note">白话：把样本空间缩小到「$Z$ 发生」之后，再在这个缩小后的空间里判定 A、B 是否独立。边缘独立与条件独立<strong>互不蕴含</strong>。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">链式法则与条件独立带来的简化</div>
+    $$ P(A\cap B\cap C) = P(A)\,P(B\mid A)\,P(C\mid A\cap B) $$
+    $$ C \perp A \mid B \ \Longrightarrow\ P(A\cap B\cap C) = P(A)\,P(B\mid A)\,P(C\mid B) $$
+    <div class="f-note">白话：一般情形要一路连乘；若已知「给定 $B$ 后 $C$ 与 $A$ 无关」，最后一项就能从 $P(C\mid A\cap B)$ 简写成 $P(C\mid B)$。正文例 3.2 第 7 步之所以能填满八格表，靠的正是这个假设；假设不成立时 $P(C)$ 就算不出来。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">边缘相关、给定 $Z$ 却独立（共同原因）</div>
+    $$ P(X{=}1,Y{=}1\mid Z{=}0) = 0.04 = 0.2\times 0.2, \qquad P(X{=}1,Y{=}1\mid Z{=}1) = 0.64 = 0.8\times 0.8 $$
+    $$ P(X{=}1,Y{=}1) = \tfrac12(0.04) + \tfrac12(0.64) = 0.34 \ \neq\ 0.25 = P(X{=}1)P(Y{=}1) $$
+    <div class="f-note">白话：两层内部都严格独立，合并后却出现相关。$Z$ 是同时影响 $X$ 与 $Y$ 的共同原因——这正是模块 01 混杂因素的概率版本，也说明「相关」本身并不足以判断机制。</div>
+  </div>
+
+  <p>数值演示见代码实验 Part 3：两层各 6000 人，层内 $X,Y$ 独立（$0.2\times0.2=0.04$、$0.8\times0.8=0.64$ 逐层精确成立），合并后 $P(X{=}1)=P(Y{=}1)=0.5$ 而 $P(X{=}1,Y{=}1)=0.34\neq0.25$，程序对三层分别打印 <code>indep=True / True / False</code>。不需要任何随机数，全部是整数计数，可逐格复核。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>互斥且概率为正必定不独立；两者只在零概率事件上能共存。「独立」必须指明条件集合：给定 $Z$ 独立与边缘独立互不蕴含，共同原因会让「层内独立、合并相关」，对撞结构会让「边缘独立、条件相关」。因此全概率公式、链式法则与朴素贝叶斯都必须先声明所依赖的条件独立假设，再用分层列联表验证。</div>
+
+  <p><strong>边界条件：</strong>在事件概率严格为正、且讨论无条件（边缘）独立时，「互斥 ⇒ 不独立」成立；在存在零概率事件、或改用条件独立（给定 $Z$）、或涉及对撞（collider）结构的条件下，本结论不成立，应改用条件独立判据 $P(A\cap B\mid Z)=P(A\mid Z)P(B\mid Z)$ 与链式法则逐项写出假设，并用分层列联表或因果图验证，而不是凭直觉套用乘积公式。</p>
+
+  <p>独立性从来不是可以默认的事实。下图是模块 05 的假设检验决策流程，它把「独立、正态性、方差齐性」明确列为前置假设条件，并要求任一条不成立时换用非参数或重抽样方法；本专题正是把其中「独立」这一条拆到最细粒度来审视。</p>
+  <figure class="figure" id="fig-flow-hypothesis-test">
+  <svg class="dia" viewBox="0 0 680 550" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="假设检验的完整决策流程"><rect class="dg-box alt" x="190.0" y="34" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="57.0" text-anchor="middle">① 提出 H₀ 与 H₁</text><text class="dg-ts" x="340.0" y="74.0" text-anchor="middle">先定方向与显著性水平 α</text><rect class="dg-box" x="190.0" y="120" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="143.0" text-anchor="middle">② 选检验统计量</text><text class="dg-ts" x="340.0" y="160.0" text-anchor="middle">由数据类型与样本量决定</text><line class="dg-edge" x1="340.0" y1="86" x2="340.0" y2="120"/><polygon class="dg-edge" points="340.0,120 336.7379163755234,112.69528847750153 343.2620836244766,112.69528847750153" fill="var(--line-strong)" stroke="none"/><rect class="dg-box warn" x="190.0" y="206" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="229.0" text-anchor="middle">③ 检查适用条件</text><text class="dg-ts" x="340.0" y="246.0" text-anchor="middle">独立 / 分布 / 方差齐性</text><line class="dg-edge" x1="340.0" y1="172" x2="340.0" y2="206"/><polygon class="dg-edge" points="340.0,206 336.7379163755234,198.69528847750152 343.2620836244766,198.69528847750152" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="190.0" y="292" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="315.0" text-anchor="middle">④ 计算统计量与 p 值</text><text class="dg-ts" x="340.0" y="332.0" text-anchor="middle">在 H₀ 成立的分布下求值</text><line class="dg-edge" x1="340.0" y1="258" x2="340.0" y2="292"/><polygon class="dg-edge" points="340.0,292 336.7379163755234,284.69528847750155 343.2620836244766,284.69528847750155" fill="var(--line-strong)" stroke="none"/><text class="dg-elabel" x="348.0" y="270.0" text-anchor="start">不满足→换方法</text><rect class="dg-box info" x="190.0" y="378" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="401.0" text-anchor="middle">⑤ 与 α 比较并下结论</text><text class="dg-ts" x="340.0" y="418.0" text-anchor="middle">拒绝 ≠ 证明 H₁ 为真</text><line class="dg-edge" x1="340.0" y1="344" x2="340.0" y2="378"/><polygon class="dg-edge" points="340.0,378 336.7379163755234,370.69528847750155 343.2620836244766,370.69528847750155" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="190.0" y="464" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="487.0" text-anchor="middle">⑥ 报告效应量与区间</text><text class="dg-ts" x="340.0" y="504.0" text-anchor="middle">避免只看 p 值</text><line class="dg-edge" x1="340.0" y1="430" x2="340.0" y2="464"/><polygon class="dg-edge" points="340.0,464 336.7379163755234,456.69528847750155 343.2620836244766,456.69528847750155" fill="var(--line-strong)" stroke="none"/><path class="dg-edge" d="M 490.0 232.0 L 490.0 232.0 L 582.0 232.0 L 582.0 232.0"/><line class="dg-edge" x1="582.0" y1="222.0" x2="582.0" y2="232.0"/><polygon class="dg-edge" points="582.0,232.0 578.7379163755235,224.69528847750152 585.2620836244765,224.69528847750152" fill="var(--line-strong)" stroke="none"/><text class="dg-ts" x="590.0" y="236.0" text-anchor="start">条件不满足：置换 / bootstrap / 秩和检验</text></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">假设检验的完整决策流程</span>
+    <span class="fig-note">从提出原假设到结论，任一步的假设条件（独立、正态性、方差齐性）不成立时须换用非参数或重抽样方法，见图中边界条件。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../modules/m05-inference.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 全概率公式与贝叶斯公式作为一套可照做的流程</h2>
+<div class="algo-spec">
+  <p>本算法位于「建模 → 评估」链条的<strong>概率推理层</strong>：上游契约是「一组完备互斥的情形划分 + 每类情形下的条件概率」，下游契约是「归一化后的后验概率或优势比」，供模块 07 贝叶斯更新、模块 08 因果推断与模块 12 的分类器使用。</p>
+
+  <h3 id="d-algo-principle">一、原理：先拆证据，再翻转条件</h3>
+  <p>设 $A_1,\dots,A_m$ 是样本空间 $\Omega$ 的一个<strong>划分</strong>（两两互斥且并为全集），$B$ 是观测到的证据。全概率公式先按情形把 $B$ 拆开求和，贝叶斯公式再用这个和作分母把 $P(B\mid A_i)$ 翻转成 $P(A_i\mid B)$。</p>
+  <div class="formula-box">
+    <div class="f-name">划分与全概率公式</div>
+    $$ A_i\cap A_j = \varnothing\ (i\neq j),\qquad \bigcup_{i=1}^{m} A_i = \Omega $$
+    $$ P(B) = \sum_{i=1}^{m} P(B\mid A_i)\,P(A_i) $$
+    <div class="f-note">白话：把「$B$ 发生的总概率」按各种情形分别算出来再加权求和；划分必须穷尽且互不重叠，否则分母会漏项或重复。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">贝叶斯公式</div>
+    $$ P(A_i\mid B) = \frac{P(B\mid A_i)\,P(A_i)}{\displaystyle\sum_{j=1}^{m} P(B\mid A_j)\,P(A_j)} = \frac{P(B\mid A_i)P(A_i)}{P(B)} $$
+    <div class="f-note">白话：后验 = 似然 × 先验 ÷ 证据；分母「证据」正是全概率公式算出的 $P(B)$，它保证所有后验加起来等于 1。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">优势比形式与序贯更新</div>
+    $$ \frac{P(A_i\mid B)}{P(A_i^c\mid B)} = \frac{P(B\mid A_i)}{P(B\mid A_i^c)}\times\frac{P(A_i)}{P(A_i^c)} $$
+    <div class="f-note">白话：每来一条证据，就把当前优势比乘上一个似然比；上一轮的后验直接充当下一轮的先验。正文例 4.2 的「初检阳性 → 复检阳性」用的就是这条迭代。</div>
+  </div>
+  <p><strong>几何解释：</strong>把样本空间画成单位正方形，按划分 $A_i$ 切成若干竖条，条宽是 $P(A_i)$（先验）；每条里按 $P(B\mid A_i)$ 的比例涂色；涂色总面积就是证据 $P(B)$；第 $i$ 条里的涂色占全部涂色的比例，就是后验 $P(A_i\mid B)$。面积图一眼就能看出「基础率极小的竖条再怎么涂色，占总涂色的比例也大不了」。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>写下目标方向。</strong>先明确要的是 $P(A\mid B)$ 还是 $P(B\mid A)$，并把两者分别写出来；方向上搞反是本节最高频的错误。</li>
+    <li><strong>构造划分。</strong>列出 $A_1,\dots,A_m$，检查两两互斥、加起来穷尽；给每块标注先验 $P(A_i)$，并校验 $\sum_i P(A_i)=1$。</li>
+    <li><strong>写似然。</strong>对每块给出 $P(B\mid A_i)$；确认它只依赖于该块。若有多条证据，必须先声明「给定类别后各证据条件独立」，否则不能连乘。</li>
+    <li><strong>算证据。</strong>用全概率公式求 $P(B)=\sum_i P(B\mid A_i)P(A_i)$，顺手校验 $0\le P(B)\le 1$。</li>
+    <li><strong>算后验。</strong>逐块代入 $P(A_i\mid B)=P(B\mid A_i)P(A_i)/P(B)$；分母对所有块相同，只需算一次。</li>
+    <li><strong>双重校验。</strong>① 归一化：$\sum_i P(A_i\mid B)=1$；② 自然频数表：把概率改写成「$N$ 人里各有几人」，逐格数一遍复核。</li>
+    <li><strong>敏感性与报告。</strong>改动先验或似然看重算后验，报告基础率的来源与不确定度；多条证据时做一次「似然比连乘 ↔ 后验」的闭环校验。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>划分：</strong>完备且互斥；每块的先验可靠（或至少能做敏感性分析）。</li>
+    <li><strong>条件概率：</strong>来自与待推断对象同质的标定人群，灵敏度／特异度可迁移（无谱偏倚）。</li>
+    <li><strong>多条证据：</strong>需满足给定类别下的条件独立；否则朴素贝叶斯会重复计数，后验过度自信。</li>
+    <li><strong>数值：</strong>先验不能全为 0（否则后验恒为 0，无法被证据更新），似然不能同时为 0（否则分母为 0）。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>估计（训练）</b> 从 $N$ 条记录统计列联表 $O(N)$ 时间、$O(m)$ 空间（$m$ 为划分数）；<b>推理（单次查询）</b> 全概率求和 $O(m)$ + 逐块后验 $O(m)$，合计 $O(m)$；<b>序贯 $T$ 轮</b> $O(mT)$；<b>空间</b> 仅存先验／似然／后验三个长度 $m$ 的向量，$O(m)$。</div>
+  <p>白话：这套流程本身极轻，成本几乎全在「从数据里把各条件概率统计出来」那一步；一旦表建好，每次推理只是几乘几加，适合在线实时更新。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>把「逆概率」问题化成一套四则运算，方向清晰、可手算、可复核。</li>
+        <li>显式暴露先验，迫使分析者交代基础率来源，天然对抗基础率谬误。</li>
+        <li>优势比形式支持序贯更新：新证据来了不必从头重算。</li>
+        <li>归一化与「自然频数表」提供两道独立校验，工程上容易审计。</li>
+        <li>复杂度 $O(m)$，可嵌入在线服务做实时概率校准。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>结论对先验敏感；先验错（谱偏倚）时，证据再强也可能纠不回来。</li>
+        <li>多条证据的条件独立假设常被违背，导致后验过度自信。</li>
+        <li>划分块数 $m$ 大且数据稀疏时，$P(B\mid A_i)$ 估计极不稳定，需要平滑。</li>
+        <li>只能给出「关联更新」，不能单独支持因果结论（需模块 08 的实验设计）。</li>
+        <li>连续变量或高维特征下，$m$ 爆炸，必须改用参数化模型或共轭结构。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>用全站共用的知学云 2×2 表：按「每周学习时长高／低」划分，观察是否完课。四格计数为</p>
+  <p>$$ \begin{array}{c|cc} & \text{完课} & \text{未完课}\\ \hline \text{高时长} & 3939 & 2071 \\ \text{低时长} & 2028 & 3962 \end{array} $$</p>
+  <p>注意：这里用的是<strong>正文未出现的新算例</strong>（正文例题用的是疾病检测与车间次品），且所有数字与案例文件一致，可跨章对照。设 $A_1$ = 高时长、$A_2$ = 低时长、$B$ = 完课。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知并校验划分。</span>$N = 3939+2071+2028+3962 = 12000$；$n_{A_1} = 6010$，$n_{A_2}=5990$。$P(A_1)=6010/12000=0.500833$，$P(A_2)=5990/12000=0.499167$，两者之和 $=1$，且 $A_1\cap A_2=\varnothing$——划分合法。</div>
+    <div class="solve-step"><span class="ss-k">写似然。</span>$P(B\mid A_1)=3939/6010=0.655408$，$P(B\mid A_2)=2028/5990=0.338564$。二者差距明显，说明「学习时长」携带关于完课的信息。</div>
+    <div class="solve-step"><span class="ss-k">全概率算证据。</span>$P(B)=0.655408\times0.500833 + 0.338564\times0.499167 = 3939/12000 + 2028/12000 = 5967/12000 = 0.497250$，与案例 <code>completed_rate = 0.49725</code> 逐位一致。这里公式自然退化成「把完课人数数一遍」，正是全概率公式的正确性自检。</div>
+    <div class="solve-step"><span class="ss-k">贝叶斯算后验。</span>$P(A_1\mid B) = (3939/12000)/(5967/12000) = 3939/5967 = 0.660131$；$P(A_2\mid B)=2028/5967=0.339869$。</div>
+    <div class="solve-step"><span class="ss-k">归一化校验。</span>$0.660131+0.339869 = 1.000000$ ✓；用人数表复核：完课者共 5967 人，其中高时长 3939 人，占比 $3939/5967$，与公式一致。</div>
+    <div class="solve-step"><span class="ss-k">方向对照（关键）。</span>$P(B\mid A_1)=0.655408$ 而 $P(A_1\mid B)=0.660131$，<strong>数值接近但绝不相等</strong>。此处接近是因为基础率几乎 50%、两组规模几乎相等；换成深度专题一的低基础率场景，二者会差出几十倍（$p=0.001$ 时 $Se=0.99$ 而 PPV 仅 $0.0902$）。绝不能因为「看起来差不多」就混用。</div>
+    <div class="solve-step"><span class="ss-k">优势比闭环校验。</span>先验优势比 $P(B)/P(B^c)=5967/6033=0.989060$；似然比 $LR = P(A_1\mid B)/P(A_1\mid B^c) = (3939/5967)/(2071/6033) = 0.660131/0.343278 = 1.923017$；后验优势比 $=0.989060\times1.923017 = 1.901980$；转回概率 $=1.901980/2.901980 = 0.655408 = P(B\mid A_1)$ ✓，与第 2 步完全吻合。</div>
+    <div class="solve-step"><span class="ss-k">顺带核对优势比 OR。</span>$\mathrm{OR} = (3939\times3962)/(2071\times2028) = 3.7158$，$\ln\mathrm{OR}=1.3126$，$\mathrm{se}_{\ln\mathrm{OR}}=\sqrt{1/3939+1/2071+1/2028+1/3962}=0.0385$，三项都与案例 <code>high_study_2x2</code> 给出的 OR=3.7158、se=0.0385 一致。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>全概率 + 贝叶斯公式（本算法）</th><th>列联表经验频率法</th><th>优势比 · 似然比序贯更新</th><th>朴素代入 $P(B\mid A)$（错误对照）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>划分完备互斥、先验已知、条件概率可迁移</td>
+        <td>已有完整列联表、只需查比例</td>
+        <td>证据按序到达、需连续更新、可给似然比</td>
+        <td>只在 $P(A)=P(B)$ 的极特殊情形才碰巧正确</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>估计 $O(N)$、推理 $O(m)$、空间 $O(m)$</td>
+        <td>建表 $O(N)$、查询 $O(1)$、空间 $O(m^2)$</td>
+        <td>每轮 $O(m)$、$T$ 轮 $O(mT)$、空间 $O(m)$</td>
+        <td>$O(1)$，代价是方向性错误</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>划分数 $m$、先验 $P(A_i)$、似然 $P(B\mid A_i)$、平滑系数</td>
+        <td>分箱口径、零格处理（是否加平滑）</td>
+        <td>似然比、初始先验优势比、证据独立性假设</td>
+        <td>无（把灵敏度直接当后验）</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">方向正确、显式暴露先验、可归一化校验</td>
+        <td>最直观，用人数而不是概率，最不容易算错</td>
+        <td class="best">支持多轮证据，更新成本极低</td>
+        <td>算得最快</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>先验错／谱偏倚／证据相关时后验失真</td>
+        <td>高维稀疏时格子为空，须平滑；难做序贯更新</td>
+        <td>条件独立不成立时连乘会重复计数、过度自信</td>
+        <td>基础率极低时错得离谱（$Se=0.99$ 被当成 PPV）</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>公式与面积图都易讲清；需维护先验来源</td>
+        <td>审计最易（整数计数）；口径要写死</td>
+        <td>需记录每轮似然比与独立性假设，审计成本中等</td>
+        <td>无法解释误报来源，线上风险最高</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="d-code">代码实验 · 基础率阈值、贝叶斯流程与条件独立的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · 整数计数，无随机数 · 2x2 取自知学云案例</span></div>
+  <pre>
+# 深度实验：基础率谬误 / 全概率+贝叶斯流程 / 条件独立
+import math
+
+print("=== Part 1: 基础率决定阳性预测值（灵敏度=特异度=0.99） ===")
+sens, spec = 0.99, 0.99
+fpr = 1 - spec
+print(" prevalence   P(+)       PPV=P(D|+)   1-PPV")
+for p in [0.0001, 0.001, 0.01, 0.02, 0.05, 0.10, 0.50]:
+    pp = sens*p + fpr*(1-p)
+    ppv = sens*p/pp
+    print("   %8.4f  %9.6f   %9.6f   %9.6f" % (p, pp, ppv, 1-ppv))
+thr = fpr/(sens+fpr)
+print(" PPV &gt; 0.5 需要患病率 &gt; %.6f  (= (1-spec)/(sens+1-spec))" % thr)
+print(" 似然比 LR+ = sens/(1-spec) = %.2f ; 先验优势比阈值 = %.6f" % (sens/fpr, fpr/sens))
+
+print()
+print("=== Part 2: 全概率 + 贝叶斯（复用知学云 2x2：高/低学习时长 x 完课） ===")
+a,b,c,d = 3939, 2071, 2028, 3962
+n = a+b+c+d
+p_high = (a+b)/n
+p_low = (c+d)/n
+p_c_given_high = a/(a+b)
+p_c_given_low = c/(c+d)
+p_comp = p_c_given_high*p_high + p_c_given_low*p_low
+p_high_given_comp = p_c_given_high*p_high/p_comp
+p_high_given_not = b/(b+d)
+print(" 2x2 = [[%d,%d],[%d,%d]]  N=%d" % (a,b,c,d,n))
+print(" P(high)=%.6f  P(low)=%.6f  P(complete|high)=%.6f  P(complete|low)=%.6f" % (p_high,p_low,p_c_given_high,p_c_given_low))
+print(" LTP: P(complete)=%.6f = %d/%d" % (p_comp, a+c, n))
+print(" Bayes: P(high|complete)=%.6f = %d/%d" % (p_high_given_comp, a, a+c))
+print(" inverse: P(complete|high)=%.6f vs P(high|complete)=%.6f (不相等)" % (p_c_given_high,p_high_given_comp))
+orv = (a*d)/(b*c)
+print(" OR=(a*d)/(b*c)=%.4f  logOR=%.4f  se_logOR=%.4f" % (orv, math.log(orv), math.sqrt(1/a+1/b+1/c+1/d)))
+prior_odds = (a+c)/(b+d)
+lr = p_high_given_comp/p_high_given_not
+post_odds = prior_odds*lr
+print(" odds check: %.6f x %.6f = %.6f -&gt; P=%.6f" % (prior_odds, lr, post_odds, post_odds/(1+post_odds)))
+
+print()
+print("=== Part 3: 给定 Z 条件独立，边际却不独立（共同原因 Z） ===")
+Z0 = [[240,960],[960,3840]]
+Z1 = [[3840,960],[960,240]]
+def show(name,t):
+    tot = sum(sum(r) for r in t)
+    px = (t[0][0]+t[0][1])/tot
+    py = (t[0][0]+t[1][0])/tot
+    pxy = t[0][0]/tot
+    print(" %-10s P(X=1)=%.4f P(Y=1)=%.4f P(X=1,Y=1)=%.4f product=%.4f indep=%s" % (name,px,py,pxy,px*py,abs(pxy-px*py)&lt;1e-9))
+show("Z=0 层内", Z0)
+show("Z=1 层内", Z1)
+M = [[Z0[i][j]+Z1[i][j] for j in range(2)] for i in range(2)]
+show("合并(边际)", M)
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: 基础率决定阳性预测值（灵敏度=特异度=0.99） ===
+ prevalence   P(+)       PPV=P(D|+)   1-PPV
+     0.0001   0.010098    0.009804    0.990196
+     0.0010   0.010980    0.090164    0.909836
+     0.0100   0.019800    0.500000    0.500000
+     0.0200   0.029600    0.668919    0.331081
+     0.0500   0.059000    0.838983    0.161017
+     0.1000   0.108000    0.916667    0.083333
+     0.5000   0.500000    0.990000    0.010000
+
+ PPV &gt; 0.5 需要患病率 &gt; 0.010000  (= (1-spec)/(sens+1-spec))
+ 似然比 LR+ = sens/(1-spec) = 99.00 ; 先验优势比阈值 = 0.010101
+
+=== Part 2: 全概率 + 贝叶斯（复用知学云 2x2：高/低学习时长 x 完课） ===
+ 2x2 = [[3939,2071],[2028,3962]]  N=12000
+ P(high)=0.500833  P(low)=0.499167  P(complete|high)=0.655408  P(complete|low)=0.338564
+ LTP: P(complete)=0.497250 = 5967/12000
+ Bayes: P(high|complete)=0.660131 = 3939/5967
+ inverse: P(complete|high)=0.655408 vs P(high|complete)=0.660131 (不相等)
+ OR=(a*d)/(b*c)=3.7158  logOR=1.3126  se_logOR=0.0385
+ odds check: 0.989060 x 1.923017 = 1.901980 -&gt; P=0.655408
+
+=== Part 3: 给定 Z 条件独立，边际却不独立（共同原因 Z） ===
+ Z=0 层内     P(X=1)=0.2000 P(Y=1)=0.2000 P(X=1,Y=1)=0.0400 product=0.0400 indep=True
+ Z=1 层内     P(X=1)=0.8000 P(Y=1)=0.8000 P(X=1,Y=1)=0.6400 product=0.6400 indep=True
+ 合并(边际)     P(X=1)=0.5000 P(Y=1)=0.5000 P(X=1,Y=1)=0.3400 product=0.2500 indep=False</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">Part 1 的 LR+=99.00 与门槛 0.010000</span>：$Se/(1-Sp)=0.99/0.01=99$，而 $\mathrm{PPV}\gt0.5$ 要求先验优势比 $p/(1-p) \gt 1/99 = 0.010101$，解得 $p \gt 0.01$。程序直接打印的 $0.010000$ 与公式 $(1-Sp)/(Se+1-Sp)=0.01/1.00$ 完全一致；把 <code>sens, spec</code> 改成别的值，这个门槛会整体移动，但公式结构不变。</p>
+    <p><span class="ci-k">表格七行</span>：$p=0.0001$ 时 $\mathrm{PPV}=0.009804$，即 <code>1-PPV=0.990196</code>——约 99% 的阳性是误报，尽管检测「99% 准确」；$p=0.001$ 时仍只有 $0.090164$（约 91% 误报）；$p=0.01$ 恰好 $0.500000$，逐位验证阈值；$p=0.5$ 时才升到 $0.990000$。<span class="ci-k">P(+) 一列</span>从 0.010098 升到 0.500000，说明低基础率下「阳性」几乎全部由假阳性贡献（$p=0.0001$ 时 $0.0099$ 的假阳性对 $0.000099$ 的真阳性）。这比正文例 4.1 的 15.4% 更极端，正是「提高特异度比提高灵敏度更有效」的数值证据。</p>
+    <p><span class="ci-k">Part 2 的 2x2</span>：$[3939,2071,2028,3962]$ 即案例 <code>high_study_2x2.table</code>，$N=12000$ 与案例 <code>n</code> 一致。<span class="ci-k">P(high)=0.500833、P(low)=0.499167</span> 是划分的两块先验，和为 1；<span class="ci-k">P(complete|high)=0.655408、P(complete|low)=0.338564</span> 是两块似然。</p>
+    <p><span class="ci-k">LTP: 0.497250 = 5967/12000</span>：全概率公式算出的证据，与案例 <code>completed_rate=0.49725</code> 逐位吻合；这里公式自然退化成「把完课人数数一遍」，是正确性自检。<span class="ci-k">Bayes: 0.660131 = 3939/5967</span> 是后验 $P(\text{高时长}\mid\text{完课})$；<span class="ci-k">inverse 一行</span>显示 $0.655408$ 与 $0.660131$ 接近却绝不相等——接近只是因为本例基础率几乎 50%，换成 Part 1 的低基础率场景二者会差出几十倍，这正是本章第 3 节「不能互换」的定量版。</p>
+    <p><span class="ci-k">OR=3.7158、logOR=1.3126、se_logOR=0.0385</span>：与案例给出的 OR=3.7158、se=0.0385 一致，说明同一份数据在不同章节可对照。<span class="ci-k">odds check</span>：先验优势比 $0.989060$ 乘似然比 $1.923017$ 得后验优势比 $1.901980$，转回概率 $0.655408$ 恰等于 $P(\text{complete}\mid\text{high})$，构成「先验 → 证据 → 后验」的闭环校验；改动任一格计数，四个数会一起变，但闭环恒等式始终成立。</p>
+    <p><span class="ci-k">Part 3 三行 indep</span>：$Z=0$ 层内 $0.0400 = 0.2\times0.2$、$Z=1$ 层内 $0.6400 = 0.8\times0.8$，两层都严格条件独立（<code>True / True</code>）；合并后 $P(X{=}1)=P(Y{=}1)=0.5$ 但 $P(X{=}1,Y{=}1)=0.3400 \neq 0.2500$（<code>False</code>）。两层人数各 6000、各格均为整数，可逐格复核，无需随机数。<strong>何时会变</strong>：若两层人数不等，合并的联合概率会随之改变；若在层内引入相关，两层的 <code>indep</code> 都会变成 False。这个构造说明「相关」本身无法区分「直接作用」与「共同原因」——与模块 01 的混杂是同一结构。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>把「已知 $P(B\mid A_i)$ 求 $P(A_i\mid B)$」化为一套可照做的流程：构造划分 → 列先验与似然 → 全概率算证据 → 贝叶斯算后验 → 归一化与频数表双重校验；<strong>不做</strong>因果识别、不做参数拟合、也不自动验证证据间的条件独立。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：完备互斥的划分 $\{A_i\}$、先验 $P(A_i)$、似然 $P(B\mid A_i)$（均无量纲、取值 $[0,1]$）、可选的多轮证据；输出：证据 $P(B)$、后验 $P(A_i\mid B)$（和为 1）、后验优势比与每轮似然比。输出恒为概率，无量纲。</td></tr>
+    <tr><th>适用场景</th><td>医学／质检筛查的阳性解读、垃圾邮件与欺诈检测、逆概率类问题（「高分学员更可能完课」反过来怎么算）、A/B 结果的贝叶斯解读、多轮标注仲裁、以及模块 07 的序贯更新与模块 12 朴素贝叶斯分类器。</td></tr>
+    <tr><th>关键参数</th><td>先验 $P(A_i)$（基础率，最敏感，错则后验系统性偏移）；似然 $P(B\mid A_i)$（灵敏度／特异度，须来自同质标定人群）；划分数 $m$（越大越需平滑）；平滑系数（零格时避免后验恒为 0）；证据间条件独立假设（多条证据时决定能否连乘）。</td></tr>
+    <tr><th>边界条件</th><td>在划分完备互斥、先验可靠、条件概率可迁移、且多条证据给定类别后条件独立时，本方法适用；在谱偏倚（标定人群与待筛人群基础率不同）、证据同源相关、先验全为 0、或似然同时为 0 的条件下不适用，应改用分层基础率下的贝叶斯更新、带协变量的 logistic 校准、或显式建模证据间的依赖结构。</td></tr>
+    <tr><th>常见问题</th><td>① 把 $P(B\mid A)$ 直接当 $P(A\mid B)$；② 划分不穷尽导致分母漏项、后验和不为 1；③ 多条证据不做条件独立检验就连乘似然比；④ 复检时误用原始基础率当先验；⑤ 忽略患病率变化对 PPV 的影响。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>$P(A\mid B)$ 和 $P(B\mid A)$ 什么时候数值很接近？可以互相代替吗？</summary><div class="faq-a">当 $P(A)\approx P(B)$ 且两类的似然差别不大时会接近——代码 Part 2 里 $0.655408$ 与 $0.660131$ 只差约 $0.005$，就是因为基础率几乎 50%、两组人数几乎相等。但<strong>概念上永远不能代替</strong>：严格相等要求 $P(A)=P(B)$ 或似然恒等。换成 Part 1 的 $p=0.001$，$Se=0.99$ 而 PPV 只有 $0.0902$，差了十倍以上。任何时候先写下你要的方向（算法第 1 步）。</div></details>
+  <details><summary>划分漏掉一种情形会怎样？</summary><div class="faq-a">分母 $P(B)=\sum_i P(B\mid A_i)P(A_i)$ 会缺项，被低估；于是各后验 $P(A_i\mid B)$ 被系统性高估，且 $\sum_i P(A_i\mid B)$ 可能大于 1（若你只归一化已列出的块）。所以第 2 步必须显式校验「两两互斥 + 并为全集 + $\sum P(A_i)=1$」。实践中常见漏项是「其他／未知」这一类，务必单独留出一块。</div></details>
+  <details><summary>两条证据能把似然比直接连乘吗？</summary><div class="faq-a">只有在「给定类别后两条证据条件独立」时才可以。若两条证据同源相关（同一批试剂、同一标注员、同一段文本里的重复特征），连乘会把同一份信息数两遍，后验会过度自信（概率被推得过分接近 0 或 1）。这正是朴素贝叶斯的经典失效模式；正确做法是先做条件独立检验，或改用能表达依赖的结构（模块 07、12）。</div></details>
+  <details><summary>复检阳性时，为什么不能用原始患病率当先验？</summary><div class="faq-a">因为初检阳性已经把信息带进来了：此时人群不再是「全体」，而是「初检阳性者」，其患病率已更新为 15.4%（正文例 4.1）。序贯更新的规则是「上一轮后验充当下一轮先验」；若退回 1% 的原始基础率，会得出约 50% 的错误答案。优势比形式把这件事写得很清楚：每轮只是在当前优势比上再乘一个似然比，不会重置。</div></details>
+  <details><summary>检测没变、只是筛查人群换了，PPV 会变吗？</summary><div class="faq-a">会，而且可能剧烈变化，因为 PPV 是「检测 × 基础率」的联合结果。代码 Part 1 里同一组 $Se=Sp=0.99$，患病率从 $0.0001$ 到 $0.5$ 时 PPV 从 $0.0098$ 升到 $0.9900$。所以任何「准确率 99%」的宣传都必须附带适用人群的基础率；把专科门诊的指标直接搬到全民筛查，是谱偏倚的典型表现。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">某检测灵敏度 0.99、特异度 0.99，人群患病率 $p=0.001$。一次阳性者真患病的概率约为？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 0.99</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 0.090</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 0.50</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. 0.010</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$P(+)=0.99\times0.001+0.01\times0.999=0.010980$，$\mathrm{PPV}=0.00099/0.010980=0.090164$，约 91% 的阳性是误报。代码 Part 1 第 2 行即此结果；选 A 就是把 $P(+\mid D)$ 当成了 $P(D\mid +)$。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">$Se=Sp=0.99$ 时，要使一次阳性「更可能是真病而非误报」，患病率必须超过多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 0.0001</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 0.001</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 0.01</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 0.50</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：由 $Se\,p \gt (1-Sp)(1-p)$ 解得 $p \gt (1-Sp)/(Se+1-Sp) = 0.01/1.00 = 0.01$。代码 Part 1 中 $p=0.0100$ 时 PPV 恰好等于 $0.500000$，正是阈值；$p=0.02$ 时升到 $0.668919$。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">两个事件 $A,B$ 互斥且 $P(A)\gt0$、$P(B)\gt0$，则它们？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 必定不独立</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 必定独立</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 可能独立也可能不独立</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 一定是对立事件</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$P(A\cap B)=0$ 而 $P(A)P(B)\gt0$，乘积判据不成立，故必定不独立。两者能同时成立的唯一情形是 $P(A)=0$ 或 $P(B)=0$（零概率退化情形）。互斥也不等于对立：对立还要求并集为全集。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">代码 Part 3 中，两层内 $X,Y$ 都严格独立，合并后却相关。原因是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 样本量太小</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 存在共同原因 $Z$，两层的 $P(X{=}1)$ 不同</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 计算出错</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 两层人数不相等</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$Z=0$ 层 $P(X{=}1)=0.2$、$Z=1$ 层 $P(X{=}1)=0.8$，共同原因同时抬高／压低 $X,Y$，于是合并后 $P(X{=}1,Y{=}1)=0.34\neq0.5\times0.5=0.25$。这是模块 01 混杂因素的概率版本；两层人数其实相等（各 6000），所以 D 不成立。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">知学云 2×2 表中，$P(\text{完课}\mid\text{高时长})=0.655408$、$P(\text{高时长}\mid\text{完课})=0.660131$。下列判断正确的是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 两者相等，可互换</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 两者相差约 10 倍</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 数值接近但绝不相等，只是本例基础率接近 50%</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 后者一定更大</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：两者分母分别是 6010 与 5967，故数值接近；但严格相等要求 $P(A)=P(B)$，本例也不满足。换到低基础率场景（Part 1 的 $p=0.001$），$P(+\mid D)=0.99$ 与 $P(D\mid +)=0.0902$ 会相差十倍以上，绝不能互换。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure class="figure-placeholder" id="fig-classic-m03-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 3-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">贝叶斯定理的面积图示：先验、似然与后验的几何关系</span>
+    <span class="fig-note">用单位正方形中的面积比表示联合概率与条件概率，直观解释「基础率如何压倒检测结果」。</span>
+    <span class="fig-src">来源：Harvard Stat 110 概率论课程讲义中的条件概率面积图（本站资源库 c07） · 查看：<a href="https://www.statlearning.com/" target="_blank" rel="noopener">https://www.statlearning.com/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+<h2 id="d-figures">本章图示汇总</h2>
+<figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s7">7 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>掷两枚均匀骰子，求（a）点数和为 7 的概率；（b）点数和为 8 的概率；（c）两枚骰子点数相同的概率。</li>
+          <li>设 $P(A) = 0.3$，$P(B) = 0.4$，$P(A \cap B) = 0.1$。求 $P(A \cup B)$、$P(A \mid B)$，并判断 $A$、$B$ 是否独立。</li>
+          <li>袋中 4 红 6 白，（a）放回连抽两球，两球都红的概率；（b）不放回连抽两球，两球都红的概率。两种情形下「第二次抽到红球」的概率是否都等于 0.4？说明含义。</li>
+          <li>某垃圾邮件过滤器：邮件中约 1% 是垃圾邮件；某关键词出现在 80% 的垃圾邮件、但只出现在 5% 的正常邮件中。收到一封含该关键词的邮件，它是垃圾邮件的概率？</li>
+          <li>已知 $E(X) = 5$，$Var(X) = 3$，求 $E(2X+1)$ 与 $Var(3X-4)$。若 $X, Y$ 独立且 $Var(Y) = 2$，求 $Var(X+Y)$。</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> 用 36 个等可能有序对。（a）和为 7：6 种，$6/36 = 1/6$；（b）和为 8：5 种，$5/36$；（c）相同：$(1,1),\dots,(6,6)$ 共 6 种，$6/36 = 1/6$。</p>
+            <p><strong>2.</strong> $P(A \cup B) = 0.3 + 0.4 - 0.1 = 0.6$；$P(A \mid B) = 0.1/0.4 = 0.25 \neq P(A) = 0.3$，故<strong>不独立</strong>（也不互斥，因为交集概率非零）。</p>
+            <p><strong>3.</strong> （a）放回：$0.4 \times 0.4 = 0.16$，此时两次独立；（b）不放回：$\frac{4}{10}\times\frac{3}{9} = \frac{12}{90} \approx 0.133$，不独立。放回时第二次抽到红球的概率恒为 0.4（不受影响）；不放回时第二次的<strong>无条件</strong>概率仍是 0.4（对称性），但<strong>条件</strong>概率会随第一次结果改变——这正是独立与不独立的差别所在。</p>
+            <p><strong>4.</strong> 设 $S$ = 垃圾邮件，$K$ = 含关键词。$P(K) = 0.8\times 0.01 + 0.05\times 0.99 = 0.0575$，$P(S \mid K) = 0.008/0.0575 = 16/115 \approx 13.9\%$。仍是基础比率效应：绝大多数邮件是正常的，仅凭一个词不足以断定。</p>
+            <p><strong>5.</strong> $E(2X+1) = 2\times 5 + 1 = 11$；$Var(3X-4) = 9\times 3 = 27$；$Var(X+Y) = 3 + 2 = 5$（独立）。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <h2 id="s8">8 · 本章小结</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>概念</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>样本空间与事件</td><td>事件是 $\Omega$ 的子集；古典概型 $P(A) = |A|/|\Omega|$（须等可能）</td></tr>
+            <tr><td>概率公理</td><td>非负、规范、可列可加；推出 $P(A^c) = 1 - P(A)$</td></tr>
+            <tr><td>加法法则</td><td>$P(A \cup B) = P(A) + P(B) - P(A \cap B)$；互斥时可直接相加</td></tr>
+            <tr><td>条件概率</td><td>$P(A \mid B) = P(A \cap B)/P(B)$；乘法法则求「同时发生」</td></tr>
+            <tr><td>互斥 vs 独立</td><td>互斥：不能同发生；独立：互不影响。互斥且概率为正 ⇒ 必不独立</td></tr>
+            <tr><td>全概率与贝叶斯</td><td>全概率拆分求总概率；贝叶斯后验 = 似然 × 先验 ÷ 证据，警惕基础比率谬误</td></tr>
+            <tr><td>期望与方差</td><td>$E(aX+b) = aE(X)+b$，$Var(aX+b) = a^2 Var(X)$；独立时 $Var(X+Y) = Var(X)+Var(Y)$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：概率与条件概率。</strong>计算 P(完课|高学习时长)，用贝叶斯公式解释「高分学员更可能完课」的逆概率。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="current" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">课程</span><span class="fr-body"><a href="https://projects.iq.harvard.edu/stat110" target="_blank" rel="noopener">Harvard Stat 110 概率论</a> <span class="muted small">（2013 · 权威共识）</span><span class="fr-why">为什么读：Blitzstein 的 Stat 110 以「故事化证明」讲条件概率与贝叶斯公式，适合零基础。</span></span></div><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="../resources.html#r-b15">Bayesian Data Analysis（第 3 版）</a> <span class="muted small">（2013 · 权威共识）</span><span class="fr-why">为什么读：贝叶斯数据分析第 1 章给出概率的两种解释与共轭结构。</span></span></div><div class="fr-item"><span class="fr-tag">理论</span><span class="fr-body"><a href="../resources.html#r-t01">贝叶斯定理</a> <span class="muted small">（1763 · 权威共识）</span><span class="fr-why">为什么读：贝叶斯定理的里程碑条目，衔接到模块 07。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div class="muted small">继续学习下一章，或标记本章完成以记录进度。</div>
+        <button class="btn primary" data-complete-btn="m03">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m02-descriptive.html"><span class="dir">← 上一篇</span><span class="ttl">02 · 描述统计与可视化</span></a>
+        <a class="next" href="m04-distributions.html"><span class="dir">下一篇 →</span><span class="ttl">04 · 随机变量与常见分布</span></a>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索概念、公式、例题…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索章节、概念、公式或例题。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

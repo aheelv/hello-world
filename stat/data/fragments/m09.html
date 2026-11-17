@@ -1,0 +1,643 @@
+<!-- 深度片段 · 09 机器学习的统计基础 -->
+<!-- 已就近放置的图示 ID：data-figure="curve-bias-variance" data-figure="flow-learning-loop" data-figure="matrix-algo-compare" data-classic="0"；其余图示由脚本补入汇总 -->
+
+<h2 id="d-deep-1">深度专题一 · 期望平方误差的形式化偏差—方差分解：三项为何恰好相加</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把「反复换一批训练数据」写成一个期望，交叉项才会真正消失</h3></div>
+  <p class="dt-lead">本章第 2 节（#s2）已经给出 $\mathrm{E}[(y-\hat f)^2]=\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$ 并做了两步展开；这里把那两步补成一份可逐行核对的严格推导：先说清随机性到底来自哪里，再证明三个交叉项分别为什么为零，最后用一组数值把三项加起来对账。模块 01 的偏差—方差分解是它在「估计量」上的统计版本，本专题是它在「预测函数」上的机器学习版本。</p>
+
+  <h4>背景：一条被反复借用的恒等式</h4>
+  <p>「误差 = 系统性偏移 + 随机抖动 + 不可约噪声」这个三段式，最早在均方误差估计的语境里被写清楚，1992 年 Geman、Bienenstock 与 Doursat 在讨论神经网络的《Neural networks and the bias/variance dilemma》中把它搬到「学习算法」上，用来解释为什么把模型做得更复杂不一定更准。此后它成为 ISLR 等教材第 2 章的标准推导。值得注意的是：这条恒等式<strong>只对平方损失成立</strong>。分类任务用 0-1 损失时并没有这么干净的加法分解，教材第 2.4 节只能借「间隔」给出平行直觉——这一点在专题末尾的边界条件里会正式点明。</p>
+  <p>本章正文第 2 节已经用「加减一项再展开」给出了骨架，但没有明确写出期望是对<strong>谁</strong>取的。这个「对谁取期望」恰恰是初学者最容易算错的地方：有人对训练噪声取、有人对测试点取、有人对训练集取，混在一起时交叉项看起来就不为零了。下面把它固定下来。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>想象你反复做同一件差事：每次重新抽 40 名学员，用这 40 条记录「拟合一条规律」，再拿这条规律去猜一名<strong>全新</strong>学员的成绩。重复几千次，你会得到几千条略有差别的猜测。把这件事的「平均猜得有多差」拆开看，只有三种来源：</p>
+  <ul>
+    <li><strong>长期偏一个方向</strong>：几千条猜测的平均值，离真实规律还差一截。这是偏差，来自「模型族根本装不下真实规律」（比如用一条直线去拟合明显弯曲的关系）。换多少批数据都搬不回来。</li>
+    <li><strong>每批各猜各的</strong>：几千条猜测围绕自己的平均值乱跳。这是方差，来自「这批恰好抽到谁」。换一批数据，结论就变；模型越复杂、越会迁就手头这 40 条，跳得越厉害。</li>
+    <li><strong>新学员自带偶然性</strong>：就算你拿到了真实的规律，具体到某一个人的成绩仍有随机起伏。这是噪声，任何模型都消不掉。</li>
+  </ul>
+  <p>关键的一句话：<strong>这三块加起来正好等于总误差，中间没有「混合项」需要额外扣掉</strong>。原因很朴素——「每批猜测减去它们的平均值，再取平均，结果恰好是 0」。正是这个「离均差之和为零」，让所有交叉项同时消失。于是「调复杂度」的本质，就是把误差在偏差与方差之间来回搬运，而噪声是搬不动的地板。</p>
+
+  <h4>形式化：固定随机性，逐步展开</h4>
+  <p>固定一个测试点 $x$。真实关系写成 $y=f(x)+\varepsilon$，其中 $\mathrm{E}[\varepsilon]=0$、$\mathrm{Var}(\varepsilon)=\sigma^2$。训练集 $\mathcal D=\{(x_i,y_i)\}_{i=1}^n$ 来自分布 $P^n$，学习算法 $\mathcal A$ 把训练集映成预测函数 $\hat f=\mathcal A(\mathcal D)$；因此 $\hat f(x)$ 是<strong>随机的</strong>，随机性来自 $\mathcal D$。测试噪声 $\varepsilon$ 与 $\mathcal D$ 独立。定义「平均模型」$\bar f(x)=\mathrm{E}_{\mathcal D}[\hat f(x)]$。下面每个公式都配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">记号：偏差与方差（对训练集取期望）</div>
+    $$ \mathrm{Bias}\bigl[\hat f(x)\bigr] = \bar f(x) - f(x) = \mathrm{E}_{\mathcal D}\bigl[\hat f(x)\bigr] - f(x), \qquad \mathrm{Var}\bigl[\hat f(x)\bigr] = \mathrm{E}_{\mathcal D}\Bigl[\bigl(\hat f(x) - \bar f(x)\bigr)^2\Bigr] $$
+    <div class="f-note">白话：偏差是「把无限多批训练数据都学一遍、得到的平均预测」离真值多远；方差是「单独某一批的预测」围绕这个平均预测抖得多厉害。两者都对训练集 $\mathcal D$ 取期望，与测试噪声无关。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第一步：把测试噪声先分离出去</div>
+    $$ \mathrm{E}_{\mathcal D,\varepsilon}\Bigl[\bigl(y-\hat f(x)\bigr)^2\Bigr] = \mathrm{E}_{\mathcal D,\varepsilon}\Bigl[\bigl(f(x)+\varepsilon-\hat f(x)\bigr)^2\Bigr] $$
+    $$ = \sigma^2 + \mathrm{E}_{\mathcal D}\Bigl[\bigl(f(x)-\hat f(x)\bigr)^2\Bigr] $$
+    <div class="f-note">白话：把 $y$ 换成「真值 + 噪声」，平方展开后出现三项；含 $\varepsilon$ 的交叉项因 $\mathrm{E}[\varepsilon]=0$ 且 $\varepsilon$ 与 $\hat f$ 独立而消失，$\varepsilon^2$ 那项留下 $\sigma^2$。剩下的是「预测函数离真值多远」的均方。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第二步：加减平均模型 $\bar f(x)$，把剩下的均方劈成两块</div>
+    $$ f(x)-\hat f(x) = \bigl(f(x)-\bar f(x)\bigr) + \bigl(\bar f(x)-\hat f(x)\bigr) $$
+    $$ \bigl(f(x)-\hat f(x)\bigr)^2 = \bigl(f(x)-\bar f(x)\bigr)^2 + \bigl(\hat f(x)-\bar f(x)\bigr)^2 + 2\bigl(f(x)-\bar f(x)\bigr)\bigl(\bar f(x)-\hat f(x)\bigr) $$
+    <div class="f-note">白话：把「离真值的距离」拆成「平均预测离真值的距离」加「这一批预测离平均预测的距离」；第三项是两者相乘的交叉项。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第三步：交叉项的期望为零（全推导的关键）</div>
+    $$ \mathrm{E}_{\mathcal D}\Bigl[2\bigl(f(x)-\bar f(x)\bigr)\bigl(\bar f(x)-\hat f(x)\bigr)\Bigr] = 2\bigl(f(x)-\bar f(x)\bigr)\Bigl(\bar f(x) - \mathrm{E}_{\mathcal D}[\hat f(x)]\Bigr) = 0 $$
+    <div class="f-note">白话：$f(x)-\bar f(x)$ 对 $\mathcal D$ 而言是常数，可以提到期望外；而 $\bar f(x)=\mathrm{E}_{\mathcal D}[\hat f(x)]$，所以括号里是「平均值减平均值」，恒为 0。这就是「离均差之和为零」的严格写法。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">偏差—方差恒等式（平方损失）</div>
+    $$ \mathrm{E}_{\mathcal D,\varepsilon}\Bigl[\bigl(y-\hat f(x)\bigr)^2\Bigr] = \underbrace{\bigl(\bar f(x)-f(x)\bigr)^2}_{\mathrm{Bias}^2} \;+\; \underbrace{\mathrm{E}_{\mathcal D}\Bigl[\bigl(\hat f(x)-\bar f(x)\bigr)^2\Bigr]}_{\mathrm{Var}} \;+\; \underbrace{\sigma^2}_{\text{不可约噪声}} $$
+    <div class="f-note">白话：总误差 = 偏了多少的平方 + 抖了多少 + 数据自带的噪声；三项相加，既不重叠也不遗漏，且 $\sigma^2$ 与模型、与样本量都无关，是任何方法都到不了的下限。</div>
+  </div>
+
+  <p>注意一个常被忽略的副产品：把第二步的两块直接与测试噪声无关地相加，可得代数恒等式 $\mathrm{E}_{\mathcal D}[(\hat f-f)^2]=\mathrm{Bias}^2+\mathrm{Var}$。这是<strong>纯代数</strong>的，不含任何概率近似；代码实验 Part 1 的 <code>B^2+V</code> 列与 <code>E[(f-fh)^2]</code> 列逐位相等，验证的正是它。</p>
+
+  <h4>数值对账：三种复杂度，三项各占多少</h4>
+  <p>用知学云案例的回归真源：$f(x)=64.4306+0.160833x$，学习时长 $\mu=95.2964$、$\sigma_x=43.4274$，测验分标准差 $14.5763$，$R^2=0.2296$。于是 $\mathrm{Var}(Y)=212.4685$、可解释方差 $\mathrm{Var}(f)=48.7841$、不可约噪声 $\sigma^2=163.6845$（$\sigma=12.7939$）。取测试点 $x_0=\mu+1.5\sigma_x=160.4375$，$f(x_0)=90.2342$。反复抽样 8000 次、每批 40 条，三种模型在 $x_0$ 处的分解如下（全部数值来自下方代码实验，可用笔复核）：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>模型</th><th>$\mathrm{Bias}^2$</th><th>$\mathrm{Var}$</th><th>$\mathrm{Bias}^2+\mathrm{Var}$</th><th>$+\sigma^2=$ 总误差</th><th>主导项</th></tr></thead>
+      <tbody>
+        <tr><td>常数模型（预测训练均值）</td><td>110.1851</td><td>5.4531</td><td>115.6382</td><td>279.3226</td><td>偏差 94%</td></tr>
+        <tr><td>线性模型（真实复杂度）</td><td>0.0115</td><td>14.4986</td><td>14.5101</td><td>178.1945</td><td>噪声 92%</td></tr>
+        <tr><td>5 次多项式</td><td>0.0416</td><td>123.3833</td><td>123.4249</td><td>287.1093</td><td>方差 43%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>读法：常数模型欠拟合，$\mathrm{Bias}^2=110.19$ 是总误差里最大的一块；把模型加到 5 次多项式，偏差几乎清零（$0.0416$），但方差从 $14.50$ 暴涨到 $123.38$，总误差反而从 $178.19$ 升到 $287.11$。三种模型的 $\sigma^2=163.6845$ 一模一样——它不随复杂度变化，这也解释了正文第 2 节「测试误差若低于噪声水平要警惕数据泄漏」。诊断顺序因此是：先看偏差还是方差主导，再决定加复杂度还是加数据／正则化；方向搞反会越调越差。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>$\mathrm{E}[(y-\hat f)^2]=\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$ 成立的全部前提是：平方损失、测试噪声与训练集独立、训练集样本可交换、且 $\hat f$ 只依赖训练集。三项没有交叉项，根源是 $\mathrm{E}_{\mathcal D}[\hat f-\bar f]=0$。因此增大样本量只压 $\mathrm{Var}$，正则化把误差从 $\mathrm{Var}$ 搬去 $\mathrm{Bias}^2$，而 $\sigma^2$ 是<strong>不可通过调参降低的信息量下限</strong>；任何声称「把误差压到低于噪声」的结果，第一反应都应是查数据泄漏。</div>
+
+  <p><strong>边界条件：</strong>在损失函数不是平方损失（0-1 分类损失、绝对损失、Huber、分位数损失）、或测试噪声与训练集不独立（时间序列残差自相关、同一用户重复观测）、或训练集样本非独立同分布、或 $\hat f$ 在训练后又用测试集做过阈值挑选与校准的条件下，本加法分解不成立，应改用 0-1 损失下的间隔（margin）分解与 C-bound、带协方差交叉项的广义分解，或干脆放弃加法恒等式、用独立留出集／共形预测直接估计预测误差与覆盖概率。</p>
+
+  <p>下图把三项随模型复杂度的走向画在一起：偏差平方单调下降、方差单调上升、总误差呈 U 形，而噪声是一条水平地板。最优点在偏差平方与方差之和最小处，而不是训练误差最低处。</p>
+  <figure data-figure="curve-bias-variance"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · k 折交叉验证为什么能估计泛化误差，以及它精确地在什么时候泄漏</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>验证折必须「完全没参与过造模型」；泄漏发生在切分之前，而不是折内</h3></div>
+  <p class="dt-lead">本章第 4 节（#s4）已列出训练／验证／测试三分、分层 k 折、四类泄漏场景与「CV 方差为何被低估」；这里不重复那份清单，而是回答两个更根本的问题：凭什么 k 折的均值就能代表「未来数据上的表现」？以及「先在全数据做标准化／筛特征／调超参」到底在哪一步、以什么方式破坏了这个代表关系？</p>
+
+  <h4>背景：从「经验技巧」到「可证明的估计量」</h4>
+  <p>交叉验证的思想可追溯到 Mosteller 与 Tukey 的「交叉验证式」数据复用，Stone (1974) 与 Geisser (1975) 把它形式化为对预测误差的估计量。它之所以可信，不是因为「多算几次取平均更稳」，而是因为每一折的样本<strong>没有被用来造那个给它打分的模型</strong>。这个「没参与」一旦被破坏，取多少次平均都救不回来——平均只会把偏差稳稳地保留下来。</p>
+  <p>工业界后来把这条教训固化成一句工程口号：凡是 <code>fit</code> 出来的东西（均值、方差、特征名单、超参数、校准器、编码器），都必须在每一折的训练部分内部重新 <code>fit</code>。本专题给出这句话的数学依据。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把 k 折交叉验证想成一场「模拟高考」：把题库分成 K 份，轮流拿其中一份当考卷，其余 K−1 份当复习资料。只要考卷在出题、印卷、定评分标准之前<strong>没被任何一位考生或老师看过</strong>，平均分就能预测真正高考的成绩。</p>
+  <p>现在设想三种「考前偷看」：① 出卷前先统计了<strong>全部</strong>题库（含考卷）的平均分，据此把题目做了标准化——考卷的分布信息已经进了复习资料；② 先拿<strong>全部</strong>题库（含考卷答案）挑出「与答案最相关的 100 个知识点」，再只在这些知识点上出题——考卷答案参与了选题；③ 用<strong>全部</strong>题库反复试，挑出考得最好的那套复习计划——考卷被用来选超参了。三种情况下，考卷都不再是「未知的未来」，分数自然虚高。</p>
+  <p>关键洞察：泄漏<strong>不发生在折内</strong>。折内你老老实实只在复习资料上算均值、重训模型，也救不回来——因为「选哪些特征」「标准化用哪组均值」这些决定，在切分之前就已经用了考卷。而反过来，只要所有数据相关的决定都只由训练折做出，哪怕折与折之间训练集高度重叠，k 折均值仍是对泛化误差的有效（略偏悲观）估计；重叠只影响<strong>标准误</strong>，不影响<strong>期望</strong>（这正是例 4.3 修正 $s/\sqrt k$ 的原因）。</p>
+
+  <h4>形式化：有效性与泄漏的精确判据</h4>
+  <p>设学习算法 $\mathcal A$ 把数据集映成预测函数。把 $\mathcal D=\{(x_i,y_i)\}_{i=1}^n$ 分成 $K$ 个互不相交的折 $F_1,\dots,F_K$。诚实 k 折 CV 的估计量是</p>
+
+  <div class="formula-box">
+    <div class="f-name">诚实 k 折交叉验证估计量</div>
+    $$ \hat R_{\mathrm{CV}} = \frac{1}{K}\sum_{k=1}^{K}\frac{1}{|F_k|}\sum_{i\in F_k} L\Bigl(y_i,\ \mathcal A\bigl(\mathcal D\setminus F_k\bigr)(x_i)\Bigr) $$
+    <div class="f-note">白话：第 $k$ 轮只用「去掉第 $k$ 折」的数据训练一个模型，再拿这个模型去给第 $k$ 折打分；K 个分数取平均。注意打分模型 $\mathcal A(\mathcal D\setminus F_k)$ 里不含 $F_k$ 的任何样本。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">为什么它（近似）无偏</div>
+    $$ \mathrm{E}\Bigl[L\bigl(y_i,\hat f_{-k}(x_i)\bigr)\Bigr] = \mathrm{E}\Bigl[R\bigl(\hat f_{-k}\bigr)\Bigr],\qquad \hat f_{-k}=\mathcal A(\mathcal D\setminus F_k) $$
+    $$ \mathrm{E}\bigl[\hat R_{\mathrm{CV}}\bigr] = \mathrm{E}\Bigl[R\bigl(\hat f_{-k}\bigr)\Bigr] \;\ge\; \mathrm{E}\Bigl[R\bigl(\hat f_{\mathrm{full}}\bigr)\Bigr] $$
+    <div class="f-note">白话：因为 $\hat f_{-k}$ 独立于 $(x_i,y_i)$，在给定 $\hat f_{-k}$ 后，单条样本损失的期望就是该模型的真实风险 $R$；于是 CV 均值估计的是「用 $n(1-1/K)$ 条数据训练出来的模型」的风险。它比「用全部 $n$ 条训练」的风险略高，是<strong>保守（悲观）</strong>的，方向是安全的。K 折之间训练集重叠只会让方差估计变复杂，不改变这个期望等式。</div>
+  </div>
+
+  <p>现在把「所有数据相关的决定」打包成一个参数 $\lambda$：它包含标准化用的均值与方差、被选中的特征子集、编码字典、以及调出来的超参数。完整流程应写成 $\mathcal A_\lambda$，其中</p>
+
+  <div class="formula-box">
+    <div class="f-name">有效性判据：参数只能由训练折决定</div>
+    $$ \lambda_k = \Psi\bigl(\mathcal D\setminus F_k\bigr), \qquad \hat f_{-k} = \mathcal A_{\lambda_k}\bigl(\mathcal D\setminus F_k\bigr) $$
+    <div class="f-note">白话：每一折都要用「本折训练部分」重新算一遍 $\lambda_k$——重新标准化、重新筛特征、重新调超参。这是 k 折 CV 有效的充要条件，也是 Pipeline 把预处理与模型封装在一起的原因。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">泄漏的精确定义：参数用了全部数据</div>
+    $$ \lambda_{\mathrm{leak}} = \Psi(\mathcal D) = \Psi\bigl((\mathcal D\setminus F_k)\cup F_k\bigr) \;\Longrightarrow\; \hat f_{-k} = \mathcal A_{\lambda_{\mathrm{leak}}}(\mathcal D\setminus F_k)\ \not\perp\ F_k $$
+    $$ \mathrm{E}\bigl[\hat R_{\mathrm{CV}}^{\mathrm{leak}}\bigr] \;\lt\; \mathrm{E}\Bigl[R\bigl(\hat f_{-k}\bigr)\Bigr] = \text{真实泛化误差} $$
+    <div class="f-note">白话：只要 $\lambda$ 在切分<strong>之前</strong>由含验证折的全数据算出，打分模型就与验证折不再独立，$\mathrm{E}[L_i]=R(\hat f_{-k})$ 那一步失效，估计量系统性偏乐观。三种典型泄漏——全数据标准化（预处理）、全数据筛特征（选择）、全数据调超参（调优）——都是同一个 $\Psi(\mathcal D)$ 的不同写法。</div>
+  </div>
+
+  <p>要「既调超参、又给无偏评估」，必须把两种用途分到两层循环里，即<strong>嵌套交叉验证</strong>：外层负责评估，内层只在外层训练折内部做选择，</p>
+  <div class="formula-box">
+    <div class="f-name">嵌套 CV：选择嵌套在评估内部</div>
+    $$ \lambda_k^{*} = \arg\min_{\lambda}\ \hat R_{\mathrm{inner}}\Bigl(\lambda;\ \mathcal D\setminus F_k\Bigr), \qquad \hat R_{\mathrm{nested}} = \frac{1}{K}\sum_{k=1}^{K}\frac{1}{|F_k|}\sum_{i\in F_k} L\Bigl(y_i,\ \mathcal A_{\lambda_k^{*}}(\mathcal D\setminus F_k)(x_i)\Bigr) $$
+    <div class="f-note">白话：给第 $k$ 折打分所用的 $\lambda_k^{*}$，是在「不含第 $k$ 折」的数据上再套一层小 CV 选出来的；外层评估全程没碰过验证折。内层选择、外层评估，顺序不能颠倒。</div>
+  </div>
+
+  <p>数值证据见代码实验 Part 3：构造<strong>标签与 100 个特征完全独立</strong>的纯噪声数据，真实可预测准确率应为 $0.50$。先在全数据上筛出「与标签最相关」的特征再做 5 折，得到 $0.6140$；每一折只在训练折内部重新筛特征，得到 $0.5032$。差 $0.1107$ 全部来自「筛特征时偷看了验证折的标签」——明明折内的阈值是老老实实重算的，泄漏依旧发生，这正说明问题出在切分之前。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>k 折交叉验证估计的是「用 $n(1-1/K)$ 条数据训练的模型」的泛化风险，成立<strong>当且仅当</strong>所有数据相关的变换 $\lambda$（标准化参数、特征子集、超参数）都只由训练折决定。泄漏不是「折内没重训模型」，而是「切分之前用全数据算过 $\lambda$」；它是期望层面的乐观偏差，取更多折、重复更多次、或折内重新拟合都不能消除。要同时选择超参与报告泛化误差，必须嵌套交叉验证或留一个只用一次的独立测试集。</div>
+
+  <p><strong>边界条件：</strong>在样本之间存在依赖结构（时间序列、同一用户的多次曝光、聚类／分组采样、图上的相邻节点）的条件下，随机 k 折「验证折与训练折独立」的假设不成立，本结论不成立，应改用时间序列滚动验证（walk-forward，验证永远在训练之后）、分组 k 折（GroupKFold，同一用户／同一簇不跨折）或按集群留一法；在类别极不平衡时应改用<strong>分层</strong> k 折，在需要无偏模型选择时应改用嵌套 CV 或独立测试集。</p>
+
+  <p>下图是本章「目标 → 问题 → 讲解 → 例题 → 代码 → 自测 → 延伸」的学习闭环：交叉验证位于「评估」这一环，它的上游契约是「一份未被污染的训练／验证划分」，下游契约是「带标准误的泛化误差估计」；任何把后一环信息倒灌进前一环的做法，都会让整条闭环失效。</p>
+  <figure data-figure="flow-learning-loop"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 岭回归：带 L2 正则的经验风险最小化</h2>
+<div class="algo-spec">
+  <p>本算法位于「数据采集 → 存储计算 → 建模 → 评估 → 部署运维」链条的<strong>建模环节</strong>，是本章第 1.2 节 ERM 与第 2.3 节正则化的共同落地。上游契约是「一个已按特征标准化、且不含测试集信息的训练集」；下游契约是「一组系数、一个由交叉验证选定的 $\lambda$，以及可分解的偏差—方差账目」。选它作经典算法，是因为它有<strong>闭式解</strong>、能把深度专题一的恒等式逐项算出来，是「统计理论 ↔ 可手算算法」之间最短的一座桥。</p>
+
+  <h3 id="d-algo-principle">一、原理：在经验风险上加一个「不许系数太大」的罚项</h3>
+  <p>给定训练集 $\{(x_i,y_i)\}_{i=1}^n$、设计矩阵 $X\in\mathbb R^{n\times p}$，岭回归在普通最小二乘的经验风险上追加 L2 罚：</p>
+  <div class="formula-box">
+    <div class="f-name">目标函数与闭式解</div>
+    $$ \hat\beta_{\lambda} = \arg\min_{\beta\in\mathbb R^{p}}\ \sum_{i=1}^{n}\bigl(y_i - x_i^{\top}\beta\bigr)^2 \;+\; \lambda\sum_{j=1}^{p}\beta_j^{2} $$
+    $$ \hat\beta_{\lambda} = \bigl(X^{\top}X + \lambda I\bigr)^{-1}X^{\top}y $$
+    <div class="f-note">白话：第一项要求「拟合训练数据」，第二项要求「系数整体别太夸张」；$\lambda$ 是两者之间的旋钮。对目标求梯度并令其为零，就得到那行闭式解——把 $X^{\top}X$ 加上 $\lambda I$ 后求逆，矩阵永远可逆，即使 $p \gt n$ 或特征高度共线。</div>
+  </div>
+  <p>为了手算，考虑单特征、无截距的特例 $y_i=\beta x_i+\varepsilon_i$。记 $S_{xx}=\sum x_i^2$、$S_{xy}=\sum x_i y_i$，则</p>
+  <div class="formula-box">
+    <div class="f-name">一维情形：OLS 解被按比例「收缩」</div>
+    $$ \hat\beta_{\lambda} = \frac{S_{xy}}{S_{xx}+\lambda} = \gamma_{\lambda}\,\hat\beta_{\mathrm{OLS}}, \qquad \gamma_{\lambda} = \frac{S_{xx}}{S_{xx}+\lambda}\ \in (0,1] $$
+    <div class="f-note">白话：岭解就是 OLS 解乘一个小于 1 的收缩因子 $\gamma_\lambda$；$\lambda$ 越大，系数被压得越接近 0。这一行让后面所有偏差—方差数字都能用笔算复核。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">系数的偏差、方差与最优 $\lambda$</div>
+    $$ \mathrm{E}[\hat\beta_{\lambda}] = \gamma_{\lambda}\beta, \qquad \mathrm{Bias}(\hat\beta_{\lambda}) = -\frac{\beta\lambda}{S_{xx}+\lambda}, \qquad \mathrm{Var}(\hat\beta_{\lambda}) = \frac{\sigma^{2}S_{xx}}{(S_{xx}+\lambda)^{2}} $$
+    $$ \mathrm{MSE}(\hat\beta_{\lambda}) = \frac{\beta^{2}\lambda^{2} + \sigma^{2}S_{xx}}{(S_{xx}+\lambda)^{2}}, \qquad \lambda^{*} = \frac{\sigma^{2}}{\beta^{2}} $$
+    <div class="f-note">白话：加 $\lambda$ 把方差按 $\gamma_\lambda^2$ 压下去，但引入与 $\lambda$ 成正比的偏差；把两者相加求极小，最优惩罚强度恰是「噪声方差 ÷ 真信号平方」。$\sigma^2$ 越大（噪声越强）或 $\beta$ 越小（信号越弱），越该加大正则——这正是深度专题一「把误差从方差搬到偏差」的定量版。</div>
+  </div>
+  <p><strong>几何与贝叶斯解释：</strong>几何上，岭回归等价于在约束 $\|\beta\|_2^2 \le t$ 下最小化残差平方和，解是残差等高线与半径 $\sqrt t$ 的球第一次相切的点；它沿 $X^{\top}X$ 的主成分方向收缩，小奇异值方向被压得最狠（也正是方差最大的方向）。贝叶斯上，L2 罚对应高斯先验 $\beta\sim N(0,\ \sigma^2/\lambda\cdot I)$，$\hat\beta_\lambda$ 是后验均值（MAP）。这两种解释说明：正则化不是「弄脏了估计」，而是显式地注入了先验信息。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>划分与封装。</strong>先切训练／验证（或确定 k 折），把「标准化 → 岭回归」封装成 Pipeline； standardization 的均值与方差只能在训练折上 <code>fit</code>（呼应深度专题二）。</li>
+    <li><strong>标准化特征、不罚截距。</strong>把每列减均值除标准差；截距项单独保留、不进 $\lambda\|\beta\|^2$，否则惩罚强度依赖量纲与目标平移。</li>
+    <li><strong>构造正规方程。</strong>计算 $X^{\top}X$、$X^{\top}y$；若 $p$ 很大用 Cholesky 解 $(X^{\top}X+\lambda I)\beta=X^{\top}y$，不要显式求逆。</li>
+    <li><strong>给出 $\lambda$ 候选网格。</strong>通常取对数网格 $\lambda\in\{0,\ 10^{-3},\dots,10^{3}\}$（以 $S_{xx}$ 量级缩放）。</li>
+    <li><strong>用交叉验证选 $\lambda$。</strong>对每个候选，在每一折训练部分重算标准化与系数，取验证误差最小者；若还要报告无偏泛化误差，用嵌套 CV。</li>
+    <li><strong>用全部训练数据重训。</strong>以选定的 $\lambda$ 在完整训练集上拟合最终 $\hat\beta_\lambda$，输出系数、训练 SSE 与 shrinkage 因子 $\gamma_\lambda$。</li>
+    <li><strong>记账与诊断。</strong>把 $\mathrm{Bias}^2$、$\mathrm{Var}$、$\sigma^2$ 三项估出来，确认是方差主导还是偏差主导；测试集只用于最后一次报告。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>模型形式：</strong>参数对 $y$ 线性、损失为平方损失（回归）；分类请改用带罚的逻辑回归。</li>
+    <li><strong>数据规模：</strong>$n$ 与 $p$ 任意，尤其适合 $p$ 接近或超过 $n$、以及特征高度共线（$X^{\top}X$ 近奇异）的场合。</li>
+    <li><strong>分布假设：</strong>误差近似独立、零均值、方差有限；推断（置信区间）还额外要正态或大样本，但点估计与预测不需要。</li>
+    <li><strong>特征类型：</strong>连续或已编码的数值特征，且必须<strong>同尺度</strong>；名义变量先one-hot 再标准化，否则罚项对大方差列不公平。</li>
+    <li><strong>$\lambda$：</strong>$\lambda\ge 0$；$\lambda=0$ 退化为 OLS。数据噪声越大、信号越弱、共线越严重，$\lambda$ 应越大。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>训练</b> 显式形成 $X^{\top}X$ 为 $O(np^2)$，Cholesky 分解 $O(p^3)$，求 $X^{\top}y$ 为 $O(np)$；用梯度下降／坐标下降可降到每轮 $O(np)$，收敛轮数与条件数 $\kappa(X^{\top}X+\lambda I)$ 有关（$\lambda$ 越大条件数越小、越快）。<b>推理</b> 单样本 $O(p)$。<b>空间</b> 存 $X^{\top}X$ 为 $O(p^2)$，若不显式成形、用流式充分统计量则 $O(p)$；存原始数据 $O(np)$。<b>调参</b> K 折 × 网格数 $M$ 会把训练成本乘上 $K\cdot M$。</div>
+  <p>白话：岭回归贵在「把 $p\times p$ 的矩阵算出来并分解一次」，而不是在数据量 $n$；这也是它在大规模表格数据上仍很便宜的原因。代价是 $p$ 极大（百万级稀疏特征）时 $O(p^2)$ 不可接受，应改用不显式成矩阵的一阶方法或稀疏近似。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>$(X^{\top}X+\lambda I)$ 对 $\lambda \gt 0$ 恒可逆，解决共线与 $p \gt n$ 的奇异性，解唯一且数值稳定。</li>
+        <li>有闭式解与收缩因子 $\gamma_\lambda$，偏差—方差账目可逐项手算，教学与审计都最干净。</li>
+        <li>把方差按 $\gamma_\lambda^2$ 显式压低，存在解析最优 $\lambda^{*}=\sigma^2/\beta^2$，调参有理论锚点。</li>
+        <li>凸优化、无局部极小、可微，易嵌入 Pipeline 与下游系统。</li>
+        <li>贝叶斯解释（高斯先验）让「正则强度」能与领域先验对齐。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>以引入偏差为代价降方差；若本来就是<strong>偏差主导</strong>（欠拟合），加正则只会更差。</li>
+        <li>不做特征选择：所有系数被压小但几乎都不为 0，$p$ 很大时模型仍难解释。</li>
+        <li>$\lambda$ 需由 CV 选定；用测试集调 $\lambda$ 就是深度专题二所说的选择泄漏。</li>
+        <li>对特征尺度敏感，未标准化时惩罚不公平；对强离群点敏感（平方损失）。</li>
+        <li>只处理平方损失与线性参数化；非线性关系需先做基展开或换核方法。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>固定一个可笔算的微型训练集：$x=(1,2,3,4)$，$y=(2.3,\ 3.7,\ 6.4,\ 7.6)$，单特征无截距。先算 $S_{xx}=1+4+9+16=30$，$S_{xy}=1\times2.3+2\times3.7+3\times6.4+4\times7.6=59.3$。所有数字都能用笔复核。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出闭式。</span>一维岭解 $\hat\beta_\lambda = S_{xy}/(S_{xx}+\lambda)=59.3/(30+\lambda)$，收缩因子 $\gamma_\lambda=30/(30+\lambda)$。</div>
+    <div class="solve-step"><span class="ss-k">代入 $\lambda=0$（OLS）。</span>$\hat\beta_0 = 59.3/30 = 1.9767$，$\gamma_0=1$；训练残差平方和 $\sum(y_i-\hat\beta_0 x_i)^2 = 0.4837$。</div>
+    <div class="solve-step"><span class="ss-k">代入 $\lambda=5$。</span>$\hat\beta_5 = 59.3/35 = 1.6943$，$\gamma_5=0.8571$；训练 SSE 升到 $2.8758$——拟合变差是正则的预期代价。</div>
+    <div class="solve-step"><span class="ss-k">代入 $\lambda=10$ 与 $\lambda=30$。</span>$\hat\beta_{10}=59.3/40=1.4825$（SSE $=7.8097$），$\hat\beta_{30}=59.3/60=0.9883$（SSE $=29.7877$）。$\lambda$ 越大，系数越贴近 0，训练拟合越差。</div>
+    <div class="solve-step"><span class="ss-k">换到统计视角。</span>设真模型 $y=2x+\varepsilon$、$\mathrm{Var}(\varepsilon)=\sigma^2=36$、$S_{xx}=30$、$\beta=2$。系数 MSE 用 $\mathrm{MSE}(\hat\beta_\lambda)=\dfrac{\beta^2\lambda^2+\sigma^2S_{xx}}{(S_{xx}+\lambda)^2}=\dfrac{4\lambda^2+1080}{(30+\lambda)^2}$ 逐项算。</div>
+    <div class="solve-step"><span class="ss-k">逐项代入。</span>$\lambda=0$：$1080/900=1.2000$（偏差 0，方差 1.2）；$\lambda=5$：$1180/1225=0.9633$；$\lambda=9$：$1404/1521=0.9231$；$\lambda=10$：$1480/1600=0.9250$；$\lambda=20$：$2680/2500=1.0720$；$\lambda=30$：$4680/3600=1.3000$。</div>
+    <div class="solve-step"><span class="ss-k">求导找最优。</span>$\dfrac{d}{d\lambda}\dfrac{4\lambda^2+1080}{(30+\lambda)^2}=\dfrac{2S_{xx}(\beta^2\lambda-\sigma^2)}{(S_{xx}+\lambda)^3}=\dfrac{60(4\lambda-36)}{(30+\lambda)^3}$，令分子为 0 得 $\lambda^{*}=\sigma^2/\beta^2=36/4=9$——上表 $\lambda=9$ 的 $0.9231$ 正是最小值，与代码实验 Part 2 的蒙特卡洛行一一对应。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>$\lambda$ 从 0 增到 9，方差从 $1.2000$ 降到 $0.7101$，代价是偏差平方升到 $0.2130$，净赚 $0.2769$；再往上加，偏差平方增速超过方差降速，MSE 回升。若换成 $x_0=2$ 处的预测误差，只需乘 $x_0^2=4$ 并加回 $\sigma^2=36$：$\lambda=9$ 时为 $4\times0.9231+36=39.6923$，与代码输出逐位一致。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把岭回归与三个同类回归估计量放在一起对照。最后一列「主成分回归」是反例式的补充：它也降方差，但靠丢弃方向而非连续收缩，解释性与偏差结构都不同。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>岭回归（L2 ERM）</th><th>普通最小二乘 OLS</th><th>Lasso（L1）</th><th>弹性网 Elastic Net</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>线性 + 平方损失；共线、$p\approx n$ 或 $p \gt n$；需要稳定点估计</td>
+        <td>线性 + 平方损失；$n \gg p$、$X^{\top}X$ 良态、无强共线</td>
+        <td>线性 + 平方损失；相信稀疏真模型、要做变量筛选</td>
+        <td>线性 + 平方损失；相关特征成组出现、既想稀疏又想稳定</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>训练 $O(np^2+p^3)$，推理 $O(p)$，空间 $O(p^2)$；调参乘 $K\cdot M$</td>
+        <td>训练 $O(np^2+p^3)$，推理 $O(p)$，空间 $O(p^2)$；无超参最省</td>
+        <td>坐标下降每轮 $O(np)$，需 LARS / 近端梯度；调参乘 $K\cdot M$</td>
+        <td>同 Lasso，但两个超参 $(\lambda,\ \alpha)$，网格搜索成本更高</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>$\lambda$（收缩强度，解析锚点 $\sigma^2/\beta^2$）；是否标准化；截距不罚</td>
+        <td>无（唯一旋钮是「选哪些特征」）</td>
+        <td>$\lambda$（稀疏度）；特征尺度必须统一</td>
+        <td>$\lambda$ 与混合比例 $\alpha\in[0,1]$（$\alpha=1$ 即 Lasso、$\alpha=0$ 即岭）</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">闭式解、恒可逆、方差账目可手算、数值最稳</td>
+        <td>无偏、理论最干净、无调参</td>
+        <td class="best">自动把多数系数压成 0，产出可解释的稀疏模型</td>
+        <td>兼得稀疏与组内稳定，相关变量倾向「成组入选」</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>引入偏差、不做筛选、偏差主导时越调越差；$p$ 百万级时 $O(p^2)$ 不可行</td>
+        <td>共线或 $p \gt n$ 时解不唯一／方差爆炸；无偏差—方差旋钮</td>
+        <td>相关特征里只随机挑一个、解不稳定；$p \gt n$ 时最多选 $n$ 个；无闭式解</td>
+        <td>两个超参联手放大选择偏差，必须嵌套 CV；解释性弱于纯 Lasso</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>所有系数非零、难直接解释；但收缩路径连续、最易审计，工程成本最低</td>
+        <td>系数即「边际效应」，解释性最强；但对量纲/共线极敏感</td>
+        <td>稀疏模型最易讲给业务方；需维护非零特征名单与重训流程</td>
+        <td>需同时记录 $\lambda,\alpha$ 与CV曲线，审计成本最高</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>六维口径由下图统一约定，保证全站各章的「横向对比」在同一套标准下展开，不随章节改变。</p>
+  <figure data-figure="matrix-algo-compare"></figure>
+</div>
+
+<h2 id="d-code">代码实验 · 偏差—方差分解、岭回归收缩与 CV 泄漏的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 09 机器学习的统计基础
+# 纯 Python 标准库；固定种子 20261107；复用「知学云 · 在线课程完课率」案例数字
+# Part 1: 偏差—方差分解的蒙特卡洛验证（E[(y-fhat)^2] = Bias^2 + Var + sigma^2）
+# Part 2: 岭回归 L2 正则的解析偏差—方差与最优 lambda
+# Part 3: k 折交叉验证中「先在全数据做特征筛选」造成的泄漏
+import math
+import random
+
+random.seed(20261107)
+
+# ---- 案例常量（来自 data/case.json 的 stats）----
+B0, B1 = 64.4306, 0.160833          # OLS: quiz ~ study 的截距/斜率
+MU_X, SD_X = 95.2964, 43.4274       # study_minutes_week 的均值/标准差
+SD_Y, R2 = 14.5763, 0.2296          # quiz_avg 的 sd、回归 R^2
+VAR_Y = SD_Y ** 2
+VAR_F = (B1 ** 2) * (SD_X ** 2)     # 可被线性函数解释的方差
+SIGMA2 = VAR_Y - VAR_F              # 残差 = 不可约噪声方差
+SIGMA = math.sqrt(SIGMA2)
+X_TEST = MU_X + 1.5 * SD_X          # 偏离中心的测试点，放大高次项方差
+
+
+def f_true(x):
+    return B0 + B1 * x
+
+
+def gauss():
+    return random.gauss(0.0, 1.0)
+
+
+# ---- 纯标准库：带主元选取的高斯消元，解正规方程 ----
+def solve(A, b):
+    n = len(b)
+    M = [list(A[i]) + [b[i]] for i in range(n)]
+    for col in range(n):
+        piv = max(range(col, n), key=lambda r: abs(M[r][col]))
+        M[col], M[piv] = M[piv], M[col]
+        p = M[col][col]
+        if abs(p) &lt; 1e-10:
+            return None
+        for j in range(col, n + 1):
+            M[col][j] /= p
+        for r in range(n):
+            if r != col and M[r][col] != 0.0:
+                fac = M[r][col]
+                for j in range(col, n + 1):
+                    M[r][j] -= fac * M[col][j]
+    return [M[i][n] for i in range(n)]
+
+
+def poly_fit(xs, ys, degree):
+    """在归一化 z=(x-MU_X)/SD_X 上拟合 degree 次多项式，返回系数。"""
+    p = degree + 1
+    A = [[0.0] * p for _ in range(p)]
+    b = [0.0] * p
+    for x, y in zip(xs, ys):
+        z = (x - MU_X) / SD_X
+        phi = [z ** k for k in range(p)]
+        for i in range(p):
+            b[i] += phi[i] * y
+            for j in range(p):
+                A[i][j] += phi[i] * phi[j]
+    for i in range(p):
+        A[i][i] += 1e-9             # 极小对角抖动，避免偶尔奇异
+    return solve(A, b)
+
+
+def poly_pred(coef, x):
+    z = (x - MU_X) / SD_X
+    return sum(c * z ** k for k, c in enumerate(coef))
+
+
+def make_train(n):
+    xs, ys = [], []
+    for _ in range(n):
+        x = MU_X + SD_X * gauss()
+        y = f_true(x) + SIGMA * gauss()
+        xs.append(x)
+        ys.append(y)
+    return xs, ys
+
+
+# ============================================================
+print("=== Part 0: 案例数值口径（全部来自 case.json）===")
+print("Var(Y)=%.4f  Var(f)=%.4f  sigma^2=%.4f  sigma=%.4f" % (VAR_Y, VAR_F, SIGMA2, SIGMA))
+print("R2 check = Var(f)/Var(Y) = %.4f   (case 0.2296)" % (VAR_F / VAR_Y))
+print("test point x0=%.4f (MU_X+1.5*SD_X), f(x0)=%.4f" % (X_TEST, f_true(X_TEST)))
+print("irreducible noise floor sigma^2 = %.4f" % SIGMA2)
+print()
+
+# ============================================================
+print("=== Part 1: 偏差—方差分解 E[(y-fhat)^2] = Bias^2 + Var + sigma^2 ===")
+print("R=%d 次重复抽样, 训练集 n=40, 模型: 常数 / 线性(正确) / 5 次多项式" % 8000)
+R, NTRAIN = 8000, 40
+NAMES = ("常数模型", "线性模型", "5次多项式")
+preds = {n: [] for n in NAMES}
+sum_center = {n: 0.0 for n in NAMES}   # sum (fhat - f)^2
+sum_with_noise = {n: 0.0 for n in NAMES}   # sum (fhat - y_new)^2
+for _ in range(R):
+    xs, ys = make_train(NTRAIN)
+    ybar = sum(ys) / NTRAIN
+    xb = sum(xs) / NTRAIN
+    yb = sum(ys) / NTRAIN
+    sxy = sum((x - xb) * (y - yb) for x, y in zip(xs, ys))
+    sxx = sum((x - xb) ** 2 for x in xs)
+    slope = sxy / sxx
+    coef = poly_fit(xs, ys, 5)
+    cur = {
+        "常数模型": ybar,
+        "线性模型": yb + slope * (X_TEST - xb),
+        "5次多项式": poly_pred(coef, X_TEST),
+    }
+    y_new = f_true(X_TEST) + SIGMA * gauss()   # 独立的新噪声
+    for n in NAMES:
+        p = cur[n]
+        preds[n].append(p)
+        sum_center[n] += (p - f_true(X_TEST)) ** 2
+        sum_with_noise[n] += (p - y_new) ** 2
+
+print("%-12s %9s %9s %11s %11s %11s %11s %9s" %
+      ("model", "Bias^2", "Var", "B^2+V", "E[(f-fh)^2]", "theory", "MC(含噪声)", "diff"))
+for n in NAMES:
+    arr = preds[n]
+    m = sum(arr) / len(arr)
+    bias2 = (m - f_true(X_TEST)) ** 2
+    var = sum((p - m) ** 2 for p in arr) / len(arr)   # 总体方差
+    e_center = sum_center[n] / R
+    theory = bias2 + var + SIGMA2
+    mc = sum_with_noise[n] / R
+    print("%-12s %9.4f %9.4f %11.4f %11.4f %11.4f %11.4f %9.4f" %
+          (n, bias2, var, bias2 + var, e_center, theory, mc, mc - theory))
+print("注1：B^2+V 与 E[(f-fh)^2] 应逐位相等（纯代数恒等式）；")
+print("注2：theory = 上式 + sigma^2；MC(含噪声) 是独立新噪声下的实测，差异来自蒙特卡洛误差。")
+print("注3：主导项从『常数=偏差111』迁移到『多项式=方差』，线性模型两项皆小、总误差最低。")
+print()
+
+# ============================================================
+print("=== Part 2: 岭回归 L2 正则，解析 Bias^2/Var 与最优 lambda ===")
+print("真模型 y=beta*x+eps, beta=2, 设计 x=[1,2,3,4], Sxx=30, sigma^2=36")
+BETA, SXX, SIG2, X0 = 2.0, 30.0, 36.0, 2.0
+LAMBDAS = [0, 5, 9, 10, 20, 30]
+RR = 6000
+sd = math.sqrt(SIG2)
+print("%6s %10s %10s %10s %12s %12s %10s" %
+      ("lambda", "E[beta]", "Bias^2", "Var", "theory MSE", "MC MSE", "shrink"))
+mc_pred = {lam: 0.0 for lam in LAMBDAS}
+for _ in range(RR):
+    ys = [BETA * x + sd * gauss() for x in (1, 2, 3, 4)]
+    sxy = sum(x * y for x, y in zip((1, 2, 3, 4), ys))
+    y_new = BETA * X0 + sd * gauss()
+    for lam in LAMBDAS:
+        bhat = sxy / (SXX + lam)
+        pred = bhat * X0
+        mc_pred[lam] += (pred - y_new) ** 2
+for lam in LAMBDAS:
+    shrink = SXX / (SXX + lam)
+    eb = BETA * shrink
+    bias2 = (eb - BETA) ** 2
+    var = SIG2 * SXX / (SXX + lam) ** 2
+    theory = X0 ** 2 * (bias2 + var) + SIG2   # 在 x0 处的预测 MSE
+    mc = mc_pred[lam] / RR
+    print("%6d %10.4f %10.4f %10.4f %12.4f %12.4f %10.4f" %
+          (lam, eb, bias2, var, theory, mc, shrink))
+print("解析最优 lambda* = sigma^2/beta^2 = %.1f；表中该行 MSE 最小。" % (SIG2 / BETA ** 2))
+print()
+
+# ============================================================
+print("=== Part 3: k 折交叉验证的『先在全数据筛特征』泄漏 ===")
+print("纯噪声数据：标签与 100 个特征完全独立；重复 %d 次取平均" % 40)
+NROW, NFEAT, KFOLD, REPS = 100, 100, 5, 40
+leaky_all, honest_all = 0.0, 0.0
+for rep in range(REPS):
+    rows = [[gauss() for _ in range(NFEAT)] for _ in range(NROW)]
+    labels = [1 if random.random() &lt; 0.5 else 0 for _ in range(NROW)]
+    folds = [list(range(i, NROW, KFOLD)) for i in range(KFOLD)]
+
+    def corr(j, idx):
+        n = len(idx)
+        mx = sum(rows[r][j] for r in idx) / n
+        my = sum(labels[r] for r in idx) / n
+        num = sum((rows[r][j] - mx) * (labels[r] - my) for r in idx)
+        dx = math.sqrt(sum((rows[r][j] - mx) ** 2 for r in idx))
+        dy = math.sqrt(sum((labels[r] - my) ** 2 for r in idx))
+        return num / (dx * dy) if dx &gt; 0 and dy &gt; 0 else 0.0
+
+    def select(idx):
+        best, bj, bc = 0.0, 0, 0.0
+        for j in range(NFEAT):
+            c = abs(corr(j, idx))
+            if c &gt; best:
+                best, bj, bc = c, j, corr(j, idx)
+        return bj, bc
+
+    def score(j, sign, thr, idx):
+        return sum(1 for r in idx
+                   if (1 if sign * (rows[r][j] - thr) &gt;= 0 else 0) == labels[r]) / len(idx)
+
+    # 泄漏版：在全数据（含全部标签）上先选特征 j*，再做 5 折
+    lj, lc = select(range(NROW))
+    lsign = 1 if lc &gt;= 0 else -1
+    lacc = 0.0
+    for k in range(KFOLD):
+        test = folds[k]
+        train = [r for r in range(NROW) if r not in test]
+        thr = sum(rows[r][lj] for r in train) / len(train)
+        lacc += score(lj, lsign, thr, test)
+    leaky_all += lacc / KFOLD
+    # 诚实版：每折只在训练折内部重新筛特征
+    hacc = 0.0
+    for k in range(KFOLD):
+        test = folds[k]
+        train = [r for r in range(NROW) if r not in test]
+        j, c = select(train)
+        sign = 1 if c &gt;= 0 else -1
+        thr = sum(rows[r][j] for r in train) / len(train)
+        hacc += score(j, sign, thr, test)
+    honest_all += hacc / KFOLD
+
+print("leaky  (先在全数据筛特征): 5-fold CV accuracy = %.4f" % (leaky_all / REPS))
+print("honest (折内重新筛特征)  : 5-fold CV accuracy = %.4f" % (honest_all / REPS))
+print("gap = %+.4f；纯噪声本应≈0.50，泄漏版被系统性抬高。" %
+      ((leaky_all - honest_all) / REPS))
+print("说明：泄漏发生在『切分之前』——筛特征用了验证折的标签；折内阈值重算是诚实的，也救不回来。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 0: 案例数值口径（全部来自 case.json）===
+Var(Y)=212.4685  Var(f)=48.7841  sigma^2=163.6845  sigma=12.7939
+R2 check = Var(f)/Var(Y) = 0.2296   (case 0.2296)
+test point x0=160.4375 (MU_X+1.5*SD_X), f(x0)=90.2342
+irreducible noise floor sigma^2 = 163.6845
+
+=== Part 1: 偏差—方差分解 E[(y-fhat)^2] = Bias^2 + Var + sigma^2 ===
+R=8000 次重复抽样, 训练集 n=40, 模型: 常数 / 线性(正确) / 5 次多项式
+model           Bias^2       Var       B^2+V E[(f-fh)^2]      theory     MC(含噪声)      diff
+常数模型          110.1851    5.4531    115.6382    115.6382    279.3226    277.1233   -2.1993
+线性模型            0.0115   14.4986     14.5101     14.5101    178.1945    175.2288   -2.9657
+5次多项式           0.0416  123.3833    123.4249    123.4249    287.1093    280.0693   -7.0400
+注1：B^2+V 与 E[(f-fh)^2] 应逐位相等（纯代数恒等式）；
+注2：theory = 上式 + sigma^2；MC(含噪声) 是独立新噪声下的实测，差异来自蒙特卡洛误差。
+注3：主导项从『常数=偏差111』迁移到『多项式=方差』，线性模型两项皆小、总误差最低。
+
+=== Part 2: 岭回归 L2 正则，解析 Bias^2/Var 与最优 lambda ===
+真模型 y=beta*x+eps, beta=2, 设计 x=[1,2,3,4], Sxx=30, sigma^2=36
+lambda    E[beta]     Bias^2        Var   theory MSE       MC MSE     shrink
+     0     2.0000     0.0000     1.2000      40.8000      40.5363     1.0000
+     5     1.7143     0.0816     0.8816      39.8531      39.5573     0.8571
+     9     1.5385     0.2130     0.7101      39.6923      39.3733     0.7692
+    10     1.5000     0.2500     0.6750      39.7000      39.3755     0.7500
+    20     1.2000     0.6400     0.4320      40.2880      39.9166     0.6000
+    30     1.0000     1.0000     0.3000      41.2000      40.7930     0.5000
+解析最优 lambda* = sigma^2/beta^2 = 9.0；表中该行 MSE 最小。
+
+=== Part 3: k 折交叉验证的『先在全数据筛特征』泄漏 ===
+纯噪声数据：标签与 100 个特征完全独立；重复 40 次取平均
+leaky  (先在全数据筛特征): 5-fold CV accuracy = 0.6140
+honest (折内重新筛特征)  : 5-fold CV accuracy = 0.5032
+gap = +0.1107；纯噪声本应≈0.50，泄漏版被系统性抬高。
+说明：泄漏发生在『切分之前』——筛特征用了验证折的标签；折内阈值重算是诚实的，也救不回来。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">Var(Y)=212.4685 / Var(f)=48.7841 / sigma^2=163.6845</span> 全部来自案例 <code>quiz_avg</code> 的 sd=14.5763 与 OLS 斜率 0.160833、学习时长 sd=43.4274。$\mathrm{Var}(f)=\beta^2\sigma_x^2=48.7841$，$\sigma^2=\mathrm{Var}(Y)-\mathrm{Var}(f)=163.6845$。<span class="ci-k">R2 check = 0.2296</span> 与案例逐位吻合，说明「把案例回归线当成真函数」这条设定没有另造一套数字。改 <code>B0, B1, SD_Y</code> 会整体平移噪声地板，但三项相加的结构不变。</p>
+    <p><span class="ci-k">x0=160.4375, f(x0)=90.2342</span>：测试点取在 $\mu+1.5\sigma_x$，是有意选在中心之外——在中心处高次多项式的方差会被压小，看不出「复杂度换方差」的效果。<code>X_TEST</code> 越往尾部挪，5 次多项式那一行的 <code>Var</code> 越大。</p>
+    <p><span class="ci-k">B^2+V 与 E[(f-fh)^2] 两列</span>（115.6382 / 115.6382，14.5101 / 14.5101，123.4249 / 123.4249）<strong>逐位相等</strong>，验证的是纯代数恒等式 $\frac1R\sum(\hat f-f)^2=(\bar{\hat f}-f)^2+\frac1R\sum(\hat f-\bar{\hat f})^2$，不含任何概率近似。这是深度专题一「交叉项为零」最硬的数值证据。</p>
+    <p><span class="ci-k">theory 列</span> 是 $B^2+V+\sigma^2$：常数 279.3226、线性 178.1945、多项式 287.1093。噪声地板 163.6845 对三者完全相同，主导项从「偏差 110.19」迁移到「方差 123.38」，把 U 形曲线的两端都摆在了同一张表上。<span class="ci-k">MC(含噪声) 与 diff 列</span> 是另用独立新噪声实测的均方误差；差异（−2.2 到 −7.0）来自 8000 次重复的蒙特卡洛抖动，尤其多项式预测分布重尾，均值标准误约几个单位——把 <code>R</code> 调大两列会更贴合，而 <code>theory</code> 列永远是精确值。</p>
+    <p><span class="ci-k">Part 2 的 shrink 列</span> 就是 $\gamma_\lambda=S_{xx}/(S_{xx}+\lambda)$：$\lambda=9$ 时 0.7692，即 $\mathrm{E}[\hat\beta]$ 从真值 2 被压到 1.5385，偏差平方升到 0.2130，但方差从 1.2000 降到 0.7101，净赚 0.2769。<span class="ci-k">lambda*=9.0</span> 来自 $\sigma^2/\beta^2=36/4=9$，表中该行 <code>theory MSE=39.6923</code> 为全表最小，与算法第六步手算的 $4\times0.9231+36$ 逐位一致。<code>MC MSE</code> 略低是有限重复次数与独立噪声抽样的正常波动。</p>
+    <p><span class="ci-k">Part 3 的 0.6140 对 0.5032</span>：数据是纯噪声（标签与 100 个特征独立），任何真实可预测信号都应为 0.50。泄漏版先在<strong>全数据</strong>上挑出与标签最相关的特征，等于让验证折的标签参与了选题，5 折均值被抬到 0.6140；诚实版每折只在训练折内部重筛，回到 0.5032。<span class="ci-k">gap=+0.1107</span> 全部是「切分之前」的乐观偏差。注意折内阈值是老老实实用训练部分重算的——这正说明拯救不了：问题不在折内，在 $\Psi(\mathcal D)$ 用了全部数据。改动 <code>NFEAT</code>（特征越多，假相关越强）或 <code>NROW</code> 会改变 gap 大小，但符号恒为正。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组方法给出三件东西：把期望平方误差严格拆成 $\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$；用带 L2 罚的 ERM（岭回归）在两者间做可手算的权衡；以及判定 k 折交叉验证是否泄漏的充要判据。<strong>不做</strong>因果识别、不做分类间隔分解、也不替代独立测试集的最终报告。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：数值特征矩阵 $X$（需标准化）、连续标签 $y$、随机种子、$\lambda$ 候选网格、折数 $K$；输出：系数 $\hat\beta_\lambda$、收缩因子 $\gamma_\lambda$、三项误差账目（量纲为标签平方）、CV 均值与其标准误。所有误差项与 $y$ 同量纲平方，$\lambda$ 与 $S_{xx}$ 同量纲。</td></tr>
+    <tr><th>适用场景</th><td>回归预测的复杂度诊断与正则化调参、共线或 $p\approx n$ 的表格数据、评估协议设计与数据泄漏审计、模型选择后的泛化误差估计；凡是「训练误差低但上线掉点」或「验证分数高得离谱」的场合都应先用这套账目体检。</td></tr>
+    <tr><th>关键参数</th><td>$\lambda$（收缩强度，解析锚点 $\sigma^2/\beta^2$，越大偏差升方差降）；$K$（折数，5 或 10 常用，影响悲观偏差与估计方差）；标准化方式（决定罚项是否公平）；截距是否罚（应不罚）；随机种子与分层标记（决定可复现与类别比例）。</td></tr>
+    <tr><th>边界条件</th><td>在损失非平方（分类 0-1、绝对值损失）、样本存在时间／分组依赖、或 $\lambda$／特征名单在全数据上预先算出的条件下，本组结论不成立，应改用间隔分解与 C-bound、时间序列滚动／分组 k 折、嵌套交叉验证或独立测试集；在偏差已主导（欠拟合）时，加大 $\lambda$ 会继续变差，应改用加特征／换更强模型而非正则。</td></tr>
+    <tr><th>常见问题</th><td>① 把 $\sigma^2$ 当成「还没调好」而继续加复杂度；② 用全数据标准化或全数据筛特征后再 CV；③ 把 k 折当成 K 次独立实验、用 $s/\sqrt K$ 报标准误；④ 在偏差主导时盲目加正则或 Bagging。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>把模型做得更复杂，测试误差一定下降吗？</summary><div class="faq-a">不一定。代码实验 Part 1 里把线性模型换成 5 次多项式，$\mathrm{Bias}^2$ 从 0.0115 只降到 0.0416（几乎没动，真模型本来就是线性的），$\mathrm{Var}$ 却从 14.4986 涨到 123.3833，总误差从 178.1945 升到 287.1093。只有当偏差项确实主导时（常数模型的 110.1851），加复杂度才划算。先判断谁主导，再决定动作。</div></details>
+  <details><summary>噪声项 $\sigma^2$ 能通过多收集数据或调参降下来吗？</summary><div class="faq-a">不能。$\sigma^2$ 是数据生成过程自带的不可约方差，与模型、样本量、$\lambda$ 都无关；代码实验里三种模型的噪声地板恒为 163.6845。唯一「降低」它的办法是引入能解释这部分波动的<strong>新信息</strong>（新特征、更细的测量口径），而不是继续调模型。若实测测试误差低于 $\sigma^2$，第一反应应是查数据泄漏，而不是庆祝。</div></details>
+  <details><summary>我在每一折里都重新标准化、重新训练了，为什么 CV 还是虚高？</summary><div class="faq-a">要分清「折内重算」与「切分前决定」。如果特征<strong>名单</strong>、$\lambda$ 网格的最优值、或编码字典是在切分之前用全数据挑出来的，那么即使折内把均值重算一遍，打分模型仍携带验证折的信息——代码实验 Part 3 的折内阈值正是重算的，泄漏版仍得 0.6140。判据是 $\lambda_k=\Psi(\mathcal D\setminus F_k)$：所有 <code>fit</code> 必须只吃训练折，用 Pipeline 封装最省心。</div></details>
+  <details><summary>5 折 CV 的 5 个分数，能当成 5 次独立实验算标准误吗？</summary><div class="faq-a">不能。任意两折的训练集共享约 $(K-2)/(K-1)$ 的样本（5 折时约 60%），5 个验证误差高度相关，朴素 $s/\sqrt 5$ 会低估不确定性约一半（见正文例 4.3 的修正因子 $1+(K-1)\rho$）。正确做法：用逐折配对的差值做比较（配对 bootstrap / McNemar），或对重复 k 折取均值并报告修正后的标准误；重复 CV 让估计更稳，但不能替代嵌套 CV 去做无偏的模型选择。</div></details>
+  <details><summary>$\lambda$ 是不是越大越稳、越该往上调？</summary><div class="faq-a">不是。$\lambda$ 把方差按 $\gamma_\lambda^2$ 压低的同时，把偏差平方按 $(\beta\lambda/(S_{xx}+\lambda))^2$ 推高；代码实验 Part 2 中 $\lambda$ 从 9 增到 30，MSE 从 39.6923 回升到 41.2000。最优值有解析解 $\lambda^{*}=\sigma^2/\beta^2=9$：噪声越大、信号越弱，才越该加大正则。实践里 $\beta,\sigma^2$ 未知，用交叉验证在训练折内部选 $\lambda$，且最终评估要嵌套或另留测试集。</div></details>
+  <details><summary>为什么时间序列不能直接随机打乱做 5 折？</summary><div class="faq-a">随机打乱会把「未来」样本放进训练集，$\hat f_{-k}$ 与验证折不再独立，深度专题二的有效性推导 $\mathrm{E}[L_i]=R(\hat f_{-k})$ 直接失效，验证分数虚高（时间泄漏）。正确方式是滚动窗口验证：训练窗口 $[t_1,t_2]$、验证窗口 $[t_2+1,t_3]$，向前滚动取多段平均；若存在周／月季节性，验证段还要覆盖至少一个完整周期。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">偏差—方差推导中，交叉项 $2(f-\bar f)(\bar f-\hat f)$ 的期望为什么恰好为 0？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 因为噪声 $\varepsilon$ 的方差是 $\sigma^2$</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 因为 $\hat f$ 与 $y$ 相互独立</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 因为 $\bar f=\mathrm{E}_{\mathcal D}[\hat f]$，故 $\mathrm{E}_{\mathcal D}[\bar f-\hat f]=0$，常数因子可提到期望外</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. 因为用的是平方损失以外的损失函数</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：交叉项期望 $=2(f-\bar f)\cdot\mathrm{E}_{\mathcal D}[\bar f-\hat f]$，而 $\mathrm{E}_{\mathcal D}[\hat f]=\bar f$，括号恒为 0。这是「离均差之和为零」的严格写法，与 $\varepsilon$ 独立（用于第一步分离噪声）是两件事；若换成 0-1 损失，加法分解根本不成立。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">代码实验 Part 1 中，把线性模型换成 5 次多项式后总误差从 178.19 升到 287.11，主要因为哪一项？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 偏差平方从 0.0115 暴涨到 110 以上</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 方差从 14.4986 涨到 123.3833，而偏差几乎没降</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 噪声 $\sigma^2$ 变大了</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 训练集样本量从 40 降到 30</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：真模型本来就是线性的，加复杂度不能降低偏差（$\mathrm{Bias}^2$ 仅 0.0115 → 0.0416），却把方差放大近 9 倍；$\sigma^2=163.6845$ 对三个模型完全相同。诊断结论：这是方差主导的过拟合，应加数据／正则化，而不是继续加复杂度。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">单特征无截距的岭回归中，把 $\lambda$ 从 0 增大，下列哪一项描述正确？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 偏差下降、方差上升</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 偏差上升、方差下降，收缩因子 $\gamma_\lambda=S_{xx}/(S_{xx}+\lambda)$ 变小</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 偏差与方差同时下降</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 噪声 $\sigma^2$ 随之下降</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\hat\beta_\lambda=\gamma_\lambda\hat\beta_{OLS}$，$\gamma_\lambda$ 随 $\lambda$ 增大而减小，故 $\mathrm{E}[\hat\beta_\lambda]=\gamma_\lambda\beta$ 偏离真值（偏差上升），而 $\mathrm{Var}=\sigma^2S_{xx}/(S_{xx}+\lambda)^2$ 按 $\gamma_\lambda^2$ 下降。噪声项与 $\lambda$ 无关。最优 $\lambda^*=\sigma^2/\beta^2$。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">某团队「先用全数据筛出 100 个特征，再做 5 折交叉验证」，折内也重新训练了模型。结果是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 完全无偏，因为折内重新训练了</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 偏悲观，因为特征变少了</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 系统性偏乐观，因为 $\lambda=\Psi(\mathcal D)$ 用了验证折的标签，$\hat f_{-k}$ 与 $F_k$ 不再独立</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 只增大方差，不改变期望</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：泄漏发生在切分之前，是期望层面的乐观偏差，折内重训、增加折数、重复 CV 都救不回来。代码实验 Part 3 中泄漏版 0.6140 对诚实版 0.5032（真值 0.50），gap +0.1107 全部来自此。修复：把筛特征放进 Pipeline，每折只在训练折内重筛；若要同时调参与评估，用嵌套 CV。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">下列哪种情形下，随机 k 折交叉验证的「验证折与训练折独立」假设不成立？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 特征已标准化、标签为连续值</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 样本量 $n=10000$、折数 $K=10$</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 类别比例 3:7，改用分层 k 折</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 同一用户的多次曝光记录散落在不同折，或数据是按时间排列的日志</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：时间序列与聚类／分组结构下样本不独立，随机切分会让「未来」或「同一用户」信息跨折，有效性推导失效。应改用滚动窗口验证（walk-forward）或分组 k 折（GroupKFold）。分层 k 折（C）恰恰是修复类别不平衡的正确做法，不是失效条件。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure data-classic="0"></figure>

@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13 · 深度学习的训练范式 · 统计 · 智能学习体系</title>
+<meta name="description" content="深度学习的训练范式：交叉熵与最大似然、计算图与自动微分、反向传播矩阵推导、SGD 到 AdamW、Xavier/He 初始化与归一化、正则化与泛化、混合精度与并行训练、缩放定律与训练诊断。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m13" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 4 · <a href="../stages/deep-learning.html">深度学习</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l4">L4 高级</span> · 10 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 09 + 线代/微积分 · 上一篇：<a href="m12-ml-algorithms.html">12 · 经典机器学习算法</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m14-architectures.html">14 · 神经网络架构谱系</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m09-ml-stats.html">09 机器学习的统计基础</a><span class="dep-arrow">→</span><a class="dep-node" href="m12-ml-algorithms.html">12 经典机器学习算法</a><span class="dep-arrow">→</span><a class="dep-node current" href="m13-deep-training.html">13 深度学习的训练范式</a><span class="dep-arrow">→</span><a class="dep-node" href="m14-architectures.html">14 神经网络架构谱系</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：自动微分, 反向传播, 梯度下降, Adam, 学习率调度, 批归一化, 权重衰减, 混合精度, 缩放定律</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>反向传播为什么等价于在计算图上反复用链式法则？ <a class="q-anchor" href="#s3">→ 对应讲解</a></li><li>Adam 相比 SGD+Momentum 改进了什么，又引入了什么新问题？ <a class="q-anchor" href="#s4">→ 对应讲解</a></li><li>批归一化为什么有效？其原始「内部协变量偏移」解释是否被后续研究推翻？ <a class="q-anchor" href="#s5">→ 对应讲解</a></li><li>损失出现 NaN / 不下降 / 训练好验证差，分别该按什么顺序排查？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+      <article class="module" data-stage="s4">
+      <div class="inner">
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/deep-learning.html">阶段 4 · 深度学习</a> / 13 · 深度学习的训练范式</div>
+        <h1>13 · 深度学习的训练范式</h1>
+        <p class="lead">本章聚焦<strong>「如何把深层模型稳定训练出来」</strong>：从交叉熵还原为最大似然开始，沿「计算图 → 反向传播 → 优化器 → 初始化与归一化 → 正则化 → 规模化 → 缩放定律」把一次训练拆成可推导、可手算、可诊断的环节。全章坚持一条主线——深度学习不是一堆技巧，而是阶段一统计推断在高维非凸模型上的延续。</p>
+        <div class="module-meta">
+          <span class="badge brand">阶段 4 · 深度学习</span>
+          <span class="badge info">L4 高级</span>
+          <span class="badge">10 学时</span>
+          <span class="badge">前置：模块 09 + 线代与微积分</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>把交叉熵损失还原为负对数似然，说明经验风险最小化与阶段一 MLE、MAP 的等价关系</li>
+          <li>在计算图上写出两层 MLP 的 $\delta$ 递推与梯度公式，并用数值梯度检查验证解析梯度</li>
+          <li>比较 SGD、动量、Nesterov 与 AdaGrad/RMSProp/Adam/AdamW 的更新式，解释偏差校正与解耦权重衰减</li>
+          <li>用方差守恒推导 Xavier 与 He 初始化，辨析 Batch/Layer/RMSNorm 的归一化维度与推理行为</li>
+          <li>诊断 loss spike、梯度爆炸与混合精度溢出，并用幂律 $L(N)$ 与 $C\approx 6ND$ 做数量级估算</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 从最大似然到训练循环</h2>
+
+      <h3 id="s1-1">1.1 直觉：训练就是「猜一个条件分布」</h3>
+      <p>监督学习的模型 $f_\theta(x)$ 并不直接输出「答案」，而是参数化一个条件分布 $p_\theta(y\mid x)$。分类时它是类别上的离散分布（softmax 输出），回归时可看作固定方差的高斯均值。训练的全部目标，就是让这个分布在观测数据上尽可能「不惊讶」：真实标签出现的概率越大越好。这正是阶段一最大似然估计（MLE）的原话，深度学习只把「参数化分布」从少数几个 $\theta$ 换成了几亿个权重。</p>
+
+      <h3 id="s1-2">1.2 交叉熵 = 负对数似然</h3>
+      <p>设样本独立同分布，似然为 $\prod_i p_\theta(y_i\mid x_i)$，取对数得 $\ell(\theta)=\sum_i\log p_\theta(y_i\mid x_i)$。最大化 $\ell$ 等价于最小化其负值除以 $n$。对单热标签 $y$ 与预测概率 $\hat y$，$\log p_\theta(y\mid x)=\sum_k y_k\log\hat y_k$，于是负对数似然正是交叉熵 $\mathrm{CE}(y,\hat y)=-\sum_k y_k\log\hat y_k$。<strong>「最小化交叉熵」与「最大化似然」是同一件事的两种说法</strong>；本章所有 $\log$ 与 $\ln$ 均指自然对数。</p>
+      <div class="formula-box">
+        <div class="f-name">交叉熵、负对数似然与经验风险最小化</div>
+        $$ \ell(\theta)=\sum_{i=1}^{n}\log p_\theta(y_i\mid x_i),\qquad J(\theta)=-\frac{1}{n}\ell(\theta) $$
+        $$ \mathrm{CE}(y,\hat y)=-\sum_{k} y_k\log \hat y_k,\qquad \max_{\theta}\ell(\theta)\ \Leftrightarrow\ \min_{\theta}J(\theta) $$
+        $$ \min_{\theta}\ \frac{1}{n}\sum_{i=1}^{n} L\bigl(y_i,f_\theta(x_i)\bigr)+\lambda\|\theta\|^2 $$
+        <div class="f-note">
+          第一式把似然与损失对接；第二式说明交叉熵就是每个样本负对数似然的平均；第三式即经验风险最小化（ERM）。末尾的 $\lambda\|\theta\|^2$ 对应高斯先验下的 <strong>MAP 估计</strong>：岭回归、weight decay、贝叶斯先验在此合流。数据分布未知，故用经验分布 $\hat p_{\text{data}}$ 代替真实分布，这一步的误差正是泛化差距的来源。
+        </div>
+      </div>
+
+      <h3 id="s1-3">1.3 训练循环：把统计目标变成可执行的四步</h3>
+      <p>目标确定后，训练循环只是把「最小化 $J(\theta)$」落到数值计算上，每一轮迭代重复四步：① 采样一个 mini-batch，用当前 $\theta$ 前向计算损失；② 反向传播求 $\nabla_\theta J$；③ 优化器据此更新 $\theta$；④ 在验证集上监控泛化。学习率、batch、优化器都是「如何沿梯度走」的选择，而非目标本身。<strong>把损失写错，后面所有工程优化都是在精确地优化一个错的东西</strong>——这是最值得先确认的一步。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 13.1</span>
+          <span class="ex-title">交叉熵与似然换算：从概率到损失</span>
+        </div>
+        <div class="example-body">
+          <p>二分类问题，三个样本的真实标签 $y=(1,0,1)$，模型预测「$y=1$」的概率分别为 $\hat p=(0.9,\ 0.2,\ 0.8)$。① 写出伯努利似然并求其数值；② 求平均负对数似然（即平均交叉熵），并用 BCE 公式逐样本核对；③ 若把三个预测都改成 $0.5$，损失变为多少，说明其含义；④ 说明加入 $\lambda\|\theta\|^2$ 后目标如何从 MLE 变为 MAP。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：伯努利似然</strong></p>
+              <p>单个样本 $p_\theta(y_i\mid x_i)=\hat p_i^{y_i}(1-\hat p_i)^{1-y_i}$，独立样本相乘：</p>
+              $$ L(\theta)=0.9^{1}\times(1-0.2)^{1}\times 0.8^{1}=0.9\times 0.8\times 0.8=\mathbf{0.576} $$
+              <p>注意第二个样本 $y=0$，贡献的是 $(1-\hat p_2)=0.8$，不是 $0.2$。</p>
+              <p><strong>第二步：平均负对数似然</strong></p>
+              $$ \ell(\theta)=\ln 0.9+\ln 0.8+\ln 0.8\approx-0.1054-0.2231-0.2231=-0.5516 $$
+              $$ J(\theta)=-\frac{1}{n}\ell(\theta)=\frac{0.5516}{3}\approx\mathbf{0.1839} $$
+              <p>用交叉熵公式逐样本核对：$-\ln 0.9=0.1054$、$-\ln(1-0.2)=0.2231$、$-\ln 0.8=0.2231$，求和 $0.5516$，除以 3 得 $0.1839$，与似然换算完全一致。</p>
+              <p><strong>第三步：全部预测为 0.5</strong></p>
+              $$ J=-\frac{1}{3}\times 3\times\ln 0.5=\ln 2\approx\mathbf{0.6931} $$
+              <p>这是二分类的<strong>随机猜测基线</strong>：均匀分布的交叉熵恰为 $\ln 2$。任何训练若长期停在此值附近，说明模型没学到信号；它也是判断「损失是否真的在下降」的参照点。</p>
+              <p><strong>第四步：从 MLE 到 MAP</strong></p>
+              <p>$\min_\theta J(\theta)$ 即 MLE。改为 $\min_\theta J(\theta)+\lambda\|\theta\|^2$ 时，由贝叶斯公式，后验 $\propto$ 似然 $\times$ 先验；取先验 $\theta\sim\mathcal{N}(0,\ \sigma^2 I)$，其负对数正是 $\frac{1}{2\sigma^2}\|\theta\|^2$。故 $\lambda=1/(2n\sigma^2)$ 量级时，正则化等价于<strong>最大化后验（MAP）</strong>——高斯先验对应 L2，拉普拉斯先验对应 L1。这也预告了第 6 节：正则化不是经验技巧，而是先验的编码。</p>
+              <p><strong>易错提示：</strong>① 二分类里把 $y=0$ 样本的 $(1-\hat p)$ 误写成 $\hat p$；② 混淆「似然乘积」与「平均损失」，忘记除以 $n$ 会导致学习率随 batch 变化；③ 用 $\log_2$ 计算却拿 $\ln 2\approx0.693$ 当基线（以 2 为底应为 1 bit）；④ 把 softmax 之前的 logits 直接代入交叉熵，须先做数值稳定的 log-softmax。</p>
+              <p><strong>应用关联：</strong>PyTorch 的 <code>nn.CrossEntropyLoss</code> 直接接收 logits 并内部做 log-softmax，等价于这里的负对数似然；语言模型把「下一个 token 的交叉熵」取指数得到困惑度 $\exp(J)$，随机基线正是词表大小 $V$。把损失还原为 MLE，就能把阶段一的置信区间、模型选择准则迁移到深度模型评估。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 计算图与自动微分</h2>
+
+      <h3 id="s2-1">2.1 计算图与链式法则</h3>
+      <p>任何程序化的损失都可拆成一张<strong>有向无环图</strong>：叶子是输入与参数，中间节点是基本运算（加、乘、ReLU、softmax），根是标量损失 $L$。链式法则说：若 $L$ 经中间量 $z$ 依赖于参数 $\theta$，则 $\frac{\partial L}{\partial\theta}=\frac{\partial L}{\partial z}\cdot\frac{\partial z}{\partial\theta}$。自动微分（AD）不是符号求导，也不是数值差分，而是<strong>把链式法则按确定的顺序作用在这张图上</strong>，因此对任意深的组合都能给出机器精度的导数。</p>
+
+      <h3 id="s2-2">2.2 前向模式与反向模式</h3>
+      <p>前向模式从输入出发，沿图传播「某个方向上的导数」，一次扫描得到一个自变量对所有输出的导数；反向模式先从根求 $\frac{\partial L}{\partial L}=1$，再逆拓扑序把<strong>伴随值（adjoint）</strong> $\bar u=\frac{\partial L}{\partial u}$ 回传，一次扫描得到损失对所有参数的梯度。深度学习的损失是标量、参数是百万维，恰好是「一个输出、海量输入」的场景，因此反向模式（即反向传播）比前向模式省下几个数量级的计算。</p>
+      <p>反向传播的核心效率来自<strong>复用</strong>：每个节点把上游传来的 $\bar u$ 乘上本地雅可比 $\partial u/\partial v$ 后累加到下游，同一中间梯度被所有路径共享，而不是对每条路径重复求导。代价是必须缓存前向的中间激活值，这正是训练显存远大于推理显存的原因，也解释了第 7 节梯度检查点（重计算换显存）的动机。</p>
+
+      <h3 id="s2-3">2.3 数值梯度检查</h3>
+      <p>解析梯度写错（下标、转置、漏一项）是实现反向传播最常见的 bug。数值梯度检查用中心差分独立估计一个分量的偏导，与解析值比对：</p>
+      $$ g_j^{\text{num}}=\frac{L(\theta+\varepsilon e_j)-L(\theta-\varepsilon e_j)}{2\varepsilon},\qquad \text{相对误差}=\frac{|g_j^{\text{num}}-g_j^{\text{ana}}|}{|g_j^{\text{num}}|+|g_j^{\text{ana}}|} $$
+      <p>$\varepsilon$ 取 $10^{-4}$ 到 $10^{-6}$ 量级；太大有截断误差，太小被浮点舍入吞掉。判据通常要求相对误差 $\leq 10^{-6}$（ReLU 等非光滑点附近可放宽到 $10^{-4}$）。检查时必须关闭 dropout、固定 batch、只扰动一个分量，且用双精度。</p>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ①：梯度检查「通过」不等于反向传播正确
+        </div>
+        <p>① 开着 dropout / BatchNorm 的训练模式做检查，两次前向随机性不同，差分结果毫无意义；② 用单边差分 $\frac{L(\theta+\varepsilon)-L(\theta)}{\varepsilon}$，截断误差是 $O(\varepsilon)$ 而非中心差分的 $O(\varepsilon^2)$；③ 只检查一个分量，恰好那个分量公式对、其余错了；④ 在 ReLU 的 $z=0$ 或 max 的平局点检查，函数不可导，解析与数值必然不符；⑤ 用 FP16 做检查，$\varepsilon$ 扰动被舍入吃掉。<strong>正确做法</strong>：eval 模式、双精度、中心差分、随机抽若干分量逐个比对，并把相对误差（而非绝对差）作为判据。</p>
+      </div>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 反向传播的矩阵推导</h2>
+
+      <h3 id="s3-1">3.1 记号与两层 MLP 的前向</h3>
+      <p>设单样本 $x\in\mathbb{R}^{d_0}$，第 $l$ 层仿射变换 $z^{(l)}=W^{(l)}a^{(l-1)}+b^{(l)}$、激活 $a^{(l)}=\sigma(z^{(l)})$，其中 $a^{(0)}=x$。定义误差信号 $\delta^{(l)}=\nabla_{z^{(l)}}L$（损失对第 $l$ 层<strong>线性输出</strong>的梯度）。两层网络即 $L=1$ 个隐层加输出层：输出层 $\hat y=\sigma_2(z^{(2)})$，损失 $L=\mathrm{Loss}(\hat y,y)$。所有推导都围绕「$\delta$ 如何逐层回传」展开。</p>
+      <div class="formula-box">
+        <div class="f-name">反向传播的 $\delta$ 递推与梯度公式</div>
+        $$ \delta^{(L)}=\nabla_{a^{(L)}}L\odot\sigma'(z^{(L)}) $$
+        $$ \delta^{(l)}=\bigl((W^{(l+1)})^\top\delta^{(l+1)}\bigr)\odot\sigma'(z^{(l)}) $$
+        $$ \nabla_{W^{(l)}}L=\delta^{(l)}(a^{(l-1)})^\top,\qquad \nabla_{b^{(l)}}L=\delta^{(l)} $$
+        <div class="f-note">
+          $\odot$ 为逐元素乘，$^\top$ 为转置。第一式是输出层（$\nabla_{a^{(L)}}L$ 由损失函数给出，如平方损失为 $\hat y-y$、交叉熵配 softmax 为 $\hat y-y$）；第二式是隐层递推：先由 $(W^{(l+1)})^\top$ 把上层 $\delta$ 线性映回本层，再乘本层激活导数；第三式说明权重梯度是「本层误差 $\times$ 本层输入」的外积。对 batch 数据只需把外积换成矩阵乘并除以样本数。
+        </div>
+      </div>
+
+      <h3 id="s3-2">3.2 逐层写出两层网络的梯度</h3>
+      <p>把上式展开到 $L=2$：先算 $\delta^{(2)}=\nabla_{a^{(2)}}L\odot\sigma_2'(z^{(2)})$，得 $\nabla_{W^{(2)}}L=\delta^{(2)}(a^{(1)})^\top$、$\nabla_{b^{(2)}}L=\delta^{(2)}$；再回传 $\delta^{(1)}=((W^{(2)})^\top\delta^{(2)})\odot\sigma_1'(z^{(1)})$，得 $\nabla_{W^{(1)}}L=\delta^{(1)}x^\top$、$\nabla_{b^{(1)}}L=\delta^{(1)}$。注意每一层的梯度都只依赖<strong>本层输入</strong>与<strong>回传的 $\delta$</strong>，与更深的层无关——这就是反向模式一次扫描即可完成的原因。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 13.2</span>
+          <span class="ex-title">两层网络解析梯度与数值梯度核对</span>
+        </div>
+        <div class="example-body">
+          <p>两层 MLP（隐层 2 个 ReLU 单元、输出 1 个线性单元、平方损失 $L=\frac12(\hat y-y)^2$）：输入 $x=(1,2)^\top$，$W^{(1)}$ 两行分别为 $(0.1,0.2)$、$(-0.3,0.4)$，$b^{(1)}=(0.1,-0.1)^\top$；$W^{(2)}=(0.5,-0.6)$，$b^{(2)}=0.2$，目标 $y=1$。① 前向求 $\hat y$ 与 $L$；② 用 $\delta$ 递推求全部解析梯度；③ 对 $W^{(2)}_{11}=0.5$ 用 $\varepsilon=10^{-4}$ 中心差分求数值梯度并比较；④ 给出相对误差。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：前向</strong></p>
+              $$ z^{(1)}_1=0.1\times1+0.2\times2+0.1=0.6,\qquad z^{(1)}_2=-0.3\times1+0.4\times2-0.1=0.4 $$
+              <p>ReLU 后 $a^{(1)}=(0.6,\ 0.4)^\top$（均为正，导数取 1）。输出层：</p>
+              $$ \hat y=z^{(2)}=0.5\times0.6-0.6\times0.4+0.2=0.30-0.24+0.20=\mathbf{0.26} $$
+              $$ L=\tfrac12(0.26-1)^2=\tfrac12\times0.74^2=\mathbf{0.2738} $$
+              <p><strong>第二步：$\delta$ 递推与解析梯度</strong></p>
+              <p>输出层线性、平方损失，故 $\delta^{(2)}=\hat y-y=0.26-1=-0.74$：</p>
+              $$ \nabla_{W^{(2)}}L=\delta^{(2)}(a^{(1)})^\top=-0.74\times(0.6,0.4)=(\mathbf{-0.444},\ -0.296) $$
+              $$ \nabla_{b^{(2)}}L=-0.74 $$
+              <p>回传到隐层，ReLU 导数为 1：</p>
+              $$ \delta^{(1)}=(W^{(2)})^\top\delta^{(2)}=(0.5,-0.6)^\top\times(-0.74)=(-0.37,\ 0.444)^\top $$
+              $$ \nabla_{W^{(1)}}L=\delta^{(1)}x^\top=\bigl((-0.37,0.444)^\top\bigr)(1,2)=\bigl((-0.37,-0.74),\ (0.444,0.888)\bigr) $$
+              $$ \nabla_{b^{(1)}}L=(-0.37,\ 0.444)^\top $$
+              <p><strong>第三步：数值梯度（扰动 $W^{(2)}_{11}$）</strong></p>
+              <p>只有 $z^{(2)}$ 随该权重线性变化：$z^{(2)}(0.5+\varepsilon)=0.26+0.6\varepsilon$，故 $L(0.5+\varepsilon)=\frac12(-0.74+0.6\varepsilon)^2$。用 $(a+b)^2-(a-b)^2=4ab$：</p>
+              $$ \frac{L(w+\varepsilon)-L(w-\varepsilon)}{2\varepsilon}=\frac{\tfrac12\times4\times(-0.74)(0.6\varepsilon)}{2\varepsilon}=\mathbf{-0.444} $$
+              <p>与解析梯度 $\nabla_{W^{(2)}_{11}}L=-0.444$ 完全相同。汇总对照：</p>
+              <div class="table-wrap"><table><thead><tr><th>参数</th><th>解析梯度</th><th>数值梯度（中心差分）</th></tr></thead><tbody>
+                <tr><td>$W^{(2)}_{11}$</td><td>$-0.444$</td><td>$-0.444$</td></tr>
+                <tr><td>$W^{(2)}_{12}$</td><td>$-0.296$</td><td>$-0.296$</td></tr>
+                <tr><td>$b^{(2)}$</td><td>$-0.740$</td><td>$-0.740$</td></tr>
+                <tr><td>$W^{(1)}_{11}$</td><td>$-0.370$</td><td>$-0.370$</td></tr>
+              </tbody></table></div>
+              <p><strong>第四步：相对误差</strong></p>
+              $$ \frac{|-0.444-(-0.444)|}{|-0.444|+|-0.444|}\approx 0\ (\text{浮点量级}\ \leq 10^{-11}) $$
+              <p>远小于 $10^{-6}$，梯度实现通过检查。平方损失对 $W^{(2)}$ 是二次函数，中心差分在本例恰好精确；对含 sigmoid/softmax 的网络会有 $O(\varepsilon^2)$ 残差，但量级仍应在 $10^{-8}$ 以下。</p>
+              <p><strong>易错提示：</strong>① 忘记对激活求导，直接把 $\delta^{(2)}$ 当 $\delta^{(1)}$；② 转置位置写反，$(W^{(l+1)})^\top\delta$ 写成 $W^{(l+1)}\delta$，维度对不上就是信号；③ 忘记除以 batch 大小，梯度随 batch 线性放大；④ 交叉熵配 softmax 时输出层 $\delta$ 仍为 $\hat y-y$，却额外再乘一次 softmax 导数（重复求导）；⑤ 在 ReLU 的 $z=0$ 处检查数值梯度，不可导点误判为 bug。</p>
+              <p><strong>应用关联：</strong>框架里 <code>loss.backward()</code> 做的就是这段递推，只是把 $\odot\sigma'$、外积与转置编译成算子。手写 NumPy 版 MLP 并用本例的「解析值 vs 中心差分」核对，是阶段四实践任务的第一关；它也是第 2 节数值梯度检查的直接落地。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 优化器：从 SGD 到 AdamW</h2>
+
+      <h3 id="s4-1">4.1 SGD、动量与 Nesterov</h3>
+      <p>最朴素的更新是 $\theta_t=\theta_{t-1}-\alpha g_t$，其中 $g_t=\nabla_\theta J(\theta_{t-1})$。mini-batch 梯度含噪声，<strong>动量</strong>用指数移动平均累积历史方向：$v_t=\mu v_{t-1}+g_t$、$\theta_t=\theta_{t-1}-\alpha v_t$，$\mu\approx0.9$ 时等效把梯度做了约 $1/(1-\mu)=10$ 步平滑，抑制高曲率方向的震荡、加速峡谷地形中的收敛。<strong>Nesterov</strong> 先看「按动量将要到达的点」再算梯度，用「未来位置」的梯度校正方向，减少过冲。三者的更新量都与梯度幅值成正比，因此共享一个全局学习率 $\alpha$。</p>
+
+      <h3 id="s4-2">4.2 自适应学习率族</h3>
+      <p>不同参数梯度量级差异很大（稀疏特征、不同层）。<strong>AdaGrad</strong> 累加梯度平方 $G_t=\sum_{\tau\leq t}g_\tau^2$ 并令步长 $\alpha/\sqrt{G_t}$，对频繁更新的参数自动降速，但 $G_t$ 单调增会使学习率过早衰减到 0。<strong>RMSProp</strong> 改用指数移动平均 $v_t=\beta v_{t-1}+(1-\beta)g_t^2$，避免单调衰减。<strong>Adam</strong> 同时估计一阶矩（动量）与二阶矩（未中心化方差），并做<strong>偏差校正</strong>消除初始零值带来的低估。</p>
+      <div class="formula-box">
+        <div class="f-name">Adam 与 AdamW 的更新式</div>
+        $$ m_t=\beta_1 m_{t-1}+(1-\beta_1)g_t,\qquad v_t=\beta_2 v_{t-1}+(1-\beta_2)g_t^2 $$
+        $$ \hat m_t=\frac{m_t}{1-\beta_1^{t}},\qquad \hat v_t=\frac{v_t}{1-\beta_2^{t}},\qquad \theta_t=\theta_{t-1}-\alpha\frac{\hat m_t}{\sqrt{\hat v_t}+\varepsilon} $$
+        $$ \text{AdamW（解耦权重衰减）}:\quad \theta_t=(1-\alpha\lambda)\theta_{t-1}-\alpha\frac{\hat m_t}{\sqrt{\hat v_t}+\varepsilon} $$
+        <div class="f-note">
+          默认 $\beta_1=0.9$、$\beta_2=0.999$、$\varepsilon=10^{-8}$。偏差校正因子 $1-\beta^t$ 在 $t$ 小时显著放大估计、$t\to\infty$ 时趋于 1。校正后 $\hat m_t/\sqrt{\hat v_t}$ 量级约为 $\pm1$（近似符号梯度），使每步有效步长与梯度幅值解耦、稳定在 $\alpha$ 附近——这正是 Adam 对学习率不那么敏感、初期不易炸的原因。
+        </div>
+      </div>
+
+      <h3 id="s4-3">4.3 偏差校正与权重衰减的解耦</h3>
+      <p>偏差校正不是小修饰：若省略，$t=1$ 时 $m_1=(1-\beta_1)g$、$v_1=(1-\beta_2)g^2$，更新系数为 $\frac{1-\beta_1}{\sqrt{1-\beta_2}}\cdot\frac{g}{|g|}\approx3.16\times\frac{g}{|g|}$（$\beta_2$ 越接近 1 放大越严重），等价于初期学习率被悄悄抬高三倍。另一处关键是 <strong>AdamW</strong>：把 L2 正则写进梯度（Adam + L2）时，正则项也会被 $\sqrt{\hat v_t}$ 缩放，导致「衰减强度」随各参数梯度历史变化；AdamW 把 $\lambda\theta$ 从梯度里拿出来，直接对参数做 $(1-\alpha\lambda)\theta$，使权重衰减与自适应学习率<strong>解耦</strong>，超参 $\lambda$ 才有可比性。</p>
+      <div class="table-wrap"><table><thead><tr><th>优化器</th><th>核心更新</th><th>自适应步长</th><th>偏差校正</th><th>典型场景</th></tr></thead><tbody>
+        <tr><td>SGD</td><td>$\theta-\alpha g_t$</td><td>否</td><td>—</td><td>视觉任务、追求最佳泛化</td></tr>
+        <tr><td>动量 / Nesterov</td><td>$\theta-\alpha v_t$</td><td>否</td><td>—</td><td>配合 lr 调度与 warmup</td></tr>
+        <tr><td>AdaGrad</td><td>$\theta-\alpha g_t/\sqrt{G_t}$</td><td>是（累积）</td><td>—</td><td>稀疏特征、凸问题</td></tr>
+        <tr><td>RMSProp</td><td>$\theta-\alpha g_t/\sqrt{v_t}$</td><td>是（EMA）</td><td>—</td><td>非平稳目标、RNN</td></tr>
+        <tr><td>Adam</td><td>$\theta-\alpha\hat m_t/(\sqrt{\hat v_t}+\varepsilon)$</td><td>是（一阶+二阶）</td><td><strong>有</strong></td><td>Transformer、默认起点</td></tr>
+        <tr><td>AdamW</td><td>$(1-\alpha\lambda)\theta-\alpha\hat m_t/(\sqrt{\hat v_t}+\varepsilon)$</td><td>是</td><td><strong>有</strong></td><td>预训练与微调的事实标准</td></tr>
+      </tbody></table></div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 13.3</span>
+          <span class="ex-title">Adam 一轮更新手算（含偏差校正对比）</span>
+        </div>
+        <div class="example-body">
+          <p>标量参数 $w_0=1.0$，损失 $L(w)=\frac12(w-3)^2$，故 $g_t=w_{t-1}-3$。Adam 取 $\alpha=0.1$、$\beta_1=0.9$、$\beta_2=0.999$、$\varepsilon=10^{-8}$，$m_0=v_0=0$。① 计算 $g_1,m_1,v_1$；② 做偏差校正并求 $w_1$；③ 若省略偏差校正，$w_1$ 会变成多少，说明差异；④ 写出本步 AdamW 在 $\lambda=0.01$ 下的更新结果。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：梯度与矩估计</strong></p>
+              $$ g_1=w_0-3=1.0-3=-2.0 $$
+              $$ m_1=0.9\times0+0.1\times(-2.0)=\mathbf{-0.2} $$
+              $$ v_1=0.999\times0+0.001\times(-2.0)^2=0.001\times4=\mathbf{0.004} $$
+              <p><strong>第二步：偏差校正与更新</strong></p>
+              $$ \hat m_1=\frac{-0.2}{1-0.9^{1}}=\frac{-0.2}{0.1}=-2.0,\qquad \hat v_1=\frac{0.004}{1-0.999^{1}}=\frac{0.004}{0.001}=4.0 $$
+              $$ \frac{\hat m_1}{\sqrt{\hat v_1}+\varepsilon}=\frac{-2.0}{2.0+10^{-8}}\approx-1.0 $$
+              $$ w_1=1.0-0.1\times(-1.0)=\mathbf{1.1} $$
+              <p>校正后 $\hat m_1/\sqrt{\hat v_1}=-1$，恰好是 $-\mathrm{sign}(g_1)$，与梯度幅值 2 无关——Adam 首步就走出一个「约 $\alpha$ 大小」的稳健步长。</p>
+              <p><strong>第三步：省略偏差校正</strong></p>
+              $$ \frac{m_1}{\sqrt{v_1}+\varepsilon}=\frac{-0.2}{\sqrt{0.004}}=\frac{-0.2}{0.06325}\approx-3.162 $$
+              $$ w_1'=1.0-0.1\times(-3.162)=\mathbf{1.316} $$
+              <p>首步走了 $0.316$ 而非 $0.1$，被放大约 $3.16=\frac{1-\beta_1}{\sqrt{1-\beta_2}}$ 倍。$\beta_2$ 越接近 1，初期 $v$ 越被低估，未校正的等效学习率越大，容易在 warmup 阶段触发 loss spike。偏差校正正是消掉这个随 $t$ 变化的因子，使 $t\to\infty$ 时 $1-\beta^t\to1$、估计无偏。</p>
+              <p><strong>第四步：AdamW</strong></p>
+              $$ w_1=(1-\alpha\lambda)w_0-\alpha\frac{\hat m_1}{\sqrt{\hat v_1}+\varepsilon}=(1-0.001)\times1.0+0.1=\mathbf{1.099} $$
+              <p>与 Adam 的 $1.1$ 仅差 $0.001=\alpha\lambda w_0$。差别虽小，但它不随 $\sqrt{\hat v}$ 缩放：对所有参数、所有时刻都以同一 $\lambda$ 衰减，这正是「解耦」的含义。若把 $\lambda w$ 加进梯度再交给 Adam，衰减量会被各参数自己的 $\sqrt{\hat v_t}$ 除一遍，$\lambda$ 不再有统一语义。</p>
+              <p><strong>易错提示：</strong>① 把偏差校正写成除以 $\beta^t$ 或 $\sqrt{1-\beta_2^t}$ 之外的形式（正确是 $1-\beta^t$）；② 认为校正「放大」更新——它同时放大 $m$（$\times10$）与 $\sqrt v$（$\times31.6$），净效果是首步缩小；③ 把 AdamW 写成「Adam + 在 loss 里加 L2」，二者不等价；④ $\varepsilon$ 写在 $\sqrt{\hat v}$ 里面（$\sqrt{\hat v+\varepsilon}$）与外面数值差别小但语义不同，主流实现在外；⑤ 沿用默认的 $\lambda=0.01$ 却不随 $\alpha$ 调整——解耦后 $\alpha\lambda$ 才是实际每步衰减比例。</p>
+              <p><strong>应用关联：</strong>几乎所有 LLM 预训练都用 AdamW + cosine 调度 + warmup；warmup 本身就是对「初期 $\hat v$ 估计不稳、二阶矩尚未可靠」的工程补偿。把本例的 $w_1=1.1$ 与 $1.316$ 对照，就能理解为什么大 batch 训练必须配 warmup 与梯度裁剪。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ②：Adam + L2 与 AdamW 不能互换
+        </div>
+        <p>把 $\frac{\lambda}{2}\|\theta\|^2$ 加进损失，其梯度 $\lambda\theta$ 会进入 $m_t$ 与 $v_t$，再被 $\sqrt{\hat v_t}+\varepsilon$ 缩放，于是<strong>实际衰减强度依赖每个参数的梯度历史</strong>：梯度长期小的参数反而被衰减得更狠。其后果是超参搜索不可迁移、与解耦实现的最佳 $\lambda$ 相差可达数倍。凡读论文或复现实验，必须确认优化器是 Adam 还是 AdamW、L2 是加在 loss 还是解耦；这一字之差常是「复现不出结果」的根源。</p>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 初始化与归一化</h2>
+
+      <h3 id="s5-1">5.1 方差守恒：Xavier 与 He 的推导直觉</h3>
+      <p>深层网络最原始的故障是<strong>激活/梯度逐层放大或衰减</strong>。设一层 $z=Wx$，$w_{ij}$ 独立零均值、方差 $\mathrm{Var}(w)$，输入与权重独立、分量零均值且方差 $\mathrm{Var}(x)$，则</p>
+      $$ \mathrm{Var}(z_i)=\sum_{j=1}^{n_{in}}\mathrm{Var}(w_{ij}x_j)=n_{in}\,\mathrm{Var}(w)\,\mathrm{Var}(x) $$
+      <p>要前向方差不变（$\mathrm{Var}(z)=\mathrm{Var}(x)$），需 $n_{in}\mathrm{Var}(w)=1$，即 $\mathrm{Var}(w)=1/n_{in}$；兼顾反向传播则取折中 $\mathrm{Var}(w)=2/(n_{in}+n_{out})$，这就是 <strong>Xavier/Glorot</strong>。对 ReLU，约一半输出被置零，常用一阶近似 $\mathrm{Var}(\mathrm{ReLU}(z))\approx\frac12\mathrm{Var}(z)$，于是条件变为 $\frac12 n_{in}\mathrm{Var}(w)=1$，即 <strong>He 初始化</strong> $\mathrm{Var}(w)=2/n_{in}$。</p>
+      <div class="formula-box">
+        <div class="f-name">方差守恒与初始化</div>
+        $$ \mathrm{Var}(z)=n_{in}\,\mathrm{Var}(w)\,\mathrm{Var}(x),\qquad \text{线性/ tanh}:\ \mathrm{Var}(w)=\frac{2}{n_{in}+n_{out}} $$
+        $$ \text{ReLU}:\ \mathrm{Var}\bigl(\mathrm{ReLU}(z)\bigr)\approx\tfrac12\mathrm{Var}(z)\ \Longrightarrow\ \mathrm{Var}(w)=\frac{2}{n_{in}} $$
+        $$ w\sim\mathcal{N}\Bigl(0,\frac{2}{n_{in}}\Bigr)\quad\text{或}\quad w\sim U\Bigl[-\sqrt{\tfrac{6}{n_{in}}},\ \sqrt{\tfrac{6}{n_{in}}}\Bigr] $$
+        <div class="f-note">
+          均匀分布形式由 $\mathrm{Var}(U[-a,a])=a^2/3=2/n_{in}$ 反解 $a=\sqrt{6/n_{in}}$ 得到。推导假设了独立、零均值、激活近似线性；一旦残差连接、归一化或注意力改变信号路径，就要用「残差分支按 $1/\sqrt{L}$ 缩放」等修正，而非机械套公式。
+        </div>
+      </div>
+
+      <h3 id="s5-2">5.2 Batch / Layer / RMSNorm</h3>
+      <p>初始化只管起点，训练中激活分布仍会漂移。<strong>归一化</strong>把每层输入重新标准化为 $\hat x=(x-\mu)/\sqrt{\sigma^2+\varepsilon}$，再经可学习的 $\gamma,\beta$ 缩放平移，保留表达能力。差别在「沿哪个维度算 $\mu,\sigma^2$」：</p>
+      <div class="table-wrap"><table><thead><tr><th>方法</th><th>归一化维度</th><th>依赖 batch</th><th>推理行为</th><th>典型用途</th></tr></thead><tbody>
+        <tr><td>BatchNorm</td><td>每个通道在 (N,H,W) 上</td><td><strong>强依赖</strong></td><td>用滑动平均的 $\mu,\sigma^2$</td><td>CNN、大 batch</td></tr>
+        <tr><td>LayerNorm</td><td>每个样本在特征维 $d$ 上</td><td>否</td><td>逐样本即时计算</td><td>Transformer、RNN</td></tr>
+        <tr><td>InstanceNorm</td><td>每样本每通道</td><td>否</td><td>即时计算</td><td>风格迁移</td></tr>
+        <tr><td>GroupNorm</td><td>通道分组内</td><td>否</td><td>即时计算</td><td>小 batch 检测/分割</td></tr>
+        <tr><td>RMSNorm</td><td>特征维，只除 $\sqrt{\mathrm{E}[x^2]}$ 不减均值</td><td>否</td><td>即时计算</td><td>LLaMA 类大模型</td></tr>
+      </tbody></table></div>
+
+      <h3 id="s5-3">5.3 内部协变量偏移的现代解释</h3>
+      <p>原始论文把 BatchNorm 的收益归因于「缓解内部协变量偏移（ICS）」，但后续实验表明，即使人为在 BN 后注入分布漂移，训练依然稳定；更被认可的解释是<strong>归一化让损失曲面更平滑、梯度更可预测</strong>，从而允许更大的学习率，并带来轻微的隐式正则（batch 统计的噪声）。这与统计里的「标准化改善条件数」一脉相承：把各方向曲率拉到同一量级，一阶方法才走得稳。RMSNorm 去掉均值中心化、只做均方根缩放，省去一次减法且在大模型上效果相当，说明<strong>缩放比中心化更关键</strong>。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 13.4</span>
+          <span class="ex-title">He 初始化方差推导与深层衰减计算</span>
+        </div>
+        <div class="example-body">
+          <p>某 ReLU 网络各隐层宽度 $n_{in}=256$，输入激活方差 $\mathrm{Var}(x)=1$，采用近似 $\mathrm{Var}(\mathrm{ReLU}(z))\approx\frac12\mathrm{Var}(z)$。① 若误用 $\mathrm{Var}(w)=1/n_{in}$，求单层线性输出 $z$ 与激活 $a$ 的方差；② 连续 $L=10$ 层后激活方差约是多少，说明后果；③ 改用 He 初始化 $\mathrm{Var}(w)=2/n_{in}$，重算单层与 10 层结果；④ 给出 $n_{in}=256$ 时 He 正态分布的标准差与均匀分布边界。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：误用 Xavier 式方差</strong></p>
+              $$ \mathrm{Var}(z)=n_{in}\,\mathrm{Var}(w)\,\mathrm{Var}(x)=256\times\frac{1}{256}\times1=\mathbf{1} $$
+              $$ \mathrm{Var}(a)\approx\tfrac12\mathrm{Var}(z)=\mathbf{0.5} $$
+              <p>线性部分方差看似守恒，但 ReLU 砍掉负值后每层<strong>再乘 1/2</strong>，这正是「Xavier 配 ReLU」在深网里失效的原因。</p>
+              <p><strong>第二步：10 层累积</strong></p>
+              $$ \mathrm{Var}(a_{10})\approx 0.5^{10}=\frac{1}{1024}\approx\mathbf{9.77\times10^{-4}} $$
+              <p>激活方差缩到千分之一，反向梯度同量级连乘 → <strong>梯度消失</strong>，前几层几乎不更新。若反过来 $\mathrm{Var}(w)$ 偏大，则每层放大导致梯度爆炸，二者是同一枚硬币。</p>
+              <p><strong>第三步：He 初始化</strong></p>
+              $$ \mathrm{Var}(z)=256\times\frac{2}{256}\times1=\mathbf{2},\qquad \mathrm{Var}(a)\approx\tfrac12\times2=\mathbf{1} $$
+              <p>每层因子为 $\frac12 n_{in}\mathrm{Var}(w)=\frac12\times256\times\frac{2}{256}=1$，故 10 层后 $\mathrm{Var}(a_{10})=1^{10}\times1=\mathbf{1}$，逐层保持，梯度可稳定回传。一般结论：He 令每层方差增益恰好为 1，与深度无关。</p>
+              <p><strong>第四步：采样参数</strong></p>
+              $$ \mathcal{N}\Bigl(0,\frac{2}{256}\Bigr):\ \sigma=\sqrt{\tfrac{1}{128}}\approx\mathbf{0.0884} $$
+              $$ U\Bigl[-\sqrt{\tfrac{6}{256}},\sqrt{\tfrac{6}{256}}\Bigr]:\ a=\sqrt{0.0234375}\approx\mathbf{0.1531} $$
+              <p>校验均匀分布方差 $a^2/3=0.0234375/3=0.0078125=1/128$，与正态形式一致。</p>
+              <p><strong>易错提示：</strong>① 忘记 ReLU 的 $1/2$ 因子，直接套 Xavier 得到「方差守恒」的假象；② 把 $n_{in}$（扇入）与 batch 大小 $n$ 混淆；③ 对带残差的网络仍按单层公式初始化，残差分支需额外按 $1/\sqrt{L}$ 缩放；④ 用截断正态却按理论方差推算，实际方差偏小；⑤ 认为初始化能替代归一化——它只保证起点，训练中仍需 BN/LN。</p>
+              <p><strong>应用关联：</strong>PyTorch 的 <code>kaiming_normal_</code> / <code>kaiming_uniform_</code> 默认 <code>nonlinearity='relu'</code>、增益 $\sqrt2$，正是 $\mathrm{Var}(w)=2/n_{in}$。ResNet 之后，初始化与残差缩放、Pre-LN 一起构成「让百层网络可训练」的三件套。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ③：BatchNorm 的「两套行为」与小 batch 陷阱
+        </div>
+        <p>BN 训练时用<strong>当前 batch</strong> 的 $\mu,\sigma^2$，推理时用训练期滑动平均的统计量；忘记 <code>model.eval()</code> 会让推理结果随 batch 组成漂移，是部署事故的高频来源。batch 很小时（如检测、分割、显存受限）batch 统计噪声极大，BN 反而伤害训练，应改 GroupNorm/LayerNorm。此外 BN 与 dropout 的顺序、BN 前的卷积是否带偏置（应省去，会被 $\beta$ 吸收），都需按框架约定处理。</p>
+      </div>
+
+      <!-- ===== 6 ===== -->
+      <h2 id="s6">6 · 正则化与泛化</h2>
+
+      <h3 id="s6-1">6.1 偏差-方差与贝叶斯先验</h3>
+      <p>阶段三的误差分解 $\mathrm{Err}=\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$ 在深度网络里依然成立，只是「模型复杂度」由容量、训练时长、数据增强共同决定。正则化的统计含义是<strong>注入先验、压低方差</strong>：$\lambda\|\theta\|^2$ 对应高斯先验（MAP），dropout 可看作对指数多个子网络做近似贝叶斯模型平均，数据增强编码了「标签在变换下不变」这一先验，早停则等价于限制优化走过的有效步数（与迭代正则化相通）。因此「正则化不是让训练集变差，而是用偏差换方差」这句话可以直接翻译成贝叶斯语言。</p>
+
+      <h3 id="s6-2">6.2 五类常用正则化</h3>
+      <div class="table-wrap"><table><thead><tr><th>方法</th><th>作用机制</th><th>对应先验 / 统计解释</th><th>关键超参</th></tr></thead><tbody>
+        <tr><td>Weight decay</td><td>参数按 $(1-\alpha\lambda)\theta$ 收缩</td><td>零均值高斯先验（MAP）</td><td>$\lambda$，常取 $0.01$–$0.1$</td></tr>
+        <tr><td>Dropout</td><td>训练时随机屏蔽单元，推理时按保留率缩放</td><td>子网络集成 / 近似模型平均</td><td>丢弃率 $p$，常 $0.1$–$0.5$</td></tr>
+        <tr><td>数据增强</td><td>对输入施加保标签变换</td><td>不变性先验、扩大有效样本量</td><td>变换强度、Mixup 系数</td></tr>
+        <tr><td>早停</td><td>验证损失回升前停止</td><td>限制有效容量、迭代正则化</td><td>patience、监控指标</td></tr>
+        <tr><td>标签平滑</td><td>把单热标签 $y$ 软化为 $(1-\epsilon)y+\epsilon/K$</td><td>防止过度自信、改善校准</td><td>$\epsilon$，常 $0.1$</td></tr>
+      </tbody></table></div>
+
+      <h3 id="s6-3">6.3 双重下降与「少即是多」的边界</h3>
+      <p>过参数化模型会出现<strong>双重下降</strong>：测试误差随容量先降、在插值阈值附近升、再继续降，经典 U 型曲线被修正。这提醒我们正则化强度不是越大越好：在大数据、大模型 regime，过强的 weight decay 会欠拟合；而标签平滑虽改善校准（ECE），却可能损害需要锐利分布的下游任务（如蒸馏、beam search）。判断标准始终回到验证集与校准曲线，而非教条。</p>
+
+      <!-- ===== 7 ===== -->
+      <h2 id="s7">7 · 规模化训练</h2>
+
+      <h3 id="s7-1">7.1 混合精度 FP16 / BF16 与损失缩放</h3>
+      <p>FP32 训练慢且占显存。<strong>混合精度</strong>让前向/反向的矩阵乘用 FP16 或 BF16（吞吐翻倍、显存减半），但保留一份 FP32 主权重与 FP32 优化器状态用于精确更新。FP16 指数位少，动态范围约 $[6\times10^{-5},\ 65504]$（最小正规数 $2^{-14}\approx6.10\times10^{-5}$，次正规下界 $2^{-24}\approx5.96\times10^{-8}$）：大梯度上溢成 Inf、小梯度下溢成 0。<strong>损失缩放</strong>把 loss 乘 $S$，梯度同比放大，把小梯度抬进正规范围，更新前再 unscale 回 FP32；若检测到 Inf/NaN 则跳过该步并把 $S$ 减半，连续多步无溢出再翻倍——即<strong>动态损失缩放</strong>。BF16 指数范围同 FP32，几乎不会上溢，常可省去缩放，但 7 位尾数精度更低，优化器状态与主权重仍须 FP32。</p>
+
+      <h3 id="s7-2">7.2 梯度累积与并行策略</h3>
+      <p>显存装不下目标 batch 时，用<strong>梯度累积</strong>：连续 $k$ 个 micro-batch 各自反传并累加梯度，再统一更新一次，等效 batch 扩大 $k$ 倍（注意损失要除以 $k$，且 BN 统计仍按 micro-batch）。更大规模要切分模型本身：</p>
+      <div class="table-wrap"><table><thead><tr><th>策略</th><th>切分对象</th><th>通信内容</th><th>主要瓶颈</th></tr></thead><tbody>
+        <tr><td>数据并行 (DP/DDP)</td><td>数据 batch，模型每卡一份</td><td>梯度 all-reduce</td><td>通信量随参数量线性增长</td></tr>
+        <tr><td>张量并行 (TP)</td><td>单层矩阵按列/行切</td><td>层内激活 all-reduce</td><td>需高带宽，限单机内</td></tr>
+        <tr><td>流水并行 (PP)</td><td>层按阶段切</td><td>阶段间激活点对点</td><td>bubble 空转，需 micro-batch 填充</td></tr>
+        <tr><td>ZeRO / FSDP</td><td>优化器状态、梯度、参数分片</td><td>按需 all-gather</td><td>以通信换显存</td></tr>
+      </tbody></table></div>
+
+      <h3 id="s7-3">7.3 检查点与断点续训</h3>
+      <p>万卡训练里故障是常态。<strong>检查点</strong>须原子地保存：模型参数、优化器状态（Adam 的 $m,v$ 与步数 $t$）、学习率调度进度、数据加载器位置、随机种子、以及动态缩放因子 $S$。只存权重会导致恢复后优化器状态归零、训练轨迹跳变。梯度检查点（activation checkpointing）则是另一回事：前向只存少量节点，反向时重算中间激活，用约 30% 额外计算换掉大部分激活显存。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 13.5</span>
+          <span class="ex-title">混合精度溢出排查：从 loss spike 到 NaN</span>
+        </div>
+        <div class="example-body">
+          <p>FP16 关键量：最大正规数 $65504$、最小正规数 $6.10\times10^{-5}$。某步 FP32 真梯度为 $g_1=0.25$、$g_2=2.0\times10^{-5}$；另在 warmup 尖峰时出现 $g_{\text{spike}}=100$。① 不做损失缩放直接转 FP16，两个常规梯度各会怎样；② 取 $S=1024$ 后重算，说明收益；③ 尖峰梯度在 $S=1024$ 下发生什么，loss 与参数会怎样；④ 给出动态缩放的恢复流程；⑤ 若改用 BF16，结论有何不同。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：无缩放</strong></p>
+              <p>$g_1=0.25$ 落在 $[\,6.10\times10^{-5},\ 65504\,]$ 内，正常表示。$g_2=2.0\times10^{-5} &lt; 6.10\times10^{-5}$，落入<strong>次正规区间</strong>：有效位极少，若硬件开启 FTZ（flush-to-zero）则直接变为 0，小梯度携带的信息永久丢失——这是混合精度最隐蔽的坑，模型不报错但收敛变慢。</p>
+              <p><strong>第二步：$S=1024$ 损失缩放</strong></p>
+              $$ g_1 S=0.25\times1024=\mathbf{256},\qquad g_2 S=2.0\times10^{-5}\times1024=\mathbf{0.02048} $$
+              <p>两者都进入正规范围、尾数精度充足。更新前 <code>unscale_</code> 除以 $S$，梯度回到 $0.25$ 与 $2.0\times10^{-5}$，参数更新与 FP32 一致。缩放只改变「搬运过程」的表示，不改变优化目标。</p>
+              <p><strong>第三步：尖峰导致上溢</strong></p>
+              $$ g_{\text{spike}}S=100\times1024=\mathbf{1.024\times10^{5}}  &gt; 65504 $$
+              <p>FP16 存不下 → 上溢为 <strong>Inf</strong>；Inf 参与更新使参数变 NaN，下一步 loss 变 NaN，监控上看到的就是典型的 <strong>loss spike 后继发 NaN</strong>。定位顺序：先看梯度是否出现 Inf/NaN，再查 $S$ 是否过大、学习率是否过大、warmup 是否过短、该 batch 是否含异常长样本或坏标签。</p>
+              <p><strong>第四步：动态缩放恢复</strong></p>
+              <p>检测到 Inf → <strong>跳过本步更新</strong>（参数、优化器状态、步数都不变），$S\leftarrow S/2=512$。下一轮：$100\times512=5.12\times10^{4} &lt; 65504$ 不再上溢，且 $g_2\times512=1.024\times10^{-2}$ 仍是正规数，正常更新。此后连续若干步（如 2000 步）无溢出，再令 $S\leftarrow2S$ 逐步回到 $1024$。若缩放仍救不了，配合<strong>梯度裁剪</strong>把 $\|\nabla\|$ 压到阈值内，并降低峰值学习率。</p>
+              <p><strong>第五步：BF16 对比</strong></p>
+              <p>BF16 指数位与 FP32 相同（最大约 $3.4\times10^{38}$），$100\times1024=1.024\times10^5$ 远不会上溢，因此 BF16 训练通常<strong>不需要损失缩放</strong>，也少一类 NaN 故障。代价是尾数仅 7 位，$2.0\times10^{-5}$ 这类小量的相对精度差，故主权重、梯度累加与 Adam 的 $m,v$ 一律保留 FP32。一句话：FP16 怕溢出，BF16 怕精度，二者都要 FP32 兜底。</p>
+              <p><strong>易错提示：</strong>① 把整模型（含优化器状态）直接 <code>.half()</code>，FP32 主权重丢失后小更新被舍入吃掉，模型不收敛；② 检测到 Inf 仍执行 <code>optimizer.step()</code>，NaN 污染全部参数且不可恢复，只能回滚检查点；③ 忘了在 unscale <em>之后</em> 做梯度裁剪，阈值被 $S$ 放大而失效；④ 用梯度累积时每个 micro-batch 都除 $S$ 或忘除 $k$，等效学习率漂移；⑤ 把「loss 变 NaN」一律归因于数据，忽略 $S$/lr/warmup 这类更常见的数值原因。</p>
+              <p><strong>应用关联：</strong>PyTorch <code>torch.cuda.amp.GradScaler</code> 与 NVIDIA Apex 实现的就是这里的「放大 → 反传 → unscale → 检查 Inf → 条件更新 → 调整 $S$」流水线。大模型训练日志里 <code>grad_norm</code> 突然飙升、<code>scale</code> 连续减半，是判断数值不稳定的第一手证据；它与第 8 节的 loss spike 诊断直接衔接。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ④：混合精度 ≠ 把模型整体转成低精度
+        </div>
+        <p>正确配方是<strong>「低精度计算、高精度存储」</strong>：矩阵乘用 FP16/BF16，主权重、梯度累加、优化器一阶/二阶矩、损失缩放的 unscale 全部保持 FP32。任何把 <code>optimizer.state</code> 或残差累加也降精度的做法，都会让小更新在舍入中消失，表现为「loss 能降但收敛不到应有水平」这种最难排查的软故障。检查点也要把 FP32 主权重一起存，否则恢复后精度链断裂。</p>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <h2 id="s8">8 · 缩放定律与训练诊断</h2>
+
+      <h3 id="s8-1">8.1 Kaplan 幂律与 Chinchilla 修正</h3>
+      <p>2020 年 Kaplan 等发现：语言模型损失随参数量 $N$、数据量 $D$、算力 $C$ 呈<strong>幂律</strong>（在 log-log 坐标上是直线），且存在不可约损失 $L_\infty$（数据本身的熵）。这意味着「投入更多算力，损失可预测地下降」，训练预算分配从玄学变成可优化问题。</p>
+      <div class="formula-box">
+        <div class="f-name">神经缩放定律与计算最优配比</div>
+        $$ L(N)=aN^{-b}+L_\infty,\qquad L(D)=a'D^{-b'}+L_\infty $$
+        $$ C\approx 6ND,\qquad D_{\text{opt}}\approx 20N\ \text{（Chinchilla，约 20 token/参数）} $$
+        <div class="f-note">
+          $6ND$ 的系数 6 来自「前向每参数约 2 FLOPs（乘加各 1）+ 反向约 4 FLOPs」，故 $C\approx6\times\text{参数量}\times\text{token 数}$。Kaplan 早期建议优先放大模型、数据增长较慢；2022 年 Chinchilla 用更大范围的实验修正为<strong>参数与数据同比例增长</strong>，约每参数配 20 个 token，同等算力下 70B 训练更久反而胜过 280B 的 Gopher。
+        </div>
+      </div>
+
+      <h3 id="s8-2">8.2 过训练、推理成本与测试时计算</h3>
+      <p>Chinchilla 最优是<strong>训练算力最优</strong>，不是部署最优。若模型要服务海量推理，把 $N$ 做小、$D$ 加大（刻意「过训练」）虽让训练损失略高，却按参数量成比例降低单次推理成本，总拥有成本更低——这是 2024 年后 7B/8B 小模型被喂数万亿 token 的动机。第三条缩放轴是<strong>测试时计算</strong>：推理时增加思维链、采样与搜索、多次自检，用推理算力换取更小模型的表现，把「训练一次、推理多次」的账重新算一遍。</p>
+
+      <h3 id="s8-3">8.3 训练诊断：loss spike、梯度爆炸与 lr–batch 联动</h3>
+      <p>常见故障各有可检验假设：<strong>loss spike</strong>（损失突然跳高）先查数据（异常样本/坏标签）、再查数值（FP16 溢出、$S$ 过大）、再查优化（lr 峰值、warmup 过短、$\beta_2$ 过小）；<strong>梯度爆炸</strong>看 $\|\nabla\|$ 是否持续超阈值，用裁剪与残差缩放处理；<strong>缓慢不收敛</strong>查学习率、初始化、归一化位置与数据泄漏。经验上 batch 增大 $k$ 倍时，梯度噪声下降，学习率可按 $\sqrt{k}$（或线性缩放配 warmup）上调，但必须同步加强 warmup 与裁剪，否则大 batch + 大 lr 极易在初期触发尖峰。<strong>先复现、再单变量消融</strong>，一次只改一个因素。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 13.6</span>
+          <span class="ex-title">缩放定律外推、Chinchilla 配比与算力估算</span>
+        </div>
+        <div class="example-body">
+          <p>设以「十亿参数」为单位 $\tilde N=N/10^9$，拟合得 $L(\tilde N)=a\tilde N^{-b}+L_\infty$，且 $L_\infty=1.60$。观测：$\tilde N=0.1$（1 亿）时 $L=3.10$；$\tilde N=1$（10 亿）时 $L=2.35$。① 求 $a,b$；② 外推 $\tilde N=10$ 与 $\tilde N=100$ 的损失，并说明收益递减；③ 对 $N=10^{10}$（100 亿）按 Chinchilla 求所需 token $D$ 与训练 FLOPs $C$；④ 若集群有效吞吐 $1.4\times10^{17}$ FLOP/s，估算训练时长；⑤ 若把 $N$ 减半做「过训练」，训练损失与推理成本各怎样变化。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：定 $a,b$</strong></p>
+              <p>由 $L-L_\infty=a\tilde N^{-b}$，代入第二个观测（$\tilde N=1$）：</p>
+              $$ 2.35-1.60=0.75=a\times1^{-b}\ \Longrightarrow\ a=\mathbf{0.75} $$
+              <p>代入第一个观测（$\tilde N=0.1$）：</p>
+              $$ 3.10-1.60=1.50=0.75\times(0.1)^{-b}=0.75\times10^{b}\ \Longrightarrow\ 10^{b}=2,\quad b=\log_{10}2\approx\mathbf{0.301} $$
+              <p>校验：$\tilde N=1$ 时 $0.75+1.60=2.35$ ✓；$\tilde N=0.1$ 时 $0.75\times10^{0.301}+1.60=1.50+1.60=3.10$ ✓。$b\approx0.301$ 意味着<strong>参数每放大 10 倍，超额损失 $L-L_\infty$ 恰好减半</strong>（$10^{-0.301}=1/2$）。</p>
+              <p><strong>第二步：外推</strong></p>
+              $$ L(10)=0.75\times10^{-0.301}+1.60=0.75\times0.5+1.60=\mathbf{1.975} $$
+              $$ L(100)=0.75\times10^{-0.602}+1.60=0.75\times0.25+1.60=\mathbf{1.7875} $$
+              <p>10 亿 → 100 亿降 $2.35-1.975=0.375$，100 亿 → 1000 亿只降 $1.975-1.7875=0.1875$：参数翻同样的 10 倍，收益减半，且损失被 $L_\infty=1.60$ 托住，幂律外推永远不可能低于它。这正是「堆参数的边际收益递减」的定量形式。</p>
+              <p><strong>第三步：Chinchilla 配比与 FLOPs</strong></p>
+              $$ D\approx20N=20\times10^{10}=\mathbf{2\times10^{11}}\ \text{token（2000 亿）} $$
+              $$ C\approx6ND=6\times10^{10}\times2\times10^{11}=\mathbf{1.2\times10^{22}}\ \text{FLOPs} $$
+              <p><strong>第四步：训练时长</strong></p>
+              $$ t=\frac{1.2\times10^{22}}{1.4\times10^{17}}\approx8.6\times10^{4}\ \text{秒}\approx\mathbf{24\ 小时} $$
+              <p>约一天，且这是<strong>理想有效算力</strong>； MFU（模型算力利用率）下降、通信开销、故障重启都会把墙钟时间拉长，故真实排期要留系数。数量级估算的价值在于判断「这个规模值不值得做」，而非给出精确排期。</p>
+              <p><strong>第五步：过训练的权衡</strong></p>
+              <p>保持 $C$ 不变、$N$ 减半到 $5\times10^{9}$，则 $D\propto1/N$ 可增至约 $4\times10^{11}$ token。此时 $\tilde N=5$，</p>
+              $$ L(5)=0.75\times5^{-0.301}+1.60\approx0.75\times0.616+1.60=\mathbf{2.062} $$
+              <p>比 Chinchilla 最优的 $1.975$ 高约 $0.09$ nats，但<strong>单次推理成本随参数量减半</strong>。若部署后要服务上亿次请求，省下的推理费远超训练损失这点代价——这正是「训练算力最优 ≠ 总拥有成本最优」。再叠加测试时计算（更长的思维链、自检采样），小模型可进一步逼近大模型的表现。</p>
+              <p><strong>易错提示：</strong>① 幂律只在拟合的 $N,D$ 范围内可信，外推到未覆盖的量级（数据枯竭、新架构）会失效；② 忘记 $L_\infty$，把损失外推到 0 甚至负数；③ 混淆「训练算力最优」与「部署总成本最优」，忽视推理侧账；④ 算 $C\approx6ND$ 时把参数量或 token 数单位（十亿/万亿）弄错一位；⑤ 把有效 FLOPs 当峰值 FLOPs，忽略 MFU 与通信折损；⑥ 用两个数据点拟合却声称得到普遍规律——真实工作需在多个尺度上拟合并报告置信区间。</p>
+              <p><strong>应用关联：</strong>Chinchilla（Hoffmann 等，2022）据此改写了行业配比；LLaMA 系列用远多于 20 token/参数的量做过训练换取低部署成本；而 o1/R1 类系统把算力转向<strong>测试时计算</strong>，是同一笔预算的第三次重新分配。读技术报告时，先看 $N$、$D$、$C$ 三者是否自洽，就能快速判断训练是否落在合理区间。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ⑤：幂律是经验拟合，不是因果律
+        </div>
+        <p>缩放定律描述的是<strong>固定架构族、固定数据分布、固定训练配方</strong>下的观测规律。换优化器、换数据清洗策略、换架构（如 MoE、SSM）都会平移曲线；数据重复训练到一定程度后收益衰减，外推更不可靠。它用于「数量级预算分配」很有价值，用于「精确预测第 4 个尺度的损失」必须连同拟合区间、残差与置信区间一起报告。把它当成物理定律去规划万亿参数项目，是常见且昂贵的误用。</p>
+      </div>
+
+      <!-- ===== 9 ===== -->
+      <div id="examples"></div><!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 13 深度学习的训练范式 -->
+
+
+<h2 id="d-deep-1">深度专题一 · 梯度消失与爆炸是同一个连乘：雅可比谱半径、$|\lambda|$ 判据，以及残差与初始化怎样改写这个乘积</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把「梯度变小/变大」还原成 $\partial L/\partial h_0=\frac{\partial L}{\partial h_L}\prod_l J_l$，一切都由这个乘积的谱决定</h3></div>
+  <p class="dt-lead">本章第 5.1 节用「方差守恒」推出 Xavier 与 He 初始化：误用 $\mathrm{Var}(w)=1/n_{in}$ 会让 10 层 ReLU 网络的激活方差缩到约 $9.77\times10^{-4}$，于是「梯度消失」。那是<strong>方差视角</strong>。本专题换一个更本质、也更接近原始文献的<strong>雅可比/谱视角</strong>：梯度本身就是一串矩阵连乘，$|\lambda|\lt1$ 塌缩、$|\lambda|\gt1$ 爆炸是同一枚硬币的两面；残差连接与正交初始化之所以有效，是因为它们直接改写了这个乘积的结构，而不只是「调小了初始化方差」。</p>
+
+  <h4>背景：一个在 1991 年就被诊断清楚的老问题</h4>
+  <p>Hochreiter 1991 年的毕业论文（德文）已分析出：循环/深层网络对长期依赖的梯度会指数衰减或膨胀；Bengio、Simard 与 Frasconi 1994 年在《Learning long-term dependencies with gradient descent is difficult》中把它形式化为「乘积的谱半径小于 1 时消失、大于 1 时爆炸」，并指出饱和激活会雪上加霜。两条修复路线恰好对应本专题的两个结论：一是让连乘的每个因子谱半径尽量接近 1——Glorot & Bengio 2010 的 Xavier、He 等 2015 的 He 初始化、Saxe 等 2013 的正交初始化与「动力等距」；二是绕开连乘——Hochreiter & Schmidhuber 1997 的 LSTM 门控，以及 He 等 2015 的残差连接，后者把因子从 $J_l$ 改成 $I+A_l$，恒等路径让梯度天然有一条增益为 1 的通道。</p>
+  <p>把本章第 3 节的 $\delta$ 递推与这里对上：$\delta^{(l)}=((W^{(l+1)})^\top\delta^{(l+1)})\odot\sigma'(z^{(l)})$ 里的 $(W^{(l+1)})^\top$ 与 $\sigma'$ 合起来正是雅可比 $J_{l+1}$ 的作用。第 3 节教你怎么算，本专题解释为什么这样算出来的数会（或不）缩成 0。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把一层网络想成一次「传话」。第一个人把话传给第二个人时乘了一个系数 $\lambda$，第二个人再乘一个 $\lambda$……传 50 个人之后，最初那句话被乘了 $\lambda^{50}$ 次。若 $|\lambda|=0.8$，$0.8^{50}\approx1.4\times10^{-5}$，话几乎听不见（梯度消失，前几层几乎不更新）；若 $|\lambda|=1.2$，$1.2^{50}\approx9.1\times10^{3}$，一点耳语被吼成巨响（梯度爆炸，权重更新巨大、loss 出现尖峰甚至 NaN）。只有 $|\lambda|=1$ 时既不衰减也不放大。</p>
+  <ul>
+    <li><strong>为什么 sigmoid 特别容易消失</strong>：sigmoid 的导数最大只有 $1/4$，且两端饱和时接近 0。就算权重本身谱范数约 1，每层增益也只有 $\le0.25$，10 层累乘上界 $0.25^{10}\approx9.5\times10^{-7}$。这是早期深网必须用逐层预训练、或换 ReLU 的根本原因。</li>
+    <li><strong>残差为什么能修</strong>：残差层不是「传话时乘 $\lambda$」，而是「原话照抄一遍（乘 1），再加上一点补充」。于是无论补充部分多小，最初那句话始终有一条增益恰为 1 的直达通道，永远不会被乘没。数学上因子从 $J_l$ 变成 $I+A_l$，连乘展开后第一项就是 $I$。</li>
+    <li><strong>初始化为什么能修</strong>：把每层权重调到「既不放大也不缩小」（正交初始化让所有奇异值恰好为 1），连乘的范数就与深度无关。本章第 5 节用方差守恒得到的是「期望意义上增益为 1」，正交初始化是更强的「最坏情况也恰好为 1」。</li>
+  </ul>
+  <p>关键的一句话：<strong>消失与爆炸不是两种病，而是同一个乘积的两种取值区间</strong>；所有修复手段，本质都是把这个乘积的谱半径钉在 1 附近，或者给它加一个恒等项。</p>
+
+  <h4>形式化：从链式法则到谱半径</h4>
+  <div class="formula-box">
+    <div class="f-name">梯度就是一串雅可比连乘</div>
+    $$ \frac{\partial L}{\partial h_0}=\frac{\partial L}{\partial h_L}\,J_L J_{L-1}\cdots J_1,\qquad J_l=\frac{\partial h_l}{\partial h_{l-1}}=\mathrm{diag}\bigl(\sigma'(z^{(l)})\bigr)\,(W^{(l)})^{\top} $$
+    <div class="f-note">白话：设 $h_l=\sigma(W^{(l)}h_{l-1}+b^{(l)})$。链式法则把「损失对第 0 层激活的导数」写成从输出端往回的一串矩阵相乘，每层的因子是「激活导数 × 权重转置」。本章第 3 节的 $\delta$ 递推逐层算的正是 $\frac{\partial L}{\partial h_L}$ 依次左乘这些 $J_l$。梯度小不小，就看这个乘积的范数。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">标量特例：$|\lambda|\lt1$ 塌缩、$|\lambda|\gt1$ 爆炸、$=1$ 恒定</div>
+    $$ J_l=\lambda\ \Longrightarrow\ \prod_{l=1}^{L}J_l=\lambda^{L},\qquad |\lambda|\lt1:\ \lambda^{L}\to0,\quad |\lambda|\gt1:\ |\lambda|^{L}\to\infty,\quad |\lambda|=1:\ |\lambda|^{L}=1 $$
+    $$ 0.8^{50}=1.4272\times10^{-5},\qquad 1.2^{50}=9.1004\times10^{3},\qquad 1.01^{50}=1.6446 $$
+    <div class="f-note">白话：代码实验 Part 1 的表把 $\lambda\in\{0.5,0.8,0.99,1.00,1.01,1.2,1.5\}$ 在 $L=1,5,10,20,50$ 处全部列出。注意 $0.99^{50}=0.6050$ 与 $1.01^{50}=1.6446$：单看一层只差 2%，50 层后已差近 3 倍——指数放大是深层网络对初始化极度敏感的根源。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">矩阵情形：由奇异值/谱半径决定，而不是元素大小</div>
+    $$ J=Q\,\mathrm{diag}(\lambda_1,\dots,\lambda_d)\,Q^{-1}\ \Longrightarrow\ J^{L}=Q\,\mathrm{diag}(\lambda_1^{L},\dots,\lambda_d^{L})\,Q^{-1} $$
+    $$ J=\begin{pmatrix}0.75r&amp;0.25r\\0.25r&amp;0.75r\end{pmatrix}\ (\text{特征值 }r,\ r/2)\ \Longrightarrow\ \|J^{L}\|_{F}=\sqrt{r^{2L}+(r/2)^{2L}} $$
+    <div class="f-note">白话：若各层共享同一组特征方向，连乘就退化成「每个特征值各自取 $L$ 次幂」，最大的 $|\lambda|$ 主导整体。代码用 $r=0.8$ 与 $r=1.2$ 真实做了 2×2 矩阵乘法，$L=50$ 时范数分别是 $1.4272\times10^{-5}$ 与 $9.1004\times10^{3}$，与解析式逐位一致。注意决定命运的是谱半径，不是矩阵里某个元素看起来大不大。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">sigmoid 的具体账：为什么深层 sigmoid 网络必然消失</div>
+    $$ \sigma'(z)=\sigma(z)\bigl(1-\sigma(z)\bigr)\ \le\ \tfrac14,\qquad \|J_l\|\ \le\ \tfrac14\,\|W^{(l)}\| $$
+    $$ \|W^{(l)}\|\approx1\ \Longrightarrow\ \Bigl\|\prod_{l=1}^{10}J_l\Bigr\|\ \le\ 0.25^{10}=9.5367\times10^{-7} $$
+    <div class="f-note">白话：sigmoid 导数上界 $1/4$ 是一个硬天花板，权重再怎么调也只能靠放大 $\|W\|$ 抵消，而放大权重又会把激活推进饱和区使 $\sigma'$ 更小，形成死结。10 层的上界已不到百万分之一。本章第 5 节改用 ReLU（正区导数恒为 1）并配 He 初始化 $\mathrm{Var}(w)=2/n_{in}$，正是为了把这个 $1/4$ 换成约 1；两种视角（方差守恒与谱半径）在这里对上了。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">残差连接改写乘积：恒等路径保住梯度</div>
+    $$ h_l=h_{l-1}+F_l(h_{l-1})\ \Longrightarrow\ J_l=I+A_l,\qquad A_l=\frac{\partial F_l}{\partial h_{l-1}} $$
+    $$ \prod_{l=1}^{L}(I+A_l)=I+\sum_l A_l+\sum_{l\lt m}A_mA_l+\cdots $$
+    <div class="f-note">白话：把连乘展开，第一项就是单位矩阵 $I$——它对应「不经过任何权重、直接把梯度从深层送回浅层」的那条路径，增益恰好为 1。因此即使所有 $A_l$ 都很小（残差分支贡献微弱），乘积也趋于 $I$ 而不是 0。若把残差分支按深度缩放 $A_l=A/L$，则 $\prod_{l}(I+A/L)\to e^{A}$，对角元 $\ge1$；代码实验里无残差的 $(A/L)^{50}=9.10\times10^{-97}$，有残差的乘积范数 $2.3484$、对角元 $1.8156$ 与 $1.4895$。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">精细初始化：动力等距（所有奇异值 = 1）</div>
+    $$ Q=\begin{pmatrix}\cos\theta&amp;-\sin\theta\\\sin\theta&amp;\cos\theta\end{pmatrix},\quad Q^{\top}Q=I\ \Longrightarrow\ \|Q^{L}\|_{F}=\sqrt2\quad(\forall L) $$
+    <div class="f-note">白话：正交矩阵的所有奇异值恰为 1，任意次连乘仍是正交矩阵，范数恒为 $\sqrt2\approx1.414214$。代码在 $L=1,10,50,100,500$ 处逐位验证了这个常数。Xavier/He 是「期望意义上方差增益为 1」，正交初始化与残差缩放是「最坏情况也不放大不缩小」，三者都是把连乘的谱钉在 1。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">爆炸侧的工程修复</div>
+    $$ g\leftarrow g\cdot\min\Bigl(1,\ \frac{\tau}{\|g\|}\Bigr),\qquad \theta_t=\theta_{t-1}-\alpha_t\,g_t,\quad \alpha_t\ \text{先 warmup 再衰减} $$
+    <div class="f-note">白话：$|\lambda|\gt1$ 时梯度范数指数增长，权重更新一步跨太大，混合精度下先溢出成 Inf 再变 NaN（本章第 7 节）。梯度裁剪把超过阈值 $\tau$ 的梯度整体缩回、warmup 让初期学习率从小爬升、残差分支按 $1/\sqrt L$ 缩放，都是在乘积的上界侧加保险。</div>
+  </div>
+
+  <h4>数值对账：三种修复各把乘积变成什么</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$\lambda$ / 结构</th><th>$L=1$</th><th>$L=10$</th><th>$L=20$</th><th>$L=50$</th><th>结论</th></tr></thead>
+      <tbody>
+        <tr><td>$0.80$（消失）</td><td>$8.00\times10^{-1}$</td><td>$1.0737\times10^{-1}$</td><td>$1.1529\times10^{-2}$</td><td>$1.4272\times10^{-5}$</td><td>指数塌缩</td></tr>
+        <tr><td>$0.99$</td><td>0.9900</td><td>0.9044</td><td>0.8179</td><td>0.6050</td><td>慢消失</td></tr>
+        <tr><td>$1.00$</td><td>1.0000</td><td>1.0000</td><td>1.0000</td><td>1.0000</td><td>理想</td></tr>
+        <tr><td>$1.20$（爆炸）</td><td>1.2000</td><td>6.1917</td><td>38.338</td><td>$9.1004\times10^{3}$</td><td>指数爆炸</td></tr>
+        <tr><td>残差 $\prod(I+A/L)$</td><td>2.1260</td><td>2.3234</td><td>2.3388</td><td>2.3484</td><td>$\to e^{A}$，不消失</td></tr>
+        <tr><td>正交 $\|Q^L\|_F$</td><td>1.414214</td><td>1.414214</td><td>1.414214</td><td>1.414214</td><td>与 $L$ 无关</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>读法：前四行是「同一条链、不同 $\lambda$」，差别只在指数；第五、六行是「不同结构」，乘积被改成了与深度无关的量。残差那行的对角元从 1.6000（$L=1$）走到 1.8156（$L=50$）趋于 $e^{0.6}=1.8221$，正是恒等路径与 $A$ 共同作用的结果；无残差的对应列则从 $7.21\times10^{-1}$ 一直掉到 $9.10\times10^{-97}$。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>$\frac{\partial L}{\partial h_0}=\frac{\partial L}{\partial h_L}\prod_{l=1}^{L}J_l$，因此梯度消失与爆炸完全由连乘的谱半径决定：主导 $|\lambda|\lt1$ 指数塌缩、$\gt1$ 指数爆炸、$=1$ 恒定。sigmoid 因 $\sigma'\le1/4$ 给出 $0.25^{L}$ 的硬上界，是早期深网失效的根源。残差连接把因子换成 $I+A_l$，展开式首项恒为 $I$，保证一条增益恰为 1 的梯度直达路径；正交/方差守恒初始化把每层奇异值钉在 1（动力等距），使 $\|Q^L\|_F=\sqrt2$ 与深度无关。三者都是<strong>改写乘积</strong>，而非事后补救数值。</div>
+
+  <p><strong>边界条件：</strong>在激活函数进入饱和区且权重谱范数被刻意放大到 $\sigma'\|W\|\gt1$、或不同特征方向的 $|\lambda|$ 有的小于 1 有的大于 1（乘积既不整体消失也不整体爆炸、而是条件数恶化）的条件下，「$|\lambda|\lt1$ 必消失、$|\lambda|\gt1$ 必爆炸」的标量判据不再逐层成立，本结论不成立，应改用奇异值谱/条件数分析配合正交初始化与归一化；在残差分支本身权重很大使 $1+\lambda\gg1$ 的条件下，残差连接反而制造爆炸，本结论不成立，应改用残差分支按 $1/\sqrt L$ 缩放、Pre-LN 与梯度裁剪；在循环网络按时间步展开、同一矩阵被连乘成千上万次的条件下，还需改用门控（LSTM/GRU）或注意力直连，单纯的初始化不足以维持长期依赖。</p>
+
+  <p>下图是本章第 1 节的训练循环：前向、损失、反向、更新四步构成一个 step。梯度消失/爆炸发生在「反向传播」这一环——它是「前向缓存的激活」与「链式法则」之间的契约；上游（初始化、归一化、残差结构）决定 $J_l$ 的谱，下游（优化器、裁剪、warmup、混合精度）决定能否安全地使用这个梯度。</p>
+  <figure class="figure" id="fig-flow-training-loop">
+  <svg class="dia" viewBox="0 0 680 550" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="深度学习的最小训练循环"><rect class="dg-box alt" x="190.0" y="34" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="57.0" text-anchor="middle">① 取一个 mini-batch</text><text class="dg-ts" x="340.0" y="74.0" text-anchor="middle">打乱 / 采样</text><rect class="dg-box" x="190.0" y="120" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="143.0" text-anchor="middle">② 前向传播 ŷ = f(x;θ)</text><text class="dg-ts" x="340.0" y="160.0" text-anchor="middle">缓存中间激活</text><line class="dg-edge" x1="340.0" y1="86" x2="340.0" y2="120"/><polygon class="dg-edge" points="340.0,120 336.7379163755234,112.69528847750153 343.2620836244766,112.69528847750153" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="190.0" y="206" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="229.0" text-anchor="middle">③ 计算损失 L(ŷ, y)</text><text class="dg-ts" x="340.0" y="246.0" text-anchor="middle">标量目标</text><line class="dg-edge" x1="340.0" y1="172" x2="340.0" y2="206"/><polygon class="dg-edge" points="340.0,206 336.7379163755234,198.69528847750152 343.2620836244766,198.69528847750152" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="190.0" y="292" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="315.0" text-anchor="middle">④ 反向传播 ∇θL</text><text class="dg-ts" x="340.0" y="332.0" text-anchor="middle">链式法则 / 自动微分</text><line class="dg-edge" x1="340.0" y1="258" x2="340.0" y2="292"/><polygon class="dg-edge" points="340.0,292 336.7379163755234,284.69528847750155 343.2620836244766,284.69528847750155" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="190.0" y="378" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="401.0" text-anchor="middle">⑤ 优化器更新 θ</text><text class="dg-ts" x="340.0" y="418.0" text-anchor="middle">SGD / Adam / 调度</text><line class="dg-edge" x1="340.0" y1="344" x2="340.0" y2="378"/><polygon class="dg-edge" points="340.0,378 336.7379163755234,370.69528847750155 343.2620836244766,370.69528847750155" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="190.0" y="464" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="487.0" text-anchor="middle">⑥ 验证与早停</text><text class="dg-ts" x="340.0" y="504.0" text-anchor="middle">监控泛化</text><line class="dg-edge" x1="340.0" y1="430" x2="340.0" y2="464"/><polygon class="dg-edge" points="340.0,464 336.7379163755234,456.69528847750155 343.2620836244766,456.69528847750155" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">深度学习的最小训练循环</span>
+    <span class="fig-note">前向 → 损失 → 反向 → 更新四步构成一个 step；自动微分把复合函数求导拆成计算图上的链式法则。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../modules/m13-deep-training.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · Adam 不是「更快的 SGD」：偏差校正、各向异性预条件与不单调的泛化差距</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>自适应方法改的是下山方向而不只是步速；因此「训练损失更低」与「测试误差更低」可以分道扬镳</h3></div>
+  <p class="dt-lead">本章第 4 节已列出 SGD → 动量 → AdaGrad/RMSProp/Adam/AdamW 的更新式，例 13.3 还手算了 Adam 首步（偏差校正后走 $0.1$、未校正走 $0.316$）。本专题不重复那一轮计算，而是问三个更进一步的问题：偏差校正因子 $1-\beta^t$ 到底从哪个期望等式推出来？Adam 与 SGD 的差别是否只是「收敛更快」？以及为什么 Wilson 等 2017 年那篇《The Marginal Value of Adaptive Gradient Methods in Machine Learning》会发现：自适应方法在训练集上更快到零误差，测试集上却可能更差。</p>
+
+  <h4>背景：从「省调参」到「泛化争议」</h4>
+  <p>Duchi、Hazan 与 Singer 2011 年的 AdaGrad 为稀疏特征引入按参数累加的梯度平方，但 $G_t$ 单调增会让学习率过早衰减到 0；Tieleman 与 Hinton 2012 年的 RMSProp 改用指数移动平均避免这个问题；Kingma 与 Ba 2014 年把一阶矩（动量）与二阶矩合在一起并加偏差校正，得到 Adam，凭「对学习率不敏感、初期不易炸」迅速成为默认起点。Loshchilov 与 Hutter 2017 年指出把 L2 写进梯度会被 $\sqrt{\hat v_t}$ 缩放、使衰减强度依赖各参数梯度历史，提出 AdamW 解耦权重衰减（本章第 4.3 节）。</p>
+  <p>转折来自 Wilson、Roelofs、Stern、Srebro 与 Recht 2017 年（NeurIPS 2017）：他们用一组凸/简单问题证明，自适应方法能更快压低<strong>训练</strong>损失，却在<strong>测试</strong>上系统性差于调好学习率的 SGD+动量；随后 Reddi、Kale 与 Kumar 2018 年（AMSGrad）又指出 Adam 在某些凸设定下甚至可能不收敛，根源是二阶矩的移动平均让有效步长非单调。Keskar 等 2017 年关于大 batch 与尖锐极小值的讨论、Dinh 等 2017 年对「平坦度」解释的质疑，则提醒我们：泛化差距的机制比「尖/平」一句话复杂，但「优化器改变隐式偏置」是共识。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <ul>
+    <li><strong>SGD 用一把尺子，Adam 用每人一把尺子。</strong>SGD 的所有参数共享一个全局学习率 $\alpha$；Adam 按每个参数自己历史梯度的大小做除法（$\sqrt{\hat v_t}$），梯度长期小的参数步长被相对放大。所以 Adam 不是「SGD 加速版」，而是给梯度套了一个随数据变化的<strong>各向异性预条件器</strong>——下山的方向被改了，落到的点自然也可能不同。这解释了为什么它不只是「更快」。</li>
+    <li><strong>偏差校正是补零初始化的账。</strong>$m_0=v_0=0$，起步时两个矩估计都被压得很低，尤其 $\beta_2=0.999$ 使 $v$ 在很长一段时间里严重低估。除以 $1-\beta^t$ 正好把这份系统性低估抬回无偏。若不校正，初期有效步长不是常数，而是先升到约 6.5 倍再慢慢回落到 1（代码实验 Part 2），这个非单调的初期放大正是 warmup 要防的尖峰来源之一。</li>
+    <li><strong>泛化差距不是单调的。</strong>训练损失几乎总随步数单调下降；测试损失却典型地先降后升（U 形）——模型先学到信号，再开始背噪声。于是「训练损失更低」既可能意味着「学得更好」，也可能意味着「背得更熟」。若优化器把小曲率方向（常常是噪声方向）也走得飞快，就会更早进入上升段，早停窗口更窄。</li>
+    <li><strong>什么时候 SGD+动量仍赢。</strong>有充足预算做学习率搜索与调度（cosine + warmup）、训练轮数长、视觉/卷积 + 强数据增强、以及显存受限（Adam 每个参数要多存 $m,v$ 两份状态）时，SGD+动量配合 weight decay 往往取得更低的测试误差。反过来，梯度稀疏、各层参数尺度差异大（Transformer 的 embedding 与 LayerNorm 增益）、小 batch、没有调参预算、或需要尽快拿到可用模型时，Adam/AdamW 仍是首选。</li>
+  </ul>
+
+  <h4>形式化：完整更新式与偏差校正的推导</h4>
+  <div class="formula-box">
+    <div class="f-name">SGD + 动量（全局学习率）</div>
+    $$ g_t=\nabla_\theta J(\theta_{t-1}),\qquad v_t=\mu v_{t-1}+g_t,\qquad \theta_t=\theta_{t-1}-\alpha\,v_t $$
+    <div class="f-note">白话：动量用指数平均把历史方向累积起来，$\mu=0.9$ 相当于平滑约 10 步；所有坐标共享同一个 $\alpha$，因此梯度天然小的方向也走得慢。这份「慢」在深度专题一与本专题 Part 3 里恰恰成了隐式正则。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">Adam：一阶矩、二阶矩、偏差校正、更新</div>
+    $$ m_t=\beta_1 m_{t-1}+(1-\beta_1)g_t,\qquad v_t=\beta_2 v_{t-1}+(1-\beta_2)g_t^{2} $$
+    $$ \hat m_t=\frac{m_t}{1-\beta_1^{t}},\qquad \hat v_t=\frac{v_t}{1-\beta_2^{t}} $$
+    $$ \theta_t=\theta_{t-1}-\alpha\frac{\hat m_t}{\sqrt{\hat v_t}+\varepsilon},\qquad \text{默认}\ \beta_1=0.9,\ \beta_2=0.999,\ \varepsilon=10^{-8} $$
+    <div class="f-note">白话：$m$ 是梯度的平滑平均（方向），$v$ 是梯度平方的平滑平均（幅度）。更新量 $\hat m_t/(\sqrt{\hat v_t}+\varepsilon)$ 近似「符号梯度」，量级约 $\pm1$，于是每步有效步长稳定在 $\alpha$ 附近、与梯度幅值解耦。$g_t^2$ 与所有运算都按坐标逐元素进行。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">偏差校正因子 $1-\beta^t$ 的严格来源</div>
+    $$ m_t=(1-\beta_1)\sum_{\tau=1}^{t}\beta_1^{\,t-\tau}g_\tau $$
+    $$ \mathrm{E}[g_\tau]=\bar g\ \Longrightarrow\ \mathrm{E}[m_t]=(1-\beta_1)\bar g\sum_{\tau=1}^{t}\beta_1^{\,t-\tau}=(1-\beta_1^{t})\,\bar g $$
+    $$ \mathrm{E}[v_t]=(1-\beta_2^{t})\,\mathrm{E}[g^{2}],\qquad \text{故除以}\ (1-\beta_1^t),\ (1-\beta_2^t)\ \text{后无偏} $$
+    <div class="f-note">白话：把递推展开成几何加权和，有限项等比数列的和正是 $1-\beta_1^t$。$m_0=0$ 让这个系数在 $t$ 小时远小于 1（$t=1$ 时只有 0.1），所以原始 $m_t$ 系统性低估；除以 $1-\beta^t$ 才补回 $\bar g$。代码实验 Part 2 用 $g\sim N(0.7,1)$、20000 次重复实测 $\mathrm{E}[m_t]$ 与 $\mathrm{E}[v_t]$，与 $(1-\beta_1^t)\bar g$、$(1-\beta_2^t)\mathrm{E}[g^2]$ 逐列吻合（如 $t=10$：0.4516 对 0.4559、0.0148 对 0.0148）。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">未校正的有效步长是非单调的</div>
+    $$ \frac{m_t}{\sqrt{v_t}+\varepsilon}\ \approx\ \frac{1-\beta_1^{t}}{\sqrt{1-\beta_2^{t}}}\cdot\frac{\bar g}{\sqrt{\mathrm{E}[g^{2}]}} $$
+    $$ t=1:\ \frac{1-\beta_1}{\sqrt{1-\beta_2}}=\frac{0.1}{\sqrt{0.001}}=3.1623,\quad t=10:\ 6.5279,\quad t=5000:\ 1.0034 $$
+    <div class="f-note">白话：分子 $1-\beta_1^t$ 很快饱和到 1，分母 $\sqrt{1-\beta_2^t}$ 因 $\beta_2=0.999$ 上升很慢，两者相除先被放大到约 6.5 倍，再花几千步才回到 1。校正后这一列恒为 1.0000。本章例 13.3 只算了 $t=1$ 的 3.16 倍；完整轨迹说明「初期学习率被悄悄抬高」不是一次性事件，而是持续上千步的非单调过程，这正是 warmup 与梯度裁剪必须配套的原因。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">各向异性预条件：改的是方向，不只是速度</div>
+    $$ \theta_t=\theta_{t-1}-\alpha\,P_t^{-1}\hat m_t,\qquad P_t=\mathrm{diag}\bigl(\sqrt{\hat v_t}+\varepsilon\bigr) $$
+    $$ \text{SGD:}\ P_t^{-1}=\alpha I\quad\text{vs}\quad \text{Adam:}\ P_t^{-1}\ \text{随每个坐标的梯度历史而变} $$
+    <div class="f-note">白话：把 Adam 写成「预条件梯度下降」，$P_t^{-1}$ 是一个逐坐标变化的对角矩阵，等价于把参数空间重新量了一遍尺子。既然搜索方向变了，收敛到的点与隐式偏置就变了——这不是「同一条路走得更快」，而是「换了条路」。在二次损失下，SGD 沿大曲率（信号）方向先收敛、小曲率（噪声）方向慢；Adam 把各方向步长拉平，小曲率方向被显著加速，于是更快开始拟合噪声。代码实验 Part 3 用对角设计把这件事变成了可测的数。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">泛化差距：训练单调、测试 U 形</div>
+    $$ \mathrm{Gap}(t)=\mathrm{Err}_{\text{test}}(\theta_t)-\mathrm{Err}_{\text{train}}(\theta_t) $$
+    $$ \mathrm{Err}_{\text{train}}\ \downarrow\ \text{单调},\qquad \mathrm{Err}_{\text{test}}(t)\ \text{先降后升}\ \Longrightarrow\ \mathrm{Gap}(t)\ \text{后期单调扩大} $$
+    <div class="f-note">白话：训练集是有限样本，损失可以被压到 0；测试误差却在模型开始背噪声后回升。所以「训练损失更低」不足以推出「泛化更好」，两者之间的差距既不恒为 0，也不随训练单调缩小。这就是所谓非单调的泛化差距：更激进地优化训练目标，可能在某个时点之后反而伤害测试表现。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">AdamW：把权重衰减从预条件里拿出来</div>
+    $$ \theta_t=(1-\alpha\lambda)\theta_{t-1}-\alpha\frac{\hat m_t}{\sqrt{\hat v_t}+\varepsilon} $$
+    <div class="f-note">白话：若把 $\lambda\theta$ 加进梯度再交给 Adam，它会进入 $m_t,v_t$ 并被各参数自己的 $\sqrt{\hat v_t}$ 除一遍，导致「衰减强度」随梯度历史漂移、超参不可迁移。AdamW 直接对参数做 $(1-\alpha\lambda)\theta$，使 $\lambda$ 有统一语义。因为泛化高度依赖正则强度，这一字之差常是复现实验成败的关键（本章第 4.3 节）。</div>
+  </div>
+
+  <h4>数值对账：轨迹不同，落点相同，早停结果不同</h4>
+  <p>代码实验 Part 3 用一个可解析的「谱模型」把机制隔离出来：对角设计 $y_i=s_i w_i^{*}+\varepsilon_i$，奇异值 $s_i^2=0.6^{i}$（从 1.0 递减到 0.0101），真参数只有前 3 维非零，噪声 $\sigma=0.3$（噪声地板 $\sigma^2=0.0900$）。训练集是单次噪声实现，验证/测试损失取 400 个噪声样本的期望以消除抽样抖动。对同一个凸二次目标，SGD+动量（$\alpha=0.02,\mu=0.9$，有效 lr $=0.2$）与 Adam（$\alpha=0.05$）从同一起点出发：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>step</th><th>SGD train</th><th>SGD test</th><th>Adam train</th><th>Adam test</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0.2860</td><td>0.2345</td><td>0.2860</td><td>0.2345</td><td>同起点</td></tr>
+        <tr><td>10</td><td>0.0744</td><td>0.1087</td><td>0.1018</td><td>0.1371</td><td>SGD 已接近噪声地板</td></tr>
+        <tr><td>50</td><td>0.0146</td><td>0.1275</td><td>0.0011</td><td>0.1707</td><td>Adam 训练更「好」、测试更差</td></tr>
+        <tr><td>3200</td><td>0.0000</td><td>0.1623</td><td>0.0000</td><td>0.1623</td><td>两者收敛到同一解</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>关键读数：验证集早停给 SGD+动量选中 step $=10$、测试 $0.1087$（离噪声地板 0.0900 很近），给 Adam 选中 step $=20$、测试 $0.1380$，相差 $0.0293$（约 21%）。但训练到底两者都到 $0.1623$——<strong>差别不在最优解，而在轨迹</strong>：SGD 的小 $s_i^2$ 方向收敛慢，等于免费给噪声方向加了正则，早停窗口宽；Adam 把各方向步长拉平，50 步就把训练损失压到 0.0011，却同步把测试损失推到 0.1707。这就是「在相同早停协议下 SGD+动量仍可能赢」的定量版本，也说明为什么 Adam 更需要 weight decay、warmup 与更早的早停。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>由 $m_t=(1-\beta_1)\sum_{\tau}\beta_1^{t-\tau}g_\tau$ 得 $\mathrm{E}[m_t]=(1-\beta_1^t)\bar g$、$\mathrm{E}[v_t]=(1-\beta_2^t)\mathrm{E}[g^2]$，故偏差校正必须除以 $1-\beta^t$；未校正时有效步长 $\frac{1-\beta_1^t}{\sqrt{1-\beta_2^t}}$ 非单调，从 3.1623 升到约 6.5279 再数千步后才回到 1。Adam 等价于带对角预条件器 $P_t^{-1}$ 的梯度下降，改变的是搜索方向与隐式偏置，而非仅仅收敛速度；因此训练损失与测试误差可分道扬镳，泛化差距随训练先负后正、后期单调扩大。在长训练 + 调度 + 早停 + 显存受限的条件下 SGD+动量常取得更低测试误差；在稀疏梯度、参数尺度差异大与快速出模型的条件下 Adam/AdamW 占优。二者收敛到同一解时，胜负由轨迹与早停决定。</div>
+
+  <p><strong>边界条件：</strong>在梯度稀疏、参数各维尺度差异极大（Transformer 的 embedding 层与 LayerNorm 增益）、小 batch、或没有资源做学习率搜索与 warmup 调度的条件下，「SGD+动量泛化更好」本结论不成立，应改用 AdamW + cosine 调度 + warmup + 解耦权重衰减；在训练步数很少、需要尽快得到可用模型时也应优先 Adam/AdamW。反过来，在目标为简单凸二次且允许无限训练、或数据无噪声的条件下，本专题的泛化差距结论不成立，应改用「谁先到零训练损失」作为唯一标准，此时自适应方法的快速收敛反而是纯收益；在需要严格可复现的凸优化理论保证时，Adam 本身可能不收敛，应改用 AMSGrad 或带收敛保证的变体。</p>
+
+  <p>下图是本章第 8 节的缩放定律：训练损失随算力/规模按幂律单调下降。把本专题的账加进去读这条曲线——它刻画的是<strong>训练</strong>损失，不是测试误差；同一笔算力投入下，泛化差距并不随曲线单调缩小。把它当成「堆算力就能同时买到更好泛化」的凭证，正是 Wilson 等所警告的误用。资源分配时须同时报告验证/测试曲线与早停点。</p>
+  <figure class="figure" id="fig-curve-scaling-law">
+  <svg class="dia" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="缩放定律：损失随算力 / 参数 / 数据的幂律下降"><line class="dg-grid" x1="62" y1="26.0" x2="654" y2="26.0"/><line class="dg-grid" x1="62" y1="83.0" x2="654" y2="83.0"/><line class="dg-grid" x1="62" y1="140.0" x2="654" y2="140.0"/><line class="dg-grid" x1="62" y1="197.0" x2="654" y2="197.0"/><line class="dg-grid" x1="62" y1="254.0" x2="654" y2="254.0"/><line class="dg-axis" x1="62" y1="26" x2="62" y2="254"/><line class="dg-axis" x1="62" y1="254" x2="654" y2="254"/><path class="dg-curve alt" d="M 62.0 26.0 L 121.2 44.3 L 180.4 61.2 L 239.6 76.7 L 298.8 90.9 L 358.0 103.6 L 417.2 114.9 L 476.4 124.9 L 535.6 133.4 L 594.8 140.6 L 654.0 146.3"/><text class="dg-elabel" x="364.0" y="94.58333333333337" text-anchor="start">早期策略：参数优先</text><path class="dg-curve ok" d="M 62.0 26.0 L 121.2 53.4 L 180.4 79.7 L 239.6 105.0 L 298.8 129.4 L 358.0 152.7 L 417.2 175.0 L 476.4 196.2 L 535.6 216.5 L 594.8 235.8 L 654.0 254.0"/><text class="dg-elabel" x="364.0" y="143.66666666666669" text-anchor="start">Chinchilla：参数与数据同步放大</text><text class="dg-ts" x="358.0" y="290" text-anchor="middle">训练算力 / 数据规模（对数）→</text><text class="dg-ts" x="14" y="140.0" text-anchor="start">损失（对数）</text></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">缩放定律：损失随算力 / 参数 / 数据的幂律下降</span>
+    <span class="fig-note">Kaplan 等给出幂律关系；Hoffmann 等（Chinchilla）指出在固定算力下应同步放大数据，纠正了「只堆参数」的策略。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Kaplan 等 arXiv:2001.08361；Hoffmann 等 arXiv:2203.15556</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 两层 sigmoid/MSE 网络的反向传播：一次完整的前向与回传手算</h2>
+<div class="algo-spec">
+  <p>本算法位于「数据采集 → 存储计算 → 建模 → 评估 → 部署运维」链条的<strong>建模环节内部</strong>，是本章第 2–3 节计算图与自动微分的落地，也是第 4 节一切优化器得以运转的前提：没有 $\nabla_\theta L$，任何更新式都无从谈起。上游契约是「一张可微的计算图与一个标量损失」，下游契约是「与参数同形状的梯度张量，交给优化器与数值梯度检查」。正文例 13.2 已用 ReLU + 线性输出 + 平方损失手算过一遍；这里<strong>刻意换成 sigmoid 激活 + MSE</strong>，因为 $\sigma'(z)=\sigma(z)(1-\sigma(z))\le1/4$ 会让回传的误差信号肉眼可见地缩小，把深度专题一的「连乘衰减」在两层里就演示出来，同时给出全部 9 个参数的解析梯度与中心差分核对。</p>
+
+  <h3 id="d-algo-principle">一、原理：在计算图上反向地反复用链式法则</h3>
+  <div class="formula-box">
+    <div class="f-name">网络、损失与 $\delta$ 递推</div>
+    $$ z^{(1)}=W^{(1)}x+b^{(1)},\quad a^{(1)}=\sigma(z^{(1)}),\quad z^{(2)}=W^{(2)}a^{(1)}+b^{(2)},\quad \hat y=\sigma(z^{(2)}) $$
+    $$ L=\tfrac12(\hat y-y)^{2},\qquad \delta^{(l)}=\nabla_{z^{(l)}}L,\qquad \sigma'(z)=\sigma(z)\bigl(1-\sigma(z)\bigr) $$
+    $$ \delta^{(2)}=(\hat y-y)\,\sigma'(z^{(2)}),\qquad \delta^{(1)}=\bigl((W^{(2)})^{\top}\delta^{(2)}\bigr)\odot\sigma'(z^{(1)}) $$
+    $$ \nabla_{W^{(l)}}L=\delta^{(l)}(a^{(l-1)})^{\top},\qquad \nabla_{b^{(l)}}L=\delta^{(l)} $$
+    <div class="f-note">白话：先前向逐层算出 $z,a,\hat y,L$ 并缓存中间值；输出层 $\delta^{(2)}$ 是「预测误差 × sigmoid 导数」；再乘 $(W^{(2)})^\top$ 把误差线性映回隐层，逐元素乘隐层激活导数得 $\delta^{(1)}$；最后用「本层误差 × 本层输入」的外积得到权重梯度。$\odot$ 为逐元素乘。整张图只需一次前向 + 一次反向，就得到全部参数的梯度。</div>
+  </div>
+  <p><strong>为什么反向模式省计算：</strong>损失是标量、参数是百万维，属于「一个输出、海量输入」。反向模式从 $\partial L/\partial L=1$ 出发逆拓扑序回传伴随值，一次扫描得到全部梯度；前向模式一次只能得到一个自变量对所有输出的导数，在这种场景下要扫百万次。代价是必须<strong>缓存前向激活</strong>（训练显存远大于推理显存），这也解释了本章第 7 节梯度检查点「重算换显存」的动机。平方损失配 sigmoid 时输出层 $\delta^{(2)}$ 不再是例 13.2 里线性输出的 $\hat y-y$，而要额外乘 $\sigma'(z^{(2)})$——这正是本例的教学重点。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>固定结构与参数。</strong>写清每层的权重矩阵、偏置、激活函数与损失；把全部参数展平成一个向量，便于统一做数值检查。本例 9 个参数：$W^{(1)}$ 四个、$b^{(1)}$ 两个、$W^{(2)}$ 两个、$b^{(2)}$ 一个。</li>
+    <li><strong>前向并缓存。</strong>依次计算 $z^{(1)},a^{(1)},z^{(2)},\hat y,L$，把每个中间量都存下来（反向要用）。单样本即可，batch 时把外积换成矩阵乘并除以样本数。</li>
+    <li><strong>输出层误差。</strong>算 $\delta^{(2)}=(\hat y-y)\sigma'(z^{(2)})$，再得 $\nabla_{W^{(2)}}L=\delta^{(2)}(a^{(1)})^\top$、$\nabla_{b^{(2)}}L=\delta^{(2)}$。</li>
+    <li><strong>回传隐层。</strong>算 $\delta^{(1)}=((W^{(2)})^\top\delta^{(2)})\odot\sigma'(z^{(1)})$，再得 $\nabla_{W^{(1)}}L=\delta^{(1)}x^\top$、$\nabla_{b^{(1)}}L=\delta^{(1)}$。注意转置位置与逐元素乘，维度对不上就是信号。</li>
+    <li><strong>数值梯度检查。</strong>对每个参数用中心差分 $g_j^{\text{num}}=\frac{L(\theta+\varepsilon e_j)-L(\theta-\varepsilon e_j)}{2\varepsilon}$（$\varepsilon=10^{-5}$，双精度、eval 模式、关闭 dropout）与解析值比对，用相对误差 $\frac{|g^{\text{num}}-g^{\text{ana}}|}{|g^{\text{num}}|+|g^{\text{ana}}|}$ 判定，要求 $\le10^{-6}$。</li>
+    <li><strong>交付优化器。</strong>把梯度交给 SGD/Adam 更新参数；若用混合精度，unscale 之后再裁剪。</li>
+    <li><strong>诊断。</strong>记录各层 $\|\delta^{(l)}\|$ 的比值，判断是否存在梯度消失（本例 $|\delta^{(1)}|/|\delta^{(2)}|\approx0.21$），并对照深度专题一决定是否换 ReLU/残差/归一化。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>可微性：</strong>损失与激活需（分段）可微；ReLU 在 $z=0$、max 在平局点、argmax 等不可导处需次梯度，数值检查应避开这些点。</li>
+    <li><strong>图结构：</strong>计算图必须是有向无环图、损失为标量；控制流可用但需可追踪。参数与激活形状必须对齐（矩阵乘法维度是最常见的报错来源）。</li>
+    <li><strong>数值精度：</strong>解析梯度与数值差分比对必须用双精度并关闭随机层；sigmoid 在 $|z|$ 很大时 $\exp(-z)$ 会溢出，实现要用数值稳定形式。</li>
+    <li><strong>规模：</strong>单样本即可手算；batch 时梯度取平均，显存随 batch 线性增长；层深时须配合初始化、归一化与残差，否则本例演示的 $\sigma'\le1/4$ 连乘会让前层几乎不更新。</li>
+    <li><strong>不适用：</strong>不可微目标（0-1 损失、精确排序指标）、离散潜变量、需要黑箱无梯度优化的场景；此时改用策略梯度/straight-through 估计或贝叶斯优化。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>训练（单样本）</b> 设第 $l$ 层宽度 $n_l$，前向时间 $O\bigl(\sum_l n_{l-1}n_l\bigr)$，反向是同阶常数倍（约 2–3× 前向），合计 $O(|W|)$，$|W|=\sum_l n_{l-1}n_l$ 为参数量；batch 大小 $B$ 时乘 $B$。<b>推理</b> 时间 $O\bigl(\sum_l n_{l-1}n_l\bigr)$，无需反向、无需缓存全部中间量。<b>空间</b> 参数与梯度各 $O(|W|)$；训练还需缓存全部激活 $O\bigl(B\sum_l n_l\bigr)$，推理只需 $O(\max_l n_l)$ 的逐层缓冲。<b>对照</b> 数值有限差分需要对每个参数各做一次前向，复杂度 $O(|W|^2)$；这正是必须用解析反向传播的原因，也是梯度检查只抽查少数分量而非全量做的原因。</div>
+  <p>白话：反向传播的精妙不在「导得更快」，而在「复用」——每个中间梯度被所有路径共享，一次回传全部拿到。代价是缓存激活带来的显存，深度/ batch 一大就变成主要瓶颈，于是有了梯度检查点（本章第 7.3 节）与混合精度。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>一次前向 + 一次反向即得全部参数梯度，代价与单次前向同阶，可扩到亿级参数。</li>
+        <li>机器精度、无截断误差；对任意深的可微组合都成立，与层数无关。</li>
+        <li>模块化的「本地雅可比 × 上游伴随值」让框架能自动组合任意算子，无需手推整体导数。</li>
+        <li>可用中心差分独立校验，相对误差判据明确（$\le10^{-6}$），工程上可自动化回归测试。</li>
+        <li>与优化器、混合精度、梯度裁剪、分布式 all-reduce 构成完整契约，是训练系统的基石。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>必须缓存前向激活，训练显存远大于推理；深网/大 batch 时成为瓶颈。</li>
+        <li>只给出局部梯度，不保证全局收敛；非凸、饱和激活下仍会消失/爆炸（见深度专题一）。</li>
+        <li>实现易错：下标、转置、漏激活导数、忘记除以 batch、交叉熵配 softmax 时重复求导。</li>
+        <li>非光滑点（ReLU 的 0、max 平局）不可导，数值检查会误报；需次梯度与避开检查点。</li>
+        <li>依赖计算图可追踪；动态控制流、原地修改、外部黑箱函数会切断图，需要额外工程处理。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>网络：输入 $x=(1.0,\ -0.5)$，隐层 2 个 sigmoid 单元，输出 1 个 sigmoid 单元，$L=\frac12(\hat y-y)^2$，目标 $y=1.0$。权重与偏置为</p>
+  <div class="formula-box">
+    <div class="f-name">给定参数</div>
+    $$ W^{(1)}=\begin{pmatrix}0.5&amp;-0.4\\0.3&amp;0.8\end{pmatrix},\quad b^{(1)}=(0.1,\ -0.2),\quad W^{(2)}=(0.7,\ -0.6),\quad b^{(2)}=0.25 $$
+    <div class="f-note">白话：第一层两行分别对应两个隐单元；第二层是一个 $1\times2$ 的行向量。$\sigma(z)=1/(1+e^{-z})$，其导数 $\sigma'(z)=\sigma(z)(1-\sigma(z))$。所有数保留 6 位，均可用笔复核，代码实验 Part 4 会原样复现。</div>
+  </div>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">前向：隐层线性输出。</span>$z^{(1)}_1=0.5\times1.0+(-0.4)\times(-0.5)+0.1=0.5+0.2+0.1=\mathbf{0.8000}$；$z^{(1)}_2=0.3\times1.0+0.8\times(-0.5)-0.2=0.3-0.4-0.2=\mathbf{-0.3000}$。</div>
+    <div class="solve-step"><span class="ss-k">前向：隐层激活。</span>$a^{(1)}_1=\sigma(0.8)=\frac{1}{1+e^{-0.8}}=\mathbf{0.689974}$；$a^{(1)}_2=\sigma(-0.3)=\frac{1}{1+e^{0.3}}=\mathbf{0.425557}$。</div>
+    <div class="solve-step"><span class="ss-k">前向：输出层与损失。</span>$z^{(2)}=0.7\times0.689974+(-0.6)\times0.425557+0.25=0.482982-0.255334+0.25=\mathbf{0.477648}$；$\hat y=\sigma(0.477648)=\mathbf{0.617192}$；$L=\frac12(0.617192-1)^2=\frac12(0.382808)^2=\mathbf{0.073271}$。</div>
+    <div class="solve-step"><span class="ss-k">反向：输出层导数与 $\delta^{(2)}$。</span>$\sigma'(z^{(2)})=\hat y(1-\hat y)=0.617192\times0.382808=\mathbf{0.236266}$；$\delta^{(2)}=(\hat y-y)\sigma'(z^{(2)})=(-0.382808)\times0.236266=\mathbf{-0.090444}$。对比线性输出的例 13.2（$\delta^{(2)}=\hat y-y=-0.74$）：sigmoid 导数把误差信号又乘小了约 4 倍。</div>
+    <div class="solve-step"><span class="ss-k">反向：第二层梯度。</span>$\nabla_{W^{(2)}}L=\delta^{(2)}(a^{(1)})^\top=-0.090444\times(0.689974,\ 0.425557)=(\mathbf{-0.062404},\ \mathbf{-0.038489})$；$\nabla_{b^{(2)}}L=\delta^{(2)}=\mathbf{-0.090444}$。</div>
+    <div class="solve-step"><span class="ss-k">反向：回传隐层。</span>$\sigma'(z^{(1)})=(0.689974\times0.310026,\ 0.425557\times0.574443)=(\mathbf{0.213910},\ \mathbf{0.244458})$；先算 $(W^{(2)})^\top\delta^{(2)}=(0.7\times(-0.090444),\ -0.6\times(-0.090444))=(-0.063311,\ 0.054266)$；再逐元素乘得 $\delta^{(1)}=(-0.063311\times0.213910,\ 0.054266\times0.244458)=(\mathbf{-0.013543},\ \mathbf{0.013266})$。</div>
+    <div class="solve-step"><span class="ss-k">反向：第一层梯度。</span>$\nabla_{W^{(1)}}L=\delta^{(1)}x^\top=\begin{pmatrix}-0.013543\times1.0&amp;-0.013543\times(-0.5)\\0.013266\times1.0&amp;0.013266\times(-0.5)\end{pmatrix}=\begin{pmatrix}\mathbf{-0.013543}&amp;\mathbf{0.006771}\\\mathbf{0.013266}&amp;\mathbf{-0.006633}\end{pmatrix}$；$\nabla_{b^{(1)}}L=\delta^{(1)}=(\mathbf{-0.013543},\ \mathbf{0.013266})$。</div>
+    <div class="solve-step"><span class="ss-k">数值核对。</span>对 9 个参数逐一做中心差分（$\varepsilon=10^{-5}$），例如 $\partial L/\partial W^{(2)}_1$ 的解析值 $-0.062404$ 与数值值 $-0.062404$ 相对误差 $2.88\times10^{-12}$；全部 9 项的最大相对误差为 $\mathbf{4.70\times10^{-11}}$，远小于 $10^{-6}$，反向传播实现通过检查。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>$|\delta^{(1)}|/|\delta^{(2)}|=\sqrt{0.013543^2+0.013266^2}\,/\,0.090444=\mathbf{0.2096}$：只经过一个隐层，误差信号就被压到约 $1/5$。它约等于「$W^{(2)}$ 的量级 × $\sigma'\le0.25$」，正是深度专题一 $0.25^{L}$ 连乘在 $L=2$ 时的样子。若堆到 10 层，量级将到 $10^{-6}$ 以下——所以深层网络必须换 ReLU、加归一化与残差，而不是继续用 sigmoid。这也说明选激活函数不是口味问题，而是连乘谱的问题。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表把「求 $\nabla_\theta L$」这件事的三种做法按站内统一六维口径并排：反向模式自动微分（即本算法）是深度学习的事实标准，数值有限差分只配当校验工具，前向模式则在「输入少、输出多」的相反场景里才划算。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>反向模式 AD（反向传播）</th><th>数值有限差分（中心差分）</th><th>前向模式 AD</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>标量损失 + 海量参数（训练神经网络）；计算图为可追踪的 DAG、算子（分段）可微</td>
+        <td>任意黑箱可计算函数；仅用于抽查少数分量的正确性校验，不用于训练</td>
+        <td>输入维数低、输出维数高（如求 Jacobian 的一列、敏感度分析）；参数远少于输出</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>时间 $O(|W|)$（约 2–3× 前向），空间 $O(|W|+B\sum_l n_l)$ 缓存激活；batch 乘 $B$</td>
+        <td>时间 $O(|W|^2)$：每个参数两次前向；空间 $O(1)$ 额外；对百万参数不可行</td>
+        <td>时间 $O(d_{\text{in}}\cdot|W|)$，一次扫描得一个输入方向对所有输出的导数；空间 $O(|W|)$ 不缓存全部激活</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>无数值超参；需选激活/损失组合、batch 大小、是否用梯度检查点与混合精度</td>
+        <td>扰动 $\varepsilon=10^{-4}\sim10^{-6}$、相对误差阈值 $10^{-6}$、必须 eval 模式 + 双精度</td>
+        <td>种子方向（切向量）个数；是否用稀疏前向模式压缩</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">一次反传得全部梯度、机器精度、与层数无关；可模块化复用中间梯度，工业框架原生支持</td>
+        <td>完全独立于实现，是发现下标/转置/漏项 bug 的黄金标准；无需可微性假设</td>
+        <td>无需缓存全部激活，显存省；对「少输入多输出」比反向模式省几个数量级</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>须缓存前向激活（显存瓶颈）；非光滑点需次梯度；非凸与饱和激活下仍会消失/爆炸，需初始化、归一化、残差与裁剪配合</td>
+        <td>截断误差 $O(\varepsilon^2)$ 与舍入误差夹击；ReLU 的 0 点必然误报；不能用于训练，也不能全量检查</td>
+        <td>「一个输出、海量输入」时比反向模式贵几个数量级，训练场景不适用；需为每个方向单独一遍</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>中：公式可读但实现易错，须配数值检查、单元测试与计算图框架；与优化器/分布式构成强契约</td>
+        <td>高：概念直白、几十行代码实现，零框架依赖；但只能作为测试脚手架，不能进训练主链路</td>
+        <td>中：数学干净、显存友好，但生态与工具链弱，主流训练框架以反向模式为主</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>读表时抓住一句：三种做法算的是<strong>同一个</strong> $\nabla_\theta L$，区别只在代价与用途；因此「用数值差分验证解析梯度」是唯一合理的组合，而「用数值差分训练」在参数上万时就已经不可行。</p>
+  <figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-code">代码实验 · 雅可比连乘、Adam 偏差校正、非单调泛化差距与两层 sigmoid 网络反向传播的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 13 深度学习的训练范式
+# 纯 Python 标准库；固定种子 20261107；复用「知学云 · 在线课程完课率」案例数字
+# Part 0: 案例口径（不可约噪声的数值锚点）
+# Part 1: 梯度消失/爆炸 = 雅可比连乘；|lambda|&lt;1 塌缩、&gt;1 爆炸；残差/正交初始化修复
+# Part 2: Adam 偏差校正 E[m_t]=(1-beta1^t)E[g] 与未校正有效步长的非单调轨迹
+# Part 3: 非单调泛化差距 + SGD+动量何时占优（对角设计 = 二次损失的谱视角）
+# Part 4: 两层 sigmoid/MSE 网络完整前反向手算 + 中心差分数值梯度核对
+import math
+import random
+
+random.seed(20261107)
+
+
+def gauss():
+    return random.gauss(0.0, 1.0)
+
+
+def mat_mul(A, B):
+    n = len(A)
+    return [[sum(A[i][k] * B[k][j] for k in range(n)) for j in range(n)] for i in range(n)]
+
+
+def frob(A):
+    return math.sqrt(sum(v * v for row in A for v in row))
+
+
+def mat_pow(A, L):
+    R = [[1.0 if i == j else 0.0 for j in range(len(A))] for i in range(len(A))]
+    for _ in range(L):
+        R = mat_mul(R, A)
+    return R
+
+
+# ============================================================
+print("=== Part 0: 案例口径（知学云 · 在线课程完课率，N=12000, seed=20261107）===")
+B0, B1 = 64.4306, 0.160833
+SD_Y, SD_X, R2 = 14.5763, 43.4274, 0.2296
+VAR_Y = SD_Y ** 2
+VAR_F = (B1 ** 2) * (SD_X ** 2)
+SIGMA2 = VAR_Y - VAR_F
+print(f"OLS quiz~study: slope={B1:.6f} R2={R2:.4f}；Var(quiz)={VAR_Y:.4f}")
+print(f"不可约噪声方差 sigma^2=Var(Y)-Var(f)={SIGMA2:.4f}（本实验 Part 3 的「噪声地板」即它的标准化替身）")
+print()
+
+# ============================================================
+print("=== Part 1: 梯度 = 雅可比连乘；|lambda|&lt;1 塌缩、|lambda|&gt;1 爆炸 ===")
+print("标量链 dL/dh0 = dL/dhL * prod_l lambda_l；下表为 lambda^L")
+LAMS = [0.5, 0.8, 0.99, 1.0, 1.01, 1.2, 1.5]
+LS = [1, 5, 10, 20, 50]
+print(f"{'lambda':&gt;8} " + " ".join(f"{'L=' + str(L):&gt;12}" for L in LS))
+for lam in LAMS:
+    print(f"{lam:8.2f} " + " ".join(f"{lam ** L:12.4e}" for L in LS))
+print(f"sigmoid 导数上界 sigma'(z)&lt;=0.25，故 ||J_l||&lt;=0.25*||W||；10 层乘积上界 0.25^10={0.25 ** 10:.4e}")
+print()
+
+print("2x2 雅可比 J=[[0.75r,0.25r],[0.25r,0.75r]]（特征值 r 与 r/2），实际矩阵连乘的 Frobenius 范数：")
+for r in [0.8, 1.2]:
+    J = [[0.75 * r, 0.25 * r], [0.25 * r, 0.75 * r]]
+    print(f"  r={r}: " + "  ".join(f"L={L}:{frob(mat_pow(J, L)):.4e}" for L in [1, 5, 10, 20, 50]))
+print("解析范数 sqrt(r^(2L)+(r/2)^(2L)) 与上面逐位一致：谱半径决定连乘，而非元素大小。")
+print()
+
+print("残差连接 h_l = h_{l-1} + (1/L)*A*h_{l-1}（残差分支按 1/L 缩放），A=diag(0.6,0.4)：")
+print(f"{'L':&gt;5} {'prod(A/L) 范数':&gt;16} {'prod(I+A/L) 范数':&gt;20} {'其(0,0)元':&gt;12} {'其(1,1)元':&gt;12}")
+A = [[0.6, 0.0], [0.0, 0.4]]
+for L in [1, 5, 10, 20, 50]:
+    small = [[A[i][j] / L for j in range(2)] for i in range(2)]
+    plain = mat_pow(small, L)
+    res = [[(1.0 if i == j else 0.0) + small[i][j] for j in range(2)] for i in range(2)]
+    res = mat_pow(res, L)
+    print(f"{L:5d} {frob(plain):16.4e} {frob(res):20.4f} {res[0][0]:12.4f} {res[1][1]:12.4f}")
+print("无残差：乘积 -&gt; 0（梯度消失）；有残差：乘积 -&gt; e^A，对角元 &gt;=1，恒等路径保住梯度。")
+print()
+
+print("精细初始化 / 动力等距：正交雅可比 Q(theta=0.3) 的所有奇异值=1，连乘范数恒为 sqrt(2)")
+th = 0.3
+Q = [[math.cos(th), -math.sin(th)], [math.sin(th), math.cos(th)]]
+print(f"{'L':&gt;6} {'||Q^L||_F':&gt;12}")
+for L in [1, 10, 50, 100, 500]:
+    print(f"{L:6d} {frob(mat_pow(Q, L)):12.6f}")
+print("结论：|lambda|&lt;1 消失、&gt;1 爆炸；把每层增益调到 1（正交/方差守恒）或用残差加恒等路径即可修复。")
+print()
+
+# ============================================================
+print("=== Part 2: Adam 偏差校正与「未校正有效步长」的非单调轨迹 ===")
+B1A, B2A, EPS = 0.9, 0.999, 1e-8
+print(f"beta1={B1A} beta2={B2A} eps={EPS}；恒定梯度 g=1 -&gt; m_t=1-beta1^t, v_t=1-beta2^t")
+print(f"{'t':&gt;6} {'m_t':&gt;10} {'1-beta1^t':&gt;12} {'v_t':&gt;12} {'1-beta2^t':&gt;12} {'未校正步长':&gt;12} {'校正后步长':&gt;12}")
+for t in [1, 2, 5, 10, 20, 50, 100, 500, 1000, 5000]:
+    m = 1.0 - B1A ** t
+    v = 1.0 - B2A ** t
+    step_raw = m / (math.sqrt(v) + EPS)
+    step_cor = (m / (1 - B1A ** t)) / (math.sqrt(v / (1 - B2A ** t)) + EPS)
+    print(f"{t:6d} {m:10.6f} {1 - B1A ** t:12.6f} {v:12.6f} {1 - B2A ** t:12.6f} "
+          f"{step_raw:12.4f} {step_cor:12.4f}")
+print("校正后步长恒为 1（与梯度幅值无关）；未校正步长从 3.16 起、t~10 冲到 6.53、数千步后才回到 1。")
+print()
+
+print("随机梯度下验证 E[m_t]=(1-beta1^t)*E[g]、E[v_t]=(1-beta2^t)*E[g^2]（g~N(0.7,1)，R=20000）")
+MU, R2REP, TMAX = 0.7, 20000, 10
+CHECK = [1, 2, 3, 5, 10]
+acc_m = {t: 0.0 for t in CHECK}
+acc_v = {t: 0.0 for t in CHECK}
+for _ in range(R2REP):
+    m = v = 0.0
+    for t in range(1, TMAX + 1):
+        g = MU + gauss()
+        m = B1A * m + (1 - B1A) * g
+        v = B2A * v + (1 - B2A) * g * g
+        if t in acc_m:
+            acc_m[t] += m
+            acc_v[t] += v
+print(f"{'t':&gt;6} {'E[m_t]实测':&gt;12} {'(1-b1^t)mu':&gt;12} {'E[v_t]实测':&gt;12} {'(1-b2^t)(mu^2+1)':&gt;20}")
+for t in CHECK:
+    em = acc_m[t] / R2REP
+    ev = acc_v[t] / R2REP
+    th_m = (1 - B1A ** t) * MU
+    th_v = (1 - B2A ** t) * (MU ** 2 + 1.0)
+    print(f"{t:6d} {em:12.4f} {th_m:12.4f} {ev:12.4f} {th_v:20.4f}")
+print("实测与理论逐列吻合 -&gt; 偏差校正因子 1/(1-beta^t) 正是「把被零初始化压低的矩估计抬回无偏」。")
+print()
+
+# ============================================================
+print("=== Part 3: 非单调泛化差距 + SGD+动量何时占优（二次损失的谱视角）===")
+# 对角设计：y_i = s_i * w*_i + eps_i，损失 J=1/2*sum (s_i w_i - y_i)^2
+# 梯度 g_i = s_i^2 (w_i - target_i)；小 s_i 方向 = 噪声方向，梯度天然小
+P = 10
+S2 = [0.6 ** i for i in range(P)]
+S = [math.sqrt(v) for v in S2]
+WSTAR = [1.0, -0.8, 0.6] + [0.0] * (P - 3)
+SIG = 0.3
+NOISE_M = 400
+train_y = [S[i] * WSTAR[i] + SIG * gauss() for i in range(P)]
+TARGET = [train_y[i] / S[i] for i in range(P)]
+# 验证/测试用「期望损失」：每维取 400 个独立噪声样本求均值，消除单次抽样的抖动
+# E[(s_i(w_i-w*_i) - eps)^2] = (s_i(w_i-w*_i))^2 - 2 s_i(w_i-w*_i)*E[eps] + E[eps^2]
+def noise_stats():
+    out = []
+    for _ in range(P):
+        e = [SIG * gauss() for _ in range(NOISE_M)]
+        out.append((sum(e) / NOISE_M, sum(v * v for v in e) / NOISE_M))
+    return out
+
+
+VAL_ST = noise_stats()
+TEST_ST = noise_stats()
+
+
+def grad(w):
+    return [S2[i] * (w[i] - TARGET[i]) for i in range(P)]
+
+
+def expected_mse(w, st):
+    return sum((S[i] * (w[i] - WSTAR[i])) ** 2
+               - 2 * S[i] * (w[i] - WSTAR[i]) * st[i][0]
+               + st[i][1] for i in range(P)) / P
+
+
+def metrics(w):
+    tr = sum((S[i] * w[i] - train_y[i]) ** 2 for i in range(P)) / P
+    va = expected_mse(w, VAL_ST)
+    te = expected_mse(w, TEST_ST)
+    return tr, va, te
+
+
+def run(opt, steps, alpha, mu=0.9):
+    w = [0.0] * P
+    vel = [0.0] * P
+    m = [0.0] * P
+    v = [0.0] * P
+    hist = {}
+    t = 0
+    if 0 in steps:
+        hist[0] = metrics(w)
+    for t in range(1, max(steps) + 1):
+        g = grad(w)
+        if opt == "sgd":
+            for i in range(P):
+                vel[i] = mu * vel[i] - alpha * g[i]
+                w[i] += vel[i]
+        else:
+            for i in range(P):
+                m[i] = B1A * m[i] + (1 - B1A) * g[i]
+                v[i] = B2A * v[i] + (1 - B2A) * g[i] * g[i]
+                mh = m[i] / (1 - B1A ** t)
+                vh = v[i] / (1 - B2A ** t)
+                w[i] -= alpha * mh / (math.sqrt(vh) + EPS)
+        if t in steps:
+            hist[t] = metrics(w)
+    return hist
+
+
+STEPS = [0, 5, 10, 20, 30, 50, 80, 120, 200, 400, 800, 1600, 3200]
+H_SGD = run("sgd", STEPS, alpha=0.02, mu=0.9)      # 有效学习率 0.02/(1-0.9)=0.2
+H_ADAM = run("adam", STEPS, alpha=0.05)            # 每坐标近似 alpha*sign(g)
+print(f"对角设计 P={P}，s_i^2=0.6^i；w* 仅前 3 维非零；噪声 sd={SIG}，噪声地板 sigma^2={SIG ** 2:.4f}")
+print("train 为单次噪声实现（会被拟合到 0）；val/test 为 400 个噪声样本的期望损失（平滑、可比）")
+print(f"singular values s^2 = {[round(v, 4) for v in S2]}")
+print("SGD+动量: alpha=0.02, mu=0.9（有效 lr=0.2）；Adam: alpha=0.05, beta=(0.9,0.999)")
+print()
+print(f"{'step':&gt;6} | {'SGD train':&gt;10} {'SGD val':&gt;9} {'SGD test':&gt;9} {'gap':&gt;8} | "
+      f"{'Adam train':&gt;10} {'Adam val':&gt;9} {'Adam test':&gt;9} {'gap':&gt;8}")
+for s in STEPS:
+    a, b, c = H_SGD[s]
+    d, e, f = H_ADAM[s]
+    print(f"{s:6d} | {a:10.4f} {b:9.4f} {c:9.4f} {c - a:8.4f} | "
+          f"{d:10.4f} {e:9.4f} {f:9.4f} {f - d:8.4f}")
+print("gap = test - train：train 单调降到 0，但 test 先降后升（U 形），泛化差距随训练拉大 -&gt; 非单调。")
+print("step=0 处 gap 为负只是「训练集单一噪声实现」的抽样波动；从 step&gt;=10 起 gap 稳定转正并持续扩大。")
+print()
+
+for name, H in [("SGD+动量", H_SGD), ("Adam", H_ADAM)]:
+    best_step = min(H, key=lambda s: H[s][1])
+    tr, va, te = H[best_step]
+    trf, vaf, tef = H[max(STEPS)]
+    print(f"{name}：验证集早停选 step={best_step:5d}，val={va:.4f}，对应 test={te:.4f}；"
+          f"训练到底(step=3200) test={tef:.4f}")
+print("两者收敛后逼近同一个「把噪声也拟合掉」的解；差别只在轨迹：")
+print("SGD 的小 s^2 方向走得慢（隐式正则），早停窗口宽；Adam 把各方向步长拉平，很快拟合噪声，窗口窄。")
+print()
+
+# ============================================================
+print("=== Part 4: 两层 sigmoid/MSE 网络完整前反向手算 + 数值梯度核对 ===")
+X = (1.0, -0.5)
+W1 = [[0.5, -0.4], [0.3, 0.8]]
+B1 = [0.1, -0.2]
+W2 = [0.7, -0.6]
+B2 = 0.25
+Y = 1.0
+
+
+def sigmoid(z):
+    return 1.0 / (1.0 + math.exp(-z))
+
+
+def unpack(p):
+    return (
+        [[p[0], p[1]], [p[2], p[3]]],
+        [p[4], p[5]],
+        [p[6], p[7]],
+        p[8],
+    )
+
+
+P0 = [W1[0][0], W1[0][1], W1[1][0], W1[1][1], B1[0], B1[1], W2[0], W2[1], B2]
+NAMES = ["W1_11", "W1_12", "W1_21", "W1_22", "b1_1", "b1_2", "W2_1", "W2_2", "b2"]
+
+
+def forward(p):
+    w1, b1, w2, b2 = unpack(p)
+    z1 = [sum(w1[i][j] * X[j] for j in range(2)) + b1[i] for i in range(2)]
+    a1 = [sigmoid(z1[i]) for i in range(2)]
+    z2 = sum(w2[i] * a1[i] for i in range(2)) + b2
+    yh = sigmoid(z2)
+    L = 0.5 * (yh - Y) ** 2
+    return z1, a1, z2, yh, L
+
+
+z1, a1, z2, yh, L = forward(P0)
+print(f"输入 x={X}，目标 y={Y}")
+print(f"前向：z1 = [{z1[0]:.4f}, {z1[1]:.4f}]   a1 = [{a1[0]:.6f}, {a1[1]:.6f}]")
+print(f"      z2 = {z2:.6f}   yhat = {yh:.6f}   L = 0.5*(yhat-y)^2 = {L:.6f}")
+
+sp2 = yh * (1 - yh)
+d2 = (yh - Y) * sp2
+sp1 = [a1[i] * (1 - a1[i]) for i in range(2)]
+d1 = [W2[i] * d2 * sp1[i] for i in range(2)]
+print(f"反向：sigma'(z2)={sp2:.6f}   delta2=(yhat-y)*sigma'(z2)={d2:.6f}")
+print(f"      sigma'(z1)=[{sp1[0]:.6f}, {sp1[1]:.6f}]")
+print(f"      delta1=[{d1[0]:.6f}, {d1[1]:.6f}]   |delta1|/|delta2| = "
+      f"{math.sqrt(sum(v * v for v in d1)) / abs(d2):.4f}（sigmoid 导数把误差信号压小）")
+gW2 = [d2 * a1[i] for i in range(2)]
+gB2 = d2
+gW1 = [[d1[i] * X[j] for j in range(2)] for i in range(2)]
+gB1 = d1
+ana = [gW1[0][0], gW1[0][1], gW1[1][0], gW1[1][1], gB1[0], gB1[1], gW2[0], gW2[1], gB2]
+print("解析梯度：")
+for nm, g in zip(NAMES, ana):
+    print(f"  dL/d{nm:6s} = {g:+.6f}")
+
+EPS2 = 1e-5
+print(f"中心差分数值梯度（eps={EPS2}）与相对误差：")
+print(f"{'param':&gt;8} {'解析':&gt;12} {'数值':&gt;12} {'相对误差':&gt;12}")
+max_rel = 0.0
+for k, nm in enumerate(NAMES):
+    pp = P0[:]
+    pm = P0[:]
+    pp[k] += EPS2
+    pm[k] -= EPS2
+    num = (forward(pp)[4] - forward(pm)[4]) / (2 * EPS2)
+    rel = abs(num - ana[k]) / (abs(num) + abs(ana[k]) + 1e-12)
+    max_rel = max(max_rel, rel)
+    print(f"{nm:&gt;8} {ana[k]:+12.6f} {num:+12.6f} {rel:12.2e}")
+print(f"最大相对误差 = {max_rel:.2e}  &lt;= 1e-6，反向传播实现通过检查。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 0: 案例口径（知学云 · 在线课程完课率，N=12000, seed=20261107）===
+OLS quiz~study: slope=0.160833 R2=0.2296；Var(quiz)=212.4685
+不可约噪声方差 sigma^2=Var(Y)-Var(f)=163.6845（本实验 Part 3 的「噪声地板」即它的标准化替身）
+
+=== Part 1: 梯度 = 雅可比连乘；|lambda|&lt;1 塌缩、|lambda|&gt;1 爆炸 ===
+标量链 dL/dh0 = dL/dhL * prod_l lambda_l；下表为 lambda^L
+  lambda          L=1          L=5         L=10         L=20         L=50
+    0.50   5.0000e-01   3.1250e-02   9.7656e-04   9.5367e-07   8.8818e-16
+    0.80   8.0000e-01   3.2768e-01   1.0737e-01   1.1529e-02   1.4272e-05
+    0.99   9.9000e-01   9.5099e-01   9.0438e-01   8.1791e-01   6.0501e-01
+    1.00   1.0000e+00   1.0000e+00   1.0000e+00   1.0000e+00   1.0000e+00
+    1.01   1.0100e+00   1.0510e+00   1.1046e+00   1.2202e+00   1.6446e+00
+    1.20   1.2000e+00   2.4883e+00   6.1917e+00   3.8338e+01   9.1004e+03
+    1.50   1.5000e+00   7.5938e+00   5.7665e+01   3.3253e+03   6.3762e+08
+sigmoid 导数上界 sigma'(z)&lt;=0.25，故 ||J_l||&lt;=0.25*||W||；10 层乘积上界 0.25^10=9.5367e-07
+
+2x2 雅可比 J=[[0.75r,0.25r],[0.25r,0.75r]]（特征值 r 与 r/2），实际矩阵连乘的 Frobenius 范数：
+  r=0.8: L=1:8.9443e-01  L=5:3.2784e-01  L=10:1.0737e-01  L=20:1.1529e-02  L=50:1.4272e-05
+  r=1.2: L=1:1.3416e+00  L=5:2.4895e+00  L=10:6.1917e+00  L=20:3.8338e+01  L=50:9.1004e+03
+解析范数 sqrt(r^(2L)+(r/2)^(2L)) 与上面逐位一致：谱半径决定连乘，而非元素大小。
+
+残差连接 h_l = h_{l-1} + (1/L)*A*h_{l-1}（残差分支按 1/L 缩放），A=diag(0.6,0.4)：
+    L     prod(A/L) 范数       prod(I+A/L) 范数      其(0,0)元      其(1,1)元
+    1       7.2111e-01               2.1260       1.6000       1.4000
+    5       2.5098e-05               2.2945       1.7623       1.4693
+   10       6.0475e-13               2.3234       1.7908       1.4802
+   20       3.4868e-31               2.3388       1.8061       1.4859
+   50       9.1004e-97               2.3484       1.8156       1.4895
+无残差：乘积 -&gt; 0（梯度消失）；有残差：乘积 -&gt; e^A，对角元 &gt;=1，恒等路径保住梯度。
+
+精细初始化 / 动力等距：正交雅可比 Q(theta=0.3) 的所有奇异值=1，连乘范数恒为 sqrt(2)
+     L    ||Q^L||_F
+     1     1.414214
+    10     1.414214
+    50     1.414214
+   100     1.414214
+   500     1.414214
+结论：|lambda|&lt;1 消失、&gt;1 爆炸；把每层增益调到 1（正交/方差守恒）或用残差加恒等路径即可修复。
+
+=== Part 2: Adam 偏差校正与「未校正有效步长」的非单调轨迹 ===
+beta1=0.9 beta2=0.999 eps=1e-08；恒定梯度 g=1 -&gt; m_t=1-beta1^t, v_t=1-beta2^t
+     t        m_t    1-beta1^t          v_t    1-beta2^t        未校正步长        校正后步长
+     1   0.100000     0.100000     0.001000     0.001000       3.1623       1.0000
+     2   0.190000     0.190000     0.001999     0.001999       4.2496       1.0000
+     5   0.409510     0.409510     0.004990     0.004990       5.7971       1.0000
+    10   0.651322     0.651322     0.009955     0.009955       6.5279       1.0000
+    20   0.878423     0.878423     0.019811     0.019811       6.2409       1.0000
+    50   0.994846     0.994846     0.048794     0.048794       4.5037       1.0000
+   100   0.999973     0.999973     0.095208     0.095208       3.2408       1.0000
+   500   1.000000     1.000000     0.393621     0.393621       1.5939       1.0000
+  1000   1.000000     1.000000     0.632305     0.632305       1.2576       1.0000
+  5000   1.000000     1.000000     0.993279     0.993279       1.0034       1.0000
+校正后步长恒为 1（与梯度幅值无关）；未校正步长从 3.16 起、t~10 冲到 6.53、数千步后才回到 1。
+
+随机梯度下验证 E[m_t]=(1-beta1^t)*E[g]、E[v_t]=(1-beta2^t)*E[g^2]（g~N(0.7,1)，R=20000）
+     t     E[m_t]实测   (1-b1^t)mu     E[v_t]实测     (1-b2^t)(mu^2+1)
+     1       0.0689       0.0700       0.0015               0.0015
+     2       0.1310       0.1330       0.0030               0.0030
+     3       0.1879       0.1897       0.0045               0.0045
+     5       0.2842       0.2867       0.0074               0.0074
+    10       0.4516       0.4559       0.0148               0.0148
+实测与理论逐列吻合 -&gt; 偏差校正因子 1/(1-beta^t) 正是「把被零初始化压低的矩估计抬回无偏」。
+
+=== Part 3: 非单调泛化差距 + SGD+动量何时占优（二次损失的谱视角）===
+对角设计 P=10，s_i^2=0.6^i；w* 仅前 3 维非零；噪声 sd=0.3，噪声地板 sigma^2=0.0900
+train 为单次噪声实现（会被拟合到 0）；val/test 为 400 个噪声样本的期望损失（平滑、可比）
+singular values s^2 = [1.0, 0.6, 0.36, 0.216, 0.1296, 0.0778, 0.0467, 0.028, 0.0168, 0.0101]
+SGD+动量: alpha=0.02, mu=0.9（有效 lr=0.2）；Adam: alpha=0.05, beta=(0.9,0.999)
+
+  step |  SGD train   SGD val  SGD test      gap | Adam train  Adam val Adam test      gap
+     0 |     0.2860    0.2435    0.2345  -0.0514 |     0.2860    0.2435    0.2345  -0.0514
+     5 |     0.1874    0.1734    0.1666  -0.0208 |     0.1792    0.1737    0.1689  -0.0104
+    10 |     0.0744    0.1115    0.1087   0.0344 |     0.1018    0.1385    0.1371   0.0353
+    20 |     0.0431    0.1555    0.1590   0.1159 |     0.0226    0.1344    0.1380   0.1154
+    30 |     0.0289    0.1471    0.1515   0.1226 |     0.0036    0.1547    0.1607   0.1571
+    50 |     0.0146    0.1240    0.1275   0.1129 |     0.0011    0.1648    0.1707   0.1696
+    80 |     0.0087    0.1385    0.1430   0.1342 |     0.0000    0.1562    0.1619   0.1619
+   120 |     0.0059    0.1428    0.1474   0.1415 |     0.0000    0.1569    0.1626   0.1626
+   200 |     0.0033    0.1476    0.1523   0.1490 |     0.0000    0.1566    0.1623   0.1623
+   400 |     0.0010    0.1519    0.1570   0.1560 |     0.0000    0.1566    0.1623   0.1623
+   800 |     0.0001    0.1550    0.1605   0.1604 |     0.0000    0.1566    0.1623   0.1623
+  1600 |     0.0000    0.1564    0.1621   0.1621 |     0.0000    0.1566    0.1623   0.1623
+  3200 |     0.0000    0.1566    0.1623   0.1623 |     0.0000    0.1566    0.1623   0.1623
+gap = test - train：train 单调降到 0，但 test 先降后升（U 形），泛化差距随训练拉大 -&gt; 非单调。
+step=0 处 gap 为负只是「训练集单一噪声实现」的抽样波动；从 step&gt;=10 起 gap 稳定转正并持续扩大。
+
+SGD+动量：验证集早停选 step=   10，val=0.1115，对应 test=0.1087；训练到底(step=3200) test=0.1623
+Adam：验证集早停选 step=   20，val=0.1344，对应 test=0.1380；训练到底(step=3200) test=0.1623
+两者收敛后逼近同一个「把噪声也拟合掉」的解；差别只在轨迹：
+SGD 的小 s^2 方向走得慢（隐式正则），早停窗口宽；Adam 把各方向步长拉平，很快拟合噪声，窗口窄。
+
+=== Part 4: 两层 sigmoid/MSE 网络完整前反向手算 + 数值梯度核对 ===
+输入 x=(1.0, -0.5)，目标 y=1.0
+前向：z1 = [0.8000, -0.3000]   a1 = [0.689974, 0.425557]
+      z2 = 0.477648   yhat = 0.617192   L = 0.5*(yhat-y)^2 = 0.073271
+反向：sigma'(z2)=0.236266   delta2=(yhat-y)*sigma'(z2)=-0.090444
+      sigma'(z1)=[0.213910, 0.244458]
+      delta1=[-0.013543, 0.013266]   |delta1|/|delta2| = 0.2096（sigmoid 导数把误差信号压小）
+解析梯度：
+  dL/dW1_11  = -0.013543
+  dL/dW1_12  = +0.006771
+  dL/dW1_21  = +0.013266
+  dL/dW1_22  = -0.006633
+  dL/db1_1   = -0.013543
+  dL/db1_2   = +0.013266
+  dL/dW2_1   = -0.062404
+  dL/dW2_2   = -0.038489
+  dL/db2     = -0.090444
+中心差分数值梯度（eps=1e-05）与相对误差：
+   param           解析           数值         相对误差
+   W1_11    -0.013543    -0.013543     7.28e-12
+   W1_12    +0.006771    +0.006771     4.40e-11
+   W1_21    +0.013266    +0.013266     5.52e-12
+   W1_22    -0.006633    -0.006633     4.68e-11
+    b1_1    -0.013543    -0.013543     7.28e-12
+    b1_2    +0.013266    +0.013266     5.52e-12
+    W2_1    -0.062404    -0.062404     2.88e-12
+    W2_2    -0.038489    -0.038489     4.70e-11
+      b2    -0.090444    -0.090444     5.49e-12
+最大相对误差 = 4.70e-11  &lt;= 1e-6，反向传播实现通过检查。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">sigma^2=163.6845</span> 沿用案例 <code>quiz_avg</code> 的残差方差（$\mathrm{Var}(Y)-\mathrm{Var}(f)=212.4685-48.7841$），与 <a href="m09-ml-stats.html">模块 09</a> 的不可约噪声地板逐位一致。Part 3 为了数值可读性把噪声标准化为 $\sigma=0.3$、$\sigma^2=0.0900$，它就是这一真实噪声地板的缩小替身；把 <code>SIG</code> 调大只会整体抬高 U 形曲线的水平线，不改变「先降后升」的形状。</p>
+    <p><span class="ci-k">Part 1 的 $\lambda^L$ 表</span>：$0.8^{50}=1.4272\times10^{-5}$ 与 $1.2^{50}=9.1004\times10^{3}$ 相差 8 个数量级，来自每层仅 $\pm0.2$ 的增益差；$0.99^{50}=0.6050$、$1.01^{50}=1.6446$ 说明「单层只差 2%」经 50 层已放大成近 3 倍。2×2 真实矩阵连乘的 Frobenius 范数与解析式 $\sqrt{r^{2L}+(r/2)^{2L}}$ 逐位一致，确认决定命运的是谱半径而非矩阵元素大小。<span class="ci-k">$0.25^{10}=9.5367\times10^{-7}$</span> 是 sigmoid 导数上界给出的 10 层乘积硬上限。</p>
+    <p><span class="ci-k">残差表的两列对比</span>是无残差 $(A/L)^L$ 与有残差 $(I+A/L)^L$：$L=50$ 时前者 $9.1004\times10^{-97}$（已消失），后者范数 2.3484、对角元 1.8156 与 1.4895（趋近 $e^{0.6}=1.8221$、$e^{0.4}=1.4918$）。恒等路径 $I$ 保证对角元始终 $\ge1$，梯度不会消失。<span class="ci-k">正交矩阵 $\|Q^L\|_F=1.414214$</span> 在 $L=1,10,50,100,500$ 处完全相同，验证「把每层奇异值钉在 1」可让连乘与深度无关。</p>
+    <p><span class="ci-k">Part 2 未校正步长列</span>（3.1623 → 4.2496 → 5.7971 → 6.5279 → … → 1.0034）是最值得盯的一列：$t=1$ 的 3.16 倍只是起点，$t\approx10$ 冲到 6.53 倍，直到 $t=5000$ 才回到 1.0034。原因是分子 $1-0.9^t$ 很快饱和、分母 $\sqrt{1-0.999^t}$ 上升极慢。校正后该列恒为 1.0000，与梯度幅值无关——这正是 $\hat m_t/\sqrt{\hat v_t}$ 近似符号梯度的含义，也是 warmup 与梯度裁剪必须配套的数值理由。</p>
+    <p><span class="ci-k">E[m_t] 实测列</span>（$t=10$ 时 0.4516 对理论 0.4559）与 <span class="ci-k">E[v_t] 实测列</span>（0.0148 对 0.0148）逐列吻合，验证 $\mathrm{E}[m_t]=(1-\beta_1^t)\bar g$、$\mathrm{E}[v_t]=(1-\beta_2^t)\mathrm{E}[g^2]$；20000 次重复的抽样误差解释了 0.004 量级的小差异。偏差校正不是工程修饰，而是从等比数列求和直接推出的无偏化。</p>
+    <p><span class="ci-k">Part 3 的 U 形</span>：SGD test 从 0.2345 降到 step 10 的 0.1087（逼近噪声地板 0.0900）再回升到 0.1623；Adam test 从 0.2345 降到 0.1371 后一路升到 0.1707，且训练损失在 step 50 已压到 0.0011（比 SGD 的 0.0146 低一个数量级）。<span class="ci-k">「训练更好、测试更差」</span>在同一张表里成立。验证集早停给出 SGD step=10 / test=0.1087 对 Adam step=20 / test=0.1380，差 0.0293；而 step=3200 时两者同为 0.1623——<strong>落点相同，胜负在轨迹</strong>。小 $s_i^2$ 方向（末尾的 0.0101）在 SGD 下收敛极慢，等于免费的隐式正则；Adam 把它拉平后迅速拟合噪声。改动 <code>alpha</code> 会平移 U 形的最低点，但只要 Adam 仍把各方向步长拉平，早停窗口更窄这一结论不变。</p>
+    <p><span class="ci-k">Part 4 的前反向数值</span>：$\hat y=0.617192$、$L=0.073271$、$\delta^{(2)}=-0.090444$、$\delta^{(1)}=(-0.013543,0.013266)$、9 个解析梯度，全部与第六步手算逐位一致；中心差分最大相对误差 $4.70\times10^{-11}\le10^{-6}$，梯度实现通过检查。<span class="ci-k">$|\delta^{(1)}|/|\delta^{(2)}|=0.2096$</span> 把 sigmoid 的 $\sigma'\le0.25$ 变成了一个可测的比值：仅两层就把误差信号压到约 $1/5$，与 Part 1 的 $0.25^{L}$ 连乘完全同源。若把 <code>sigmoid</code> 换成 ReLU，这一比值会接近 $|W^{(2)}|$ 的量级，隐层梯度立刻变大——这正是换激活能修梯度消失的直接证据。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组方法给出三件东西：把梯度消失/爆炸还原为雅可比连乘并给出残差、正交/方差守恒初始化与裁剪的修复条件；把 Adam 的偏差校正、各向异性预条件与泛化差距写成可推导、可实测的形式；以及用两层 sigmoid/MSE 网络完成一次完整前向与反向手算并用中心差分核对。<strong>不做</strong>架构设计、不做分布式并行、也不替代独立的验证/测试评估协议。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：可微计算图（层宽、权重、激活、损失）、mini-batch 数据、随机种子、$\beta_1,\beta_2,\alpha,\varepsilon,\lambda$、扰动 $\varepsilon_{\text{num}}$、裁剪阈值 $\tau$、训练步数 $T$；输出：与参数同形状的梯度张量、各层 $\delta$ 及其范数比、优化器状态 $(m,v,t)$、训练/验证/测试损失曲线、数值梯度相对误差。梯度与参数同量纲，$\delta$ 与损失对激活的导数同量纲，相对误差无量纲。</td></tr>
+    <tr><th>适用场景</th><td>深层网络训练前的可训练性诊断（按谱半径/方差增益选激活、初始化与残差结构）；优化器选型与学习率调度设计（$|\lambda|$、warmup、早停、weight decay）；反向传播实现的正确性回归测试；在长训练 + 调度 + 视觉/卷积任务上权衡 SGD+动量与 AdamW；以及在相同早停协议下比较两种优化轨迹的泛化表现。</td></tr>
+    <tr><th>关键参数</th><td>$\beta_1=0.9$、$\beta_2=0.999$、$\varepsilon=10^{-8}$（$\beta_2$ 越接近 1，未校正初期放大越严重）；$\alpha$ 与 warmup/cosine 调度（决定初期尖峰与收敛速度）；$\mu\approx0.9$（动量，等效平滑约 10 步）；$\lambda$（AdamW 解耦权重衰减，实际每步衰减 $\alpha\lambda$）；$\tau$（梯度裁剪阈值）；$\nu$ 与残差分支缩放 $1/\sqrt L$；数值差分 $\varepsilon_{\text{num}}=10^{-5}$ 与相对误差阈值 $10^{-6}$。</td></tr>
+    <tr><th>边界条件</th><td>在饱和激活且 $\sigma'\|W\|\gt1$、或不同方向 $|\lambda|$ 一小于一大于（条件数恶化）时，标量 $|\lambda|$ 判据不成立，应改用奇异值谱/条件数分析 + 正交初始化与归一化；在残差分支权重过大时残差反而爆炸，应改用 $1/\sqrt L$ 缩放、Pre-LN 与裁剪；在梯度稀疏、参数尺度差异大、小 batch 或无调参预算时「SGD+动量泛化更好」不成立，应改用 AdamW + warmup + cosine；在目标可微性不满足（ReLU 零点、max 平局、0-1 损失）时解析梯度与数值检查不成立，应改用次梯度或避开非光滑点。</td></tr>
+    <tr><th>常见问题</th><td>（1）以为 Adam 只是「更快的 SGD」而忽略预条件改变方向；（2）省略偏差校正或把校正写成除以 $\beta^t$；（3）用训练损失曲线代替验证曲线做早停；（4）数值梯度检查时开着 dropout / 用 FP16 / 在 ReLU 的 0 点检查。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>Adam 的偏差校正到底在补什么？为什么是除以 $1-\beta^t$ 而不是 $\beta^t$？</summary><div class="faq-a">把递推展开：$m_t=(1-\beta_1)\sum_{\tau=1}^t\beta_1^{t-\tau}g_\tau$。若 $\mathrm{E}[g_\tau]=\bar g$，几何级数求和得 $\mathrm{E}[m_t]=(1-\beta_1^t)\bar g$，同理 $\mathrm{E}[v_t]=(1-\beta_2^t)\mathrm{E}[g^2]$。$m_0=v_0=0$ 使 $t$ 小时这两个系数远小于 1，故需除以它们而非乘以 $\beta^t$。代码实测 $t=10$ 时 $\mathrm{E}[m_t]=0.4516$ 对理论 0.4559。省略校正后有效步长 $\frac{1-\beta_1^t}{\sqrt{1-\beta_2^t}}$ 会先升到 6.5279 再数千步才回 1，是 warmup 要防的初期放大。</div></details>
+  <details><summary>既然 Adam 训练损失降得更快，为什么还可能测试更差？</summary><div class="faq-a">因为 $\theta_t=\theta_{t-1}-\alpha P_t^{-1}\hat m_t$ 的 $P_t^{-1}$ 是逐坐标变化的对角预条件器，它改变的是<strong>搜索方向</strong>而非仅速度。在二次损失的谱视角下，SGD 沿大曲率（信号）方向先收敛、小曲率（噪声）方向慢，等于免费正则；Adam 把各方向步长拉平，噪声方向也被加速。代码 Part 3 里 Adam 在 step 50 把训练损失压到 0.0011（SGD 为 0.0146），测试损失却已是 0.1707（SGD 为 0.1275）。训练损失与测试误差可分道扬镳，验证集早停给的结论是 SGD 0.1087 对 Adam 0.1380。</div></details>
+  <details><summary>那是不是应该永远用 SGD+动量？</summary><div class="faq-a">不是。代码里两者训练到 3200 步都收敛到同一个 test=0.1623——胜负来自轨迹与早停，不是最终解。SGD+动量占优需要三个前提：充足调参预算（学习率搜索 + cosine/warmup）、较长训练、以及强数据增强/显存受限（Adam 每参数多存 $m,v$ 两份状态）。反过来，梯度稀疏、各层参数尺度差异大（Transformer 的 embedding 与 LayerNorm 增益）、小 batch、无调参预算或需要尽快出可用模型时，AdamW 仍是首选。这正是「优化器是归纳偏置的一部分」。</div></details>
+  <details><summary>残差连接为什么能治梯度消失？会不会反而导致爆炸？</summary><div class="faq-a">残差层 $h_l=h_{l-1}+F_l(h_{l-1})$ 的雅可比是 $I+A_l$，连乘展开 $\prod(I+A_l)=I+\sum A_l+\cdots$，首项恒为单位矩阵，对应一条增益恰为 1 的梯度直达路径。代码里把残差分支按 $1/L$ 缩放后，无残差的 $(A/L)^{50}=9.10\times10^{-97}$，有残差的乘积范数 2.3484、对角元 $\ge1$，趋于 $e^A$。但若残差分支权重过大使 $1+\lambda\gg1$，连乘会指数增长而爆炸，此时应改用残差分支按 $1/\sqrt L$ 缩放、Pre-LN、warmup 与梯度裁剪。</div></details>
+  <details><summary>数值梯度检查「差一点没通过」，一定是反向传播写错了吗？</summary><div class="faq-a">不一定，先排除五类假阳性：开着 dropout / BatchNorm 训练模式（两次前向随机性不同）、用了单边差分（截断误差 $O(\varepsilon)$）、在 ReLU 的 $z=0$ 或 max 平局点检查（不可导）、用 FP16（$\varepsilon$ 扰动被舍入吃掉）、只查了恰好正确的那一个分量。正确做法是 eval 模式、双精度、中心差分、随机抽若干分量、以相对误差（而非绝对差）为判据。本例 9 个参数的最大相对误差 $4.70\times10^{-11}$，才是干净的「通过」。</div></details>
+  <details><summary>为什么这个例题特意用 sigmoid 而不是 ReLU？</summary><div class="faq-a">因为 sigmoid 的 $\sigma'(z)=\sigma(z)(1-\sigma(z))\le0.25$，能在一个两层网络里就把深度专题一的连乘衰减演示出来：本例 $\delta^{(2)}=-0.090444$ 传到隐层变成 $\delta^{(1)}=(-0.013543,0.013266)$，$|\delta^{(1)}|/|\delta^{(2)}|=0.2096$，只两层就压到约 $1/5$。换 ReLU（正区导数为 1）该比值会接近 $|W^{(2)}|$ 量级。这也说明激活函数的选择不是口味问题，而是连乘谱的问题；正文例 13.2 用 ReLU 是为了把注意力放在 $\delta$ 递推本身，本例用 sigmoid 是为了把注意力放在梯度尺度上，两者互补。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">50 层标量链，每层雅可比 $\lambda=0.8$。$\partial L/\partial h_0$ 相对 $\partial L/\partial h_L$ 的量级约为？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. $0.8\times50=40$（放大）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. $0.8$（与层数无关）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. $0.8^{50}=1.43\times10^{-5}$（消失）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. $1.2^{50}=9.10\times10^{3}$（爆炸）</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\frac{\partial L}{\partial h_0}=\frac{\partial L}{\partial h_L}\prod_{l=1}^{L}J_l=\frac{\partial L}{\partial h_L}\lambda^L$。$\lambda=0.8$ 时 $0.8^{50}=1.4272\times10^{-5}$，梯度消失；$\lambda=1.2$ 才是 $9.1004\times10^3$ 的爆炸。D 把 $\lambda$ 代错了；A 把连乘误作乘以层数；B 忽略了指数。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">残差连接 $h_l=h_{l-1}+F_l(h_{l-1})$ 的雅可比是 $I+A_l$。它保住梯度的根本原因是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. $A_l$ 的谱半径被初始化压到 0</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. $\prod_l(I+A_l)=I+\sum_l A_l+\cdots$ 的首项恒为 $I$，存在增益恰为 1 的直达路径</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 它把学习率自动调大了</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 它消除了所有非线性</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：展开连乘后单位矩阵 $I$ 是首项，对应不经过任何权重的梯度直达通道，增益恰为 1，因此即使所有 $A_l$ 很小乘积也趋于 $I$ 而非 0。代码中 $L=50$ 时无残差 $(A/L)^{50}=9.10\times10^{-97}$，有残差乘积范数 2.3484、对角元 1.8156/1.4895 趋于 $e^A$。若残差分支过大（$1+\lambda\gg1$）反而会爆炸，需按 $1/\sqrt L$ 缩放。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">Adam 中 $\mathrm{E}[m_t]=(1-\beta_1^t)\bar g$。据此，偏差校正是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 把 $m_t$ 乘以 $\beta_1^t$</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 把 $v_t$ 除以 $1-\beta_1^t$</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 只在 $t=1$ 时需要，之后可省略</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. $\hat m_t=m_t/(1-\beta_1^t)$、$\hat v_t=v_t/(1-\beta_2^t)$，把被零初始化压低的矩估计抬回无偏</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：由 $m_t=(1-\beta_1)\sum_\tau\beta_1^{t-\tau}g_\tau$ 得 $\mathrm{E}[m_t]=(1-\beta_1^t)\bar g$、$\mathrm{E}[v_t]=(1-\beta_2^t)\mathrm{E}[g^2]$，故分别除以 $1-\beta_1^t$、$1-\beta_2^t$。校正后有效步长恒为 1；未校正则从 3.1623 升到 6.5279 再数千步才回 1，因此 C 错。代码 20000 次重复实测 $\mathrm{E}[m_{10}]=0.4516$ 对理论 0.4559。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">代码实验 Part 3 中，验证集早停给 SGD+动量 test=0.1087、给 Adam test=0.1380，但两者训练到底都到 0.1623。最合理的解读是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 两者收敛到同一个解，差别在轨迹：SGD 小 $s_i^2$ 方向慢，早停窗口宽；Adam 拉平步长更早拟合噪声</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. Adam 的偏差校正写错了</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. SGD 找到了一个泛化更好的不同极小值</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 噪声地板 $\sigma^2$ 在两种优化器下不同</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：凸二次目标有唯一极小值，step=3200 时两者同为 0.1623，证明落点相同；差别只在于到达路径与早停点。SGD 的收敛速率正比于 $s_i^2$，小曲率（噪声）方向极慢，等于隐式正则；Adam 的对角预条件把各方向步长拉平，step 50 训练损失已 0.0011 而测试损失 0.1707。噪声地板恒为 $\sigma^2=0.0900$，与优化器无关。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">两层 sigmoid/MSE 网络手算中，$\delta^{(2)}=-0.090444$ 而 $\delta^{(1)}=(-0.013543,0.013266)$，比值约 0.21。这主要说明？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 反向传播的转置写反了</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 数值梯度检查没通过，公式有误</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. $\sigma'(z)\le0.25$ 把误差信号逐层压小，是深度专题一连乘衰减在两层的体现</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 学习率设得太小了</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\delta^{(1)}=((W^{(2)})^\top\delta^{(2)})\odot\sigma'(z^{(1)})$，sigmoid 导数最大 0.25，本例 $\sigma'(z^{(1)})=(0.213910,0.244458)$，把信号压到约 $1/5$；中心差分核对 9 个参数的最大相对误差仅 $4.70\times10^{-11}$，公式正确。换 ReLU（正区导数为 1）该比值会接近 $|W^{(2)}|$ 量级；堆到 10 层则低于 $10^{-6}$，正是梯度消失。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">下列哪种情形下，「SGD+动量泛化更好」最可能不成立？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q6" value="A"> A. 长训练 + cosine 调度 + warmup + 强数据增强的卷积网络</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="B"> B. 梯度稀疏、各层参数尺度差异大、小 batch 且没有预算做学习率搜索的 Transformer 预训练</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="C"> C. 显存受限、需要尽量少存优化器状态的场景</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="D"> D. 有独立验证集可做早停的表格/视觉任务</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：B 正是自适应方法的主场：梯度稀疏、参数尺度差异大、小 batch、无调参预算，应改用 AdamW + warmup + cosine + 解耦权重衰减。A、C、D 反而是 SGD+动量常占优的条件（充足调度、长训练、Adam 每参数多存 $m,v$ 两份状态、有早停）。记住判据：优化器是归纳偏置的一部分，不是谁绝对更好。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure class="figure-placeholder" id="fig-classic-m13-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 13-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">计算图与反向传播：前向激活与梯度回传的方向示意</span>
+    <span class="fig-note">以两层网络为例，实线箭头表示前向计算、虚线箭头表示局部梯度回传，是自动微分教学中最常见的结构图。</span>
+    <span class="fig-src">来源：Rumelhart, Hinton &amp; Williams (1986) 反向传播；教学图见 Stanford CS231n 讲义（本站资源库 c02） · 查看：<a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">https://arxiv.org/abs/2001.08361</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+<h2 id="d-frontier">最新理论突破 · 背景 / 核心思想 / 结论 / 影响 / 局限</h2>
+<div class="callout tip"><div class="callout-title">阅读提示</div><p>下列条目按「背景 → 核心思想 → 关键结论 → 影响 → 局限」五栏固定展开，来源指向资源库中带核验状态的原始论文。局限一栏与结论同等重要：多数突破性结论只在特定数据分布、算力口径或任务族内成立。</p></div>
+<div class="breakthrough" id="d-frontier-1">
+  <div class="bt-head"><span class="bt-year">2020→2022</span><h3>缩放定律的建立与 Chinchilla 修正</h3></div>
+  <div class="bt-grid"><div class="bt-field"><span class="bf-k">背景与动机</span><div class="bf-v">大模型训练成本极高，「该买多少算力、配多大模型、喂多少数据」此前主要靠经验与直觉，缺少可外推的定量依据。</div></div><div class="bt-field"><span class="bf-k">核心思想</span><div class="bf-v">把最终损失写成参数量、数据量、算力的幂律函数，并在固定算力下求最优资源分配。</div></div><div class="bt-field"><span class="bf-k">关键结论</span><div class="bf-v">性能可随规模可预测地改善；但最优的数据/参数比远高于 2020 年原始结论。</div></div><div class="bt-field"><span class="bf-k">影响</span><div class="bf-v">把「调参直觉」变成「算力预算规划」，是当代大模型训练范式的定量基础。</div></div><div class="bt-field"><span class="bf-k">局限与边界</span><div class="bf-v">经验拟合而非定理；超出观测规模、更换数据分布或引入推理时计算后外推失效。</div></div></div>
+  <div class="bt-src">来源（资源库条目，含核验状态）：<a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Scaling Laws for Neural Language Models</a> · <a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Training Compute-Optimal Large Language Models</a> · 数据更新 2026-11-07</div>
+</div>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s9">9 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>三分类单热标签 $y=(0,1,0)$，模型 softmax 概率 $\hat y=(0.1,0.7,0.2)$。求该样本交叉熵与似然；若模型输出恒为均匀 $(1/3,1/3,1/3)$，损失是多少？</li>
+          <li>沿用例 13.2 的网络，但把目标改为 $y=0$（其余不变）。重算 $\delta^{(2)}$ 与 $\nabla_{W^{(2)}}L$，说明梯度符号为何整体翻转。</li>
+          <li>Adam 取 $\beta_1=0.9,\beta_2=0.999$，某步 $g=2.0$、$m_0=v_0=0$。求 $\hat m_1/\sqrt{\hat v_1}$；省略偏差校正时该比值又是多少？</li>
+          <li>ReLU 网络 $n_{in}=100$，误用 $\mathrm{Var}(w)=1/n_{in}$。求单层激活方差增益与 20 层后的方差；改用 He 初始化后增益变为多少？</li>
+          <li>FP16 下取 $S=2048$，某梯度真值 $g=40$。判断是否上溢；若上溢，动态缩放把 $S$ 减到多少才能容纳？此时一个真值 $g_{small}=3.0\times10^{-5}$ 的梯度是否被抬进正规范围？</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> 交叉熵 $=-\ln 0.7\approx0.3567$；该样本似然 $=0.7$（多分类 $p_\theta(y\mid x)=\hat y_{\arg\max y}$），$-\ln 0.7$ 与交叉熵一致。均匀分布时 $=-\ln(1/3)=\ln 3\approx1.0986$，即 $\ln K$（$K=3$）的随机基线。提示：多分类只有一个类别贡献，别把三项都加起来。</p>
+            <p><strong>2.</strong> $\hat y$ 仍为 $0.26$，$\delta^{(2)}=\hat y-y=0.26-0=+0.26$；$\nabla_{W^{(2)}}L=0.26\times(0.6,0.4)=(0.156,\ 0.104)$，$\nabla_{b^{(2)}}L=0.26$。$\delta^{(1)}=(0.5,-0.6)^\top\times0.26=(0.13,-0.156)^\top$。相比例 13.2 全部符号翻转，因为平方损失的 $\delta^{(2)}=\hat y-y$ 随 $y$ 从 1 变 0 由 $-0.74$ 变 $+0.26$；梯度始终指向「减小 $\hat y-y$」的方向。</p>
+            <p><strong>3.</strong> $m_1=0.2,\ v_1=0.004$；$\hat m_1=0.2/0.1=2$，$\hat v_1=0.004/0.001=4$，故 $\hat m_1/\sqrt{\hat v_1}=2/2=1$。未校正时 $m_1/\sqrt{v_1}=0.2/0.06325\approx3.162$。比值再次验证偏差校正把首步有效步长从约 $3.16\alpha$ 拉回 $\alpha$。注意 $g$ 变号只改变符号，不改变量级。</p>
+            <p><strong>4.</strong> 单层增益 $=\frac12 n_{in}\mathrm{Var}(w)=\frac12\times100\times\frac{1}{100}=0.5$；20 层后 $0.5^{20}\approx9.54\times10^{-7}$，梯度实质消失。He 初始化 $\mathrm{Var}(w)=2/100$，增益 $=\frac12\times100\times\frac{2}{100}=1$，20 层后仍为 1。</p>
+            <p><strong>5.</strong> $40\times2048=81920  &gt; 65504$，上溢为 Inf，应跳过该步。需 $40S\leq65504\Rightarrow S\leq1637.6$，动态缩放减半到 $S=1024$ 时 $40\times1024=40960 &lt; 65504$ 可容纳。此时 $g_{small}\times1024=3.0\times10^{-5}\times1024\approx0.0307$，大于 $6.10\times10^{-5}$，进入正规范围、精度恢复。提示：判断要同时看上界与下界两个约束。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 10 ===== -->
+      <h2 id="s10">10 · 本章小结</h2>
+      <div class="table-wrap"><table><thead><tr><th>主题</th><th>要点</th></tr></thead><tbody>
+        <tr><td>损失与 MLE</td><td>交叉熵 = 负对数似然；$\min_\theta\frac1n\sum_i L(y_i,f_\theta(x_i))$ 即 ERM/MLE；加 $\lambda\|\theta\|^2$ 即高斯先验下的 MAP</td></tr>
+        <tr><td>自动微分</td><td>计算图 + 链式法则；反向模式一次扫描得全部梯度；中心差分做数值梯度检查，相对误差 $\leq10^{-6}$</td></tr>
+        <tr><td>反向传播</td><td>$\delta^{(l)}=((W^{(l+1)})^\top\delta^{(l+1)})\odot\sigma'(z^{(l)})$；$\nabla_{W^{(l)}}L=\delta^{(l)}(a^{(l-1)})^\top$</td></tr>
+        <tr><td>优化器</td><td>SGD → 动量 → 自适应；Adam 一阶/二阶矩 + 偏差校正；AdamW 解耦权重衰减，$\lambda\theta$ 不进 $\sqrt{\hat v}$</td></tr>
+        <tr><td>初始化与归一化</td><td>方差守恒 $\mathrm{Var}(w)=2/n_{in}$（He）；BN/LN/RMSNorm 平滑损失曲面、允许大 lr；BN 有训练/推理两套统计</td></tr>
+        <tr><td>正则化</td><td>weight decay=高斯先验、dropout=模型平均、增强=不变性先验、早停=迭代正则、标签平滑=校准；对应偏差-方差</td></tr>
+        <tr><td>规模化</td><td>低精度计算 + FP32 存储；动态损失缩放防 FP16 上下溢；累积/DP/TP/PP/ZeRO；检查点须含优化器状态与 $S$</td></tr>
+        <tr><td>缩放定律与诊断</td><td>$L(N)=aN^{-b}+L_\infty$、$C\approx6ND$、$D\approx20N$；过训练换推理成本；spike 按数据→数值→优化顺序排查</td></tr>
+      </tbody></table></div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：深度训练。</strong>把特征送入小批量训练循环，比较优化器、学习率调度与缩放行为。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="current" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://www.deeplearningbook.org/" target="_blank" rel="noopener">Deep Learning</a> <span class="muted small">（2016 · 权威共识）</span><span class="fr-why">为什么读：Deep Learning 第 6–8 章：反向传播、优化与正则化的完整推导。</span></span></div><div class="fr-item"><span class="fr-tag">课程</span><span class="fr-body"><a href="https://stanford-cs336.github.io/spring2025/" target="_blank" rel="noopener">Stanford CS336 从零构建语言模型</a> <span class="muted small">（2025 · 已核验）</span><span class="fr-why">为什么读：CS336 从零构建语言模型，覆盖训练循环与缩放实践。</span></span></div><div class="fr-item"><span class="fr-tag">论文</span><span class="fr-body"><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Scaling Laws for Neural Language Models</a> <span class="muted small">（2020 · 权威共识）</span><span class="fr-why">为什么读：缩放定律原始论文，本章训练算力讨论的出处。</span></span></div><div class="fr-item"><span class="fr-tag">工具</span><span class="fr-body"><a href="https://pytorch.org/" target="_blank" rel="noopener">PyTorch</a> <span class="muted small">（2016 · 权威共识）</span><span class="fr-why">为什么读：PyTorch 官方 autograd 文档：计算图与梯度语义。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div><a class="btn" href="../index.html">← 返回首页</a> <a class="btn" href="../stages/deep-learning.html">阶段页</a> <a class="btn" href="../roadmap.html">路线图</a></div>
+        <button class="btn primary" data-complete-btn="m13">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m12-ml-algorithms.html"><span class="dir">← 阶段 3 · 上一篇</span><span class="ttl">12 · 经典机器学习算法</span></a>
+        <a class="next" href="m14-architectures.html"><span class="dir">进入阶段 5 →</span><span class="ttl">14 · 神经网络架构谱系</span></a>
+      </nav>
+      </div>
+      </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索阶段、概念、资源、论文…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索全站内容。例如：置信区间、Transformer、共形预测、DeepSeek-R1。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

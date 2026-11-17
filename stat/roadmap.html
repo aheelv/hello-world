@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学习路线图 · 统计 · 智能学习体系</title>
+<meta name="description" content="六阶段演进路线的完整学习路径、先修知识、难度层级、目标能力、实践任务、评估标准与进阶衔接。">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/learning.css">
+<link rel="stylesheet" href="assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="roadmap" data-prefix="">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="roadmap.html">路线图</a>
+    <a class="icon-btn" href="resources.html">资源库</a>
+    <a class="icon-btn" href="timeline.html">时间线</a>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+      <article class="module">
+      <div class="inner">
+      <header class="module-header">
+        <div class="crumbs"><a href="index.html">首页</a> / 学习路线图</div>
+        <h1>学习路线图</h1>
+        <p class="lead">六个阶段、约 240 学时、15 个专题。每阶段都给出先修知识、难度层级、学习路径、目标能力、实践任务、评估标准与进阶衔接，达标后再进阶。</p>
+        <div class="module-meta">
+          <span class="badge brand">6 阶段</span> <span class="badge info">15 专题</span>
+          <span class="badge ok">240 学时</span> <span class="badge ">更新 2026-11-07</span>
+        </div>
+      </header>
+      <div class="callout note"><div class="callout-title">演进主线</div>
+        <p><strong>统计学 → 大数据分析 → 机器学习 → 深度学习 → 神经网络 → 生成式AI</strong></p>
+        <p>本路线按「先掌握方法与训练范式，再深入网络结构与机制，最后进入生成式系统」的认知顺序组织。深度学习与神经网络互为表里：阶段四聚焦如何把深层模型训练好，阶段五拆解网络结构本身为何有效，因此顺序上先四后五。</p>
+      </div>
+
+      <h2 id="overview">0 · 阶段总览</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>阶段</th><th>难度</th><th>周期</th><th>学时</th><th>先修摘要</th><th>专题数</th><th>阶段页</th></tr></thead><tbody>
+<tr><td><strong>1 · 统计学</strong></td>
+          <td>L1 → L2</td><td>第 1–6 周</td><td>48</td>
+          <td>初中代数与基本函数（一次函数、指数、对数直觉）；会读表格、会画折线图/柱状图</td><td>8</td>
+          <td><a href="stages/statistics.html">进入 →</a></td></tr>
+<tr><td><strong>2 · 大数据分析</strong></td>
+          <td>L2 → L3</td><td>第 7–10 周</td><td>32</td>
+          <td>阶段一全部内容（尤其抽样、估计、置信区间）；Python 熟练：函数、迭代器、pandas 基本操作</td><td>1</td>
+          <td><a href="stages/big-data.html">进入 →</a></td></tr>
+<tr><td><strong>3 · 机器学习</strong></td>
+          <td>L2 → L4</td><td>第 11–15 周</td><td>40</td>
+          <td>阶段一（尤其回归、最大似然、偏差-方差）；阶段二的数据管线与 SQL</td><td>2</td>
+          <td><a href="stages/machine-learning.html">进入 →</a></td></tr>
+<tr><td><strong>4 · 深度学习</strong></td>
+          <td>L3 → L4</td><td>第 16–20 周</td><td>40</td>
+          <td>阶段三全部内容；多元微积分：偏导、链式法则；线性代数：矩阵求导直觉</td><td>1</td>
+          <td><a href="stages/deep-learning.html">进入 →</a></td></tr>
+<tr><td><strong>5 · 神经网络</strong></td>
+          <td>L3 → L5</td><td>第 21–24 周</td><td>32</td>
+          <td>阶段四全部内容；能独立实现 Transformer 的前向传播</td><td>1</td>
+          <td><a href="stages/neural-networks.html">进入 →</a></td></tr>
+<tr><td><strong>6 · 生成式 AI</strong></td>
+          <td>L4 → L5</td><td>第 25–30 周</td><td>48</td>
+          <td>阶段四与阶段五全部内容；阶段一的 MLE、KL 散度、假设检验与共形预测基础</td><td>2</td>
+          <td><a href="stages/generative-ai.html">进入 →</a></td></tr>
+</tbody></table></div>
+      <h2 id="knowledge-map">知识依赖全景 · 六阶段如何咬合</h2>
+      <div class="callout note"><div class="callout-title">怎么读这张图</div>
+        <p>统计学是共同底座：它提供「不确定性如何量化」的语言。大数据分析把这套语言放大到单机装不下的规模；机器学习把它变成可泛化的预测函数；深度学习给出可端到端训练的参数化结构；神经网络架构讨论把何种先验写进结构；生成式 AI 则是前五层在真实系统里的集成。任意一层的缺口都会在后一层以「调参玄学」的形式暴露出来。</p>
+      </div>
+<figure class="figure"><svg class="dia" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="六阶段知识依赖全景"><line class="dg-edge strong" x1="340.0" y1="215.0" x2="340.0" y2="60.0"/><rect class="dg-box alt" x="274.0" y="43.0" width="132" height="34" rx="8"/><text class="dg-t" x="340.0" y="64.5" text-anchor="middle">① 统计学</text><text class="dg-ts" x="358.0" y="90.0" text-anchor="start">· 概率 / 推断</text><text class="dg-ts" x="358.0" y="111.0" text-anchor="start">· 回归 / 实验</text><text class="dg-ts" x="358.0" y="132.0" text-anchor="start">· 不确定性量化</text><line class="dg-edge strong" x1="340.0" y1="215.0" x2="526.2" y2="137.5"/><rect class="dg-box ok" x="460.19546181365433" y="120.5" width="132" height="34" rx="8"/><text class="dg-t" x="526.1954618136543" y="142.0" text-anchor="middle">② 大数据分析</text><text class="dg-ts" x="544.1954618136543" y="167.5" text-anchor="start">· 分布式统计</text><text class="dg-ts" x="544.1954618136543" y="188.5" text-anchor="start">· 流式与近似</text><text class="dg-ts" x="544.1954618136543" y="209.5" text-anchor="start">· 数据质量</text><line class="dg-edge strong" x1="340.0" y1="215.0" x2="526.2" y2="292.5"/><rect class="dg-box info" x="460.19546181365433" y="275.5" width="132" height="34" rx="8"/><text class="dg-t" x="526.1954618136543" y="297.0" text-anchor="middle">③ 机器学习</text><text class="dg-ts" x="544.1954618136543" y="322.5" text-anchor="start">· 泛化理论</text><text class="dg-ts" x="544.1954618136543" y="343.5" text-anchor="start">· 偏差方差</text><text class="dg-ts" x="544.1954618136543" y="364.5" text-anchor="start">· 模型选择</text><line class="dg-edge strong" x1="340.0" y1="215.0" x2="340.0" y2="370.0"/><rect class="dg-box warn" x="274.0" y="353.0" width="132" height="34" rx="8"/><text class="dg-t" x="340.0" y="374.5" text-anchor="middle">④ 深度学习</text><text class="dg-ts" x="358.0" y="400.0" text-anchor="start">· 自动微分</text><text class="dg-ts" x="358.0" y="421.0" text-anchor="start">· 优化器</text><text class="dg-ts" x="358.0" y="442.0" text-anchor="start">· 缩放定律</text><line class="dg-edge strong" x1="340.0" y1="215.0" x2="153.8" y2="292.5"/><rect class="dg-box muted" x="87.80453818634572" y="275.50000000000006" width="132" height="34" rx="8"/><text class="dg-t" x="153.80453818634572" y="297.00000000000006" text-anchor="middle">⑤ 神经网络</text><text class="dg-ts" x="135.80453818634572" y="322.50000000000006" text-anchor="end">· 归纳偏置</text><text class="dg-ts" x="135.80453818634572" y="343.50000000000006" text-anchor="end">· 注意力</text><text class="dg-ts" x="135.80453818634572" y="364.50000000000006" text-anchor="end">· 架构选型</text><line class="dg-edge strong" x1="340.0" y1="215.0" x2="153.8" y2="137.5"/><rect class="dg-box alt" x="87.8045381863457" y="120.5" width="132" height="34" rx="8"/><text class="dg-t" x="153.8045381863457" y="142.0" text-anchor="middle">⑥ 生成式 AI</text><text class="dg-ts" x="135.8045381863457" y="167.5" text-anchor="end">· 对齐 / 偏好优化</text><text class="dg-ts" x="135.8045381863457" y="188.5" text-anchor="end">· RAG / Agent</text><text class="dg-ts" x="135.8045381863457" y="209.5" text-anchor="end">· 可靠评测</text><circle class="dg-hub" cx="340.0" cy="215.0" r="72"/><text class="dg-hub-t" x="340.0" y="197.0" text-anchor="middle">六阶段</text><text class="dg-hub-t" x="340.0" y="217.0" text-anchor="middle">知识依赖</text></svg><figcaption><span class="fig-no">图 R-1</span><span class="fig-title">六阶段知识依赖全景</span><span class="fig-note">统计学是共同底座；大数据分析提供规模化手段，机器学习给出建模范式，深度学习与网络架构提供可训练结构，生成式 AI 是系统集成。</span><span class="fig-src">类型：思维导图 · 来源：<a href="roadmap.html">作者自绘 · 依据本站资源库已核验条目</a> · 离线自绘</span></figcaption></figure>
+<figure class="figure"><svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg><figcaption><span class="fig-no">图 R-2</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span><span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span><span class="fig-src">类型：流程图 · 来源：<a href="DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 离线自绘</span></figcaption></figure>
+      <div class="callout tip"><div class="callout-title">难度递进与术语口径</div>
+        <p>全站按 L1 入门 → L2 基础 → L3 进阶 → L4 高级 → L5 前沿递进；每章页首的「本章定位」给出先修、后继与知识依赖链。术语统一以 <a href="glossary.html">术语表</a> 为准，例如「置信区间」专指频率学区间，「可信区间」专指贝叶斯后验区间，不混用。</p>
+      </div>
+      <h2 id="case-relay">跨模块贯穿案例 · 一条数据链走完 15 章</h2>
+      <div class="callout info"><div class="callout-title">知学云 · 在线课程完课率提升项目</div>
+        <p>预测学员完课概率、识别可干预因素、评估「学习小组」的因果效应，最终落地为 RAG 学习助手。 数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯 Python 标准库确定性生成。各章「代码实验」共用同一份数据，因此统计量可跨章对照——这是本站把零散方法串成系统工程视角的主线。</p>
+      </div>
+<figure class="figure"><svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="跨模块贯穿案例：一次完整的数据科学工程链"><rect class="dg-box alt" x="20.0" y="66" width="85.0" height="62" rx="8"/><text class="dg-t" x="62.5" y="94.0" text-anchor="middle">数据理解</text><text class="dg-ts" x="62.5" y="111.0" text-anchor="middle">m01–m02</text><rect class="dg-box" x="131.0" y="66" width="85.0" height="62" rx="8"/><text class="dg-t" x="173.5" y="94.0" text-anchor="middle">统计建模</text><text class="dg-ts" x="173.5" y="111.0" text-anchor="middle">m03–m07</text><line class="dg-edge" x1="105.0" y1="97.0" x2="131.0" y2="97.0"/><polygon class="dg-edge" points="131.0,97.0 123.69528847750153,100.26208362447656 123.69528847750153,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="242.0" y="66" width="85.0" height="62" rx="8"/><text class="dg-t" x="284.5" y="94.0" text-anchor="middle">实验验证</text><text class="dg-ts" x="284.5" y="111.0" text-anchor="middle">m08</text><line class="dg-edge" x1="216.0" y1="97.0" x2="242.0" y2="97.0"/><polygon class="dg-edge" points="242.0,97.0 234.69528847750152,100.26208362447656 234.69528847750152,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="353.0" y="66" width="85.0" height="62" rx="8"/><text class="dg-t" x="395.5" y="94.0" text-anchor="middle">规模化</text><text class="dg-ts" x="395.5" y="111.0" text-anchor="middle">m09–m12</text><line class="dg-edge" x1="327.0" y1="97.0" x2="353.0" y2="97.0"/><polygon class="dg-edge" points="353.0,97.0 345.69528847750155,100.26208362447656 345.69528847750155,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="464.0" y="66" width="85.0" height="62" rx="8"/><text class="dg-t" x="506.5" y="94.0" text-anchor="middle">深度系统</text><text class="dg-ts" x="506.5" y="111.0" text-anchor="middle">m13–m14</text><line class="dg-edge" x1="438.0" y1="97.0" x2="464.0" y2="97.0"/><polygon class="dg-edge" points="464.0,97.0 456.69528847750155,100.26208362447656 456.69528847750155,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="575.0" y="66" width="85.0" height="62" rx="8"/><text class="dg-t" x="617.5" y="94.0" text-anchor="middle">生成式应用</text><text class="dg-ts" x="617.5" y="111.0" text-anchor="middle">m15</text><line class="dg-edge" x1="549.0" y1="97.0" x2="575.0" y2="97.0"/><polygon class="dg-edge" points="575.0,97.0 567.6952884775015,100.26208362447656 567.6952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg><figcaption><span class="fig-no">图 R-3</span><span class="fig-title">跨模块贯穿案例：一次完整的数据科学工程链</span><span class="fig-note">同一个「在线课程完课率」项目在 15 章中反复出现，每章只替换方法，帮助读者形成系统工程视角。</span><span class="fig-src">类型：流程图 · 来源：<a href="roadmap.html">作者自绘 · 依据本站资源库已核验条目</a> · 离线自绘</span></figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th>章节</th><th>本章视角</th><th>本章任务</th></tr></thead><tbody><tr><td><a href="modules/m01-data.html">01 · 数据与统计思维</a></td><td>数据理解与偏差识别</td><td>判断每个字段的测量尺度；识别自愿报名样本带来的选择偏差与混杂。</td></tr><tr><td><a href="modules/m02-descriptive.html">02 · 描述统计与可视化</a></td><td>描述统计与可视化</td><td>给出学习时长、测验分的五数概括与箱线图；处理极端值与缺失。</td></tr><tr><td><a href="modules/m03-probability.html">03 · 概率论基础</a></td><td>概率与条件概率</td><td>计算 P(完课|高学习时长)，用贝叶斯公式解释「高分学员更可能完课」的逆概率。</td></tr><tr><td><a href="modules/m04-distributions.html">04 · 随机变量与常见分布</a></td><td>随机变量与分布</td><td>用二项分布刻画完课数、泊松分布刻画发帖数、正态分布近似测验分。</td></tr><tr><td><a href="modules/m05-inference.html">05 · 统计推断：估计与检验</a></td><td>估计与检验</td><td>为总体完课率构造 Wilson 区间；对干预组/对照组做两比例 z 检验。</td></tr><tr><td><a href="modules/m06-regression.html">06 · 回归分析</a></td><td>回归建模</td><td>用学习时长回归测验分；讨论线性概率模型的越界问题与逻辑回归的引入。</td></tr><tr><td><a href="modules/m07-bayesian.html">07 · 贝叶斯统计与计算</a></td><td>贝叶斯更新</td><td>以 Beta(2,2) 为先验，用共轭更新得到完课率后验并给出可信区间。</td></tr><tr><td><a href="modules/m08-experiment.html">08 · 实验设计与因果推断</a></td><td>实验与因果</td><td>把学习小组视为随机干预，估计 ATE；讨论不依从、ITT 与 CACE。</td></tr><tr><td><a href="modules/m09-ml-stats.html">09 · 机器学习的统计基础</a></td><td>泛化与模型选择</td><td>用交叉验证比较复杂度，观察偏差—方差权衡与评估指标的统计波动。</td></tr><tr><td><a href="modules/m10-ai-stats.html">10 · AI 前沿：统计学与大模型</a></td><td>AI 前沿统计</td><td>用共形预测输出带覆盖率保证的预测集；检查概率校准与评测不确定性。</td></tr><tr><td><a href="modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td><td>规模化统计</td><td>把 1.2 万行扩展为 1.2 亿条日志，用可合并充分统计量与近似算法重算指标。</td></tr><tr><td><a href="modules/m12-ml-algorithms.html">12 · 经典机器学习算法</a></td><td>经典算法</td><td>用逻辑回归、决策树、集成模型预测完课，并按六维口径横向对比。</td></tr><tr><td><a href="modules/m13-deep-training.html">13 · 深度学习的训练范式</a></td><td>深度训练</td><td>把特征送入小批量训练循环，比较优化器、学习率调度与缩放行为。</td></tr><tr><td><a href="modules/m14-architectures.html">14 · 神经网络架构谱系</a></td><td>网络架构</td><td>用 MLP 处理表格特征、用注意力编码学习行为序列，讨论归纳偏置与资源账。</td></tr><tr><td><a href="modules/m15-genai-systems.html">15 · 生成式 AI 系统与方法</a></td><td>生成式系统</td><td>构建 RAG 学习助手：检索课程资料 → 生成答疑 → 忠实度与拒答评测。</td></tr></tbody></table></div>
+      <div class="callout note"><p>字段字典、规范统计量与生成方式见 <a href="DATA-GUIDE.md">数据维护说明</a>；章节编写规范见 <a href="CHAPTER-SPEC.md">教材级章节规范</a>。系统工程视角下，这条链路对应「采集与口径 → 描述与建模 → 实验验证 → 规模化 → 深度系统 → 生成式应用」的完整生命周期。</p></div>
+      <h2 id="stage-s1">1 · 统计学</h2>
+      <div class="tag-row"><span class="badge info">L1 → L2</span> <span class="badge ok">第 1–6 周</span> <span class="badge ">48 学时</span> <span class="badge ">18 世纪至今 · 一切后续阶段的地基</span></div>
+      <p>从数据到推断的语言。建立统计思维，掌握从描述、概率到推断与因果的完整方法论。</p>
+
+      <h3 id="s1-prereq">先修知识</h3>
+      <ul class="check-list">
+<li>初中代数与基本函数（一次函数、指数、对数直觉）</li>
+<li>会读表格、会画折线图/柱状图</li>
+<li>Python 或电子表格基础为非必需，但能显著加快练习</li>
+</ul>
+      <h3 id="s1-path">学习路径</h3>
+      <div class="table-wrap"><table><thead><tr><th>步</th><th>主题</th><th>要点</th><th>专题</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>数据与统计思维</strong></td><td>总体/样本、测量尺度、抽样偏差、研究设计</td><td><a href="modules/m01-data.html">01 · 数据与统计思维</a></td></tr>
+<tr><td>2</td><td><strong>描述统计与可视化</strong></td><td>集中/离散趋势、分布形状、相关与图表选择</td><td><a href="modules/m02-descriptive.html">02 · 描述统计与可视化</a></td></tr>
+<tr><td>3</td><td><strong>概率论基础</strong></td><td>条件概率、贝叶斯公式、期望方差</td><td><a href="modules/m03-probability.html">03 · 概率论基础</a></td></tr>
+<tr><td>4</td><td><strong>随机变量与分布族</strong></td><td>PMF/PDF/CDF、常用分布、中心极限定理</td><td><a href="modules/m04-distributions.html">04 · 随机变量与常见分布</a></td></tr>
+<tr><td>5</td><td><strong>统计推断</strong></td><td>MLE、置信区间、假设检验、p 值、功效</td><td><a href="modules/m05-inference.html">05 · 统计推断：估计与检验</a></td></tr>
+<tr><td>6</td><td><strong>回归分析</strong></td><td>最小二乘、逻辑回归、正则化与诊断</td><td><a href="modules/m06-regression.html">06 · 回归分析</a></td></tr>
+<tr><td>7</td><td><strong>贝叶斯与计算</strong></td><td>共轭先验、MCMC、变分推断与 ELBO</td><td><a href="modules/m07-bayesian.html">07 · 贝叶斯统计与计算</a></td></tr>
+<tr><td>8</td><td><strong>实验设计与因果</strong></td><td>RCT、A/B 测试、ANOVA、倾向得分、DID</td><td><a href="modules/m08-experiment.html">08 · 实验设计与因果推断</a></td></tr>
+</tbody></table></div>
+      <h3 id="s1-competency">目标能力</h3><ul class="check-list">
+<li>能把一个含糊的业务问题改写成可检验的统计问题</li>
+<li>能对一份陌生数据做出完整、无误导的描述分析与可视化</li>
+<li>能手工推导并计算置信区间、检验统计量，且正确解释 p 值</li>
+<li>能识别混杂、幸存者偏差、辛普森悖论与多重比较陷阱</li>
+<li>能设计带功效分析的简单随机实验并写出结论边界</li>
+</ul>
+      <h3 id="s1-tasks">实践任务</h3>
+      <div class="table-wrap"><table><thead><tr><th>任务</th><th>层级</th><th>提交物</th></tr></thead><tbody>
+<tr><td>Titanic 描述分析</td><td>基础</td><td>Notebook + 结论短文</td></tr>
+<tr><td>Bootstrap 置信区间</td><td>基础</td><td>可复现脚本 + 对比图</td></tr>
+<tr><td>A/B 测试全流程复盘</td><td>进阶</td><td>实验报告</td></tr>
+<tr><td>辛普森悖论数值复现</td><td>进阶</td><td>数据表 + 推导</td></tr>
+<tr><td>从零实现 MLE</td><td>挑战</td><td>推导 + 数值验证</td></tr>
+</tbody></table></div>
+      <h3 id="s1-assessment">评估标准</h3>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>可检验标准</th></tr></thead><tbody>
+<tr><td><strong>概念准确性</strong></td><td>能正确说出 95% 置信区间与 p 值的频率学派含义，且不把它们解释为「假设为真的概率」。</td></tr>
+<tr><td><strong>计算可复现</strong></td><td>给出的例题数值可以独立复算，中间步骤完整、符号一致。</td></tr>
+<tr><td><strong>陷阱识别</strong></td><td>对给定案例能指出至少 2 类偏差/混杂，并说明如何规避。</td></tr>
+<tr><td><strong>实验设计</strong></td><td>能先算样本量再收数据，明确 α、功效、主要指标与护栏指标。</td></tr>
+<tr><td><strong>衔接 readiness</strong></td><td>能解释「样本量增大时统计结论为何仍可能失效」，从而理解进入大数据阶段的必要性。</td></tr>
+</tbody></table></div>
+      <h3 id="s1-bridge">进阶衔接</h3>
+      <div class="callout tip"><p>当数据规模超出单机内存、数据不再是一次性抽好的静态样本，独立同分布、可精确计算等假设开始松动。下一阶段把统计推断放进分布式与流式系统里重新审视。</p>
+        <p><a class="btn primary" href="stages/statistics.html">阶段 1 完整页面 →</a>
+        <a class="btn" href="resources.html?stage=s1">本阶段资源</a>
+        <a class="btn" href="timeline.html?stage=s1">本阶段里程碑</a></p>
+      </div>
+      <h2 id="stage-s2">2 · 大数据分析</h2>
+      <div class="tag-row"><span class="badge info">L2 → L3</span> <span class="badge ok">第 7–10 周</span> <span class="badge ">32 学时</span> <span class="badge ">2000 年代至今 · 分布式与流式范式</span></div>
+      <p>当推断遇上规模。在 TB 级、流式、分布式环境下仍能做出统计上可信的分析。</p>
+
+      <h3 id="s2-prereq">先修知识</h3>
+      <ul class="check-list">
+<li>阶段一全部内容（尤其抽样、估计、置信区间）</li>
+<li>Python 熟练：函数、迭代器、pandas 基本操作</li>
+<li>SQL 基础：GROUP BY / JOIN / 窗口函数</li>
+<li>命令行与文件系统基本概念</li>
+</ul>
+      <h3 id="s2-path">学习路径</h3>
+      <div class="table-wrap"><table><thead><tr><th>步</th><th>主题</th><th>要点</th><th>专题</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>规模带来的统计问题</strong></td><td>为何 n 变大后 p 值会失效、抽样不再 i.i.d.、偏差被放大</td><td><a href="modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>2</td><td><strong>分布式计算模型</strong></td><td>MapReduce、Spark RDD/DataFrame、分区与 shuffle、数据倾斜</td><td><a href="modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>3</td><td><strong>存储与格式</strong></td><td>列式存储、Parquet/Arrow、分区、数据湖与仓、事务与一致性</td><td><a href="modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>4</td><td><strong>流式与窗口</strong></td><td>事件时间/处理时间、水位线、滑动窗口、精确一次语义</td><td><a href="modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>5</td><td><strong>近似与草图算法</strong></td><td>Bloom Filter、HyperLogLog、Count-Min Sketch、蓄水池采样</td><td><a href="modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>6</td><td><strong>大规模实验与数据质量</strong></td><td>分层哈希分流、护栏指标、血缘、缺失与漂移监控</td><td><a href="modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+</tbody></table></div>
+      <h3 id="s2-competency">目标能力</h3><ul class="check-list">
+<li>能估算一个分析作业的数据量、内存与网络 shuffle 成本</li>
+<li>能为同一指标选择精确算法或近似算法，并说明误差与资源权衡</li>
+<li>能设计分层随机分流与护栏指标，避免网络效应与提前窥探</li>
+<li>能用 DuckDB/Polars/Spark 完成十亿行级聚合与可复现报告</li>
+<li>能识别并定位数据倾斜、重复计数、迟到数据导致的统计偏差</li>
+</ul>
+      <h3 id="s2-tasks">实践任务</h3>
+      <div class="table-wrap"><table><thead><tr><th>任务</th><th>层级</th><th>提交物</th></tr></thead><tbody>
+<tr><td>十亿行聚合</td><td>基础</td><td>基准脚本 + 对比表</td></tr>
+<tr><td>近似去重</td><td>进阶</td><td>实现/调用 + 误差曲线</td></tr>
+<tr><td>Spark 倾斜诊断</td><td>进阶</td><td>Spark UI 截图说明 + 前后对比</td></tr>
+<tr><td>流式窗口统计</td><td>挑战</td><td>流式作业 + 语义说明</td></tr>
+<tr><td>分层 A/B 分流</td><td>挑战</td><td>分流器 + 平衡性检验</td></tr>
+</tbody></table></div>
+      <h3 id="s2-assessment">评估标准</h3>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>可检验标准</th></tr></thead><tbody>
+<tr><td><strong>规模意识</strong></td><td>能在写 SQL 前估算数据量、shuffle 体积与内存占用，并据此选择引擎。</td></tr>
+<tr><td><strong>误差可解释</strong></td><td>对任何近似结果能给出误差界或置信陈述，而不是只报一个数。</td></tr>
+<tr><td><strong>统计有效性</strong></td><td>能说明大样本下 p 值失效的原因，改用效应量/置信区间/序贯方法。</td></tr>
+<tr><td><strong>可复现</strong></td><td>作业参数、数据版本、随机种子与口径全部记录，结果可重跑一致。</td></tr>
+<tr><td><strong>衔接 readiness</strong></td><td>能把清洗好的特征稳定产出为训练/验证/测试集，理解数据泄漏在管线层面的来源。</td></tr>
+</tbody></table></div>
+      <h3 id="s2-bridge">进阶衔接</h3>
+      <div class="callout tip"><p>数据管线打通后，瓶颈从「算得动」转为「预测得准」。下一阶段把统计推断变成可学习的模型：经验风险最小化、正则化与严格评估协议。</p>
+        <p><a class="btn primary" href="stages/big-data.html">阶段 2 完整页面 →</a>
+        <a class="btn" href="resources.html?stage=s2">本阶段资源</a>
+        <a class="btn" href="timeline.html?stage=s2">本阶段里程碑</a></p>
+      </div>
+      <h2 id="stage-s3">3 · 机器学习</h2>
+      <div class="tag-row"><span class="badge info">L2 → L4</span> <span class="badge ok">第 11–15 周</span> <span class="badge ">40 学时</span> <span class="badge ">1950 年代至今 · 统计学习范式</span></div>
+      <p>从推断到预测。独立完成端到端建模，并给出统计上可辩护的评估结论。</p>
+
+      <h3 id="s3-prereq">先修知识</h3>
+      <ul class="check-list">
+<li>阶段一（尤其回归、最大似然、偏差-方差）</li>
+<li>阶段二的数据管线与 SQL</li>
+<li>线性代数：向量、矩阵乘法、特征值直觉</li>
+<li>Python + NumPy/pandas/scikit-learn</li>
+</ul>
+      <h3 id="s3-path">学习路径</h3>
+      <div class="table-wrap"><table><thead><tr><th>步</th><th>主题</th><th>要点</th><th>专题</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>机器学习的统计视角</strong></td><td>ERM、偏差-方差、泛化、双重下降</td><td><a href="modules/m09-ml-stats.html">09 · 机器学习的统计基础</a></td></tr>
+<tr><td>2</td><td><strong>评估协议</strong></td><td>训练/验证/测试、k 折与分层、数据泄漏、AIC/BIC</td><td><a href="modules/m09-ml-stats.html">09 · 机器学习的统计基础</a></td></tr>
+<tr><td>3</td><td><strong>经典算法族</strong></td><td>线性/逻辑回归、决策树、SVM、朴素贝叶斯、KNN</td><td><a href="modules/m12-ml-algorithms.html">12 · 经典机器学习算法</a></td></tr>
+<tr><td>4</td><td><strong>集成与无监督</strong></td><td>Bagging/Boosting、随机森林、XGBoost、聚类与 PCA</td><td><a href="modules/m12-ml-algorithms.html">12 · 经典机器学习算法</a></td></tr>
+<tr><td>5</td><td><strong>模型选择与校准</strong></td><td>超参搜索、多重比较、概率校准、Brier 分数</td><td><a href="modules/m09-ml-stats.html">09 · 机器学习的统计基础</a></td></tr>
+<tr><td>6</td><td><strong>工程与上线前检查</strong></td><td>特征管线、版本、监控、公平性与可解释性</td><td><a href="modules/m12-ml-algorithms.html">12 · 经典机器学习算法</a></td></tr>
+</tbody></table></div>
+      <h3 id="s3-competency">目标能力</h3><ul class="check-list">
+<li>能把业务目标翻译成可优化的损失函数与可解释的评估指标</li>
+<li>能设计无泄漏的训练/验证/测试协议并说明每一折的用途</li>
+<li>能对同一问题比较 3 类以上模型，并给出带不确定性的结论</li>
+<li>能诊断过拟合、欠拟合、类别不平衡与分布偏移</li>
+<li>能解释正则化、集成与超参选择背后的统计动机</li>
+</ul>
+      <h3 id="s3-tasks">实践任务</h3>
+      <div class="table-wrap"><table><thead><tr><th>任务</th><th>层级</th><th>提交物</th></tr></thead><tbody>
+<tr><td>表格数据端到端</td><td>基础</td><td>Notebook + 模型卡</td></tr>
+<tr><td>数据泄漏诊断</td><td>进阶</td><td>对照实验 + 说明</td></tr>
+<tr><td>AIC/BIC 与正则化路径</td><td>进阶</td><td>计算 + 系数路径图</td></tr>
+<tr><td>校准评估</td><td>挑战</td><td>可靠性图 + 决策分析</td></tr>
+<tr><td>偏差-方差数值实验</td><td>挑战</td><td>实验脚本 + 数值核对</td></tr>
+</tbody></table></div>
+      <h3 id="s3-assessment">评估标准</h3>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>可检验标准</th></tr></thead><tbody>
+<tr><td><strong>评估严谨性</strong></td><td>能说明验证集与测试集不得互相污染，且能主动检查泄漏。</td></tr>
+<tr><td><strong>结论带不确定性</strong></td><td>模型对比给出置信区间或显著性检验，而非只比大小。</td></tr>
+<tr><td><strong>统计动机</strong></td><td>能解释每个方法对应哪个统计假设、违背时会怎样。</td></tr>
+<tr><td><strong>工程可复现</strong></td><td>随机种子、版本、特征口径固定，结果可复跑。</td></tr>
+<tr><td><strong>衔接 readiness</strong></td><td>能说清「特征工程成为瓶颈」为何自然导向表示学习与深层网络。</td></tr>
+</tbody></table></div>
+      <h3 id="s3-bridge">进阶衔接</h3>
+      <div class="callout tip"><p>当人工特征成为瓶颈，让模型自己学表示就成了下一步。阶段四聚焦深层模型如何被训练出来：计算图、反向传播、优化与规模化训练。</p>
+        <p><a class="btn primary" href="stages/machine-learning.html">阶段 3 完整页面 →</a>
+        <a class="btn" href="resources.html?stage=s3">本阶段资源</a>
+        <a class="btn" href="timeline.html?stage=s3">本阶段里程碑</a></p>
+      </div>
+      <h2 id="stage-s4">4 · 深度学习</h2>
+      <div class="tag-row"><span class="badge info">L3 → L4</span> <span class="badge ok">第 16–20 周</span> <span class="badge ">40 学时</span> <span class="badge ">2006 年至今 · 训练范式与规模化</span></div>
+      <p>把深层模型训练出来。掌握深层网络的训练方法论，能独立诊断并稳定一次训练。</p>
+
+      <h3 id="s4-prereq">先修知识</h3>
+      <ul class="check-list">
+<li>阶段三全部内容</li>
+<li>多元微积分：偏导、链式法则；线性代数：矩阵求导直觉</li>
+<li>PyTorch 或 JAX 基本张量操作</li>
+<li>GPU / 显存 / 浮点精度的基本概念</li>
+</ul>
+      <h3 id="s4-path">学习路径</h3>
+      <div class="table-wrap"><table><thead><tr><th>步</th><th>主题</th><th>要点</th><th>专题</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>计算图与自动微分</strong></td><td>前向/反向、链式法则、梯度检查</td><td><a href="modules/m13-deep-training.html">13 · 深度学习的训练范式</a></td></tr>
+<tr><td>2</td><td><strong>训练循环与优化器</strong></td><td>SGD/动量/Adam、学习率调度、warmup、梯度裁剪</td><td><a href="modules/m13-deep-training.html">13 · 深度学习的训练范式</a></td></tr>
+<tr><td>3</td><td><strong>初始化与归一化</strong></td><td>Xavier/He、Batch/Layer/RMSNorm、残差连接</td><td><a href="modules/m13-deep-training.html">13 · 深度学习的训练范式</a></td></tr>
+<tr><td>4</td><td><strong>正则化与泛化</strong></td><td>weight decay、dropout、数据增强、早停、标签平滑</td><td><a href="modules/m13-deep-training.html">13 · 深度学习的训练范式</a></td></tr>
+<tr><td>5</td><td><strong>规模化训练</strong></td><td>混合精度、梯度累积、数据/张量/流水并行、检查点</td><td><a href="modules/m13-deep-training.html">13 · 深度学习的训练范式</a></td></tr>
+<tr><td>6</td><td><strong>缩放定律与训练诊断</strong></td><td>Kaplan → Chinchilla → 过训练 → 测试时计算；loss spike 定位</td><td><a href="modules/m13-deep-training.html">13 · 深度学习的训练范式</a></td></tr>
+</tbody></table></div>
+      <h3 id="s4-competency">目标能力</h3><ul class="check-list">
+<li>能从零写出可训练的 MLP 与反向传播，并用梯度检查验证</li>
+<li>能读懂训练日志，定位不收敛、loss spike、过拟合与数值溢出</li>
+<li>能设计消融实验，区分「结构贡献」与「调参贡献」</li>
+<li>能用缩放定律做数量级估算：给定算力如何分配 N 与 D</li>
+<li>能在有限显存下用混合精度/累积/检查点完成一次完整训练</li>
+</ul>
+      <h3 id="s4-tasks">实践任务</h3>
+      <div class="table-wrap"><table><thead><tr><th>任务</th><th>层级</th><th>提交物</th></tr></thead><tbody>
+<tr><td>NumPy 实现 MLP</td><td>基础</td><td>实现 + 梯度检查报告</td></tr>
+<tr><td>CIFAR-10 训练与消融</td><td>进阶</td><td>消融表 + 曲线图</td></tr>
+<tr><td>优化器对比</td><td>进阶</td><td>对比实验</td></tr>
+<tr><td>缩放定律拟合</td><td>挑战</td><td>拟合代码 + 外推验证</td></tr>
+<tr><td>训练故障复盘</td><td>挑战</td><td>故障手册</td></tr>
+</tbody></table></div>
+      <h3 id="s4-assessment">评估标准</h3>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>可检验标准</th></tr></thead><tbody>
+<tr><td><strong>实现正确性</strong></td><td>手写反向传播通过数值梯度检查（相对误差 &lt; 1e-6 量级）。</td></tr>
+<tr><td><strong>诊断能力</strong></td><td>对给定训练曲线能给出至少 2 个可检验假设与对应验证操作。</td></tr>
+<tr><td><strong>实验规范</strong></td><td>消融实验只变一个因素，记录种子、预算与完整超参。</td></tr>
+<tr><td><strong>理论连接</strong></td><td>能说明交叉熵损失与最大似然估计的等价关系。</td></tr>
+<tr><td><strong>衔接 readiness</strong></td><td>训练已稳定后，能提出「为什么这个结构有效」的问题，自然进入架构剖析。</td></tr>
+</tbody></table></div>
+      <h3 id="s4-bridge">进阶衔接</h3>
+      <div class="callout tip"><p>会训练之后，真正决定能力上限的是结构带来的归纳偏置。阶段五回到网络本身：从卷积、循环到注意力与 Transformer，拆解每一种结构为何有效、代价是什么。</p>
+        <p><a class="btn primary" href="stages/deep-learning.html">阶段 4 完整页面 →</a>
+        <a class="btn" href="resources.html?stage=s4">本阶段资源</a>
+        <a class="btn" href="timeline.html?stage=s4">本阶段里程碑</a></p>
+      </div>
+      <h2 id="stage-s5">5 · 神经网络</h2>
+      <div class="tag-row"><span class="badge info">L3 → L5</span> <span class="badge ok">第 21–24 周</span> <span class="badge ">32 学时</span> <span class="badge ">1943 年至今 · 架构谱系与归纳偏置</span></div>
+      <p>结构即先验。理解主流架构的归纳偏置、复杂度与适用边界，能按任务选结构。</p>
+
+      <h3 id="s5-prereq">先修知识</h3>
+      <ul class="check-list">
+<li>阶段四全部内容</li>
+<li>能独立实现 Transformer 的前向传播</li>
+<li>理解矩阵乘法复杂度与大 O 记号</li>
+<li>读过至少 2 篇架构类原始论文</li>
+</ul>
+      <h3 id="s5-path">学习路径</h3>
+      <div class="table-wrap"><table><thead><tr><th>步</th><th>主题</th><th>要点</th><th>专题</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>从感知机到 MLP</strong></td><td>通用近似定理、深度 vs 宽度、激活函数</td><td><a href="modules/m14-architectures.html">14 · 神经网络架构谱系</a></td></tr>
+<tr><td>2</td><td><strong>卷积网络</strong></td><td>局部感受野、权值共享、平移等变、层次化特征</td><td><a href="modules/m14-architectures.html">14 · 神经网络架构谱系</a></td></tr>
+<tr><td>3</td><td><strong>循环网络</strong></td><td>BPTT、LSTM/GRU 门控、长程依赖与串行瓶颈</td><td><a href="modules/m14-architectures.html">14 · 神经网络架构谱系</a></td></tr>
+<tr><td>4</td><td><strong>注意力与 Transformer</strong></td><td>QKV、缩放点积、多头、位置编码、复杂度</td><td><a href="modules/m14-architectures.html">14 · 神经网络架构谱系</a></td></tr>
+<tr><td>5</td><td><strong>现代变体</strong></td><td>残差/Pre-LN、ViT、GNN 消息传递、MoE 稀疏激活、SSM</td><td><a href="modules/m14-architectures.html">14 · 神经网络架构谱系</a></td></tr>
+<tr><td>6</td><td><strong>架构比较与选型</strong></td><td>参数量/FLOPs/显存估算、外推性、归纳偏置对照</td><td><a href="modules/m14-architectures.html">14 · 神经网络架构谱系</a></td></tr>
+</tbody></table></div>
+      <h3 id="s5-competency">目标能力</h3><ul class="check-list">
+<li>能手写自注意力公式并说明每一步的维度与复杂度</li>
+<li>能解释 Transformer 相对 RNN 在并行性与长程依赖上的取舍</li>
+<li>能估算给定配置的参数量、KV Cache 与训练 FLOPs</li>
+<li>能按任务（图像/序列/图/长文本）选择结构并给出理由</li>
+<li>能阅读架构论文并复现其核心模块</li>
+</ul>
+      <h3 id="s5-tasks">实践任务</h3>
+      <div class="table-wrap"><table><thead><tr><th>任务</th><th>层级</th><th>提交物</th></tr></thead><tbody>
+<tr><td>NumPy 自注意力</td><td>基础</td><td>实现 + 形状断言</td></tr>
+<tr><td>参数量核算</td><td>基础</td><td>核算表 + 验证脚本</td></tr>
+<tr><td>架构对照实验</td><td>进阶</td><td>对照表 + 分析</td></tr>
+<tr><td>从零训练小语言模型</td><td>挑战</td><td>模型 + 注意力可视化</td></tr>
+<tr><td>长序列方案评估</td><td>挑战</td><td>评测报告</td></tr>
+</tbody></table></div>
+      <h3 id="s5-assessment">评估标准</h3>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>可检验标准</th></tr></thead><tbody>
+<tr><td><strong>公式准确</strong></td><td>能正确写出注意力公式、说明除以 $\sqrt{d_k}$ 的原因。</td></tr>
+<tr><td><strong>复杂度意识</strong></td><td>能指出标准注意力对序列长度二次增长，并说出至少两种缓解思路。</td></tr>
+<tr><td><strong>选型论证</strong></td><td>选型理由落在归纳偏置与资源约束上，而非只凭排行榜。</td></tr>
+<tr><td><strong>复现能力</strong></td><td>能按论文复现一个核心模块并用单元测试验证。</td></tr>
+<tr><td><strong>衔接 readiness</strong></td><td>能解释「架构 + 规模 + 对齐」如何共同构成生成式 AI 系统。</td></tr>
+</tbody></table></div>
+      <h3 id="s5-bridge">进阶衔接</h3>
+      <div class="callout tip"><p>当 Transformer 架构、海量数据与规模化训练三者叠加，再经偏好对齐，就得到生成式 AI。最后一阶段回到统计主线：最大似然、信息论、偏好模型、共形预测与可靠评测。</p>
+        <p><a class="btn primary" href="stages/neural-networks.html">阶段 5 完整页面 →</a>
+        <a class="btn" href="resources.html?stage=s5">本阶段资源</a>
+        <a class="btn" href="timeline.html?stage=s5">本阶段里程碑</a></p>
+      </div>
+      <h2 id="stage-s6">6 · 生成式 AI</h2>
+      <div class="tag-row"><span class="badge info">L4 → L5</span> <span class="badge ok">第 25–30 周</span> <span class="badge ">48 学时</span> <span class="badge ">2020 年至今 · 大模型与生成系统</span></div>
+      <p>统计主线的最前沿。读懂 2024–2026 前沿论文的统计论证，并能设计可靠评测与小规模对齐实验。</p>
+
+      <h3 id="s6-prereq">先修知识</h3>
+      <ul class="check-list">
+<li>阶段四与阶段五全部内容</li>
+<li>阶段一的 MLE、KL 散度、假设检验与共形预测基础</li>
+<li>能读懂 arXiv 论文中的目标函数与消融表</li>
+<li>具备 GPU 或云端算力的基本使用经验</li>
+</ul>
+      <h3 id="s6-path">学习路径</h3>
+      <div class="table-wrap"><table><thead><tr><th>步</th><th>主题</th><th>要点</th><th>专题</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>语言模型的统计本质</strong></td><td>自回归分解、交叉熵、KL、困惑度、tokenizer</td><td><a href="modules/m10-ai-stats.html">10 · AI 前沿：统计学与大模型</a></td></tr>
+<tr><td>2</td><td><strong>缩放定律演进</strong></td><td>Kaplan → Chinchilla → 过训练 → 测试时计算</td><td><a href="modules/m10-ai-stats.html">10 · AI 前沿：统计学与大模型</a></td></tr>
+<tr><td>3</td><td><strong>生成模型族</strong></td><td>VAE/ELBO、GAN、DDPM、分数匹配、流匹配</td><td><a href="modules/m15-genai-systems.html">15 · 生成式 AI 系统与方法</a></td></tr>
+<tr><td>4</td><td><strong>对齐与偏好学习</strong></td><td>SFT、Bradley-Terry、RLHF/PPO、DPO、GRPO</td><td><a href="modules/m15-genai-systems.html">15 · 生成式 AI 系统与方法</a></td></tr>
+<tr><td>5</td><td><strong>系统能力</strong></td><td>RAG、工具调用、Agent、多模态、长上下文、推理模型</td><td><a href="modules/m15-genai-systems.html">15 · 生成式 AI 系统与方法</a></td></tr>
+<tr><td>6</td><td><strong>可靠评测与不确定性</strong></td><td>基准污染、置信区间、共形预测、LLM-as-judge 偏误</td><td><a href="modules/m10-ai-stats.html">10 · AI 前沿：统计学与大模型</a></td></tr>
+</tbody></table></div>
+      <h3 id="s6-competency">目标能力</h3><ul class="check-list">
+<li>能把一篇新论文的目标函数还原为最大似然 / KL / 偏好模型</li>
+<li>能解释 2024–2026 推理模型、MoE、流匹配背后的统计动机</li>
+<li>能设计带置信区间与抗污染的评测方案，并识别 LLM-as-judge 偏误</li>
+<li>能完成小规模 SFT / LoRA / DPO 实验并写出可复现实验记录</li>
+<li>能对生成结果施加共形预测式的覆盖保证，并说明其失效条件</li>
+</ul>
+      <h3 id="s6-tasks">实践任务</h3>
+      <div class="table-wrap"><table><thead><tr><th>任务</th><th>层级</th><th>提交物</th></tr></thead><tbody>
+<tr><td>困惑度换算</td><td>基础</td><td>计算 + 解释</td></tr>
+<tr><td>缩放定律外推</td><td>进阶</td><td>拟合 + 讨论</td></tr>
+<tr><td>LoRA 微调与对照</td><td>进阶</td><td>实验记录 + 资源对比</td></tr>
+<tr><td>DPO 偏好实验</td><td>挑战</td><td>实现 + 消融</td></tr>
+<tr><td>可靠评测报告</td><td>挑战</td><td>评测报告</td></tr>
+<tr><td>共形覆盖验证</td><td>挑战</td><td>覆盖率表 + 局限说明</td></tr>
+</tbody></table></div>
+      <h3 id="s6-assessment">评估标准</h3>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>可检验标准</th></tr></thead><tbody>
+<tr><td><strong>理论还原</strong></td><td>能把 LLM 训练损失写成负对数似然，并说明与 KL 的关系。</td></tr>
+<tr><td><strong>前沿可读性</strong></td><td>对 2024–2026 的技术报告能指出其统计假设、目标函数与消融是否充分。</td></tr>
+<tr><td><strong>评测严谨</strong></td><td>给出置信区间、说明污染与多重比较，不以单次排行榜分数下结论。</td></tr>
+<tr><td><strong>不确定性诚实</strong></td><td>能说明共形预测保证的是边缘覆盖、依赖可交换性，并列出失效场景。</td></tr>
+<tr><td><strong>闭环</strong></td><td>能回到阶段一的推断语言，指出整个 AI 系统里哪些结论是统计上站得住的、哪些不是。</td></tr>
+</tbody></table></div>
+      <h3 id="s6-bridge">进阶衔接</h3>
+      <div class="callout tip"><p>走到前沿之后，最稀缺的能力反而是最初的统计严谨性：假设是否成立、估计是否有偏、结论是否有不确定性。建议带着新的问题回到阶段一与资料库，形成持续迭代的闭环。</p>
+        <p><a class="btn primary" href="stages/generative-ai.html">阶段 6 完整页面 →</a>
+        <a class="btn" href="resources.html?stage=s6">本阶段资源</a>
+        <a class="btn" href="timeline.html?stage=s6">本阶段里程碑</a></p>
+      </div>
+      <h2 id="howto">如何自检进阶</h2>
+      <div class="callout exam"><div class="callout-title">三条硬规则</div>
+        <ol><li>每阶段至少完成 2 项实践任务并提交可复现产物，才进入下一阶段。</li>
+        <li>评估标准中任何一条说不清，就回到对应专题的例题与易错点，不要靠「看懂了」代替「做得出」。</li>
+        <li>涉及外部资料时，优先读资源库中标注「已核验」的一手来源；「待核验」条目仅作线索。</li></ol>
+      </div>
+      <div class="flex-between mt-6">
+        <div><a class="btn" href="index.html">← 返回首页</a> <a class="btn" href="resources.html">资源库</a> <a class="btn" href="timeline.html">时间线</a></div>
+        <a class="btn primary" href="stages/statistics.html">从阶段 1 开始 →</a>
+      </div>
+      </div>
+      </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="resources.html">资源库</a> · <a href="timeline.html">时间线</a> · <a href="glossary.html">术语表</a> · <a href="roadmap.html">学习路线图</a> · <a href="DATA-GUIDE.md">数据维护说明</a> · <a href="TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索阶段、概念、资源、论文…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索全站内容。例如：置信区间、Transformer、共形预测、DeepSeek-R1。</div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendor/katex/dist/katex.min.js"></script>
+<script src="assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/site-data.js"></script>
+<script src="assets/js/search-index.js"></script>
+<script src="assets/js/learning-index.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/site-ui.js"></script>
+<script src="assets/js/learning.js"></script>
+</body>
+</html>

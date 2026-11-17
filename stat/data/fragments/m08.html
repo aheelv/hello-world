@@ -1,0 +1,439 @@
+<h2 id="d-deep-1">深度专题一 · 随机化为什么能平衡「未观测」混杂：潜在结果的形式化证明</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>不用看见它，也能让它不构成偏差</h3></div>
+  <p class="dt-lead">正文已经用「潜在结果」定义了 ATE，也说了随机化使组间差无偏。这一节把这句话追到底：随机化凭什么连<strong>没有被记录、甚至没被想到</strong>的混杂变量也一起平衡掉？以及，这个保证在什么条件下会失效。</p>
+
+  <h4>背景：观察性数据补不上的那一块</h4>
+  <p>Neyman 在 1923 年提出潜在结果、Fisher 在 1920–30 年代确立随机化、Rubin 在 1974 年把二者统一成因果推断的语言。要解决的问题始终是一个：观测到的组间差异里，混着「处理组本来就更可能完课」这部分<strong>选择偏差</strong>。倾向得分匹配、回归调整、分层都能按<strong>已测量</strong>的协变量 $X$ 把两组拉齐，可一旦有个「学习动机」「家庭支持」这类没进数据库的变量 $U$ 同时影响「是否加入小组」与「是否完课」，调整就补不上。随机化宣称能处理 $U$，听起来近乎魔术，所以必须把它写成可检验的等式。</p>
+
+  <h4>直觉：洗牌不会撕掉牌背的标签</h4>
+  <p>把 12000 名学员随机分成两组，相当于把一副牌洗匀后发成两摞。每个学员身上贴着许多标签：基础水平、自律程度、当周是否有空……其中绝大多数我们没测，也就是 $U$。洗牌<strong>不会撕掉</strong>这些标签，但它让「标签的分布」在两摞牌里在期望意义上相同——因为发牌动作（哈希分桶）根本不看标签。</p>
+  <p>要点有两层，别混在一起：</p>
+  <ul>
+    <li>随机化<strong>不是</strong>让两组的每个个体一一相同，而是让两组在所有协变量（含未观测的）上的<strong>概率分布相同</strong>；</li>
+    <li>它<strong>不需要</strong>研究者看见 $U$，只需要「分配机制与 $U$ 无关」这一个条件成立。</li>
+  </ul>
+  <p>反面情形：若「活跃用户自己选择加入学习小组」，那么 $U$（活跃度）直接决定了分配，两摞牌的标签分布系统性错开，样本量再大也只会把这个偏差估计得<strong>更精确</strong>，不会消掉它。这正是正文里「混杂是设计问题，不是样本量问题」的形式化版本。</p>
+
+  <h4>形式化：从「根本难题」到「无偏」</h4>
+  <p>对每个个体 $i$ 定义两个潜在结果：$Y_i(1)$ 是接受处理的结果，$Y_i(0)$ 是不接受的结果，个体效应 $\tau_i=Y_i(1)-Y_i(0)$，目标是平均处理效应 $ATE=E[\tau_i]$。观测到的只是</p>
+  $$ Y_i=T_i\,Y_i(1)+(1-T_i)\,Y_i(0) $$
+  <p class="dt-lead">白话：$T_i=1$ 时我们只看到 $Y_i(1)$，$T_i=0$ 时只看到 $Y_i(0)$；同一个人「另一条路会怎样」永远缺一格，这就是因果推断的根本难题。</p>
+
+  <p>把朴素组间差拆开，选择偏差立刻显形：</p>
+  $$ \underbrace{E[Y\mid T=1]-E[Y\mid T=0]}_{\text{能算出来的组间差}}\ =\ \underbrace{\bigl(E[Y(1)\mid T=1]-E[Y(0)\mid T=1]\bigr)}_{ATT}\ +\ \underbrace{\bigl(E[Y(0)\mid T=1]-E[Y(0)\mid T=0]\bigr)}_{\text{选择偏差}} $$
+  <p class="dt-lead">白话：第二项就是「处理组哪怕不参加小组，本来也会更会完课」的那部分；观察性数据里它通常不为零。</p>
+
+  <p>随机化的<strong>全部</strong>内容，是让分配 $T$ 与潜在结果、已测协变量、未测协变量都独立：</p>
+  $$ T\ \perp\!\!\!\perp\ \bigl(Y(0),\ Y(1),\ X,\ U\bigr) $$
+  <p class="dt-lead">白话：这是一枚与任何个体特征都无关的硬币。注意 $U$ 被显式写进独立性里——这就是「连没测过的变量也平衡」的出处：证明里根本不需要知道 $U$ 是什么，只需要它不影响硬币。</p>
+
+  <p>于是两条关键的等号成立：</p>
+  $$ E[Y\mid T=1]=E[Y(1)\mid T=1]=E[Y(1)],\qquad E[Y\mid T=0]=E[Y(0)\mid T=0]=E[Y(0)] $$
+  $$ \Longrightarrow\ E[Y\mid T=1]-E[Y\mid T=0]=E[Y(1)]-E[Y(0)]=ATE $$
+  <p class="dt-lead">白话：每一步只用到 $T$ 的独立性，完全没有出现 $X$ 或 $U$ 是否被测量。所以随机化的保证<strong>强于</strong>任何「按已测变量调整」的方法。</p>
+
+  <p>更贴近工程地说，有限样本下 $U$ 不会精确相等。设两组的未观测协变量均值为 $\bar U_T,\bar U_C$，$U$ 对结果的线性影响系数为 $\gamma$，则估计误差可写成</p>
+  $$ \hat\tau-ATE=\underbrace{(\bar U_T-\bar U_C)\,\gamma}_{\text{偶然不平衡}}\ +\ \text{抽样噪声},\qquad E[\bar U_T-\bar U_C]=0 $$
+  $$ \mathrm{Var}(\bar U_T-\bar U_C)=\sigma_U^{2}\Bigl(\frac1{n_T}+\frac1{n_C}\Bigr) $$
+  <p class="dt-lead">白话：单次实验里未观测变量会有随机波动，但期望为零，且波动随样本量按 $1/\sqrt n$ 缩小。随机化给的是「无偏 + 方差可量化」，不是「每次都严丝合缝」——所以它才需要功效分析与置信区间。</p>
+
+  <p>用共享案例落地：处理组 $n_T=6000$、完课 $3353$ 人（$0.5588$），对照组 $n_C=6000$、完课 $2614$ 人（$0.4357$），组间差 $\hat\tau=+0.1232$、$z=13.4924$。若分流是 1:1 完全随机，则 $T\perp(Y(0),Y(1),X,U)$，$\hat\tau$ 的期望就是 ATE；若改成「活跃用户自愿加入」，$E[\bar U_T-\bar U_C] &gt; 0$，这 $+0.1232$ 里就混着 $\gamma$ 倍的选择偏差，且不会随 6000 人消失。</p>
+
+  <p>最后看匹配为什么做不到。倾向得分依赖<strong>无混杂假设</strong>：</p>
+  $$ \bigl(Y(0),Y(1)\bigr)\ \perp\!\!\!\perp\ T\ \mid\ X $$
+  <p class="dt-lead">白话：它要求「所有混杂因子都已进 $X$」。只要存在 $U\notin X$ 且 $U\to T$、$U\to Y$，后门路径 $T\leftarrow U\to Y$ 就没被阻断；随机化则是从源头切断 $U\to T$ 这条箭头，不需要 $U$ 被观测。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>随机化的力量不在「让两组个体长得一样」，而在「让分配 $T$ 独立于包括<strong>所有未观测变量</strong>在内的潜在结果」，于是选择偏差项的期望恒为 $0$、剩余不平衡只剩方差且按 $1/\sqrt n$ 收缩。任何只基于已测协变量 $X$ 的调整（匹配、IPW、回归）都无法对 $U\notin X$ 给出这个保证——这就是 RCT 强于观察性方法的唯一、也是全部理由。</div>
+
+  <h4>边界：什么时候这个保证不成立</h4>
+  <p>在<strong>SUTVA 被违反</strong>（个体间存在溢出或网络效应，对照组被处理组影响）、<strong>存在不依从</strong>而实际接受处理 $D\ne T$、或<strong>分流机制与用户特征相关</strong>（按活跃度分配、哈希盐被复用、埋点在某一组漏报）的条件下，$T\perp(Y(0),Y(1),X,U)$ 不成立，「组间差无偏估计 ATE」这一结论不成立，应分别改用<strong>按簇随机 / switchback 设计</strong>（处理溢出）、<strong>ITT 与 CACE 估计</strong>（处理不依从）、或<strong>先修复分流器并重跑 A/A 校验与 SRM 卡方检验</strong>（分配被污染）。</p>
+
+  <figure data-figure="flow-abtest"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 偷看 p 值为什么抬高假阳性：从固定视界到序贯检验</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>不是「多看了几眼」，是「多了几次拒绝机会」</h3></div>
+  <p class="dt-lead">正文把 peeking 列为 A/B 测试最常见的错误，并指出窥探多次可把假阳性率推到 20%–30%。这一节给出它为什么会膨胀、膨胀多少、以及允许中途决策时该换成什么。</p>
+
+  <h4>背景：一条被写进前提里的限制</h4>
+  <p>$\alpha=0.05$ 的承诺有一个常被忽略的前提：<strong>样本量事先固定，且只检验一次</strong>。Armitage、McPherson 与 Rowe 在 1969 年研究「重复显著性检验」时就指出，反复在累积数据上做检验会大幅抬高一类错误率。互联网实验平台把「每天看一眼大盘」变成默认动作后，这个问题从统计教材走进了每一次发版会。</p>
+
+  <h4>直觉：连抛硬币的「五连正」几乎必然出现</h4>
+  <p>连续抛一枚公平硬币 100 次，中途看 10 次，问「有没有出现过连续 5 个正面」——几乎必然有。如果你事先规定「一看到五连正就宣布硬币有问题」，你几乎一定会误判。$p$ 值完全一样：零假设下 $z$ 统计量会随机游走，反复查看总会撞上 $|z| &gt; 1.96$ 的那一刻。</p>
+  <p>关键澄清：peeking 的危害不是「看了几眼」这个动作，而是<strong>每看一次就多给 $H_0$ 一次被拒绝的机会</strong>。它与多重比较同源，只是这里的「多次检验」沿时间轴发生。还有第二重危害：能让你按下停止键的，往往是随机波动的<strong>最高点</strong>，于是「一显著就停」还会系统性<strong>高估效应量</strong>（赢家诅咒 / 停止规则偏倚）。</p>
+
+  <h4>形式化：判定对象被悄悄换掉了</h4>
+  <p>单次固定视界检验的承诺是</p>
+  $$ P_{H_0}\bigl(|Z|\ &gt;\ z_{\alpha/2}\bigr)=\alpha,\qquad z_{0.025}=1.96 $$
+  <p class="dt-lead">白话：零假设为真时，统计量越过 $1.96$ 的概率是 $5\%$。这句话只对「一个预先确定的 $Z$」成立。</p>
+
+  <p>若把 $K$ 次查看当作 $K$ 次<strong>独立</strong>检验，至少一次显著的概率是</p>
+  $$ P_{H_0}(\text{至少一次显著})=1-(1-\alpha)^{K} $$
+  <p class="dt-lead">白话：取 $K=10,\ \alpha=0.05$，得 $1-0.95^{10}=0.4013$，即约 $40\%$。这是「独立机会」给出的粗略上界。</p>
+
+  <p>但 A/B 测试是<strong>累积数据</strong>：第 $k$ 次的 $z$ 建立在前 $k$ 批全部样本上，各时点高度相关，并非 $K$ 次独立检验。真正的判定对象是 z 过程的<strong>最大值</strong>：</p>
+  $$ P_{H_0}\Bigl(\max_{1\le k\le K}|Z_k|\ &gt;\ c\Bigr)\ \gg\ 2\bigl(1-\Phi(c)\bigr) $$
+  <p class="dt-lead">白话：你以为在检验「最后一次的 $Z_K$」，实际在检验「整条轨迹有没有碰过边界」。用只适用于单点 $Z_K$ 的临界值 $1.96$ 去卡最大值，必然过松；在连续时间极限下，$Z(t)$ 近似布朗运动，越界概率由反射原理给出，随窥探次数单调上升。</p>
+
+  <p>代码实验里，固定视界（只在第 10 次检验）的假阳性率是 $0.0467$，而每次都检验是 $0.1900$——约 $4$ 倍。它<strong>低于</strong>独立上界 $0.4013$，正是因为累积数据的 z 高度相关：多看几次并没有真的多出 10 次独立机会，但已经足够把 $5\%$ 推到近 $20\%$。</p>
+
+  <h4>形式化：允许中途决策的正确做法</h4>
+  <p>第一条路线是把总 $\alpha$ 当成<strong>预算</strong>分批花掉（alpha-spending，Lan–DeMets）：预先登记一个消耗函数 $f(t)$，$t\in[0,1]$ 是信息比例（已用样本 / 预定样本），第 $k$ 次查看只花掉</p>
+  $$ \alpha_k=\alpha\bigl(f(t_k)-f(t_{k-1})\bigr),\qquad \sum_{k=1}^{K}\alpha_k=\alpha $$
+  <p class="dt-lead">白话：把 $5\%$ 切成很多小片，每次查看只准花掉对应那一片，整体仍守住 $5\%$。O'Brien–Fleming 型消耗函数为</p>
+  $$ f(t)=2\Bigl(1-\Phi\bigl(z_{\alpha/2}/\sqrt{t}\bigr)\Bigr) $$
+  <p class="dt-lead">白话：$t$ 小（实验早期）时 $z_{\alpha/2}/\sqrt t$ 很大，$f(t)$ 几乎为 $0$，早期几乎不花预算、边界极严；临近结束才把剩余 $\alpha$ 放开。这与「早期数据最不稳定」的直觉一致。对应的时变临界值近似 $c_k=z_{\alpha/2}/\sqrt{t_k}$，早期远大于 $1.96$。</p>
+
+  <p>第二条路线是 always-valid p 值 / mSPRT，用似然比鞅给出任意时刻都有效的判定量：</p>
+  $$ \Lambda_t=\int\exp\Bigl(\delta S_t-\tfrac12\delta^{2}t\Bigr)\,d\pi(\delta),\qquad p_t=\min\Bigl(1,\ \frac1{\Lambda_t}\Bigr) $$
+  <p class="dt-lead">白话：$S_t$ 是累积效应信号，$\pi(\delta)$ 是效应量的混合先验；$\Lambda_t$ 是似然比鞅。在<strong>任意</strong>停止时刻都满足 $P_{H_0}(p_t\le\alpha)\le\alpha$，所以「想看就看、想停就停」是合法的，不再依赖固定视界。</p>
+
+  <p>顺带呼应模块 07：贝叶斯后验 $P(\Delta &gt; 0\mid x)$ 基于已观测数据，不依赖停止规则（似然原则），因此 peeking 不破坏贝叶斯区间的覆盖率；被破坏的是<strong>频率学派</strong>那句「重复抽样覆盖率」承诺。这也解释了为什么「改用后验概率做门禁」是序贯场景的一条可行出路。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>$\alpha$ 是「一次检验」的承诺，不是「一个实验」的承诺。反复窥探把一次拒绝机会变成 $K$ 次，把判定对象从单个 $Z_K$ 悄悄换成 $\max_k|Z_k|$；在固定视界临界值 $1.96$ 下，真实一类错误率随窥探次数单调上升（本实验 10 次窥探为 $0.1900$，约 $4$ 倍于 $0.0467$），且停下来的点估计系统性偏高。要允许中途决策，必须换成把 $\alpha$ 作为预算分批消耗的序贯边界或 always-valid p 值，<strong>而不是事后辩解「我们只看了几次」</strong>。</div>
+
+  <h4>边界：什么时候不必担心</h4>
+  <p>在<strong>实验已采用预先登记的 alpha-spending 序贯边界或 always-valid p 值、且窥探只作用于唯一预先指定的核心指标</strong>的条件下，「用固定临界值 $1.96$ 判定停止」这一结论不成立，应改用该序贯方法给出的时变临界值 $c_k=z_{\alpha/2}/\sqrt{t_k}$ 与剩余 $\alpha$ 预算来判定停止；反之，若窥探同时发生在多个指标、多个分层或多个实验上却未做族系误差率校正，则本结论仍成立且更严重，应改用 Bonferroni / Holm 校正并把所有查看时点、指标与分层写进预登记分析计划。</p>
+
+  <figure data-classic="0"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 随机化 A/B 检验（两比例 z 检验与功效 / 样本量）</h2>
+<div class="algo-spec">
+
+  <h3>1. 原理：把「差异」除以「噪声」</h3>
+  <p>设响应为二值（完课 $Y_i\in\{0,1\}$），处理 $T_i\in\{0,1\}$ 由哈希分桶随机分配。记 $p_1=P(Y=1\mid T=1)$、$p_0=P(Y=1\mid T=0)$，目标参数就是 $\Delta=p_1-p_0$，在完全依从时它等于 ITT，也等于 ATE。估计量是两组频率之差 $\hat\Delta=\hat p_1-\hat p_0$。</p>
+
+  <p>在 $H_0:\Delta=0$ 下，两组共享同一成功率，用合并比例 $\hat p=(c_1+c_0)/(n_1+n_0)$ 估计噪声尺度：</p>
+  $$ SE_0=\sqrt{\hat p(1-\hat p)\Bigl(\frac1{n_1}+\frac1{n_0}\Bigr)} $$
+  <p class="dt-lead">白话：$c_1,c_0$ 是两组的完课人数。这一项衡量「纯靠随机波动，两组频率差大约会是多少」。</p>
+
+  <p>检验统计量就是「差异是噪声的多少倍」，在 $H_0$ 下近似标准正态：</p>
+  $$ z=\frac{\hat p_1-\hat p_0}{\sqrt{\hat p(1-\hat p)(1/n_1+1/n_0)}},\qquad p_{\text{双侧}}=2\bigl(1-\Phi(|z|)\bigr) $$
+  <p class="dt-lead">白话：$z$ 越大说明差异越不像噪声。共享案例里 $z=13.4924$，双侧 $p\approx1.74\times10^{-41}$。</p>
+
+  <p>报告区间时不再假设两组相同，改用各自比例的标准误：</p>
+  $$ SE=\sqrt{\frac{\hat p_1(1-\hat p_1)}{n_1}+\frac{\hat p_0(1-\hat p_0)}{n_0}},\qquad CI_{95\%}=\hat\Delta\pm1.96\,SE $$
+  <p class="dt-lead">白话：<strong>检验</strong>用合并比例（因为 $H_0$ 假设两组一样），<strong>区间</strong>用各自比例（因为报告时不假设一样）。两者用途不同，别混用。</p>
+
+  <p>设计阶段（实验开始<strong>之前</strong>）先反算样本量。给定基线 $p_0$、期望 $p_1$、显著性 $\alpha$、功效 $1-\beta$：</p>
+  $$ n=\frac{\Bigl(z_{\alpha/2}\sqrt{2\bar p(1-\bar p)}+z_{\beta}\sqrt{p_1(1-p_1)+p_0(1-p_0)}\Bigr)^{2}}{(p_1-p_0)^{2}},\qquad \bar p=\frac{p_0+p_1}{2} $$
+  <p class="dt-lead">白话：想检出的差异 $\Delta$ 越小，$n$ 按 $1/\Delta^{2}$ 膨胀——差异减半，样本量约翻两番，这就是平方反比律。</p>
+
+  <p>反过来，固定 $n$ 能检出的最小效应（MDE）为</p>
+  $$ \mathrm{MDE}\approx(z_{\alpha/2}+z_{\beta})\sqrt{\frac{2\bar p(1-\bar p)}{n}} $$
+  <p class="dt-lead">白话：MDE 是「这台实验机器的分辨率」；业务上想要的效果若小于 MDE，实验必然「无结论」，不如不做。</p>
+
+  <p>几何解释：$\hat\Delta$ 的抽样分布是一口宽度 $\propto1/\sqrt n$ 的钟。$\alpha$ 在零假设的钟上切出两侧拒绝域；功效则是备择假设那口钟落进拒绝域的面积。样本量的作用就是把两口钟都<strong>收窄</strong>，让它们分得更开。</p>
+
+  <h3>2. 编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>定指标</strong>：唯一核心指标（OEC，如完课率）＋护栏指标（崩溃率、客诉率）＋诊断指标，全部写进预登记，事后不换。</li>
+    <li><strong>定设计参数</strong>：MDE $\Delta$、$\alpha=0.05$（双侧）、功效 $1-\beta=0.8$；用历史数据估基线 $p_0$。</li>
+    <li><strong>算样本量</strong>：代入上式得每组 $n$，向上取整；换算天数时至少覆盖一个完整周（星期效应），取「满足 $n$ 且不少于 7 天」。</li>
+    <li><strong>哈希分桶与校验</strong>：$b=\mathrm{hash}(uid+\text{salt})\bmod 100$，桶 0–49 对照、50–99 处理；不同实验层用不同盐。上线前跑 A/A 校验，用卡方检验查 SRM（样本比例失衡），失衡一票否决。</li>
+    <li><strong>跑满周期</strong>：只监控故障与护栏，<strong>不查看显著性</strong>；不因「看起来赢了」提前停止（专题二）。</li>
+    <li><strong>只分析一次</strong>：算 $\hat p_1,\hat p_0,\hat\Delta,SE_0,z$、双侧 $p$、$95\%$ 置信区间；这一步只需四个计数 $n_1,c_1,n_0,c_0$。</li>
+    <li><strong>报告效应量而非只报显著性</strong>：绝对差、相对提升、置信区间、护栏指标、分层一致性；用<strong>区间下界</strong>对比事先约定的业务阈值，而不是只看 $p &lt; 0.05$。</li>
+    <li><strong>处理意外</strong>：存在不依从则另算 ITT 与 CACE；若业务方坚持中途决策，切换到序贯边界或 always-valid $p$ 值。</li>
+  </ol>
+
+  <h3>3. 适用条件</h3>
+  <ul>
+    <li><strong>数据假设</strong>：二值响应、个体级独立随机分流、SUTVA（无溢出、无网络效应）、两组样本独立、无系统性漏报；$n\hat p$ 与 $n(1-\hat p)$ 足够大（经验各至少 10）使正态近似成立。</li>
+    <li><strong>规模</strong>：$n$ 由功效公式决定；共享案例 $n=6000$ 每组，$\mathrm{MDE}\approx2.56$ 个百分点。</li>
+    <li><strong>特征类型</strong>：核心指标为比例或可转为二值；连续指标改用两均值 $t$ 检验或 CUPED 方差缩减。</li>
+    <li><strong>失效边界</strong>：稀有事件或极小样本 → Fisher 精确检验 / Wilson 区间；聚类或网络效应 → 按簇随机 + 簇稳健标准误；不依从 → ITT / CACE；多指标多分层 → 族系误差率校正；$n$ 极大 → 改看效应量与区间（模块 11）。</li>
+    <li><strong>系统链条位置</strong>：处于「评估」环节；上游契约是「采集 / 存储计算」层交付可信的分流日志与埋点，下游契约是「部署运维」层的上线门禁要拿到带区间的效应量，而不是一个 $p$ 值。</li>
+  </ul>
+
+  <div class="complexity">
+    <b>训练（累积计数）</b>：一次扫描 $O(n)$ 得到 $n_1,c_1,n_0,c_0$ 四个整数；
+    <b>推理（算 z / 区间）</b>：$O(1)$；
+    <b>空间</b>：$O(1)$，只存四个计数；
+    <b>分流哈希</b>：每用户 $O(1)$ 时间、$O(1)$ 空间；
+    <b>序贯 / 分层变体</b>：乘以查看次数 $K$ 与层数 $L$，仍为 $O(K L n)$、空间 $O(K L)$；
+    <b>按用户去重</b>：需 $O(n)$ 哈希表。
+  </div>
+  <p class="dt-lead">白话：这是全站最省资源的算法之一——贵的是流量与时间，不是 CPU 和内存。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>随机化给出因果保证，组间差无偏估计 ATE（专题一的结论）。</li>
+        <li>无模型假设、一行公式可手算、平台化成本极低，只需四个计数。</li>
+        <li>功效与样本量可事先规划，实验「做不做得起」在开跑前就能回答。</li>
+        <li>输出天然附带置信区间，可直接对接业务阈值门禁。</li>
+        <li>与分层哈希、CUPED、序贯检验等工程能力可组合叠加。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>只回答「平均有没有差异」，掩盖异质性处理效应（HTE）。</li>
+        <li>对 peeking 极敏感；固定 $\alpha$ 承诺只在单次检验下成立。</li>
+        <li>$n$ 极大时 $p$ 值对无意义差异也显著，产生「假精确」。</li>
+        <li>SUTVA 在社交、双边市场里常被违反，个体级分流会低估全局效果。</li>
+        <li>不依从会把 ITT 稀释成 CACE 的一部分，直接解读会低估真实干预效果。</li>
+        <li>星期效应、 novelty effect、样本比例失衡都需额外校验，公式本身不检测。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>4. 示例推演：手算到底</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>共享案例「学习小组」：处理组 $n_1=6000$，完课 $c_1=3353$；对照组 $n_0=6000$，完课 $c_0=2614$。</div>
+    <div class="solve-step"><span class="ss-k">两组频率。</span>$\hat p_1=3353/6000=0.558833$，$\hat p_0=2614/6000=0.435667$。</div>
+    <div class="solve-step"><span class="ss-k">效应量（ITT / ATE）。</span>$\hat\Delta=0.558833-0.435667=0.123167\approx+0.1232$；相对提升 $=0.123167/0.435667=0.2827$，即约 $28.3\%$。</div>
+    <div class="solve-step"><span class="ss-k">合并比例。</span>$\hat p=(3353+2614)/12000=5967/12000=0.497250$，故 $\hat p(1-\hat p)=0.497250\times0.502750=0.249992$。</div>
+    <div class="solve-step"><span class="ss-k">零假设下的标准误。</span>$SE_0=\sqrt{0.249992\times(1/6000+1/6000)}=\sqrt{8.3331\times10^{-5}}=0.009129$，与共享案例的 $\mathrm{se}=0.009129$ 一致。</div>
+    <div class="solve-step"><span class="ss-k">z 统计量与 p 值。</span>$z=0.123167/0.009129=13.4924$，与共享案例 $z=13.4924$ 一致；双侧 $\log_{10}p\approx-40.76$，即 $p\approx1.74\times10^{-41}$。白话：这个数小到没有实际意义，判断应靠效应量与区间。</div>
+    <div class="solve-step"><span class="ss-k">95% 置信区间。</span>代码实验沿用合并口径：$0.123167\pm1.96\times0.009129=(0.105275,\ 0.141059)$。若按常规用未合并 $SE=\sqrt{0.558833\times0.441167/6000+0.435667\times0.564333/6000}=0.009059$，区间略窄为 $(0.105412,\ 0.140922)$；两者都远离 $0$，结论一致。</div>
+    <div class="solve-step"><span class="ss-k">样本量：算两个根号项。</span>$\bar p=(0.435667+0.558833)/2=0.497250$，$\sqrt{2\bar p(1-\bar p)}=\sqrt{0.499984}=0.707101$，乘 $z_{0.025}=1.959964$ 得 $1.385905$；$\sqrt{p_1(1-p_1)+p_0(1-p_0)}=\sqrt{0.492342}=0.701671$，乘 $z_{0.2}=0.841621$ 得 $0.590509$。</div>
+    <div class="solve-step"><span class="ss-k">代入公式。</span>$n=(1.385905+0.590509)^{2}/0.123167^{2}=3.906207/0.015170=257.5$，向上取整为 <strong>258 人 / 组</strong>。白话：只要约 258 人每组就足以检出 $12.3$ 个百分点这么大的效果；实际用了 6000 人每组，功效实为 $1.000000$（严重过配）。</div>
+    <div class="solve-step"><span class="ss-k">反解 MDE。</span>$\mathrm{MDE}=(1.959964+0.841621)\times\sqrt{2\times0.497250\times0.502750/6000}=2.801585\times0.009129=0.025574$，即 $2.56$ 个百分点。白话：这台实验能可靠看见的最小差异是 2.56pp；若业务只在意 0.5pp，这个设计就白跑了。</div>
+    <div class="solve-step"><span class="ss-k">平方反比律校验。</span>若把想检出的差异减半（$\Delta\to\Delta/2$），$n$ 约变 $4$ 倍（$258\to$ 约 $1030$ 每组，因 $\bar p$ 略变而非精确 4 倍）。这就是「0.5pp 也要看得见」的实验往往要跑很久的原因。</div>
+    <div class="solve-step"><span class="ss-k">peeking 的独立上界。</span>若 10 次查看彼此独立，$1-(1-0.05)^{10}=0.4013$；代码实测累积数据下为 $0.1900$，固定视界为 $0.0467$。白话：上界偏松（因 z 相关），但方向一致——窥探把 $5\%$ 推到近 $20\%$。</div>
+    <div class="solve-step"><span class="ss-k">不依从下的 ITT / CACE。</span>设处理组实际依从率 $0.80$、对照组交叉参与率 $0.10$，则第一阶段 $=0.70$。ITT 就是随机化组间差 $=+0.123167$（不依从不改变 ITT 的无偏性）；$\mathrm{CACE}=\mathrm{ITT}/0.70=0.175952$。白话：CACE 是「依从者」的局部平均处理效应（LATE），成立需排除限制、单调性（无 defiers）、第一阶段不为零三条假设。</div>
+  </div>
+
+  <h3>5. 横向对比：六维口径</h3>
+  <table class="compare-table">
+    <thead><tr><th>维度</th><th>随机化 A/B 两比例 z 检验（本章）</th><th>Fisher 精确检验 / Wilson 区间</th><th>ITT + CACE（工具变量视角）</th><th>序贯检验（alpha-spending / mSPRT）</th></tr></thead>
+    <tbody>
+      <tr><th>适用条件</th><td>二值响应、个体级随机、SUTVA、$n\hat p\ \ge\ 10$、固定视界</td><td>小样本、稀有事件、正态近似不可靠</td><td>存在不依从、需估计「实际接受处理者」的效应</td><td>必须中途查看、样本量与停止时刻事先不确定</td></tr>
+      <tr><th>复杂度</th><td class="best">累积 $O(n)$；判定 $O(1)$；空间 $O(1)$（四个计数）</td><td>需枚举列联表尾部，样本大时阶乘开销高；空间 $O(1)$</td><td>需额外记录实际依从 $D$；估计 $O(n)$，IV 矩计算 $O(1)$</td><td>每查看点 $O(n)$，共 $O(K n)$；空间 $O(K)$ 存边界</td></tr>
+      <tr><th>关键超参</th><td>$\alpha$（0.05）、功效（0.8）、MDE $\Delta$、分流盐、周期（至少 7 天）</td><td>显著性水平、单双侧</td><td>依从率差（第一阶段）、排除限制与单调性假设</td><td>消耗函数 $f(t)$（O'Brien–Fleming 等）、查看时点 $t_k$、总 $\alpha$ 预算</td></tr>
+      <tr><th>优点</th><td class="best">因果保证强、可手算、平台化最省、天然带区间</td><td>小样本下覆盖率精确，不依赖渐近近似</td><td>把「被稀释的效果」还原为 LATE，政策含义清晰</td><td>任意时刻查看仍守住 $\alpha$，可显著缩短实验时长</td></tr>
+      <tr><th>局限与失效边界</th><td>对 peeking 极敏感；大 $n$ 下 $p$ 假精确；SUTVA 易被违反；掩盖 HTE</td><td>大样本下计算不经济；不提供功效 / 样本量规划</td><td>假设不可检验（排除限制、单调性）；第一阶段弱时方差爆炸</td><td>边界需预登记，事后改查看计划即失效；早期边界极严、可能「该停停不了」</td></tr>
+      <tr><th>可解释性与工程成本</th><td class="best">四个计数即可复核，成本最低；但要配套预登记与 SRM 监控</td><td>结果直观，但阶乘枚举不易平台化</td><td>需向业务解释「ITT 与 CACE 哪个是决策口径」，沟通成本中等</td><td>需平台支持消耗函数与边界表，工程成本较高</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="d-code">代码实验 · 两比例 z 检验、未观测混杂平衡、peeking 与 ITT/CACE</h2>
+<p>下面这段纯标准库程序把专题一、专题二与算法详解的每个数字都算了一遍：先复现共享案例的 A/B 检验与功效样本量，再用潜在结果模拟对比「随机化」与「自选择」下的偏差，接着模拟固定视界与反复窥探的假阳性率，最后算不依从下的 ITT / CACE。固定种子，输出可逐字复现。</p>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow">可复现：固定种子 20261107，仅用 math / random</span></div>
+  <pre># -*- coding: utf-8 -*-
+"""m08 代码实验：A/B 检验、功效样本量、未观测混杂平衡、peeking 假阳性、ITT/CACE"""
+import math, random
+
+def Phi(z):
+    return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
+
+def log_two_sided_p(z):
+    # 大 z 时 2(1-Phi(z)) ~ 2*phi(z)/z，取对数避免下溢
+    return (-0.5*z*z - math.log(z) - 0.5*math.log(2*math.pi) + math.log(2.0))
+
+# ---- 1) 共享案例的两比例 z 检验 ----
+nt, ct = 6000, 3353
+nc, cc = 6000, 2614
+pt, pc = ct/nt, cc/nc
+ate = pt - pc
+pbar = (ct + cc)/(nt + nc)
+se = math.sqrt(pbar*(1-pbar)*(1/nt + 1/nc))
+z = ate/se
+lo, hi = ate - 1.96*se, ate + 1.96*se
+print("[1] 随机化 A/B 检验（知学云 · 学习小组）")
+print("    treatment : %d/%d = %.6f" % (ct, nt, pt))
+print("    control   : %d/%d = %.6f" % (cc, nc, pc))
+print("    ATE(ITT)  : %+.6f" % ate)
+print("    pooled p  : %.6f   se = %.6f" % (pbar, se))
+print("    z         : %.4f" % z)
+print("    95%% CI    : [%+.6f, %+.6f]" % (lo, hi))
+print("    log10(p)  : %.2f  (双侧 p 约 %.2e)" % (log_two_sided_p(z)/math.log(10), math.exp(log_two_sided_p(z))))
+
+# ---- 2) 功效 / 样本量 / 最小可检测效应 ----
+za, zb = 1.959964, 0.841621     # z_{alpha/2}, z_beta (双侧 0.05、功效 0.80)
+delta = pt - pc
+pbar2 = (pt + pc)/2
+term = za*math.sqrt(2*pbar2*(1-pbar2)) + zb*math.sqrt(pt*(1-pt) + pc*(1-pc))
+n_req = term**2/delta**2
+se_n = math.sqrt(2*pbar2*(1-pbar2)/6000)
+mde = (za + zb)*se_n
+power_n = Phi(delta/se - za) + Phi(-delta/se - za)
+print("[2] 功效 / 样本量")
+print("    delta=%.6f  检测它所需 n/组 = %.1f -&gt; %d" % (delta, n_req, math.ceil(n_req)))
+print("    n=6000/组时 se=%.6f  MDE(功效0.8) = %.6f (%.2f pp)" % (se_n, mde, 100*mde))
+print("    实际功效(检出 %.4f) = %.6f" % (delta, power_n))
+
+# ---- 3) 未观测混杂 U：随机化 vs 自选择 ----
+def simulate(mode, seed=20261107, n=20000):
+    r = random.Random(seed)
+    yt, yc, ut, uc = 0.0, 0.0, 0.0, 0.0
+    nt_, nc_ = 0, 0
+    for i in range(n):
+        u = r.random()                       # 未观测混杂：学习动机/能力
+        y0 = 10.0 + 5.0*u + r.gauss(0, 1)    # 潜在结果 Y(0)
+        y1 = y0 + 2.0                        # 个体效应恒为 2 -&gt; 真 ATE = 2
+        if mode == "random":
+            zz = 1 if r.random() &lt; 0.5 else 0
+        else:
+            prob = 0.9 if u &gt; 0.5 else 0.1   # 高 U 的人更可能进处理组
+            zz = 1 if r.random() &lt; prob else 0
+        if zz == 1:
+            nt_ += 1; yt += y1; ut += u
+        else:
+            nc_ += 1; yc += y0; uc += u
+    return yt/nt_ - yc/nc_, ut/nt_ - uc/nc_
+
+print("[3] 潜在结果模拟（n=20000，真 ATE=2，U 未被记录）")
+for mode in ("random", "select"):
+    d, b = simulate(mode)
+    print("    %-6s naive diff=%.4f  bias=%+.4f  U(处理-对照)=%+.4f" % (mode, d, d-2.0, b))
+
+# ---- 4) peeking：固定视界 vs 每步偷看 ----
+def run_peek(reps=1500, peeks=10, per=100, seed=20261107):
+    r = random.Random(seed)
+    fixed, ever_any = 0, 0
+    for rep in range(reps):
+        st, sc, nt_, nc_ = 0, 0, 0, 0
+        ever = False
+        for k in range(peeks):
+            for _ in range(per):
+                st += 1 if r.random() &lt; 0.5 else 0
+                sc += 1 if r.random() &lt; 0.5 else 0
+            nt_ += per; nc_ += per
+            pt_, pc_ = st/nt_, sc/nc_
+            pb = (st + sc)/(nt_ + nc_)
+            s = math.sqrt(pb*(1-pb)*(1/nt_ + 1/nc_)) if 0 &lt; pb &lt; 1 else 0.0
+            zz = (pt_ - pc_)/s if s &gt; 0 else 0.0
+            if abs(zz) &gt; 1.96:
+                ever = True
+            if k == peeks - 1 and abs(zz) &gt; 1.96:
+                fixed += 1
+        if ever:
+            ever_any += 1
+    return fixed/reps, ever_any/reps
+
+f, p = run_peek()
+print("[4] H0 下 1500 次模拟，10 次窥探，每次每组新增 100 人（真实 p=0.5）")
+print("    固定视界(只最后一次检验) 假阳性率 = %.4f" % f)
+print("    每次都检验(peeking) 假阳性率      = %.4f" % p)
+
+# ---- 5) 不依从：ITT 与 CACE ----
+take_t, take_c = 0.80, 0.10
+first = take_t - take_c
+cace = ate/first
+print("[5] 不依从下的 ITT / CACE")
+print("    ITT(意向处理效应) = %+.6f" % ate)
+print("    依从率 Z=1: %.2f  Z=0: %.2f  第一阶段 = %.2f" % (take_t, take_c, first))
+print("    CACE = ITT / 第一阶段 = %+.6f" % cace)
+</pre>
+  <div class="run-output">
+    <div class="ro-head">真实运行输出（python3 直接执行上方代码所得 stdout）</div>
+    <pre>[1] 随机化 A/B 检验（知学云 · 学习小组）
+    treatment : 3353/6000 = 0.558833
+    control   : 2614/6000 = 0.435667
+    ATE(ITT)  : +0.123167
+    pooled p  : 0.497250   se = 0.009129
+    z         : 13.4924
+    95% CI    : [+0.105275, +0.141059]
+    log10(p)  : -40.76  (双侧 p 约 1.74e-41)
+[2] 功效 / 样本量
+    delta=0.123167  检测它所需 n/组 = 257.5 -&gt; 258
+    n=6000/组时 se=0.009129  MDE(功效0.8) = 0.025574 (2.56 pp)
+    实际功效(检出 0.1232) = 1.000000
+[3] 潜在结果模拟（n=20000，真 ATE=2，U 未被记录）
+    random naive diff=1.9793  bias=-0.0207  U(处理-对照)=-0.0083
+    select naive diff=3.9618  bias=+1.9618  U(处理-对照)=+0.3964
+[4] H0 下 1500 次模拟，10 次窥探，每次每组新增 100 人（真实 p=0.5）
+    固定视界(只最后一次检验) 假阳性率 = 0.0467
+    每次都检验(peeking) 假阳性率      = 0.1900
+[5] 不依从下的 ITT / CACE
+    ITT(意向处理效应) = +0.123167
+    依从率 Z=1: 0.80  Z=0: 0.10  第一阶段 = 0.70
+    CACE = ITT / 第一阶段 = +0.175952</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">3353/6000 = 0.558833 与 2614/6000 = 0.435667</span>是共享案例两组完课率；差 $+0.123167$（约 $+0.1232$）就是随机化下的 ITT，也是专题一里 $E[Y\mid T=1]-E[Y\mid T=0]$ 的样本版本。改分流比例或埋点漏报会让这两个数变化，进而触发 SRM 校验。</p>
+    <p><span class="ci-k">0.497250 / 0.009129 / 13.4924</span>依次是合并比例、零假设下的标准误与 z 统计量，与站点共享案例的 $z=13.4924$、$\mathrm{se}=0.009129$ 严格一致。$\log_{10}p=-40.76$ 对应 $p\approx1.74\times10^{-41}$：它小到只是「差异不太像噪声」，并不说明效果值不值得上线，判断要落到 $+0.1232$ 与区间 $[+0.105275,+0.141059]$ 上。</p>
+    <p><span class="ci-k">257.5 -&gt; 258</span>是功效公式对 $\Delta=0.123167$ 反解出的每组样本量；实际 $6000$ 每组使功效达到 $1.000000$，MDE 降到 $0.025574$（$2.56$ pp）。白话：效果太大时实验「过配」了；若把想检出的 $\Delta$ 减半，按 $1/\Delta^2$ 规律 $n$ 约翻两番。这两个数会随 $\alpha$、功效、基线 $p_0$ 改变，但平方反比的方向不变。</p>
+    <p><span class="ci-k">random: bias=-0.0207, U 差=-0.0083</span>对 <span class="ci-k">select: bias=+1.9618, U 差=+0.3964</span>是专题一的核心证据。真 ATE 恒为 $2$；随机分配下未观测 $U$ 的组均值差只有 $-0.0083$（随机波动），估计 $1.9793$ 几乎无偏；自选择下 $U$ 差达 $+0.3964$，乘系数 $\gamma=5$ 得约 $+1.98$ 的选择偏差，估计被推到 $3.9618$。样本量同为 20000，偏差却只出现在自选择那一列——证明随机化平衡的是<strong>未观测</strong>变量。</p>
+    <p><span class="ci-k">0.0467 vs 0.1900</span>是专题二的量化结论：同一批 $H_0$ 模拟，只在最后一次检验的假阳性率约 $5\%$，每次都检验则约 $19\%$（约 $4$ 倍）。它低于独立检验上界 $1-0.95^{10}=0.4013$，因为累积数据的 z 高度相关；窥探次数 $K$、每次新增样本量、重复次数都会改变末位数字，但「固定视界约 $\alpha$、窥探显著更高」的定性关系稳定。</p>
+    <p><span class="ci-k">ITT=+0.123167, 第一阶段=0.70, CACE=+0.175952</span>：ITT 不受不依从影响（分配仍是随机的），CACE 把它除以依从率差还原为依从者的 LATE。第一阶段越接近 $0$，CACE 方差越大；若处理组依从率降到与对照组相同，分母为 $0$，CACE 不可识别——这正是把「第一阶段不为零」列为关键假设的原因。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>随机化 A/B 检验用两组完课计数估计平均处理效应 $\Delta=p_1-p_0$，给出 z 统计量、双侧 $p$ 值与 $95\%$ 置信区间，并在开跑前反算所需样本量与可检测最小效应（MDE）。它<strong>不</strong>估计异质性处理效应，也<strong>不</strong>自动判断业务价值；后者需要效应量对业务阈值的比较。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：四个整数计数 $n_1,c_1,n_0,c_0$（量纲：人数）、设计参数 $\alpha$、功效、MDE、基线率、分流盐与预登记分析计划。输出：$\hat p_1,\hat p_0,\hat\Delta$（无量纲比例差）、$SE_0$、$z$、双侧 $p$、$95\%$ 区间、每组所需 $n$、MDE、功效；存在不依从时增量输出 ITT 与 CACE。</td></tr>
+    <tr><th>适用场景</th><td>产品改版、算法上线、教学干预等可随机分流的二值指标决策；需要因果结论而非相关结论；实验平台做容量规划（流量与天数）；共享案例「学习小组」对完课率的效应评估。</td></tr>
+    <tr><th>关键参数</th><td>显著性 $\alpha$（默认 0.05 双侧）、功效 $1-\beta$（默认 0.8，$z_{0.2}=0.841621$）、MDE $\Delta$（最敏感，按 $1/\Delta^2$ 放大样本量）、基线率 $p_0$、分流哈希盐、实验周期（至少覆盖 7 天）、SRM 卡方阈值 $\chi^{2}_{0.05,1}=3.84$。调参方向：MDE 定得越保守，所需流量越大但「无结论」风险越低。</td></tr>
+    <tr><th>边界条件</th><td>在 SUTVA 被违反（社交 / 双边市场溢出）、存在不依从而 $D\ne T$、分流与用户特征相关、样本量未达预定值却反复窥探、或多个指标多层同时检验却未校正时，本方法不适用，应分别改用按簇随机与 switchback、ITT / CACE、修复分流器后重跑 A/A、序贯检验（alpha-spending / always-valid $p$ 值）、以及 Bonferroni / Holm 或预先指定唯一核心指标。</td></tr>
+    <tr><th>常见问题</th><td>第一，把「显著」当成「值得上线」，忽略 $n$ 极大时 $p$ 值对微小差异也敏感；第二，显著就提前停止，触发 peeking 膨胀；第三，把相对提升（$28.3\%$）当绝对差（$+0.1232$）代进样本量公式，差一个量级；第四，只看整体不看分层与护栏指标，漏掉异质性与体验恶化。详见下方常见问题。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>$z=13.4924$、$p\approx10^{-41}$，是不是效果特别大、一定要全量上线？</summary><div class="faq-a">$z$ 大只说明「差异远大于噪声」，而噪声随 $n$ 以 $1/\sqrt n$ 收缩。真正决定上线的是效应量与成本：$+0.1232$ 的绝对提升、$28.3\%$ 的相对提升、区间 $[+0.1053,+0.1411]$ 的下界是否越过业务阈值，以及护栏指标是否恶化。模块 11 会进一步说明，在千万级样本上一个 0.05 个百分点的小改进也能给出极小的 $p$ 值，那时「显著」几乎没有决策价值。</div></details>
+  <details><summary>随机化不是让两组「一模一样」吗？为什么代码里 U 均值还差 -0.0083？</summary><div class="faq-a">随机化给的是<strong>期望意义上</strong>的平衡，不是逐次精确相等。单次实验里 $\bar U_T-\bar U_C$ 是随机变量，$E=0$、$\mathrm{Var}=\sigma_U^2(1/n_T+1/n_C)$，所以会有 $\pm$ 量级为 $1/\sqrt n$ 的波动。代码里 $-0.0083$ 就是 20000 个样本下的一个小波动；自选择那一列 $+0.3964$ 则是系统性偏差，不随 $n$ 消失。二者性质完全不同。</div></details>
+  <details><summary>代码里 10 次窥探的假阳性率是 0.1900，为什么不是 $1-0.95^{10}=0.4013$？</summary><div class="faq-a">因为 $0.4013$ 假设 10 次检验<strong>彼此独立</strong>，但 A/B 测试是累积数据：第 $k$ 次的 z 用前 $k$ 批全部样本算，相邻时点高度相关。正确的判定对象是 $\max_k|Z_k|$ 的分布，而非 $K$ 个独立 $Z$。相关性把膨胀「压回」到 0.1900，但仍是固定视界 0.0467 的约 4 倍。窥探越频繁、每次新增样本越少，相关性越强，实际膨胀越接近连续时间布朗运动的越界概率。</div></details>
+  <details><summary>产品经理要求「第 3 天显著就全量」，除了 peeking 还有什么反对理由？</summary><div class="faq-a">至少还有三条：第一，未达预定样本量与完整周期，工作日 / 周末行为差异（星期效应）尚未覆盖，样本不具代表性；第二，早期 novelty effect（新功能新鲜感）会虚高短期指标；第三，护栏指标（客诉率、加载时长）与分层一致性还没跑够。合规替代是：跑满预定样本与周期后只分析一次；若必须早停，改用预先登记的序贯边界或 always-valid $p$ 值。</div></details>
+  <details><summary>ITT 和 CACE 该报哪个？共享案例里为什么 CACE 比 ITT 大？</summary><div class="faq-a">决策口径取决于问题：问「发邀请这个动作值不值得做」报 ITT（$+0.1232$，它保留了不依从、可直接对应政策）；问「真正参加学习小组的人效果有多大」报 CACE（$+0.175952$）。CACE $=\mathrm{ITT}/0.70$ 更大，因为只有 70% 的净依从率把 ITT 稀释了。CACE 是 LATE，成立依赖排除限制、单调性与第一阶段非零，不能外推到全体学员。</div></details>
+  <details><summary>把 A/B 检验放进「采集 → 存储计算 → 建模 → 评估 → 部署运维」链条，上下游契约是什么？</summary><div class="faq-a">它站在<strong>评估</strong>环节。上游契约：采集 / 存储计算层必须交付「分流单位 = 分析单位」的确定性哈希日志、无漏报的埋点、可复现的盐与版本；否则 SRM 或伪重复会直接污染四个计数。下游契约：部署运维层的上线门禁要拿到带置信区间的效应量与护栏结论，而不是一个 $p$ 值；实验元数据（MDE、预定样本量、查看时点）必须随结果一起归档，才能事后审计有没有 peeking。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">随机化之所以能平衡<strong>未观测</strong>混杂 $U$，最准确的说法是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 它让两组每个个体的 $U$ 取值完全相等</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 它让分配 $T$ 与 $(Y(0),Y(1),X,U)$ 独立，选择偏差项的期望为 0</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 样本量足够大时 $U$ 的影响会被平均掉，与分配方式无关</label>
+    </div>
+    <div class="quiz-feedback" data-explain="随机化不要求逐个体相等，只要求 T 独立；由此 E[Y|T=1]=E[Y(1)]、E[Y|T=0]=E[Y(0)]，组间差无偏估计 ATE。剩余不平衡是方差且按 1/√n 收缩。C 错在「与分配方式无关」：自选择下偏差不随 n 消失。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">共享案例处理组 3353/6000、对照组 2614/6000，合并比例与 z 统计量分别是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 0.4973 与 1.96</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 0.5588 与 13.4924</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 0.497250 与 13.4924</label>
+    </div>
+    <div class="quiz-feedback" data-explain="合并比例 p̄=(3353+2614)/12000=5967/12000=0.497250；SE₀=√[p̄(1-p̄)·2/6000]=0.009129；z=0.123167/0.009129=13.4924，与站点共享案例数字一致。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">代码模拟里 10 次窥探假阳性率 0.1900，而固定视界 0.0467，主因是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 判定对象从单个 $Z_K$ 变成了 $\max_k|Z_k|$，拒绝机会变多</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 每次窥探都新增了 100 个真实有效的处理效应</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 卡方检验在窥探时失效了</label>
+    </div>
+    <div class="quiz-feedback" data-explain="窥探把一次检验变成 K 次，真正被检验的是 z 过程的最大值；用只适用于单点的临界值 1.96 去卡最大值必然过松。B 错在 H₀ 下真实效应恒为 0；C 与本题无关。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">要允许实验中途查看并早停，正确做法是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 把显著性水平偷偷改成 0.005 继续用 1.96 判定</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 预先登记 alpha-spending 消耗函数或 always-valid p 值，用时变临界值</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 只在最后一次窥探时记录 p 值，其余几次不写入实验日志</label>
+    </div>
+    <div class="quiz-feedback" data-explain="序贯方法把总 α 当预算分批花（如 O'Brien–Fleming 消耗函数），或用似然比鞅给出任意时刻有效的 p 值，从而在任意停止时刻守住 α。A、C 都是事后补救，不恢复固定视界的覆盖率承诺。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">处理组依从率 0.80、对照组交叉率 0.10、ITT=+0.123167，则 CACE 约为？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. +0.123167</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. +0.086217</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. +0.175952</label>
+    </div>
+    <div class="quiz-feedback" data-explain="第一阶段 = 0.80 − 0.10 = 0.70；CACE = ITT / 0.70 = 0.123167/0.70 = 0.175952。它是依从者的 LATE，比 ITT 大是因为不依从把意向效应稀释了。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>

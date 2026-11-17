@@ -1,0 +1,200 @@
+/* ==========================================================================
+   base.css — 基础排版与元素默认样式
+   ========================================================================== */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg { max-width: 100%; display: block; }
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: var(--sp-6) 0;
+}
+
+/* ---------- 标题 ---------- */
+h1, h2, h3, h4, h5, h6 {
+  margin: 1.7em 0 0.6em;
+  line-height: var(--lh-tight);
+  font-weight: 700;
+  color: var(--text);
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+h1:first-child, h2:first-child, h3:first-child { margin-top: 0; }
+
+h1 { font-size: var(--fs-2xl); letter-spacing: -0.015em; }
+h2 {
+  font-size: var(--fs-xl);
+  padding-bottom: 0.35em;
+  border-bottom: 2px solid var(--brand-line);
+}
+h3 { font-size: var(--fs-lg); }
+h4 { font-size: var(--fs-md); }
+h5 { font-size: var(--fs-base); }
+h6 { font-size: var(--fs-sm); color: var(--text-2); }
+
+/* ---------- 段落与列表 ---------- */
+p { margin: 0.85em 0; }
+
+ul, ol { margin: 0.8em 0; padding-left: 1.5em; }
+li { margin: 0.35em 0; }
+li > ul, li > ol { margin: 0.25em 0; }
+
+blockquote {
+  margin: var(--sp-5) 0;
+  padding: var(--sp-3) var(--sp-5);
+  border-left: 4px solid var(--brand);
+  background: var(--brand-soft);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text-2);
+}
+blockquote p:first-child { margin-top: 0; }
+blockquote p:last-child  { margin-bottom: 0; }
+
+/* ---------- 行内代码与代码块 ---------- */
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+code {
+  background: var(--bg-code);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.12em 0.38em;
+  word-break: break-word;
+}
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--sp-4);
+  overflow-x: auto;
+  line-height: 1.6;
+}
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 0.85rem;
+}
+kbd {
+  background: var(--bg-panel);
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0.08em 0.4em;
+  font-size: 0.8em;
+  color: var(--text-2);
+}
+
+/* ---------- 表格 ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--sp-5) 0;
+  font-size: var(--fs-sm);
+  background: var(--bg-panel);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: table;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  padding-bottom: var(--sp-2);
+  font-weight: 600;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 0.6em 0.85em;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--bg-inset);
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+tbody tr:nth-child(even) td { background: var(--bg-inset); }
+tbody tr:hover td { background: var(--brand-soft); }
+
+.table-wrap {
+  overflow-x: auto;
+  margin: var(--sp-5) 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+}
+.table-wrap table {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+.table-wrap th, .table-wrap td { border-left: 0; border-right: 0; }
+
+/* ---------- 数学公式 ---------- */
+.katex { font-size: 1.06em; }
+.katex-display {
+  margin: 1.1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35em 0;
+}
+body[data-theme="dark"] .katex { color: var(--text); }
+
+/* ---------- 选中 / 焦点 ---------- */
+::selection {
+  background: var(--brand);
+  color: var(--brand-on);
+}
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ---------- 滚动条 ---------- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 6px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* ---------- 打印 ---------- */
+@media print {
+  .site-header, .sidebar, .toc, .module-nav, .progress-bar,
+  .back-top, .search-overlay, .no-print { display: none !important; }
+  .content { margin: 0 !important; }
+  body { background: #fff; }
+}

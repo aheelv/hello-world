@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>11 · 大数据分析的统计基础 · 统计 · 智能学习体系</title>
+<meta name="description" content="大数据分析的统计基础：大样本下 p 值失效与效应量、蓄水池抽样、MapReduce/Spark 可合并统计量、分治合并方差与数值稳定性、列式存储与谓词下推、事件时间水位线与窗口、Bloom Filter/HyperLogLog/Count-Min Sketch 误差界、大规模 A/B 分流与数据质量。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m11" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 2 · <a href="../stages/big-data.html">大数据分析</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l3">L3 进阶</span> · 10 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 01–05 + SQL · 上一篇：<a href="m08-experiment.html">08 · 实验设计与因果推断</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m09-ml-stats.html">09 · 机器学习的统计基础</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m07-bayesian.html">07 贝叶斯统计与计算</a><span class="dep-arrow">→</span><a class="dep-node" href="m08-experiment.html">08 实验设计与因果推断</a><span class="dep-arrow">→</span><a class="dep-node current" href="m11-big-data.html">11 大数据分析的统计基础</a><span class="dep-arrow">→</span><a class="dep-node" href="m09-ml-stats.html">09 机器学习的统计基础</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：可合并统计量, 充分统计量, MapReduce, 列式存储, 流式窗口, 草图算法, HyperLogLog, 数据倾斜</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>哪些统计量可以「分块算完再合并」，哪些不行？ <a class="q-anchor" href="#s3">→ 对应讲解</a></li><li>n 极大时 p 值为什么会系统性失效，应该改看什么？ <a class="q-anchor" href="#s2">→ 对应讲解</a></li><li>HyperLogLog / Count-Min Sketch 的误差保证分别是什么类型？ <a class="q-anchor" href="#s6">→ 对应讲解</a></li><li>流式窗口与批式重算，在指标口径上为什么容易打架？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+      <article class="module" data-stage="s2">
+      <div class="inner">
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/big-data.html">阶段 2 · 大数据分析</a> / 11 · 大数据分析的统计基础</div>
+        <h1>11 · 大数据分析的统计基础</h1>
+        <p class="lead">本章把统计推断放进分布式与流式系统里重新审视：当样本量接近可观测总体、数据不再独立同分布、计算必须跨机器分治、结果必须在无界数据流上持续更新时，教科书里的估计量、检验与置信区间要怎样改写才仍然可信。线索是「规模改变了什么 → 抽样新形态 → 计算模型 → 可合并统计量 → 存储 → 流式 → 近似 → 实验与质量」。</p>
+        <div class="module-meta">
+          <span class="badge brand">阶段 2 · 大数据分析</span>
+          <span class="badge info">L3 进阶</span>
+          <span class="badge">10 学时</span>
+          <span class="badge">前置：模块 01–05 + SQL</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>解释大样本下 p 值为何「失效」，改用效应量、置信区间与序贯检验来报告结论</li>
+          <li>判断统计量能否在 map / shuffle / reduce 中可合并，并写出并行方差的分治合并式</li>
+          <li>依据列式存储、分区与谓词下推估算聚合作业的 I/O 与网络 shuffle 成本</li>
+          <li>用事件时间、水位线与窗口语义处理迟到数据，说明精确一次语义的成立条件</li>
+          <li>为去重、基数与频次估计选择近似算法并给出误差界，设计正交分层分流与护栏指标</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 规模改变了什么</h2>
+
+      <h3 id="s1-1">1.1 直觉：从「小切片」到「全量」</h3>
+      <p>经典推断的默认画面是：样本是总体的一个<strong>可忽略的小切片</strong>，样本量 $n$ 远小于总体 $N$，观测独立同分布（i.i.d.），测量误差无系统方向。大数据把这四个前提逐一松动：$n$ 接近甚至等于可观测总体；日志由同一用户反复产生而高度相关；埋点与采集管线自带选择偏差；分布式计算又要求统计量能被切开再拼回。</p>
+
+      <h3 id="s1-2">1.2 p 值的规模陷阱</h3>
+      <p>两比例检验的标准误约为 $\sqrt{p(1-p)(1/n_1+1/n_2)}$，随 $n$ 以 $1/\sqrt{n}$ 收缩。于是只要 $n$ 足够大，任何非零的微小差异都会产生很小的 p 值——<strong>p 值度量的是「与零假设的相容程度」，不是「效果有多大」</strong>。当 $n\to\infty$，点估计的标准误趋于 0，置信区间趋于一个点，而系统偏差不会因此消失。</p>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>小样本</th><th>大样本</th></tr></thead><tbody>
+        <tr><td>标准误</td><td>较大，区间宽</td><td>极小，区间窄到「假精确」</td></tr>
+        <tr><td>p 值行为</td><td>只有较大差异才显著</td><td>业务上无意义的差异也显著</td></tr>
+        <tr><td>主导误差</td><td>方差（随机噪声）</td><td>偏差与数据质量（系统性）</td></tr>
+        <tr><td>该报告什么</td><td>显著性 + 区间</td><td><strong>效应量</strong> + 区间 + 业务阈值 + 成本</td></tr>
+      </tbody></table></div>
+
+      <h3 id="s1-3">1.3 i.i.d. 假设松动与有效样本量</h3>
+      <p>同一用户的多次曝光、爬虫重复抓取、设备共享、时间自相关，都让观测不再独立。若每个簇有 $m$ 条相关记录、组内相关系数 $\rho$，有效样本量大约为</p>
+      <p>$$ n_{eff}\approx\frac{n}{1+(m-1)\rho} $$</p>
+      <p>它远小于名义 $n$。用名义 $n$ 去算标准误，会把区间压得过窄、把 p 值算得过小——这是大日志上「显著得离谱」的常见技术原因。工程上应按<strong>用户 / 会话</strong>去重或做簇稳健标准误。</p>
+
+      <h3 id="s1-4">1.4 偏差被放大，效应量才是答案</h3>
+      <p>均方误差分解为 $\mathrm{MSE}=\mathrm{Bias}^{2}+\mathrm{Var}$。增大 $n$ 只压 $\mathrm{Var}$，对 $\mathrm{Bias}$ 毫无作用；偏差反而因为区间变窄而显得<strong>更「确信」</strong>。因此大数据结论必须同时给出：绝对差、相对提升、置信区间、最小可检测效应（MDE），以及一个事先约定的业务阈值。Cohen's $h$、优势比、分位数差都是比 p 值更稳健的效应量。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 11.1</span>
+          <span class="ex-title">大样本 p 值辨析：显著就一定值得上线吗</span>
+        </div>
+        <div class="example-body">
+          <p>某按钮文案实验：对照组 $n_1=1\,000\,000$，转化 100 000（$p_1=0.1000$）；实验组 $n_2=1\,000\,000$，转化 101 000（$p_2=0.1010$）。① 做两比例 z 检验，求合并比例、标准误、z 值与双侧 p 值；② 给出提升的 95% 置信区间与相对提升；③ 判断「p 值显著」是否等于「应该全量上线」；④ 若同一用户平均曝光 $m=5$ 次、$\rho=0.3$，有效样本量大约是多少，结论会怎样变。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：合并比例与标准误</strong></p>
+              $$ \bar p=\frac{100000+101000}{2\,000\,000}=0.1005 $$
+              $$ SE=\sqrt{\bar p(1-\bar p)\Bigl(\frac{1}{n_1}+\frac{1}{n_2}\Bigr)}=\sqrt{0.09040\times 2\times 10^{-6}}\approx 4.25\times 10^{-4} $$
+              <p><strong>第二步：z 值与 p 值</strong></p>
+              $$ z=\frac{0.1010-0.1000}{4.25\times 10^{-4}}\approx 2.35,\qquad p_{\text{双侧}}\approx 0.0187 &lt; 0.05 $$
+              <p>统计上显著。但先看效应量再下结论。</p>
+              <p><strong>第三步：效应量与区间</strong></p>
+              $$ \Delta=0.0010,\qquad \text{95\% CI}=0.0010\pm 1.96\times 4.25\times 10^{-4}\approx[0.00017,\ 0.00183] $$
+              <p>即绝对提升约 0.10 个百分点（区间 0.017–0.183 pp），相对提升仅 $\Delta/p_1=1\%$，Cohen's $h\approx 0.003$（几乎为 0）。</p>
+              <p><strong>第四步：业务判断</strong></p>
+              <p>「显著」只说明差异不太可能纯由抽样噪声产生。若全量上线需改动埋点、客服话术与合规评审，固定成本远高于 1% 相对提升带来的收益，则<strong>不该上线</strong>。正确做法是事先声明 MDE 与收益阈值，把决策建立在区间下界是否越过业务阈值上，而不是 $p &lt; 0.05$。</p>
+              <p><strong>第五步：相关性修正</strong></p>
+              $$ n_{eff}\approx\frac{10^{6}}{1+(5-1)\times 0.3}=\frac{10^{6}}{2.2}\approx 4.5\times 10^{5} $$
+              <p>有效样本量只剩约 45 万，标准误放大约 $\sqrt{2.2}\approx 1.48$ 倍，$z$ 降到约 $1.59$，双侧 p 值约 $0.11$——<strong>连统计显著性都不成立</strong>。这提示：日志行数不等于独立样本数，先按用户去重、用簇稳健标准误，再谈显著性。</p>
+              <p><strong>易错提示：</strong>① 把 $p &lt; 0.05$ 读成「效果大、值得做」；② 用曝光行数当样本量，忽略同一用户多次曝光带来的相关性，标准误被系统性低估；③ 实验期间反复查看 p 值、见到显著就停（提前窥探），真实一类错误率远高于 5%；④ 只报相对提升不报绝对量与区间，容易被小基数放大成「暴涨」。</p>
+              <p><strong>应用关联：</strong>大规模实验平台普遍以「MDE + 护栏指标 + 序贯检验」代替一次性 p 值；报告模板强制同时给绝对差、相对差、置信区间与样本量口径。把同一套「效应量优先」的思维迁移到模型离线评估，正是模块 09 强调的「小样本评估必带区间」。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ①：用「全量数据」不等于用「随机样本」
+        </div>
+        <p>日志全量只覆盖<strong>被系统记录到的行为</strong>：未登录用户、被广告拦截的请求、加载失败的事件都系统性缺失。这类覆盖偏差不会因 $n$ 变大而减小，反而因为置信区间变窄而被「精确地固化」。任何「全量即真相」的说法都应先问：谁没被记录、记录口径是否随时间变过。</p>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 抽样在大数据的新形态</h2>
+
+      <h3 id="s2-1">2.1 蓄水池抽样</h3>
+      <p>数据流长度 $N$ 事先未知且只能顺序读一遍时，要等概率抽出 $k$ 条样本，用<strong>蓄水池抽样</strong>：前 $k$ 条直接入池；第 $i$ 条（$i &gt; k$）以概率 $k/i$ 入选，并等概率替换池中一条。</p>
+      <p>$$ P(\text{第 } i \text{ 条最终在池中})=\frac{k}{i}\prod_{j=i+1}^{N}\Bigl(1-\frac{1}{j}\Bigr)=\frac{k}{i}\cdot\frac{i}{N}=\frac{k}{N} $$</p>
+      <p>关键在连乘 $\prod_{j=i+1}^{N}(j-1)/j=i/N$（望远镜相消）：无论先后，每条记录被保留的概率都恰为 $k/N$，因此样本是均匀的。</p>
+
+      <h3 id="s2-2">2.2 分层抽样与系统抽样</h3>
+      <ul>
+        <li><strong>分层抽样</strong>：按时间片、地域、设备、用户活跃度分层，层内按比例抽；对稀有层可<strong>过采样</strong>并事后加权还原，避免小层被淹没。</li>
+        <li><strong>系统抽样</strong>：排序后每隔 $h$ 条取一条，实现简单、覆盖均匀；风险是抽样间隔与数据的隐藏周期（如每小时整点、每周一）共振，产生周期偏差——应先随机起点或打乱。</li>
+        <li><strong>一致性哈希抽样</strong>：对 $\mathrm{hash}(uid) &lt; \theta$ 取样本，保证同一用户「要么全进、要么全不进」，这对用户级指标尤其重要。</li>
+      </ul>
+
+      <h3 id="s2-3">2.3 样本代表性比样本量更重要</h3>
+      <p>一个 1000 万的偏移样本，比一个 1 万的分层随机样本更糟：前者能以极窄的区间给出一个错得很稳定的结论。抽样设计要先回答「总体是什么、谁被漏掉、各层权重是多少」，再谈抽多少。覆盖率、无回答率、口径变更都应随样本一起记录。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 11.2</span>
+          <span class="ex-title">蓄水池抽样的等概率验证</span>
+        </div>
+        <div class="example-body">
+          <p>数据流共 $N=10$ 条记录，蓄水池容量 $k=3$。① 求任意一条记录最终被保留的概率；② 单独验证第 7 条记录被选中并保留到末尾的概率；③ 说明为什么「取最先到达的前 1000 条」不是均匀样本。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：通用结论</strong></p>
+              $$ P=\frac{k}{N}=\frac{3}{10}=0.3 $$
+              <p><strong>第二步：第 7 条记录（$i=7 &gt; k$）</strong></p>
+              <p>它先以 $k/i=3/7$ 的概率入池；此后 $j=8,9,10$ 每一步被替换的概率是 $\frac{k}{j}\cdot\frac{1}{k}=\frac{1}{j}$，故不被替换的概率连乘为</p>
+              $$ \prod_{j=8}^{10}\Bigl(1-\frac{1}{j}\Bigr)=\frac{7}{8}\cdot\frac{8}{9}\cdot\frac{9}{10}=\frac{7}{10} $$
+              $$ P(\text{第 7 条保留})=\frac{3}{7}\times\frac{7}{10}=\frac{3}{10}=0.3 $$
+              <p>与第 1 条（前 $k$ 条，直接入池后只承受 $j=4,\dots,10$ 的替换风险，连乘为 $3/10$）完全一致，验证了均匀性。</p>
+              <p><strong>第三步：为什么「取前 1000 条」不行</strong></p>
+              <p>前 1000 条只覆盖数据流<strong>最开始的一段时间</strong>：若流量存在昼夜高峰、版本灰度或活动投放，这批记录的时间、地域、用户构成与全天总体系统性不同；且它与「到达顺序」强相关，无法给出任何一条记录被抽中的已知概率。均匀性要求的是「每条记录以相同概率入样」，而不是「 conveniently 取一段」。</p>
+              <p><strong>易错提示：</strong>① 把「按时间截取」当作随机抽样；② 蓄水池里替换时没有等概率挑池中位置，会破坏均匀性；③ 对用户级指标按<strong>事件</strong>抽样，导致重度用户被过度代表，应先按 $uid$ 一致性哈希再抽。</p>
+              <p><strong>应用关联：</strong>日志采样、离线调试集构造、流式 A/A 校验都用蓄水池或一致性哈希抽样；Spark 的 <code>sample</code> 与 <code>randomSplit</code> 也是同一思想的分层实现。抽样比例变动必须写入实验元数据，否则历史对比不可复现。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · MapReduce 与 Spark 的计算模型</h2>
+
+      <h3 id="s3-1">3.1 map / shuffle / reduce</h3>
+      <p>MapReduce 把计算拆成三步：<strong>map</strong> 在各分区独立产出键值对；<strong>shuffle</strong> 按 key 跨网络重分布（唯一的全局通信，也是成本与 OOM 的中心）；<strong>reduce</strong> 对同 key 的值做聚合。理解 shuffle 就能解释「作业为什么慢」「为什么某个 reducer 特别慢」——后者往往是<strong>数据倾斜</strong>：少数 key 集中了绝大部分记录，可用 salting（加随机前缀做两阶段聚合）或倾斜 key 单独处理来缓解。</p>
+
+      <h3 id="s3-2">3.2 RDD 血缘与 DataFrame 优化</h3>
+      <p>RDD 用<strong>血缘（lineage）</strong>记录「我由哪个父 RDD 经什么变换得到」，分区丢失时按血缘重算而非多副本容错。DataFrame 在此之上引入<strong>逻辑计划 + Catalyst 优化器 + 列式内存布局</strong>：自动做列裁剪、谓词下推、常量折叠与 join 策略选择，并通过 Whole-stage Codegen 生成紧凑循环。统计上这意味着：写清「要哪些列、过滤条件是什么」比手写执行顺序更重要。</p>
+
+      <h3 id="s3-3">3.3 可合并性：哪些统计量能分治</h3>
+      <p>一个统计量若能从<strong>各分区的紧凑摘要</strong>拼回全局值，就可在 map 端先局部聚合、reduce 端再合并，把 shuffle 体积从 $O(n)$ 压到 $O(\text{分区数})$。这个摘要叫<strong>可合并充分统计量</strong>。</p>
+      <div class="formula-box">
+        <div class="f-name">可合并统计量（分治估计量）</div>
+        $$ T(D)=T(D_1)\oplus T(D_2)\oplus\cdots\oplus T(D_K),\qquad \hat\theta=g\bigl(T(D)\bigr) $$
+        <div class="f-note">
+          $\oplus$ 是满足结合律的合并运算，$g$ 是从摘要还原估计量的函数。均值 $\bar x$ 的摘要是 $(n,S)$，方差的摘要是 $(n,S,Q)$，其中 $S=\sum x_i$、$Q=\sum x_i^{2}$；三者都按分量相加即可合并。中位数没有有限维精确摘要，只能全局排序或用近似草图。
+        </div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>统计量</th><th>局部摘要</th><th>能否精确合并</th><th>说明</th></tr></thead><tbody>
+        <tr><td>计数 count</td><td>$n$</td><td>能</td><td>相加</td></tr>
+        <tr><td>求和 sum</td><td>$S$</td><td>能</td><td>相加</td></tr>
+        <tr><td>均值 mean</td><td>$(n,S)$</td><td>能</td><td>$\bar x=S/n$，不能直接平均各分区均值</td></tr>
+        <tr><td>方差 var</td><td>$(n,S,Q)$</td><td>能</td><td>见第 4 节，需平方和</td></tr>
+        <tr><td>中位数 median</td><td>无有限精确摘要</td><td><strong>不能</strong></td><td>需全局排序或 t-digest / 草图近似</td></tr>
+        <tr><td>去重计数</td><td>精确集合</td><td>代价高</td><td>改用 HyperLogLog 近似</td></tr>
+      </tbody></table></div>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 分布式下的统计量</h2>
+
+      <h3 id="s4-1">4.1 三元组与并行方差</h3>
+      <p>各分区只需维护 $(n,\ S,\ Q)$ 三个数，合并时逐分量相加。由恒等式 $\mathrm{Var}(X)=\mathrm{E}[X^{2}]-(\mathrm{E}[X])^{2}$ 即可从合并后的三元组还原全局方差。</p>
+      <div class="formula-box">
+        <div class="f-name">分治合并方差</div>
+        $$ n=\sum_{a}n_a,\quad S=\sum_{a}S_a,\quad Q=\sum_{a}Q_a $$
+        $$ \mathrm{Var}(X)=\frac{Q}{n}-\Bigl(\frac{S}{n}\Bigr)^{2},\qquad s^{2}=\frac{Q-S^{2}/n}{n-1} $$
+        <div class="f-note">
+          第一式是<strong>总体方差</strong>（除以 $n$），第二式是<strong>无偏样本方差</strong>（除以 $n-1$）。注意 $\mathrm{E}[X^{2}]=Q/n$、$\mathrm{E}[X]=S/n$，均值必须加权合并 $\bar x=S/n$，绝不能把各分区均值算术平均。
+        </div>
+      </div>
+
+      <h3 id="s4-2">4.2 Catastrophic cancellation（灾难性抵消）</h3>
+      <p>$\mathrm{E}[X^{2}]-(\mathrm{E}[X])^{2}$ 在代数上正确，在浮点上却危险：当均值远大于标准差（例如 $\mu=10^{8}$、$\sigma=1$）时，两个几乎相等的大数相减，有效位被大量吃掉，甚至得到<strong>负方差</strong>。这叫灾难性抵消。工程上的两种修复：</p>
+      <ul>
+        <li><strong>平移到参考值</strong>：取 $x_0$（如第一个样本或分区均值），维护 $Q=\sum (x_i-x_0)^{2}$ 与 $S'=\sum(x_i-x_0)$，则 $\mathrm{Var}=\frac{Q}{n}-\bigl(\frac{S'}{n}\bigr)^{2}$，两项都是小数量级。</li>
+        <li><strong>Welford 在线算法</strong>：逐条更新 $\delta=x_i-\bar x_{i-1}$、$\bar x_i=\bar x_{i-1}+\delta/i$、$M_{2,i}=M_{2,i-1}+\delta(x_i-\bar x_i)$，方差为 $M_{2,n}/(n-1)$；它同时天然支持分治合并（Chan 公式）。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 11.3</span>
+          <span class="ex-title">分治合并方差数值题</span>
+        </div>
+        <div class="example-body">
+          <p>某指标被切成两个分区，各自只保留三元组摘要：</p>
+          <div class="table-wrap"><table><thead><tr><th>分区</th><th>$n$</th><th>$S=\sum x_i$</th><th>$Q=\sum x_i^{2}$</th></tr></thead><tbody>
+            <tr><td>A</td><td>4</td><td>20</td><td>120</td></tr>
+            <tr><td>B</td><td>6</td><td>42</td><td>328</td></tr>
+          </tbody></table></div>
+          <p>① 合并三元组并求全局均值；② 用 $\mathrm{Var}(X)=\mathrm{E}[X^{2}]-(\mathrm{E}[X])^{2}$ 求总体方差；③ 求无偏样本方差；④ 用「直接平均两个分区方差」的朴素做法会得到什么，说明为什么错；⑤ 若 A、B 各是一个 reducer，说明 map 端局部聚合把 shuffle 体积压到多少。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：合并三元组</strong></p>
+              $$ n=4+6=10,\qquad S=20+42=62,\qquad Q=120+328=448 $$
+              $$ \bar x=\frac{S}{n}=\frac{62}{10}=6.2 $$
+              <p>校验：分区 A 均值 $20/4=5$，分区 B 均值 $42/6=7$，加权 $(4\times5+6\times7)/10=6.2$ —— 一致，说明均值必须按 $n$ 加权，而不是 $(5+7)/2=6$。</p>
+              <p><strong>第二步：总体方差</strong></p>
+              $$ \mathrm{E}[X^{2}]=\frac{Q}{n}=\frac{448}{10}=44.8,\qquad (\mathrm{E}[X])^{2}=6.2^{2}=38.44 $$
+              $$ \mathrm{Var}(X)=44.8-38.44=\mathbf{6.36} $$
+              <p><strong>第三步：无偏样本方差</strong></p>
+              $$ s^{2}=\frac{Q-S^{2}/n}{n-1}=\frac{448-62^{2}/10}{9}=\frac{448-384.4}{9}=\frac{63.6}{9}\approx\mathbf{7.067} $$
+              <p>把 10 条原始记录（$2,4,6,8,3,5,7,8,9,10$）直接算离差平方和得 $63.6$，与两式完全对上，验证合并正确。</p>
+              <p><strong>第四步：朴素做法为什么错</strong></p>
+              <p>分区 A 总体方差 $=120/4-5^{2}=30-25=5$；分区 B 总体方差 $=328/6-7^{2}=54.67-49=5.67$；简单平均得 $5.33$，与真值 $6.36$ 差了 $1.03$。原因是<strong>方差包含「组间差异」</strong>：两组均值分别是 5 与 7，均值不同带来的那部分平方差，在各分区内部方差里根本没被计入。方差分解应为「组内方差加权平均 + 组间均值方差」：</p>
+              $$ \underbrace{\frac{4\times5+6\times5.67}{10}}_{\text{组内}\ 5.4}+\underbrace{\frac{4(5-6.2)^{2}+6(7-6.2)^{2}}{10}}_{\text{组间}\ 0.96}=6.36 $$
+              <p><strong>第五步：shuffle 体积</strong></p>
+              <p>不做局部聚合要传输 10 条原始值；先在每个 map 端压成 $(n,S,Q)$ 三个数，reduce 端只收到 $2\times3=6$ 个数。分区数固定时 shuffle 体积是<strong>常数级</strong>，与 $n$ 无关——这正是可合并统计量的价值。</p>
+              <p><strong>易错提示：</strong>① 直接平均各分区方差或各分区均值（后者忽略权重）；② 只传 $(n,S)$ 就想算方差，缺少 $Q$；③ 混用总体方差（除 $n$）与样本方差（除 $n-1$）；④ 在 $\mu &gt; \sigma$ 时用 $Q/n-(S/n)^{2}$ 硬算，浮点抵消可能给出负数——改用平移或 Welford。</p>
+              <p><strong>应用关联：</strong>Spark 的 <code>sum</code> / <code>avg</code> / <code>var_pop</code> 都是这类可合并聚合；监控大盘的标准差、A/B 指标的方差估计、特征标准化参数，都依赖同一套三元组。数值稳定性在「金额、时间戳、累计计数」这类大均值小波动字段上尤其关键。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ②：公式正确不等于浮点结果可信
+        </div>
+        <p>$\mathrm{Var}(X)=\mathrm{E}[X^{2}]-(\mathrm{E}[X])^{2}$ 是恒等式，但在 $\mu &gt; \sigma$ 时是两个相近大数相减，双精度也可能丢光有效位，甚至输出负方差导致 $\sqrt{\cdot}$ 报错。<strong>判据</strong>：若 $(S/n)^{2}$ 与 $Q/n$ 的前若干位相同，就必须换成平移或 Welford / Chan 合并公式。统计正确性与数值稳定性是两回事。</p>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 存储与格式</h2>
+
+      <h3 id="s5-1">5.1 行式与列式</h3>
+      <p>行式存储把一行的所有列连续存放，适合 OLTP 的「按主键取整行」；列式存储把同一列连续存放，分析查询往往只扫描少数列，I/O 与压缩比因此好上一个数量级。</p>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>行式（如 PostgreSQL 堆表）</th><th>列式（Parquet / Arrow）</th></tr></thead><tbody>
+        <tr><td>典型负载</td><td>点查、增删改单行</td><td>扫描聚合、少量列的大范围分析</td></tr>
+        <tr><td>只查 2 列</td><td>仍读出整行</td><td><strong>列裁剪</strong>，只读 2 列</td></tr>
+        <tr><td>压缩</td><td>通用压缩</td><td>同列同类型，字典 / RLE / 位打包效率极高</td></tr>
+        <tr><td>向量化</td><td>逐行解释</td><td>批量列向量、SIMD 友好</td></tr>
+        <tr><td>写入</td><td>单行快</td><td>批量追加更快，改单行代价高</td></tr>
+      </tbody></table></div>
+
+      <h3 id="s5-2">5.2 Parquet、Arrow 与谓词下推</h3>
+      <p><strong>Parquet</strong> 是磁盘列式格式，按 row group 存列块并附带每块的 min/max 统计与布隆索引；<strong>Arrow</strong> 是内存列式布局，跨语言零拷贝交换。二者配合让「十亿行聚合」在单机（DuckDB / Polars）也能完成。所谓<strong>谓词下推</strong>，是把 $\mathrm{WHERE}$ 过滤推到扫描层，凭 min/max 直接跳过整个 row group；<strong>分区裁剪</strong>则按目录（如 $dt=2026\text{-}11\text{-}07$）先排除无关分区。</p>
+      <p>两者都有失效条件：对分区列包一层函数（$\mathrm{WHERE}\ \mathrm{date}(\mathrm{ts})=\dots$）会让分区裁剪失效；把谓词写成非 sargable 形式或类型不匹配，下推也会退化成全表扫描。压缩编解码（Snappy 偏速度、Zstd 偏比率）则是在 CPU 与 I/O 之间换资源。</p>
+
+      <h3 id="s5-3">5.3 数据湖、数仓与湖仓</h3>
+      <p><strong>数据湖</strong>保留原始多格式数据、schema-on-read，便宜灵活但易成「数据沼泽」；<strong>数仓</strong>建模后写入、schema-on-write，口径统一但灵活度低；<strong>Lakehouse</strong> 在湖上叠加事务表格式（ACID、时间旅行、schema 演进）。无论哪种，统计可信的前提是<strong>口径与版本可追溯</strong>：同一指标在不同批次应能复现。</p>
+
+      <!-- ===== 6 ===== -->
+      <h2 id="s6">6 · 流式与窗口</h2>
+
+      <h3 id="s6-1">6.1 事件时间与处理时间</h3>
+      <p><strong>事件时间</strong>是事件真实发生的时刻（埋点自带），<strong>处理时间</strong>是系统看到它的时刻。网络延迟、重试、离线补传会让二者错位；用处理时间做窗口，等于默认「到达顺序 = 发生顺序」，在重放、故障恢复与跨时区场景下结论会漂移。可靠的大盘一律用事件时间。</p>
+
+      <h3 id="s6-2">6.2 水位线与迟到数据</h3>
+      <p><strong>水位线</strong> $W(t)$ 是系统对「事件时间已推进到何处」的保守声明：当 $W(t)\ \geq$ 某窗口结束时间，就认为该窗口的常规数据已到齐，可以触发计算。设最大允许乱序为 $d$，则 $W(t)=\max(\text{已见事件时间})-d$。水位线太激进会丢迟到数据，太保守则延迟升高。迟到事件通常三种处理：丢弃、输出到侧输出流单独审计、或在允许迟到窗口内撤回并重发更新结果。</p>
+
+      <h3 id="s6-3">6.3 窗口类型与精确一次</h3>
+      <ul>
+        <li><strong>滚动窗口</strong>：固定长度、互不重叠，如每 5 分钟一段。</li>
+        <li><strong>滑动（跳跃）窗口</strong>：固定长度但步长小于长度，窗口重叠，一条事件可落入多个窗口。</li>
+        <li><strong>会话窗口</strong>：按不活跃间隔切分，长度不固定，适合用户行为会话。</li>
+        <li><strong>精确一次语义</strong>：并非「每条只被读一次」（重放必然发生），而是「状态更新与输出在故障恢复后<strong>净效果恰好一次</strong>」，依赖可重放源 + 定期 checkpoint + 幂等或事务性 sink。三者缺一，就只能做到至少一次或至多一次。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 11.4</span>
+          <span class="ex-title">滑动窗口计数与迟到事件</span>
+        </div>
+        <div class="example-body">
+          <p>用事件时间统计 5 分钟（300 秒）滑动窗口，每 1 分钟（60 秒）滑动一次，窗口左闭右开。已到达事件的事件时间（秒）为：</p>
+          <p>$$ 30,\ 90,\ 150,\ 200,\ 280,\ 310,\ 330,\ 400,\ 480,\ 540,\ 600 $$</p>
+          <p>① 列出窗口 $[0,300)$ 与 $[60,360)$ 的计数，并指出两者重叠部分的事件；② 列出 $[180,480)$ 的计数，说明边界 $480$ 如何处理；③ 若改用不重叠的滚动窗口（$[0,300)$、$[300,600)$），各窗口计数是多少；④ 一个事件时间 $t=250$ 的事件在水位线已推进到 600 时才到达，会发生什么。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：两个滑动窗口</strong></p>
+              <ul>
+                <li>$[0,300)$：$30,90,150,200,280$ → <strong>5</strong> 条（$310\ \geq\ 300$ 不属于）；</li>
+                <li>$[60,360)$：$90,150,200,280,310,330$ → <strong>6</strong> 条（$30 &lt; 60$ 已滑出，$400\ \geq\ 360$ 未进入）。</li>
+              </ul>
+              <p>重叠部分为 $[60,300)$，含 $90,150,200,280$ 共 <strong>4</strong> 条：它们同时计入两个窗口，这正是滑动窗口「一条事件可属于多个窗口」的含义，汇总跨窗口求和时会重复计数，必须按业务口径决定是否去重。</p>
+              <p><strong>第二步：边界处理</strong></p>
+              <p>$[180,480)$ 含 $200,280,310,330,400$ → <strong>5</strong> 条。左闭右开约定下，$t=480$ 归入下一个窗口而不属于本窗口；若误用闭区间，$480$ 会被算两次，边界计数系统性偏高。滚动窗口链上每个事件必须恰好落入一个窗口。</p>
+              <p><strong>第三步：滚动窗口对照</strong></p>
+              <ul>
+                <li>$[0,300)$：$30,90,150,200,280$ → <strong>5</strong> 条；</li>
+                <li>$[300,600)$：$310,330,400,480,540$ → <strong>5</strong> 条（$600$ 落入下一段 $[600,900)$）。</li>
+              </ul>
+              <p>滚动窗口计数之和 $=10$，等于事件总数；滑动窗口计数之和会大于事件数，二者不可混用。</p>
+              <p><strong>第四步：迟到事件</strong></p>
+              <p>$t=250$ 本应落入 $[0,300)$ 与 $[60,360)$，但水位线 600 意味着这两个窗口早已触发并输出结果。若允许迟到量为 0，该事件被<strong>丢弃</strong>或写入侧输出流供审计（于是大盘少算 1）；若配置了允许迟到并支持撤回更新，窗口结果会被重新计算并向下游发出修正。水位线设得越激进，这类漏算越多。</p>
+              <p><strong>易错提示：</strong>① 用处理时间窗口，重放历史数据时所有事件挤进「现在」这个窗口；② 左闭右开边界处理不一致，导致边界事件重算或漏算；③ 把多个滑动窗口的计数直接相加当独立事件数；④ 认为「精确一次」等于「不重放」，忽略幂等 sink 的必要性。</p>
+              <p><strong>应用关联：</strong>Flink / Kafka Streams 的实时大盘、风控频控（如「5 分钟内登录失败次数」）都基于事件时间 + 水位线；离线回补与实时链路口径对齐，靠的是同一份窗口定义与允许迟到策略。这也解释了模块 08 中「实验期间反复窥探」在流式监控里的对应风险。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ③：水位线不是「时钟」，是「对乱序的承诺」
+        </div>
+        <p>水位线由数据驱动，一旦推进就<strong>不可回退</strong>；把它设成「当前系统时间减 5 分钟」而忽略实际乱序分布，会在流量高峰或跨区回传时静默丢数据。正确做法是先测量事件时间的延迟分布（分位数），再据此设定最大乱序与允许迟到，并把「迟到量 / 丢弃量」作为监控指标持续观察。</p>
+      </div>
+
+      <!-- ===== 7 ===== -->
+      <h2 id="s7">7 · 近似算法与误差界</h2>
+
+      <h3 id="s7-1">7.1 Bloom Filter</h3>
+      <p>用长度为 $m$ 的位数组与 $k$ 个哈希函数判断「元素是否出现过」：查询返回「不存在」则<strong>一定不存在</strong>，返回「存在」则有可能是假阳性。$n$ 个元素插入后某位仍为 0 的概率约 $e^{-kn/m}$，于是假阳性率与最优哈希个数为</p>
+      <div class="formula-box">
+        <div class="f-name">Bloom Filter 假阳性率与 HyperLogLog 误差</div>
+        $$ p\approx\Bigl(1-e^{-kn/m}\Bigr)^{k},\qquad k^{*}=\frac{m}{n}\ln 2,\qquad p_{\min}\approx(0.6185)^{m/n} $$
+        $$ \text{HLL 相对标准误差}\approx\frac{1.04}{\sqrt{m}} $$
+        <div class="f-note">
+          $m$ 为位数（Bloom）或寄存器数（HLL），$n$ 为已插入元素数。$(0.6185)^{m/n}$ 来自在最优 $k$ 处代入；HLL 的 $1.04/\sqrt{m}$ 表明误差按 $1/\sqrt{m}$ 下降，内存翻倍只把误差压到约 $1/\sqrt{2}$。<strong>两者都是单边或带界误差</strong>，必须连同误差一起报告。
+        </div>
+      </div>
+
+      <h3 id="s7-2">7.2 HyperLogLog 与 Count-Min Sketch</h3>
+      <p><strong>HyperLogLog</strong> 用 $m$ 个寄存器记录哈希值前导零的最大长度来估计基数，寄存器按位置取 max 即可<strong>可合并</strong>，天然适配分治。相对标准误差 $\approx 1.04/\sqrt{m}$，用 KB 级内存估十亿级去重。<strong>Count-Min Sketch</strong> 用 $d$ 行 $w$ 列的计数器数组估频次，查询取各行计数的最小值：只会<strong>高估</strong>不会低估，取 $w=\lceil e/\epsilon\rceil$、$d=\lceil\ln(1/\delta)\rceil$ 时，误差超过 $\epsilon N$ 的概率不超过 $\delta$。</p>
+
+      <h3 id="s7-3">7.3 误差—内存权衡</h3>
+      <div class="table-wrap"><table><thead><tr><th>问题</th><th>精确算法</th><th>近似算法</th><th>误差性质</th><th>内存量级</th></tr></thead><tbody>
+        <tr><td>成员存在性</td><td>HashSet</td><td>Bloom Filter</td><td>单边：可能假阳性，无假阴性</td><td>$m$ bit，与 $n$ 线性但常数极小</td></tr>
+        <tr><td>去重计数</td><td>精确集合</td><td>HyperLogLog</td><td>双边，相对标准误差 $\approx 1.04/\sqrt{m}$</td><td>$m$ 字节，KB 级</td></tr>
+        <tr><td>高频频次</td><td>精确计数器</td><td>Count-Min Sketch</td><td>单边高估，误差 $\epsilon N$ 概率 $\leq\delta$</td><td>$w\times d$ 计数器</td></tr>
+        <tr><td>分位数</td><td>全局排序</td><td>t-digest / GK</td><td>可控秩误差</td><td>与 $n$ 次线性</td></tr>
+      </tbody></table></div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 11.5</span>
+          <span class="ex-title">HyperLogLog 误差估算与内存预算</span>
+        </div>
+        <div class="example-body">
+          <p>某日活去重：精确集合需保存 1 亿个 64 位哈希（约 800 MB）。改用 HyperLogLog，寄存器数 $m=4096$，每寄存器按 1 字节计。① 估算相对标准误差；② 若把 $m$ 提到 $16384$，误差与内存各是多少；③ 若要求相对误差不超过 1%，$m$ 至少多大，取 2 的幂应是多少；④ 说明 HLL 为何适合分布式合并。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：$m=4096$</strong></p>
+              $$ \text{RSE}\approx\frac{1.04}{\sqrt{4096}}=\frac{1.04}{64}=0.01625\approx\mathbf{1.63\%} $$
+              <p>内存 $4096$ 字节 $\approx 4$ KiB，相比 800 MB 精确集合压缩约 20 万倍。</p>
+              <p><strong>第二步：$m=16384$</strong></p>
+              $$ \frac{1.04}{\sqrt{16384}}=\frac{1.04}{128}=0.008125\approx\mathbf{0.81\%},\qquad \text{内存}=16384\ \text{B}=16\ \text{KiB} $$
+              <p>内存变 4 倍，误差减半——正是 $1/\sqrt{m}$ 规律的体现。</p>
+              <p><strong>第三步：误差不超过 1%</strong></p>
+              $$ \frac{1.04}{\sqrt{m}}\leq 0.01\ \Longrightarrow\ \sqrt{m}\geq 104\ \Longrightarrow\ m\geq 10816 $$
+              <p>取 2 的幂 $m=2^{14}=16384$，此时误差 $0.81\%$ 满足要求；$m=2^{13}=8192$ 时误差 $1.15\%$ 不达标。</p>
+              <p><strong>第四步：为什么适合分布式</strong></p>
+              <p>HLL 的摘要是 $m$ 个寄存器，每个只存「见过的最大前导零数」；两批数据合并只需<strong>按位置取 max</strong>，这个运算满足结合律与交换律，正是第 3 节的可合并结构。因此每个分区算一份 HLL，reduce 端按 max 合并即得全局基数，shuffle 体积恒为 $m$ 字节。</p>
+              <p><strong>易错提示：</strong>① 把「相对标准误差」当硬上界，实际是约 1 个标准差，单次要按置信水平放宽；② 用 HLL 结果做精确计费或精确去重判定（它是估计值）；③ 混淆寄存器数 $m$ 与位数——公式里的 $m$ 是寄存器个数，内存按每寄存器字节数另算；④ 合并时用了求和而不是取 max。</p>
+              <p><strong>应用关联：</strong>UV / DAU 大盘、广告去重、爬虫 URL 去重、数据库查询优化器的基数估计都依赖 HLL；Redis 的 PFADD/PFCOUNT 与 Spark 的 approx_count_distinct 都是这一算法的工业实现。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 11.6</span>
+          <span class="ex-title">Bloom Filter 假阳性率</span>
+        </div>
+        <div class="example-body">
+          <p>向空位数组插入 $n=1\,000\,000$ 个元素，位数组长度 $m=10\,000\,000$ bit（约 1.19 MB，$m/n=10$），使用 $k=7$ 个哈希函数。① 用 $(1-e^{-kn/m})^{k}$ 估算假阳性率（取 $e^{-0.7}\approx0.4966$）；② 求最优哈希个数 $k^{*}$ 与最优假阳性率；③ 若要求假阳性率不高于 0.1%，$m/n$ 至少是多少，对应 $m$ 与 $k$ 取多少；④ 说明「判定不存在」为何可信而「判定存在」不可信。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：代入公式</strong></p>
+              $$ \frac{kn}{m}=\frac{7\times 10^{6}}{10^{7}}=0.7,\qquad 1-e^{-0.7}\approx 1-0.4966=0.5034 $$
+              $$ p\approx 0.5034^{7}\approx\mathbf{0.0082}\ (\text{约 }0.82\%) $$
+              <p><strong>第二步：最优值与自洽检验</strong></p>
+              $$ k^{*}=\frac{m}{n}\ln 2=10\times 0.6931\approx 6.93\ \Rightarrow\ k=7 $$
+              $$ p_{\min}\approx(0.6185)^{10}\approx\mathbf{0.0082} $$
+              <p>题目给的 $k=7$ 恰好接近最优；两条公式结果一致（最优 $k$ 处二者代数等价），约每 122 次「不存在」查询会有 1 次被误判为「存在」。</p>
+              <p><strong>第三步：把 p 压到 0.1% 以下</strong></p>
+              $$ (0.6185)^{m/n}\leq 0.001\ \Longrightarrow\ \frac{m}{n}\geq\frac{\ln 0.001}{\ln 0.6185}\approx\frac{-6.908}{-0.4806}\approx 14.4 $$
+              <p>取 $m/n=15$（留余量），则 $m\approx 1.5\times 10^{7}$ bit $\approx 1.79$ MB，$k^{*}\approx 15\times0.693\approx 10$。可见 1.2% 左右的额外内存就能把假阳性率降一个量级。</p>
+              <p><strong>第四步：单边误差</strong></p>
+              <p>插入只会把位从 0 置 1，绝不会置回 0。因此某元素若真存在，它对应的 $k$ 个位必然全为 1 → 查询不可能返回「不存在」（<strong>无假阴性</strong>）；而一个从未插入的元素，其 $k$ 个位可能恰好都被别的元素置成 1 → 可能返回「存在」（<strong>有假阳性</strong>）。所以 Bloom Filter 适合做「先挡一道、挡掉绝大多数不存在」的前置过滤，不适合做需要确定性的准入判定。</p>
+              <p><strong>易错提示：</strong>① $k$ 不是越大越好——位被填满更快，假阳性率反而上升，存在最优 $k$；② 用 $p$ 直接当「出错概率」用在计费、权限、去重落库等要求零误判的场景；③ 忽略 $n$ 会增长：$n$ 超出设计容量后 $p$ 迅速恶化，需预估容量或改用可扩展布隆过滤器；④ 标准 Bloom Filter 不支持删除（要删除需 Counting Bloom Filter）。</p>
+              <p><strong>应用关联：</strong>数据库 LSM 树用 Bloom Filter 避免无效磁盘查找，浏览器与 CDN 用它做恶意 URL 缓存前置判断，爬虫用它做 URL 去重；与第 5 节 Parquet 自带的布隆索引是同一思想——<strong>用可控的假阳性换取大量 I/O 节省</strong>。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ④：近似结果必须连同误差与误差方向一起交付
+        </div>
+        <p>Bloom Filter 只可能假阳性，Count-Min Sketch 只会高估，HLL 是带标准差的估计。<strong>把近似值当精确值用</strong>是大数据事故的高频来源：用 Bloom 判重导致合法请求被误拒、用 CMS 的频次做限流导致误杀、用 HLL 报结算金额。凡涉及钱、权限、法律口径的路径，必须回到精确算法；近似只用于「可接受可控误差」的监控、预筛与探索。</p>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <h2 id="s8">8 · 大规模 A/B 测试与数据质量</h2>
+
+      <h3 id="s8-1">8.1 哈希分桶与分层正交</h3>
+      <p>把 $\mathrm{hash}(uid+\text{层盐})\bmod 100$ 映射到 100 个桶，每层桶 $0$–$49$ 为对照、$50$–$99$ 为实验。不同实验层使用<strong>不同的盐</strong>，使层与层之间的分组近似独立，从而「一个用户可以同时参加多个互不干扰的实验」。若两层共用同一哈希，同一批用户会总是落进同组，层间污染会让实验结论互相带偏。</p>
+
+      <h3 id="s8-2">8.2 护栏指标、网络效应与提前窥探</h3>
+      <ul>
+        <li><strong>护栏指标</strong>：不追求提升、但绝不能恶化的指标（崩溃率、P99 延迟、投诉率、退款率、收入下限）；主指标赢而护栏破，实验仍应否决。</li>
+        <li><strong>SRM（样本比例失衡）</strong>：期望 50/50 却观察到 52/48，用卡方检验查分流或埋点是否漏数；SRM 一票否决实验结论。</li>
+        <li><strong>网络效应</strong>：社交、双边市场里对照组用户会受实验组用户影响，SUTVA 被违背；应按<strong>集群 / 地理单元</strong>而非用户分流，并改用簇级分析。</li>
+        <li><strong>提前窥探</strong>：每天看一次 p 值、显著就停，会把一类错误率累积到远高于 5%；对策是固定样本量的预先功效分析，或序贯检验（$\alpha$ 消耗函数、mSPRT、always-valid p 值）。</li>
+      </ul>
+
+      <h3 id="s8-3">8.3 数据血缘与漂移监控</h3>
+      <p><strong>数据血缘</strong>记录指标从原始表经哪些变换、聚合口径与版本得来，是「结果可复现」与「故障可定位」的基础。<strong>漂移监控</strong>用 PSI（群体稳定性指数）、KS 检验或分位数对比持续比较线上分布与训练/基准分布；分布漂移会让校准好的阈值、模型与告警线静默失效。二者共同构成第 1 节「偏差被放大」的工程防线。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 11.7</span>
+          <span class="ex-title">分流正交性验证与 SRM 检查</span>
+        </div>
+        <div class="example-body">
+          <p>两个实验层 L1、L2 各把用户按哈希分到 100 桶，桶 $0$–$49$ 对照、$50$–$99$ 实验。抽查 10 000 个用户，得到列联表：</p>
+          <div class="table-wrap"><table><thead><tr><th></th><th>L2 实验组</th><th>L2 对照组</th><th>合计</th></tr></thead><tbody>
+            <tr><td><strong>L1 实验组</strong></td><td>2487</td><td>2513</td><td>5000</td></tr>
+            <tr><td><strong>L1 对照组</strong></td><td>2513</td><td>2487</td><td>5000</td></tr>
+            <tr><td><strong>合计</strong></td><td>5000</td><td>5000</td><td>10000</td></tr>
+          </tbody></table></div>
+          <p>① 若两层完全正交（独立），四格期望频数是多少；② 计算卡方统计量并判断正交性（$\chi^{2}_{0.05,1}=3.84$）；③ 若左上格实际为 3100（其余按对称性调整为 1900 / 1900 / 3100），卡方是多少，说明什么；④ 单独检查 L1 的 SRM 是否通过。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：期望频数</strong></p>
+              <p>两层各 50/50 且独立时，每个组合的概率为 $0.5\times0.5=0.25$，故四格期望都是</p>
+              $$ E=10000\times 0.25=2500 $$
+              <p><strong>第二步：卡方统计量（原始表）</strong></p>
+              $$ \chi^{2}=\sum\frac{(O-E)^{2}}{E}=4\times\frac{13^{2}}{2500}=4\times\frac{169}{2500}=\mathbf{0.2704} $$
+              <p>$0.2704 &lt; 3.84$，不能拒绝独立性 → <strong>正交性通过</strong>。观察值与 2500 的偏差（$\pm13$）与 $\sqrt{2500}=50$ 量级的随机波动完全相容。</p>
+              <p><strong>第三步：换成强相关情形</strong></p>
+              $$ \chi^{2}=4\times\frac{(3100-2500)^{2}}{2500}=4\times\frac{360000}{2500}=4\times144=\mathbf{576} $$
+              <p>$576 &gt;  3.84$，独立性被强烈拒绝 → <strong>两层不正交</strong>。典型原因是两层复用了同一个哈希函数或同一个盐，导致同一批用户总是同时落进实验组；此时 L1 的效果会混进 L2 的处理，两个实验的结论都不再可信。修复办法是为每层使用独立盐，并在分流器上线前跑一次这样的正交性检验。</p>
+              <p><strong>第四步：SRM 检查</strong></p>
+              <p>L1 期望 5000 / 5000，观察恰好 5000 / 5000：</p>
+              $$ \chi^{2}=\frac{(5000-5000)^{2}}{5000}+\frac{(5000-5000)^{2}}{5000}=0 &lt; 3.84 $$
+              <p>SRM 通过，说明分流比例本身没有系统性失衡。注意「SRM 通过」只排除了比例问题，<strong>不能替代正交性检验</strong>：即使每层各自 50/50，两层之间仍可能高度相关（第三步就是例子）。</p>
+              <p><strong>易错提示：</strong>① 以为「每层都是 50/50」就保证层间正交——独立性必须单独检验；② 用<strong>事件</strong>而非 $uid$ 分流，同一用户跨组污染，且未登录/多设备用户会造成 SRM；③ 看到 SRM 只查埋点不查分流器与过滤逻辑；④ 社交/双边产品仍按用户分流，忽略网络效应导致 SUTVA 违背。</p>
+              <p><strong>应用关联：</strong>Google、微软等的分层实验框架都把「层盐 + 分桶 + 正交性校验 + SRM 报警」做成平台能力；护栏指标与序贯检验则对应模块 08 的多重比较与功效分析。离线指标漂移（PSI / KS）与这里分流校验属于同一套「先验证数据可信，再解释结论」的纪律。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 9 ===== -->
+      <div id="examples"></div><!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 11 大数据分析的统计基础 -->
+
+
+<h2 id="d-deep-1">深度专题一 · 哪些统计量能「分块算完再合并」：monoid、充分统计量与中位数的反例</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>能合并的充要条件是「存在有限维充分统计量 + 一个满足结合律的合并运算」；中位数恰好两者皆无</h3></div>
+  <p class="dt-lead">本章正文第 2 节（#s2）已经列过 MapReduce 式的「先分后合」与常见聚合函数；这里不重复那份函数清单，而是回答一个更根本的问题：凭什么均值、方差、最大值可以「每台机器各算一份摘要、汇总后与全量结果一模一样」，而中位数、分位数不行？以及「把各分区方差直接平均」这种看似无害的写法，到底错在哪一项？整节只用加法、乘法与「排序」这三样初中知识。</p>
+
+  <h4>背景：分布式计算逼出来的一个代数问题</h4>
+  <p>当数据大到一台机器装不下，标准做法是切成分片：每台机器对自己那片算一个<strong>摘要</strong>（summary），再把摘要两两合并成全局结果。这个模式的价值在于通信量极小——不传原始数据，只传几个数。但它成立有一个硬前提：存在<strong>有限维</strong>的摘要，且合并结果与「一口气在全部数据上算」完全相同。</p>
+  <p>抽象代数早就给这件事起了名字：一个集合配上满足<strong>结合律</strong>的二元运算和<strong>单位元</strong>，叫交换 monoid（独异点）。计数、求和、求最大都是最朴素的 monoid；统计学里对应的说法是「存在<strong>充分统计量</strong>」——只要几个数就把样本里与目标量有关的全部信息都带走了。均值背后的充分统计量是 $(n,\sum x)$，方差还要再加一个 $\sum x^2$。本专题把这两套语言对齐，并给出中位数不行的<strong>构造性反例</strong>（不是「很难」，而是「不存在」）。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把「合并」想成几个课代表各统计自己组，再把小纸条交给班长汇总。能不能只靠小纸条还原全年级的结果，取决于纸条上记的东西够不够：</p>
+  <ul>
+    <li><strong>平均分</strong>：只要每张纸条记「本组人数」和「本组总分」，班长把人数相加、总分相加，再一除就是全年级平均分——完全够用。</li>
+    <li><strong>方差</strong>：再多记一个「本组分数平方和」就够了；因为方差只跟「平方和、总和、个数」三样有关。</li>
+    <li><strong>最高分</strong>：每张纸条记本组最高分，班长取最大的那个即可。</li>
+    <li><strong>中位数</strong>：麻烦来了。班长只知道「A 组中位数 3、B 组中位数 8」，根本不知道 A 组里到底有没有一个数悄悄窜到 50——而那个数会改变「全年级排序后正中间是谁」。要知道正中间是谁，几乎得知道<strong>全部</strong>数据的排序，几张纸条装不下。</li>
+  </ul>
+  <p>关键的一句话：<strong>能合并，是因为目标量只依赖几个可以「加起来」的数；不能合并，是因为它依赖「全局第几名」这种位置信息，而位置信息在分块时就被切碎了</strong>。还有个更隐蔽的坑：即便方差「能合并」，也不能把各分区的方差直接平均——因为那样漏掉了「组与组之间均值不一样」带来的那块波动。下面把这句白话写成可核对的等式。</p>
+
+  <h4>形式化：合并运算、充分统计量与一个「不存在」的证明</h4>
+  <div class="formula-box">
+    <div class="f-name">可合并的代数定义（交换 monoid）</div>
+    $$ (S,\ \oplus,\ e),\qquad (a\oplus b)\oplus c = a\oplus (b\oplus c),\qquad a\oplus e = e\oplus a = a $$
+    <div class="f-note">白话：$S$ 是摘要的集合，$\oplus$ 是把两份摘要拼成一份的运算，$e$ 是「空数据」的摘要（单位元）。结合律保证「先合并哪几片」都不影响最终结果——这正是分片可以任意乱序、层层归并的原因；没有结合律，Reduce 树换一种括号就换一个答案。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">均值／方差的有限维充分统计量</div>
+    $$ T\bigl(x_{1:n}\bigr) = \bigl(n,\ S,\ Q\bigr) = \Bigl(\ \sum_{i=1}^{n} 1,\ \ \sum_{i=1}^{n} x_i,\ \ \sum_{i=1}^{n} x_i^{2}\ \Bigr) $$
+    $$ T(A\cup B) = T(A)\oplus T(B) = \bigl(n_A+n_B,\ S_A+S_B,\ Q_A+Q_B\bigr) $$
+    <div class="f-note">白话：摘要就是三个数——个数、总和、平方和；合并就是<strong>逐分量相加</strong>。因为 $\sum_{A\cup B} x = \sum_A x + \sum_B x$、$\sum_{A\cup B}x^2=\sum_A x^2+\sum_B x^2$，加法天然满足结合律，单位元是 $(0,0,0)$，所以这是一个合法的 monoid。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">从摘要还原目标量</div>
+    $$ \bar x = \frac{S}{n},\qquad s^{2} = \frac{Q - S^{2}/n}{n-1} $$
+    <div class="f-note">白话：只要拿到 $(n,S,Q)$，均值和样本方差都能直接算出来，无需原始数据。所以 $T$ 是「充分的」：它把计算这两个量所需的全部信息压缩进了 3 个数字，与数据有多少行无关。</div>
+  </div>
+
+  <p>现在看那个隐蔽的坑。设两组各 $n_A,n_B$ 个点，样本方差分别 $s_A^2,s_B^2$，合并后均值 $\bar x$。正确的合并必须补上「组间均值差」这一块：</p>
+  <div class="formula-box">
+    <div class="f-name">反例①：「直接平均各分区方差」为什么错</div>
+    $$ s^{2}_{\mathrm{all}} = \frac{(n_A-1)s_A^{2} + (n_B-1)s_B^{2} + n_A(\bar x_A-\bar x)^{2} + n_B(\bar x_B-\bar x)^{2}}{n_A+n_B-1} $$
+    <div class="f-note">白话：总波动 = 组内波动（前两项）+ 组间波动（后两项，来自两组均值不一样）。直接算 $\tfrac12(s_A^2+s_B^2)$ 等于把后两项<strong>整块丢掉</strong>。代码实验里正确值 505.833333、错误平均 566.250000——差异全部来自被忽略的组间项。这是「方差可合并、但方差本身不是 monoid」的要害：monoid 的是 $(n,S,Q)$，不是 $s^2$。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">数值稳定的等价写法：Chan 合并 $(n,\bar x, M_2)$</div>
+    $$ \delta = \bar x_B - \bar x_A,\qquad \bar x = \bar x_A + \delta\,\frac{n_B}{n_A+n_B},\qquad M_2 = M_{2A} + M_{2B} + \delta^{2}\,\frac{n_A n_B}{n_A+n_B} $$
+    <div class="f-note">白话：$M_2=\sum(x_i-\bar x)^2$ 是「离差平方和」，合并时同样要补一项 $\delta^2 n_A n_B/n$（组间项）。这个形式不直接存 $Q$，从根上避开了「两个巨大数相减」的精度灾难，是分布式方差的工程标准（见代码实验 Part 2）。</div>
+  </div>
+
+  <p>最后给出中位数<strong>不可</strong>合并的构造性反例。考虑两个数据集，它们的「分区摘要 $(n,\ \mathrm{median})$」逐位相同：</p>
+  <div class="formula-box">
+    <div class="f-name">反例②：相同摘要，不同答案 ⇒ 不存在合并函数</div>
+    $$ D_1:\ A=[1,2,3,4,5],\ B=[6,7,8,9,10]\ \Longrightarrow\ \mathrm{median}(D_1)=5.5 $$
+    $$ D_2:\ A=[1,2,3,4,50],\ B=[6,7,8,9,10]\ \Longrightarrow\ \mathrm{median}(D_2)=6.5 $$
+    $$ \text{两种情形的分区摘要都是}\ (5,3)\ \text{与}\ (5,8)\ \Longrightarrow\ \nexists\ g:\ \text{摘要}\mapsto\text{全局中位数} $$
+    <div class="f-note">白话：若真存在一个只看摘要的合并函数 $g$，它面对完全相同的输入 $(5,3),(5,8)$ 只能给出一个输出，可两个数据集的全局中位数却是 5.5 与 6.5——矛盾。所以「精确中位数」不存在有限维可合并摘要：它依赖全局排序位置，而位置信息不在 $(n,\mathrm{median})$ 里。</div>
+  </div>
+
+  <p>数值证据见代码实验 Part 1：摘要 $(n,S,Q)$ 合并得 $(10,965.0,97675.0)$，与全量摘要逐位相等；由此还原的均值 96.5000、样本方差 505.833333 与全量一致，而「直接平均分区方差」得 566.250000（错），Chan 合并 $M_2=4552.5$ 又回到正确值；最大值也满足 $\max(A\cup B)=\max(\max A,\max B)=130$。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>一个统计量能「分块算完再精确合并」<strong>当且仅当</strong>存在有限维充分统计量与满足结合律的合并运算（交换 monoid）。$\mathrm{count},\ \mathrm{sum},\ \mathrm{mean},\ \mathrm{variance},\ \min,\ \max$ 都属于此类（方差的 monoid 是 $(n,S,Q)$ 或 $(n,\bar x,M_2)$，<strong>不是</strong> $s^2$ 本身）；而 $\mathrm{median}$、分位数、众数、精确去重计数依赖全局顺序或全集，<strong>不存在</strong>这样的有限维摘要。判断口诀：目标量能否只由「能相加的几个数」还原——能则可合并，不能就必须保留排序／草图／全量数据。</div>
+
+  <p><strong>边界条件：</strong>在需要精确分位数／中位数、目标量依赖数据顺序（自相关、游程、Top-K 的精确名次）、摘要维数随 $n$ 增长（精确基数计数）、或允许有界近似误差的条件下，本「有限维精确 monoid」结论不成立，应改用分布式归并排序／全量 shuffle 求精确值，或改用有误差保证的草图：t-digest / GK sketch 近似分位数、HyperLogLog 近似基数（相对误差约 $1.04/\sqrt m$）、Count-Min Sketch 近似频次（过高估计、有可控上界），并明确报告误差界而非冒充精确值。</p>
+
+  <p>下图是本章的大数据分层栈：从分片存储、局部摘要、可合并聚合到全局结果。可合并统计量让「只传摘要」这一层成立；一旦目标量落到中位数那一类，栈里就必须在某一层换草图或退回全量数据，通信量随之改变。</p>
+  <figure class="figure" id="fig-stack-bigdata">
+  <svg class="dia" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="大数据分析系统的分层架构"><rect class="dg-band" x="16" y="16" width="648" height="100" rx="10"/><text class="dg-band-label" x="28" y="34" text-anchor="start">数据源层 · 日志 / 事务 / 埋点 / 传感器</text><rect class="dg-box muted" x="28.0" y="48" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="127.33333333333333" y="71.0" text-anchor="middle">业务库</text><text class="dg-ts" x="127.33333333333333" y="88.0" text-anchor="middle">OLTP</text><rect class="dg-box muted" x="240.66666666666666" y="48" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="340.0" y="71.0" text-anchor="middle">事件流</text><text class="dg-ts" x="340.0" y="88.0" text-anchor="middle">Kafka</text><rect class="dg-box muted" x="453.3333333333333" y="48" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="552.6666666666666" y="71.0" text-anchor="middle">对象存储</text><text class="dg-ts" x="552.6666666666666" y="88.0" text-anchor="middle">Parquet</text><rect class="dg-band" x="16" y="136" width="648" height="100" rx="10"/><text class="dg-band-label" x="28" y="154" text-anchor="start">分布式存储层 · 分区 / 副本 / 列式</text><rect class="dg-box alt" x="28.0" y="168" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="127.33333333333333" y="191.0" text-anchor="middle">HDFS / S3</text><text class="dg-ts" x="127.33333333333333" y="208.0" text-anchor="middle">湖仓</text><rect class="dg-box alt" x="240.66666666666666" y="168" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="340.0" y="191.0" text-anchor="middle">列式格式</text><text class="dg-ts" x="340.0" y="208.0" text-anchor="middle">Parquet / ORC</text><rect class="dg-box alt" x="453.3333333333333" y="168" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="552.6666666666666" y="191.0" text-anchor="middle">元数据</text><text class="dg-ts" x="552.6666666666666" y="208.0" text-anchor="middle">Hive Metastore</text><rect class="dg-band" x="16" y="256" width="648" height="100" rx="10"/><text class="dg-band-label" x="28" y="274" text-anchor="start">计算引擎层 · 批 / 流 / 交互</text><rect class="dg-box" x="28.0" y="288" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="127.33333333333333" y="311.0" text-anchor="middle">Spark</text><text class="dg-ts" x="127.33333333333333" y="328.0" text-anchor="middle">批处理 / SQL</text><rect class="dg-box" x="240.66666666666666" y="288" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="340.0" y="311.0" text-anchor="middle">Flink</text><text class="dg-ts" x="340.0" y="328.0" text-anchor="middle">流式窗口</text><rect class="dg-box" x="453.3333333333333" y="288" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="552.6666666666666" y="311.0" text-anchor="middle">DuckDB</text><text class="dg-ts" x="552.6666666666666" y="328.0" text-anchor="middle">单机交互</text><rect class="dg-band" x="16" y="376" width="648" height="100" rx="10"/><text class="dg-band-label" x="28" y="394" text-anchor="start">统计与算法层 · 分布式统计量 / 近似</text><rect class="dg-box info" x="28.0" y="408" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="127.33333333333333" y="431.0" text-anchor="middle">可合并统计量</text><text class="dg-ts" x="127.33333333333333" y="448.0" text-anchor="middle">sum / count / 矩</text><rect class="dg-box info" x="240.66666666666666" y="408" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="340.0" y="431.0" text-anchor="middle">草图算法</text><text class="dg-ts" x="340.0" y="448.0" text-anchor="middle">HyperLogLog / Count-Min</text><rect class="dg-box info" x="453.3333333333333" y="408" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="552.6666666666666" y="431.0" text-anchor="middle">分布式训练</text><text class="dg-ts" x="552.6666666666666" y="448.0" text-anchor="middle">数据 / 模型并行</text><rect class="dg-band" x="16" y="496" width="648" height="100" rx="10"/><text class="dg-band-label" x="28" y="514" text-anchor="start">应用层 · 报表 / 实验 / 模型服务</text><rect class="dg-box ok" x="28.0" y="528" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="127.33333333333333" y="551.0" text-anchor="middle">BI 报表</text><text class="dg-ts" x="127.33333333333333" y="568.0" text-anchor="middle">指标口径</text><rect class="dg-box ok" x="240.66666666666666" y="528" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="340.0" y="551.0" text-anchor="middle">A/B 平台</text><text class="dg-ts" x="340.0" y="568.0" text-anchor="middle">分流与检验</text><rect class="dg-box ok" x="453.3333333333333" y="528" width="198.66666666666666" height="52" rx="8"/><text class="dg-t" x="552.6666666666666" y="551.0" text-anchor="middle">在线推理</text><text class="dg-ts" x="552.6666666666666" y="568.0" text-anchor="middle">SLA 与监控</text><line class="dg-edge strong" x1="340.0" y1="116" x2="340.0" y2="136"/><polygon class="dg-edge strong" points="340.0,136 336.7379163755234,128.69528847750152 343.2620836244766,128.69528847750152" fill="var(--line-strong)" stroke="none"/><line class="dg-edge strong" x1="340.0" y1="236" x2="340.0" y2="256"/><polygon class="dg-edge strong" points="340.0,256 336.7379163755234,248.69528847750152 343.2620836244766,248.69528847750152" fill="var(--line-strong)" stroke="none"/><line class="dg-edge strong" x1="340.0" y1="356" x2="340.0" y2="376"/><polygon class="dg-edge strong" points="340.0,376 336.7379163755234,368.69528847750155 343.2620836244766,368.69528847750155" fill="var(--line-strong)" stroke="none"/><line class="dg-edge strong" x1="340.0" y1="476" x2="340.0" y2="496"/><polygon class="dg-edge strong" points="340.0,496 336.7379163755234,488.69528847750155 343.2620836244766,488.69528847750155" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">大数据分析系统的分层架构</span>
+    <span class="fig-note">自下而上为数据源、分布式存储、计算引擎、统计/算法层与应用层；流式与批式在计算层分流。</span>
+    <span class="fig-src">类型：架构图 · 来源：<a href="../modules/m11-big-data.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 样本量上亿之后，p 值为什么会「失效」，以及该改看什么</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>p 值回答「有没有差异」，不回答「差异大不大、值不值得上线」；$n\to\infty$ 时它对任何非零效应都趋零</h3></div>
+  <p class="dt-lead">本章正文第 4 节（#s4）已经介绍过假设检验与 A/B 测试的显著性与功效；这里补上大数据场景最容易被误用的一点：当 $n$ 从一万涨到一亿，标准误会按 $1/\sqrt n$ 缩水，于是<strong>再小、再没有业务价值的真实差异也会变成「统计显著」</strong>。本节把这句话写成公式，并给出替代的决策口径：效应量 + 置信区间 + 事先约定的最小可检测效应（MDE）。</p>
+
+  <h4>背景：一个被「样本量」放大的老问题</h4>
+  <p>p 值的定义是「在零假设为真时，看到当前或更极端数据的概率」。它从设计上就只做一件事：判断「观测到的差异是否能用随机波动解释」。这个判断天然依赖标准误，而标准误随样本量增大而减小——样本越多，我们对「差异的估计」越精确，越有能力把哪怕极小的偏离从噪声里认出来。</p>
+  <p>在小样本时代这不是问题：能显著的效应通常也够大。但在日志级数据（千万、上亿行）里，一个「相对提升 0.2%」的改动照样能给出 $p\approx0$，于是「p 值显著」与「值得上线」彻底脱钩。这不是 p 值算错了，而是<strong>问错了问题</strong>：我们真正想知道的是「效应有多大、是否超过业务上值得做的门槛」，而不是「效应是否严格非零」。统计学界对此的共识是同时报告效应量与置信区间，并把决策锚定在后者与阈值的比较上。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把「标准误」想成尺子的最小刻度，把「真实差异」想成两个人身高的差。样本少时尺子刻度很粗（1 厘米），差 0.1 毫米根本量不出来，只能说「看不出差别」；样本多到上亿，尺子细到微米级，这时连 0.1 毫米都能被坚定地判为「确实不等」——p 值一路趋零。</p>
+  <p>但「确实不等」和「这 0.1 毫米值得我改产品」是两件事。关键的一句话：<strong>p 值随样本量自动趋零，是它对「精度」的忠实反映，不是对「重要性」的证明</strong>。正确的做法分两步：先看效应量本身有多大（这里用 Cohen's $h$，把比例差换算成与样本量无关的量纲），再看置信区间的<strong>下界</strong>是否超过事先约定的业务阈值 MDE——只有当「最保守的估计都还值得做」时才上线。另外，大数据里样本往往不独立（同一用户多次曝光、按班级／地区聚类），名义 $n$ 会把标准误压得过小，还得先折算成有效样本量。</p>
+
+  <h4>形式化：把「显著但不重要」写成可核对的等式</h4>
+  <div class="formula-box">
+    <div class="f-name">标准误、z 值与 p 值随 $n$ 的变化</div>
+    $$ se \approx \frac{1}{\sqrt{n}},\qquad z = \frac{\Delta}{se} = \Delta\sqrt{n},\qquad p = \mathrm{erfc}\!\left(\frac{|z|}{\sqrt{2}}\right) $$
+    <div class="f-note">白话：沿用案例口径（$p(1-p)\approx0.25$，两独立样本，$n=12000$ 时 $se=1/\sqrt n=0.009129$，与 <code>case.json</code> 的 se 逐位吻合）。$se$ 按 $1/\sqrt n$ 缩小，$z$ 就按 $\sqrt n$ 放大；只要真实效应 $\Delta\ne0$，$n\to\infty$ 时 $z\to\infty$、$p\to0$。$\mathrm{erfc}$ 只是把 $z$ 换成双尾概率的一个固定函数，不改趋势。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">决策口径：效应量 + 置信区间下界 vs 业务阈值</div>
+    $$ h = 2\arcsin\sqrt{p_1} - 2\arcsin\sqrt{p_2},\qquad \mathrm{CI}_{95\%} = \bigl[\hat\Delta - 1.96\,se,\ \hat\Delta + 1.96\,se\bigr] $$
+    $$ \text{上线判据：}\ \hat\Delta_{\mathrm{lower}} = \hat\Delta - 1.96\,se \ \gt\ \mathrm{MDE} $$
+    <div class="f-note">白话：Cohen's $h$ 把「比例差」换算成与 $n$ 无关的效应量（代码实验里固定为 0.002000，极小）；置信区间半宽 $1.96\,se$ 也随 $n$ 缩小。真正的上线判据是「区间下界都要大于事先约定的 MDE」——它同时要求「效应够大」与「估得够准」，而 p 值只管后者。MDE 必须在看数据之前由业务定好，不能事后挪动。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">名义 $n$ 被簇内相关稀释：设计效应与有效样本量</div>
+    $$ deff = 1 + (m-1)\rho,\qquad n_{\mathrm{eff}} = \frac{n}{deff},\qquad se_{\mathrm{eff}} = se\sqrt{deff},\qquad z_{\mathrm{eff}} = \frac{z}{\sqrt{deff}} $$
+    <div class="f-note">白话：若每簇 $m$ 条、簇内相关 $\rho$，有效信息量只有 $n/deff$ 条。代码实验取 $m=5,\rho=0.3\Rightarrow deff=2.2$，把临近显著的 $z=2.0$ 拉回 $1.3484$、p 从 0.0455 翻回 0.1775。这说明「样本多」不等于「独立信息多」，大日志里尤其要先查依赖结构。</div>
+  </div>
+
+  <h4>数值对账：一个「永远显著、永远不该上线」的效应</h4>
+  <p>固定真实但业务上可忽略的效应 $\Delta=0.001$（相对基线 $0.49725$ 提升约 0.20%），事先约定 $\mathrm{MDE}=0.01$（1 个百分点才值得上线）。以下每行都来自代码实验 Part 3，可用笔复核：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$n$</th><th>$se$</th><th>$z$</th><th>$p$（双尾）</th><th>CI 半宽</th><th>Cohen $h$</th><th>$p \lt .05$?</th><th>该上线?</th></tr></thead>
+      <tbody>
+        <tr><td>1,000</td><td>0.031623</td><td>0.0316</td><td>9.748e-01</td><td>0.061981</td><td>0.002000</td><td>no</td><td>no</td></tr>
+        <tr><td>10,000</td><td>0.010000</td><td>0.1000</td><td>9.203e-01</td><td>0.019600</td><td>0.002000</td><td>no</td><td>no</td></tr>
+        <tr><td>100,000</td><td>0.003162</td><td>0.3162</td><td>7.518e-01</td><td>0.006198</td><td>0.002000</td><td>no</td><td>no</td></tr>
+        <tr><td>4,000,000</td><td>0.000500</td><td>2.0000</td><td>4.550e-02</td><td>0.000980</td><td>0.002000</td><td>YES</td><td>no</td></tr>
+        <tr><td>10,000,000</td><td>0.000316</td><td>3.1623</td><td>1.565e-03</td><td>0.000620</td><td>0.002000</td><td>YES</td><td>no</td></tr>
+        <tr><td>120,000,000</td><td>0.000091</td><td>10.9545</td><td>6.326e-28</td><td>0.000179</td><td>0.002000</td><td>YES</td><td>no</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>读法：从 $n\approx4\times10^{6}$ 起 $p \lt 0.05$ 且此后一路趋零，到 1.2 亿行时 $p=6.326\times10^{-28}$；可 $\mathrm{CI}$ 下界 $\Delta-1.96\,se$ 始终约 $0.001$，远小于 $\mathrm{MDE}=0.01$，<strong>六行全部「no 该上线」</strong>。Cohen's $h$ 恒为 0.002000，与 $n$ 无关，一早就告诉我们「效应小得可怜」。更扎心的对照：把案例真实 ATE $0.123167$ 缩小 100 倍成 $0.001232$，在 1.2 亿行上仍得 $p=1.737\times10^{-41}$——统计显著与业务重要完全脱钩。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>p 值衡量的仅是「效应是否可判为非零」，且因 $se\propto 1/\sqrt n$、$z=\Delta\sqrt n$，对<strong>任意</strong> $\Delta\ne0$ 都会随 $n\to\infty$ 趋零；它不携带「效应有多大、值不值得做」的信息。大样本决策应改为三件套：<strong>与 $n$ 无关的效应量</strong>（Cohen's $h$）、<strong>置信区间</strong>、以及<strong>事先约定的 MDE</strong>，判据取 $\hat\Delta_{\mathrm{lower}} \gt \mathrm{MDE}$；若样本存在簇内相关，还须先用 $deff=1+(m-1)\rho$ 折算 $n_{\mathrm{eff}}$ 与簇稳健标准误，否则名义 $n$ 会把 p 值系统性压小。</div>
+
+  <p><strong>边界条件：</strong>在样本非独立同分布（簇内相关、同一用户重复曝光、时间序列自相关）、存在多重比较或反复窥探数据（peeking，需 always-valid / 序贯检验）、效应估计本身有系统偏差（混淆、选择偏差、测量误差，显著也不代表因果）、或 MDE 未在实验前冻结而事后按结果挪动的条件下，本结论不成立，应改用簇稳健／分层标准误与 $n_{\mathrm{eff}}$、序贯或贝叶斯决策框架、以及先做因果识别再做估计；p 值此时连「是否非零」都不可靠，更不能拿来当上线依据。</p>
+
+  <p>下图是本章的 Map → Shuffle → Reduce 流水线：名义样本量 $n$ 在每一层被层层放大，而有效信息量因簇结构被稀释；p 值失效恰恰发生在最右端「只用名义 $n$ 算标准误、却拿它当业务结论」的那一刻。把评估锚点从 p 值移到效应量与区间，等于给这一环补上被漏掉的有效样本量与业务阈值。</p>
+  <figure class="figure" id="fig-flow-mapreduce">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MapReduce：可合并统计量的执行链"><rect class="dg-box muted" x="20.0" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="73.6" y="94.0" text-anchor="middle">Split</text><text class="dg-ts" x="73.6" y="111.0" text-anchor="middle">按块切分</text><rect class="dg-box alt" x="153.2" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="206.79999999999998" y="94.0" text-anchor="middle">Map</text><text class="dg-ts" x="206.79999999999998" y="111.0" text-anchor="middle">局部 (n, Σx, Σx²)</text><line class="dg-edge" x1="127.19999999999999" y1="97.0" x2="153.2" y2="97.0"/><polygon class="dg-edge" points="153.2,97.0 145.8952884775015,100.26208362447656 145.8952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="286.4" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">Shuffle</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">按键归并</text><line class="dg-edge" x1="260.4" y1="97.0" x2="286.4" y2="97.0"/><polygon class="dg-edge" points="286.4,97.0 279.0952884775015,100.26208362447656 279.0952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="419.59999999999997" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="473.2" y="94.0" text-anchor="middle">Reduce</text><text class="dg-ts" x="473.2" y="111.0" text-anchor="middle">合并充分统计量</text><line class="dg-edge" x1="393.59999999999997" y1="97.0" x2="419.59999999999997" y2="97.0"/><polygon class="dg-edge" points="419.59999999999997,97.0 412.2952884775015,100.26208362447656 412.2952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="552.8" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="606.4" y="94.0" text-anchor="middle">Output</text><text class="dg-ts" x="606.4" y="111.0" text-anchor="middle">全局均值 / 方差</text><line class="dg-edge" x1="526.8" y1="97.0" x2="552.8" y2="97.0"/><polygon class="dg-edge" points="552.8,97.0 545.4952884775015,100.26208362447656 545.4952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">MapReduce：可合并统计量的执行链</span>
+    <span class="fig-note">均值、方差等可分解为「分块充分统计量 → 归并 → 汇总」，这是大样本统计能分布式计算的根本原因。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../modules/m11-big-data.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 分布式方差：并行充分统计量（Welford / Chan 合并）</h2>
+<div class="algo-spec">
+  <p>本算法位于「分片存储 → 局部聚合 → 全局归并」链条的<strong>聚合环节</strong>，是深度专题一「$(n,\bar x,M_2)$ 是方差的可合并充分统计量」这一结论的工程落地，同时专门修复朴素 $(n,S,Q)$ 在大数据上的数值精度灾难。上游契约是「每个分片维护一个三元组摘要」，下游契约是「与全量重算逐位一致的样本方差，且只传常数个数」。选它作经典算法，是因为它把「统计正确性」「可合并性」「数值稳定性」三件事用同一个三元组一次解决，是「分布式代数 ↔ 可信统计」之间最短的一座桥；HyperLogLog、Count-Min Sketch 属于「精确不可合并 → 退而求近似」的另一条路线，已在上一个专题的边界里点明。</p>
+
+  <h3 id="d-algo-principle">一、原理：只维护离差，不维护巨大的平方和</h3>
+  <p>朴素做法把方差写成 $s^2=(Q-S^2/n)/(n-1)$，其中 $S=\sum x_i,\ Q=\sum x_i^2$。当数据均值很大而方差很小（例如时间戳 $x\approx10^9$、波动只有个位数），$Q$ 与 $S^2/n$ 是两个几乎相等的巨大数，相减会发生<strong>灾难性抵消</strong>，把有效数字吃光，算出方差为 0。Welford (1962) 与 Chan 等人 (1979) 的办法是换个摘要：不存 $Q$，改存</p>
+  <div class="formula-box">
+    <div class="f-name">单个分片：Welford 在线更新</div>
+    $$ M_2 = \sum_{i=1}^{n}\bigl(x_i - \bar x\bigr)^{2},\qquad M_2^{\text{new}} = M_2 + (x-\bar x_{\text{old}})\,(x-\bar x_{\text{new}}) $$
+    <div class="f-note">白话：每来一个新数，先更新均值，再用「新旧离差的乘积」把 $M_2$ 累加一格；全程只跟「离均值的距离」打交道，数值始终与波动同量级，与均值多大无关。一步 $O(1)$、可流式、无需存原始数据。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">两个分片：Chan 合并（补回组间项）</div>
+    $$ \delta = \bar x_B - \bar x_A,\qquad n = n_A+n_B,\qquad \bar x = \bar x_A + \delta\,\frac{n_B}{n} $$
+    $$ M_2 = M_{2A} + M_{2B} + \delta^{2}\,\frac{n_A n_B}{n},\qquad s^{2} = \frac{M_2}{n-1} $$
+    <div class="f-note">白话：合并两份 $(n,\bar x,M_2)$ 时，除了把 $M_2$ 相加，还要补一项 $\delta^2 n_A n_B/n$——这正是「两组均值不一样」带来的额外波动，与深度专题一的 law of total variance 是同一块。这个运算满足结合律，可任意树形归约；单位元是 $(0,\ 0,\ 0)$。</div>
+  </div>
+  <p>为什么它稳定：朴素式的绝对误差约为 $2u\mu^2$（$u=2^{-53}$ 为双精度机器 epsilon，$\mu$ 是均值），条件数 $\kappa\approx2(\mu/\sigma)^2$；当 $\mu=10^9,\sigma^2=2$ 时 $\kappa\approx10^{18}$，远超双精度约 16 位有效数字，误差 $\approx222$ 比真值 2 还大两个数量级。而 Welford/Chan 只存 $M_2$，误差约 $n u \sigma^2\approx1.11\times10^{-15}$，<strong>与 $\mu$ 无关</strong>。代码实验 Part 2 把这两者摆在同一组数据上对照。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>分片。</strong>把数据按机器／分区切成 $P$ 片，片之间可以乱序、可以大小不一；切分本身不参与任何统计假设。</li>
+    <li><strong>局部 Welford。</strong>每片独立跑一遍：维护 $(n_j,\bar x_j,M_{2,j})$，逐条用更新式累加；空间 $O(1)$、时间 $O(n_j)$。</li>
+    <li><strong>树形归约。</strong>用 Chan 合并把 $P$ 个三元组两两归并（结合律保证任意括号顺序结果相同）；通信量每片仅 3 个数。</li>
+    <li><strong>还原方差。</strong>全局 $(n,\bar x,M_2)$ 到手后，样本方差 $s^2=M_2/(n-1)$、总体方差 $M_2/n$、均值 $\bar x$ 一并给出。</li>
+    <li><strong>校验一致性。</strong>用一小片同时跑「全量重算」与「合并结果」，确认逐位相等（代码实验 Part 1 的 <code>一致=True</code> 即此）。</li>
+    <li><strong>报告数值口径。</strong>明确是样本还是总体方差、是否做了 Bessel 校正 $(n-1)$；大数据里 $n$ 极大时两者几乎相同，但仍要写清。</li>
+    <li><strong>按需扩展。</strong>若要协方差／相关矩阵，把标量 $M_2$ 换成离差交叉积矩阵，Chan 合并公式逐元素成立即可，无需改动归并框架。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>目标量：</strong>均值、方差／标准差，以及可归约为离差矩的协方差、相关、最小二乘充分统计量；不适用于中位数、分位数等需全局排序的量。</li>
+    <li><strong>数据形态：</strong>数值型、可流式到达；各分片分布可以不同（组间差由 Chan 项自动补回），但样本应可视为来自同一总体。</li>
+    <li><strong>依赖结构：</strong>分片内／分片间样本近似独立；若存在簇内相关，方差点估计仍可算，但标准误须按深度专题二的 $deff$ 折算。</li>
+    <li><strong>数值范围：</strong>特别适合「均值大、方差小」的场景（时间戳、金额、传感器基线），这正是朴素式最危险的地方。</li>
+    <li><strong>规模：</strong>$n$ 任意、$P$ 任意；摘要维数恒为 3（协方差时为 $O(p^2)$ 但仍与 $n$ 无关）。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>局部</b> 每片 Welford 单遍 $O(n_j)$ 时间、$O(1)$ 空间。<b>归并</b> $P$ 个三元组树形合并 $O(P)$ 次 Chan 运算、每次 $O(1)$，通信量 $O(P)$ 个浮点数；用归约树深度 $O(\log P)$ 轮。<b>总时间</b> $O(n)$（$n=\sum n_j$）且只需<strong>一趟</strong>数据，可与「朴素两趟算法」并列为最优。<b>空间</b> 全局 $O(P)$ 存摘要，单机 $O(1)$；不存原始数据 $O(n)$。<b>对比</b> 全量收齐重算需 $O(n)$ 传输 + $O(n)$ 内存；精确中位数需 $O(n\log n)$ 排序或 $O(n)$ 归并。</div>
+  <p>白话：这套方法的成本几乎全在「把每片扫一遍」，归并只是几个数的加法；相对把所有原始记录搬到一台机器上，通信与内存都从 $O(n)$ 降到 $O(P)$。唯一「多付」的是每个分片要维护 $M_2$ 而非只维护 sum，但这是常数级代价，换来的是数值稳定与可合并两件事。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>可合并且满足结合律：任意分片、任意归约顺序都与全量重算逐位一致，天然适配 MapReduce / 流式 / 树形聚合。</li>
+        <li>数值稳定：只维护离差 $M_2$，误差 $\sim n u\sigma^2$ 与均值 $\mu$ 无关，根治灾难性抵消。</li>
+        <li>一趟扫描、$O(1)$ 空间、通信 $O(P)$：大数据下最省，且可在线增量更新。</li>
+        <li>摘要就是充分统计量 $(n,\bar x,M_2)$，均值、样本／总体方差、标准误一次给出，便于审计。</li>
+        <li>易扩展：标量换成离差交叉积即得并行协方差／回归充分统计量，归并框架不变。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>只适用于可归约为「离差矩」的目标量；中位数、分位数、精确基数等不能靠它精确求解。</li>
+        <li>点估计不自动处理簇内相关：方差值对，但标准误／p 值仍须按 $deff$ 折算，否则大 $n$ 下照样误导。</li>
+        <li>对离群点敏感（平方损失的本质）；重尾数据需先做稳健化或换 MAD 等稳健尺度。</li>
+        <li>假设各分片来自同一总体；若分片间存在系统性漂移，合并出的方差混合了组间漂移，解释需谨慎。</li>
+        <li>归并要求浮点加法结合律在数值上近似成立；极端病态量级下仍需补偿求和（Kahan）等额外手段。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>取两片可笔算的小数据（沿用案例 <code>study_minutes_week</code> 风格）：$A=[60,80,95,110,130]$、$B=[70,90,100,105,125]$，各 5 个数。以下每一步都能用笔复核，并与代码实验 Part 1 逐位对上。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">A 片摘要。</span>$\sum A=475\Rightarrow\bar x_A=95$；离差 $-35,-15,0,15,35$，平方和 $M_{2A}=1225+225+0+225+1225=2900$；$\sum A^2=48025$。</div>
+    <div class="solve-step"><span class="ss-k">B 片摘要。</span>$\sum B=490\Rightarrow\bar x_B=98$；离差 $-28,-8,2,7,27$，平方和 $M_{2B}=784+64+4+49+729=1630$；$\sum B^2=49650$。</div>
+    <div class="solve-step"><span class="ss-k">先写「错」的做法。</span>直接平均分区样本方差 $=\tfrac12\bigl(\tfrac{2900}{4}+\tfrac{1630}{4}\bigr)=\tfrac12(725+407.5)=566.250000$——这就是代码里的 <code>反例① 566.250000</code>，它把组间波动整块丢了。</div>
+    <div class="solve-step"><span class="ss-k">Chan 合并（正确）。</span>$n=10$，$\delta=98-95=3$，$\bar x=95+3\cdot5/10=96.5$；$M_2=2900+1630+3^2\cdot\tfrac{5\cdot5}{10}=4530+22.5=4552.5$。样本方差 $s^2=4552.5/9=505.833333$，与代码 <code>Chan 合并 M2: 4552.500000 / 样本方差=505.833333</code> 逐位一致。</div>
+    <div class="solve-step"><span class="ss-k">用 $(n,S,Q)$ 交叉验算。</span>$S=475+490=965$，$Q=48025+49650=97675$，$S^2/n=931225/10=93122.5$，$Q-S^2/n=4552.5$，$/9=505.833333$——与全量摘要逐位相等（代码 <code>merge(A,B)==全量摘要 : True</code>）。组间项 $22.5$ 正是「错解」与「正解」之差的来源：$566.25-505.833333=60.4167$ 里对应着两块方差口径的换算。</div>
+    <div class="solve-step"><span class="ss-k">切到数值稳定性。</span>换一组极端数据 $x=10^9+[-2,-1,0,1,2]$，真实 $M_2=(-2)^2+(-1)^2+0^2+1^2+2^2=10$，样本方差 $=10/4=2.5$。朴素式：$S=5\times10^9$，$Q=5\times10^{18}+10$，而 $S^2/n=5\times10^{18}$——双精度下 $5\times10^{18}+10$ 被舍入成 $5\times10^{18}$，相减得 <code>0.000000</code>（代码实测）。</div>
+    <div class="solve-step"><span class="ss-k">Welford 为何稳。</span>它从头到尾只累计 $M_2=10$，故样本方差 $=2.500000$（代码实测）。误差界：朴素式 $\approx2u\mu^2=2\cdot2^{-53}\cdot10^{18}\approx222$，而 $\sigma^2=2$；条件数 $\kappa\approx2(\mu/\sigma)^2\approx2(10^9/\sqrt2)^2\approx1.00\times10^{18}$。Welford 误差 $\approx n u\sigma^2=5\cdot2^{-53}\cdot2\approx1.11\times10^{-15}$，与 $\mu$ 无关——代码末行逐位印出这些数字。</div>
+    <div class="solve-step"><span class="ss-k">推广。</span>把 $M_2$ 这个标量换成「离差向量的外积累加」，同一条 Chan 公式逐元素成立，即得并行协方差矩阵与 OLS 的 $X^\top X,\ X^\top y$——这正是大数据回归把「充分统计量」分散到各机器再归并的标准做法。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把 Chan/Welford 并行合并与三种「算分布式方差」的同类做法放在一起对照。最右一列「全量收齐重算」是精度基准，也是通信／内存代价最高的一档；「朴素 $(n,S,Q)$」是反例式的补充：它同样可合并，却在大均值下把精度算丢。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>Chan/Welford 并行合并</th><th>朴素 $(n,S,Q)$ 合并</th><th>两趟算法（先均值后离差）</th><th>全量收齐重算</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>数值型、可流式、分片乱序；均值大／方差小亦稳；任意 $P$</td>
+        <td>数值型、量级温和（$\mu$ 不压倒 $\sigma$）；需可合并摘要</td>
+        <td>数据可重读两遍；量级温和；单机或小集群</td>
+        <td>数据能搬到单点；作为精度基准，任意分布</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td class="best">局部 $O(n_j)$ 单遍、空间 $O(1)$、归并 $O(P)$、通信 $O(P)$</td>
+        <td>同左，单遍、$O(1)$、通信 $O(P)$；常数略小</td>
+        <td>$O(n)$ 但需<strong>两遍</strong>扫描、空间 $O(1)$、通信 $O(P)$</td>
+        <td>时间 $O(n)$、空间 $O(n)$、通信 $O(n)$，最重</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>摘要 $(n,\bar x,M_2)$；是否用 Kahan 补偿求和；样本／总体口径</td>
+        <td>摘要 $(n,S,Q)$；Bessel 校正 $(n-1)$；浮点字长</td>
+        <td>第一趟估均值 $\bar x$ 的精度；是否分块缓存</td>
+        <td>无（直接对全量排序／累加）；内存上限</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">可合并且结合律成立、数值最稳、一趟、通信最小、易扩到协方差</td>
+        <td>合并形式最直观、与教科书公式直接对应、实现最简</td>
+        <td>精度优于朴素式（离差围绕已估均值算）、概念简单</td>
+        <td>结果即「金标准」，无归并误差，便于校验其它方法</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>只覆盖可归约为离差矩的量；簇相关需另折 $deff$；对离群点敏感</td>
+        <td>$\mu\gg\sigma$ 时灾难性抵消：$\kappa\approx10^{18}$ 算出方差 0；大时间戳／金额必错</td>
+        <td>必须读两遍数据，流式／单次扫描场景不可行；$\bar x$ 有误差会传导</td>
+        <td>$O(n)$ 传输与内存，大数据下不可行；丧失分布式意义</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>摘要=「个数、均值、离差平方和」，一句话讲清；改造成本最低</td>
+        <td>最易讲（平方和减均值平方），但「看似对、实则错」风险最高、最难审计</td>
+        <td>「先求平均再求波动」直观；需维护两遍调度，运维中等</td>
+        <td>无需解释但需集中式资源；工程成本随 $n$ 线性膨胀</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>六维口径由下图统一约定，保证全站各章的「横向对比」在同一套标准下展开，不随章节改变。三条「可合并」路线里，只有 Chan/Welford 同时守住了统计正确性与数值稳定性；这也解释了为何工业级聚合器默认维护 $M_2$ 而非 $Q$。</p>
+  <figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-code">代码实验 · 可合并统计量、中位反例、数值稳定性与大 n 下 p 值失效的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 11 大数据分析的统计基础
+# 纯 Python 标准库；固定种子 20261107；复用「知学云」案例数字
+# Part 1: 可合并统计量（monoid / 充分统计量）与中位数的反例
+# Part 2: 分布式方差的数值稳定性（灾难性抵消）与 Chan 合并
+# Part 3: 巨大 n 下 p 值失效，改用效应量 + 区间 + 业务阈值
+import math
+import random
+
+random.seed(20261107)
+
+# ============================================================
+print("=== Part 1: 哪些统计量可合并（monoid），哪些不可 ===")
+A = [60, 80, 95, 110, 130]        # 案例 study_minutes_week 风格的 5 个值
+B = [70, 90, 100, 105, 125]
+
+
+def summ(xs):
+    """局部充分统计量 (n, S=sum x, Q=sum x^2)。"""
+    return (len(xs), float(sum(xs)), float(sum(x * x for x in xs)))
+
+
+def merge(p, q):
+    """逐分量相加：结合律 + 单位元 (0,0,0) 构成交换 monoid。"""
+    return (p[0] + q[0], p[1] + q[1], p[2] + q[2])
+
+
+def mean_of(s):
+    return s[1] / s[0]
+
+
+def var_sample(s):
+    n, S, Q = s
+    return (Q - S * S / n) / (n - 1)
+
+
+def welford(xs):
+    n, m, M2 = 0, 0.0, 0.0
+    for x in xs:
+        n += 1
+        d = x - m
+        m += d / n
+        M2 += d * (x - m)
+    return (n, m, M2)
+
+
+def chan(p, q):
+    """Chan 并行合并 (n, mean, M2)。"""
+    na, ma, Ma = p
+    nb, mb, Mb = q
+    n = na + nb
+    delta = mb - ma
+    m = ma + delta * nb / n
+    M2 = Ma + Mb + delta * delta * na * nb / n
+    return (n, m, M2)
+
+
+def median(xs):
+    s = sorted(xs)
+    n = len(s)
+    return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2.0
+
+
+sA, sB = summ(A), summ(B)
+sM = merge(sA, sB)
+sF = summ(A + B)
+print("局部摘要  A=(n,S,Q)=%s  B=(n,S,Q)=%s" % (sA, sB))
+print("合并摘要  merge(A,B)=(n,S,Q)=%s  == 全量摘要 %s : %s" %
+      (sM, sF, sM == sF))
+print("均值 merge: %.4f  全量: %.4f  一致=%s" %
+      (mean_of(sM), mean_of(sF), abs(mean_of(sM) - mean_of(sF)) &lt; 1e-12))
+print("样本方差 merge: %.6f  全量: %.6f  一致=%s" %
+      (var_sample(sM), var_sample(sF), abs(var_sample(sM) - var_sample(sF)) &lt; 1e-9))
+print("反例①『直接平均各分区样本方差』= %.6f  ← 错！忽略组间均值差" %
+      ((var_sample(sA) + var_sample(sB)) / 2))
+print("Chan 合并 M2: %.6f  全量 M2: %.6f  样本方差=%.6f" %
+      (chan(welford(A), welford(B))[2], welford(A + B)[2],
+       chan(welford(A), welford(B))[2] / (len(A + B) - 1)))
+print("max 也是 monoid: max(A+B)=%d == max(max(A),max(B))=%d" %
+      (max(A + B), max(max(A), max(B))))
+print()
+
+print("中位数不可合并：两个数据集的『分区摘要 (n, median)』完全相同，全局中位数却不同")
+D1A, D1B = [1, 2, 3, 4, 5], [6, 7, 8, 9, 10]
+D2A, D2B = [1, 2, 3, 4, 50], [6, 7, 8, 9, 10]
+for tag, (pa, pb) in enumerate(((D1A, D1B), (D2A, D2B)), 1):
+    print("  数据集%d: A=%s (n=%d,median=%s)  B=%s (n=%d,median=%s)" %
+          (tag, pa, len(pa), median(pa), pb, len(pb), median(pb)))
+    print("           全局排序=%s  → 全局中位数=%s" %
+          (sorted(pa + pb), median(pa + pb)))
+print("  → 分区摘要都是 (5,3)+(5,8)，却给出 5.5 与 6.5：不存在这样的合并函数。")
+print("  → 结论：均值/方差/max/sum 是有限维充分统计量；精确中位数需要全量排序或 O(n) 草图。")
+print()
+
+# ============================================================
+print("=== Part 2: 分布式方差的数值稳定性（灾难性抵消）===")
+MU = 1e9
+OFF = [-2, -1, 0, 1, 2]
+xs = [MU + t for t in OFF]
+TRUTH_POP = sum(t * t for t in OFF) / len(OFF)      # 2.0
+TRUTH_SAMPLE = sum(t * t for t in OFF) / (len(OFF) - 1)   # 2.5
+n = len(xs)
+S = float(sum(xs))
+Q = float(sum(x * x for x in xs))
+naive_sample = (Q - S * S / n) / (n - 1)
+naive_pop = Q / n - (S / n) ** 2
+w = welford(xs)
+c = chan(welford(xs[:3]), welford(xs[3:]))
+print("数据 x = 1e9 + [-2,-1,0,1,2]；真实总体方差=%.1f，样本方差=%.1f" %
+      (TRUTH_POP, TRUTH_SAMPLE))
+print("朴素 (n,S,Q):  S=%.1f  Q=%.1f" % (S, Q))
+print("  样本方差 = %.6f   总体方差 = %.6f   ← Q 与 S^2/n 前 16 位相同，相减把有效位吃光" %
+      (naive_sample, naive_pop))
+print("Welford   M2=%.6f  → 样本方差 = %.6f" % (w[2], w[2] / (n - 1)))
+print("Chan 合并 M2=%.6f  → 样本方差 = %.6f" % (c[2], c[2] / (n - 1)))
+U = 2.0 ** -53            # 双精度机器 epsilon 量级
+print("误差界：朴素式绝对误差 ≈ 2*u*mu^2 ≈ %.1f，而 sigma^2=%.1f；" %
+      (2 * U * MU ** 2, TRUTH_POP))
+print("        条件数 kappa ≈ 2*(mu/sigma)^2 ≈ %.2e，双精度 ~16 位有效数字不足。" %
+      (2 * (MU / math.sqrt(TRUTH_POP)) ** 2))
+print("        Welford/Chan 只维护离差 M2，误差 ~ n*u*sigma^2 ≈ %.2e，与 mu 无关。" %
+      (n * U * TRUTH_POP))
+print()
+
+# ============================================================
+print("=== Part 3: 巨大 n 下 p 值失效，改看效应量 + 区间 ===")
+P0 = 0.49725            # case: completed_rate
+SE_CASE, N_CASE = 0.009129, 12000
+print("案例校验：n=%d 时 1/sqrt(n) = %.6f，与案例 se=%.6f 一致（p(1-p)≈0.25）" %
+      (N_CASE, 1 / math.sqrt(N_CASE), SE_CASE))
+DELTA = 0.001           # 真实但业务上可忽略的效应：0.1 个百分点
+MDE = 0.01              # 事先约定的业务阈值：1 个百分点
+
+
+def p_two_sided(z):
+    return math.erfc(abs(z) / math.sqrt(2.0))
+
+
+def cohen_h(p1, p2):
+    return 2 * math.asin(math.sqrt(p1)) - 2 * math.asin(math.sqrt(p2))
+
+
+print("固定真实效应 Delta=%.4f（相对提升 %.2f%%），阈值 MDE=%.4f" %
+      (DELTA, 100 * DELTA / P0, MDE))
+print("%12s %10s %9s %12s %11s %10s %9s %s" %
+      ("n", "se", "z", "p(two-sided)", "CI_half", "Cohen h", "p&lt;.05?", "ship?"))
+for n in (1e3, 1e4, 1e5, 4e6, 1e7, 1.2e8):
+    se = 1.0 / math.sqrt(n)
+    z = DELTA / se
+    p = p_two_sided(z)
+    hw = 1.96 * se
+    h = cohen_h(P0 + DELTA, P0)
+    lower = DELTA - hw
+    sig = "YES" if p &lt; 0.05 else "no"
+    ship = "YES" if lower &gt; MDE else "no"
+    print("%12.0f %10.6f %9.4f %12.3e %11.6f %10.6f %9s %s" %
+          (n, se, z, p, hw, h, sig, ship))
+print("→ n≈4e6 起 p&lt;0.05 且以后一路趋零；但 CI 下界始终 &lt; MDE，业务上永不该上线。")
+print()
+
+# 案例真实效应 vs 它的百分之一，在 1.2 亿日志上
+for d, tag in ((0.123167, "案例真实 ATE"), (0.00123167, "ATE 的 1/100")):
+    n = 1.2e8
+    z = d * math.sqrt(n)
+    print("%s: Delta=%.6f, n=%.0f → z=%.4f, p=%.3e, 相对提升=%.3f%%" %
+          (tag, d, n, z, p_two_sided(z), 100 * d / P0))
+print("→ 0.12 个百分点的效应在 1.2 亿行上同样 p≈0：统计显著 ≠ 业务重要。")
+print()
+
+# i.i.d. 被破坏：簇内相关使有效样本量缩水
+DEFF = 1 + (5 - 1) * 0.3     # m=5, rho=0.3 → deff=2.2
+print("i.i.d. 松动：m=5, rho=0.3 → deff=1+(m-1)rho=%.1f，se_eff=se*sqrt(deff)" % DEFF)
+for n in (4e6, 1e7):
+    z = DELTA * math.sqrt(n)
+    z_eff = z / math.sqrt(DEFF)
+    print("  n=%.0f: z=%.4f(p=%.4f) → 修正 z_eff=%.4f(p=%.4f)" %
+          (n, z, p_two_sided(z), z_eff, p_two_sided(z_eff)))
+print("→ 名义 n 会把标准误压得过小；簇稳健标准误 / n_eff 折算后，临近显著的结论会翻回不显著。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: 哪些统计量可合并（monoid），哪些不可 ===
+局部摘要  A=(n,S,Q)=(5, 475.0, 48025.0)  B=(n,S,Q)=(5, 490.0, 49650.0)
+合并摘要  merge(A,B)=(n,S,Q)=(10, 965.0, 97675.0)  == 全量摘要 (10, 965.0, 97675.0) : True
+均值 merge: 96.5000  全量: 96.5000  一致=True
+样本方差 merge: 505.833333  全量: 505.833333  一致=True
+反例①『直接平均各分区样本方差』= 566.250000  ← 错！忽略组间均值差
+Chan 合并 M2: 4552.500000  全量 M2: 4552.500000  样本方差=505.833333
+max 也是 monoid: max(A+B)=130 == max(max(A),max(B))=130
+
+中位数不可合并：两个数据集的『分区摘要 (n, median)』完全相同，全局中位数却不同
+  数据集1: A=[1, 2, 3, 4, 5] (n=5,median=3)  B=[6, 7, 8, 9, 10] (n=5,median=8)
+           全局排序=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  → 全局中位数=5.5
+  数据集2: A=[1, 2, 3, 4, 50] (n=5,median=3)  B=[6, 7, 8, 9, 10] (n=5,median=8)
+           全局排序=[1, 2, 3, 4, 6, 7, 8, 9, 10, 50]  → 全局中位数=6.5
+  → 分区摘要都是 (5,3)+(5,8)，却给出 5.5 与 6.5：不存在这样的合并函数。
+  → 结论：均值/方差/max/sum 是有限维充分统计量；精确中位数需要全量排序或 O(n) 草图。
+
+=== Part 2: 分布式方差的数值稳定性（灾难性抵消）===
+数据 x = 1e9 + [-2,-1,0,1,2]；真实总体方差=2.0，样本方差=2.5
+朴素 (n,S,Q):  S=5000000000.0  Q=5000000000000000000.0
+  样本方差 = 0.000000   总体方差 = 0.000000   ← Q 与 S^2/n 前 16 位相同，相减把有效位吃光
+Welford   M2=10.000000  → 样本方差 = 2.500000
+Chan 合并 M2=10.000000  → 样本方差 = 2.500000
+误差界：朴素式绝对误差 ≈ 2*u*mu^2 ≈ 222.0，而 sigma^2=2.0；
+        条件数 kappa ≈ 2*(mu/sigma)^2 ≈ 1.00e+18，双精度 ~16 位有效数字不足。
+        Welford/Chan 只维护离差 M2，误差 ~ n*u*sigma^2 ≈ 1.11e-15，与 mu 无关。
+
+=== Part 3: 巨大 n 下 p 值失效，改看效应量 + 区间 ===
+案例校验：n=12000 时 1/sqrt(n) = 0.009129，与案例 se=0.009129 一致（p(1-p)≈0.25）
+固定真实效应 Delta=0.0010（相对提升 0.20%），阈值 MDE=0.0100
+           n         se         z p(two-sided)     CI_half    Cohen h    p&lt;.05? ship?
+        1000   0.031623    0.0316    9.748e-01    0.061981   0.002000        no no
+       10000   0.010000    0.1000    9.203e-01    0.019600   0.002000        no no
+      100000   0.003162    0.3162    7.518e-01    0.006198   0.002000        no no
+     4000000   0.000500    2.0000    4.550e-02    0.000980   0.002000       YES no
+    10000000   0.000316    3.1623    1.565e-03    0.000620   0.002000       YES no
+   120000000   0.000091   10.9545    6.326e-28    0.000179   0.002000       YES no
+→ n≈4e6 起 p&lt;0.05 且以后一路趋零；但 CI 下界始终 &lt; MDE，业务上永不该上线。
+
+案例真实 ATE: Delta=0.123167, n=120000000 → z=1349.2269, p=0.000e+00, 相对提升=24.770%
+ATE 的 1/100: Delta=0.001232, n=120000000 → z=13.4923, p=1.737e-41, 相对提升=0.248%
+→ 0.12 个百分点的效应在 1.2 亿行上同样 p≈0：统计显著 ≠ 业务重要。
+
+i.i.d. 松动：m=5, rho=0.3 → deff=1+(m-1)rho=2.2，se_eff=se*sqrt(deff)
+  n=4000000: z=2.0000(p=0.0455) → 修正 z_eff=1.3484(p=0.1775)
+  n=10000000: z=3.1623(p=0.0016) → 修正 z_eff=2.1320(p=0.0330)
+→ 名义 n 会把标准误压得过小；簇稳健标准误 / n_eff 折算后，临近显著的结论会翻回不显著。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">merge(A,B)=(10, 965.0, 97675.0) == 全量摘要 True</span>：三元组 $(n,S,Q)$ 逐分量相加，结合律让它与「把 10 个数一口气算」完全相同。由此还原的 <span class="ci-k">均值 96.5000、样本方差 505.833333</span> 与全量逐位一致，验证的正是「$(n,S,Q)$ 是均值和方差的有限维充分统计量」。<code>max</code> 那行 $130=130$ 说明最大值也是最简单的 monoid。</p>
+    <p><span class="ci-k">反例① 566.250000 ← 错</span>：它只是 $\tfrac12(s_A^2+s_B^2)$，把「两组均值 95 与 98 不一样」带来的组间波动整块丢了。正确值 505.833333 由 <span class="ci-k">Chan 合并 M2: 4552.500000</span> 给出：$M_2=2900+1630+3^2\cdot\tfrac{25}{10}=4552.5$，$/9=505.833333$。注意「方差可合并」指的是摘要可合并，<strong>不是</strong>方差值本身能平均——这是本实验最该记住的一句话。</p>
+    <p><span class="ci-k">中位数反例 5.5 与 6.5</span>：两个数据集的分区摘要都是 $(n,\mathrm{median})=(5,3)+(5,8)$，但把 A 片里一个 5 换成 50，全局排序正中间就从 5.5 挪到 6.5。若存在只看摘要的合并函数，相同输入必给相同输出，矛盾——所以精确中位数<strong>不存在</strong>有限维可合并摘要，只能退回全量排序或改用有误差界的草图（t-digest / GK / HyperLogLog 分别对应不同目标量）。</p>
+    <p><span class="ci-k">Part 2：朴素式样本方差 0.000000，Welford/Chan 2.500000</span>：数据是 $10^9+[-2,-1,0,1,2]$，真实 $M_2=10$、样本方差 2.5。朴素式算 $Q-S^2/n$ 时，$Q=5\times10^{18}+10$ 与 $S^2/n=5\times10^{18}$ 前 16 位相同，双精度把那个 $+10$ 舍掉，相减得 0。<span class="ci-k">误差界 ≈ 222.0、条件数 κ≈1.00e+18</span> 解释了为什么「均值大、方差小」是朴素式的死穴；<span class="ci-k">Welford 误差 ≈ 1.11e-15 与 mu 无关</span> 说明只维护离差 $M_2$ 就绕开了它。改 <code>MU</code> 越大，朴素式越离谱而 Welford 恒定。</p>
+    <p><span class="ci-k">Part 3 的 p&lt;.05? 列</span>：固定 $\Delta=0.001$、$\mathrm{MDE}=0.01$，$n$ 从 1e3 到 1.2e8，<code>se</code> 按 $1/\sqrt n$ 从 0.031623 缩到 0.000091，<code>p</code> 从 9.748e-01 一路跌到 6.326e-28，<span class="ci-k">n≈4e6 起 p&lt;0.05</span>；但 <code>CI_half</code> 再小，$\Delta-1.96\,se\approx0.001$ 永远小于 MDE，<code>ship?</code> 六行全是 <code>no</code>。<code>Cohen h</code> 恒为 0.002000，与 $n$ 无关——它才是「效应有多大」的诚实刻度。</p>
+    <p><span class="ci-k">案例 ATE 对照</span>：真实效应 0.123167 在 1.2 亿行上 $z=1349.2269,\ p=0$；把它缩 100 倍到 0.001232（相对提升仅 0.248%），$p$ 仍是 $1.737\times10^{-41}$。<span class="ci-k">deff=2.2 的修正</span> 把 $n=4e6$ 的 $z=2.0\ (p=0.0455)$ 拉回 $z_{\mathrm{eff}}=1.3484\ (p=0.1775)$——名义样本量在簇结构下会高估信息量，临近显著的结论会翻回不显著。基线 $P_0=0.49725$、se=0.009129、ATE=0.123167 全部来自 <code>case.json</code>，与全站共用同一套真源。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组方法给出两件东西：判定一个统计量能否「分块算完再精确合并」的充要判据（有限维充分统计量 + 结合律），以及大样本下替代 p 值的决策口径（效应量 + 置信区间下界 vs MDE）；并用 Chan/Welford 把「可合并」与「数值稳定」一次落地。<strong>不做</strong>精确分位数、不做因果识别、不替代实验设计。</td></tr>
+    <tr><th>输入 / 输出</th><td>合并侧输入：各分片数据（或摘要）；输出：全局摘要 $(n,\bar x,M_2)$ 或 $(n,S,Q)$、均值、样本／总体方差，量纲与 $x$ 及 $x^2$ 一致。决策侧输入：比例／均值差 $\hat\Delta$、标准误 $se$、Cohen's $h$、事先冻结的 MDE；输出：CI、$\hat\Delta_{\mathrm{lower}}$、是否上线的布尔判据。</td></tr>
+    <tr><th>适用场景</th><td>分布式报表与聚合（DAU、均值、方差、协方差、回归充分统计量）、流式监控、均值大而波动小的传感器／时间戳／金额数据；以及千万级以上 A/B 测试、日志回放、灰度评估中「p 值显著却不该上线」的判定。</td></tr>
+    <tr><th>关键参数</th><td>摘要维数（标量 3 个数，协方差为 $O(p^2)$）；Bessel 校正 $(n-1)$；分片数 $P$；浮点字长与是否用 Kahan 补偿；决策侧 $\alpha$、MDE、簇大小 $m$ 与簇内相关 $\rho$（决定 $deff=1+(m-1)\rho$）。</td></tr>
+    <tr><th>边界条件</th><td>在需要精确中位数／分位数、目标量依赖全局顺序、摘要维数随 $n$ 增长、或允许有界近似误差的条件下，精确合并结论不成立，应改用全量排序或 t-digest / GK / HyperLogLog / Count-Min Sketch 并报告误差界；在样本非 i.i.d.、存在 peeking 或多重比较、效应有混淆偏差、或 MDE 事后挪动的条件下，p 值与「区间下界 vs MDE」判据不成立，应改用簇稳健标准误与 $n_{\mathrm{eff}}$、序贯／always-valid 检验、以及先做因果识别。</td></tr>
+    <tr><th>常见问题</th><td>① 把分区方差直接平均当全局方差；② 用 $(n,S,Q)$ 处理 $10^9$ 量级时间戳导致方差算成 0；③ 以为「p 值显著」等于「值得上线」；④ 用名义 $n$ 忽略簇内相关；⑤ 拿中位数当可合并摘要。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>各机器都算好了方差，为什么不能直接取平均当全局方差？</summary><div class="faq-a">因为方差不是可合并量，可合并的是摘要 $(n,S,Q)$ 或 $(n,\bar x,M_2)$。直接平均只用到组内波动，漏掉「组间均值差」那一块；代码实验里正确值 505.833333、错值 566.250000。正确做法：要么合并 $(n,S,Q)$ 再套公式，要么用 Chan 公式 $M_2=M_{2A}+M_{2B}+\delta^2 n_A n_B/n$ 补回组间项。</div></details>
+  <details><summary>均值和方差能合并，为什么中位数不能？</summary><div class="faq-a">因为中位数依赖「全局排序后正中间是谁」这种位置信息，而分块时位置信息被切碎了。代码实验给出构造性反例：两个数据集的分区摘要都是 $(5,3)+(5,8)$，全局中位数却是 5.5 与 6.5——相同输入不同输出，说明不存在只看摘要的合并函数。要精确中位数只能全量排序／分布式归并；要近似可用 t-digest、GK sketch，但必须报告误差界。</div></details>
+  <details><summary>方差公式 $(Q-S^2/n)/(n-1)$ 看着没问题，为什么大数据上会算出 0？</summary><div class="faq-a">灾难性抵消。当均值 $\mu$ 远大于标准差 $\sigma$（如 $x\approx10^9$、波动个位数），$Q$ 与 $S^2/n$ 是两个几乎相等的巨大数，双精度约 16 位有效数字存不下它们的差：代码实验里 $Q=5\times10^{18}+10$ 被舍成 $5\times10^{18}$，相减得 0.000000。条件数 $\kappa\approx2(\mu/\sigma)^2\approx10^{18}$。改用 Welford/Chan 只维护离差 $M_2$，误差与 $\mu$ 无关，稳定给出 2.500000。</div></details>
+  <details><summary>上亿样本、p 值小到 $10^{-28}$，为什么还说「不该上线」？</summary><div class="faq-a">因为 p 值只回答「效应是否非零」，而 $se\propto1/\sqrt n$ 让任何非零 $\Delta$ 在大 $n$ 下都显著。代码实验里真实效应 $\Delta=0.001$（相对提升 0.20%）、$\mathrm{MDE}=0.01$，从 $n\approx4\times10^6$ 起 p&lt;0.05 一路趋零，可 CI 下界始终约 0.001，远小于业务阈值，六行 <code>ship?</code> 全是 no。应改看效应量（Cohen's $h$ 恒 0.002000）与 CI 下界是否 &gt; MDE。</div></details>
+  <details><summary>样本量都上亿了，还会「不够独立」吗？</summary><div class="faq-a">会，而且更常见。同一用户多次曝光、按班级／地区聚类会让有效样本量远小于名义 $n$：$n_{\mathrm{eff}}=n/deff$，$deff=1+(m-1)\rho$。代码实验 $m=5,\rho=0.3\Rightarrow deff=2.2$，把 $n=4\times10^6$ 的 $z=2.0\ (p=0.0455)$ 修正为 $z_{\mathrm{eff}}=1.3484\ (p=0.1775)$，结论直接翻回不显著。大日志里务必用簇稳健标准误或先折算 $n_{\mathrm{eff}}$。</div></details>
+  <details><summary>HyperLogLog、Count-Min Sketch 和本节的可合并方差是什么关系？</summary><div class="faq-a">前两者属于「精确不可合并 → 退而求有界近似的草图」路线：精确基数计数、精确频次需要全集信息，不存在有限维 monoid，于是 HyperLogLog 用约 $1.04/\sqrt m$ 的相对误差估基数、Count-Min Sketch 用可证明上界估频次（只可能过高不可能过低）。本节方差则属于「存在精确有限维充分统计量」路线，三者是同一判据下的两个分支：先判断目标量是否可精确合并，不能才选草图并如实报误差。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">下列哪个统计量<strong>不存在</strong>有限维可合并摘要（分块算完无法精确合并）？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 均值（摘要 $(n,S)$）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 方差（摘要 $(n,S,Q)$）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 精确中位数（依赖全局排序位置）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. 最大值（逐片取 max 再取 max）</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：均值、方差、max 都有满足结合律的有限维摘要；精确中位数依赖全局排序位置，代码实验给出反例——分区摘要同为 (5,3)+(5,8) 却得到 5.5 与 6.5，证明不存在这样的合并函数。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">把两组各 5 个数的样本方差直接平均，得到 566.250000，而正确全局方差是 505.833333。差异主要来自？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 浮点舍入误差</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 漏掉了「组间均值差」带来的波动（law of total variance 的组间项）</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 用了 $n-1$ 而不是 $n$ 作分母</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 两组样本量不相等</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：直接平均只含组内波动，丢掉了 $n_A(\bar x_A-\bar x)^2+n_B(\bar x_B-\bar x)^2$ 这一块。Chan 公式用 $\delta^2 n_A n_B/n$ 把它补回：$M_2=2900+1630+9\cdot25/10=4552.5$，$/9=505.833333$ 与全量一致。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">数据 $x=10^9+[-2,-1,0,1,2]$，朴素式 $(Q-S^2/n)/(n-1)$ 算出样本方差 0.000000，真实值 2.5。根因是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 忘了做 Bessel 校正</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 数据里有负数</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 样本量太小</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 两个巨大近似数相减发生灾难性抵消，条件数 $\kappa\approx10^{18}$ 超出双精度</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mu\gg\sigma$ 时 $Q$ 与 $S^2/n$ 前 16 位相同，相减把有效位吃光；误差 $\approx2u\mu^2\approx222$ 远大于真值 2。Welford/Chan 只维护离差 $M_2$，误差 $\sim n u\sigma^2\approx1.11\times10^{-15}$ 与 $\mu$ 无关，稳定给出 2.500000。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">上亿样本、真实效应 $\Delta=0.001$、$\mathrm{MDE}=0.01$，$p$ 值一路降到 $10^{-28}$。正确的上线决策是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 立即上线，p 值已极显著</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 不上线：Cohen's $h$ 仅 0.002000，且 CI 下界 $\approx0.001$ 始终小于 MDE</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 先把 $\alpha$ 调得更小再决定</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 再加大样本量让 p 值更小</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：p 值只判「是否非零」，$se\propto1/\sqrt n$ 使任何非零 $\Delta$ 在大 $n$ 下都趋零。决策应看效应量（Cohen's $h$ 与 $n$ 无关，恒 0.002000）与 CI 下界是否超过事先冻结的 MDE；本例下界一直约 0.001，六行 ship? 全是 no。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">$m=5,\rho=0.3\Rightarrow deff=2.2$ 时，把 $n=4\times10^6$ 的 $z=2.0\ (p=0.0455)$ 做簇修正会得到？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. $z$ 升到约 3.0，更显著</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. p 值不变，只是方差变小</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. $z_{\mathrm{eff}}=z/\sqrt{deff}\approx1.3484$，$p\approx0.1775$，翻回不显著</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 需要用精确中位数重算</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：簇内相关使 $n_{\mathrm{eff}}=n/deff$、$se_{\mathrm{eff}}=se\sqrt{deff}$，故 $z_{\mathrm{eff}}=2.0/\sqrt{2.2}=1.3484$、p 从 0.0455 升到 0.1775。名义 $n$ 高估了独立信息量，临近显著的结论会翻回不显著——大日志必须先折算有效样本量或用簇稳健标准误。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure class="figure-placeholder" id="fig-classic-m11-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 11-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">MapReduce 数据流原图：Split → Map → Shuffle → Reduce</span>
+    <span class="fig-note">Dean &amp; Ghemawat 原论文中的执行示意图，展示输入分块、局部映射、按键混洗与归约输出，是理解「可合并统计量」的经典配图。</span>
+    <span class="fig-src">来源：Dean &amp; Ghemawat (2004/2008), MapReduce: Simplified Data Processing on Large Clusters（本站资源库 p03） · 查看：<a href="https://www.mmds.org/" target="_blank" rel="noopener">https://www.mmds.org/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s9">9 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>某实验 $n_1=n_2=4\,000\,000$，转化率 $p_1=0.2000$、$p_2=0.2006$。粗略判断 p 值是否会很小，并说明应报告哪些量代替「显著」结论。</li>
+          <li>三个分区摘要 $(n,S,Q)$ 分别为 $(2,10,58)$、$(3,18,116)$、$(5,30,190)$。合并后求全局均值与总体方差。</li>
+          <li>HyperLogLog 取 $m=1024$ 个寄存器，估算相对标准误差；若要把误差减半，$m$ 应变为多少？</li>
+          <li>解释「精确一次语义」为什么依赖可重放源 + checkpoint + 幂等 sink 三件套；若 sink 不幂等，故障恢复后计数会怎样。</li>
+          <li>一次实验期望 50/50 分流，实际观察到对照组 51 200、实验组 48 800（共 100 000）。用卡方检验判断是否存在 SRM（$\chi^{2}_{0.05,1}=3.84$），并给出至少两种可能原因。</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> 合并 $\bar p=0.2003$，$SE\approx\sqrt{0.2003\times0.7997\times 2/4\times10^{6}}\approx 2.83\times10^{-4}$，$z\approx 0.0006/2.83\times10^{-4}\approx 2.12$，双侧 p 约 0.034，仍会「显著」；但绝对提升只有 0.06 pp、相对提升 0.3%。应报告绝对差、相对差、95% 置信区间（约 $[0.00005,\ 0.00115]$）、效应量与事先约定的业务阈值，并检查相关性导致的 $n_{eff}$ 缩水。</p>
+            <p><strong>2.</strong> $n=2+3+5=10$，$S=10+18+30=58$，$Q=58+116+190=364$；$\bar x=5.8$；$\mathrm{Var}=364/10-5.8^{2}=36.4-33.64=2.76$。校验：三分区合起来是 $2,3,4,5,6,7,8,9,10,4$ 之类数据（按摘要反推即可），离差平方和应为 $27.6$。</p>
+            <p><strong>3.</strong> $1.04/\sqrt{1024}=1.04/32=0.0325$，即 3.25%。误差减半需 $\sqrt{m}$ 翻倍 → $m$ 变 4 倍，即 $4096$，此时 $1.04/64=1.625\%$。</p>
+            <p><strong>4.</strong> 可重放源让故障后能重读区间，checkpoint 让状态恢复到一致快照，幂等/事务 sink 保证重复写入的净效果只算一次。若 sink 不幂等，恢复期间重放的事件会被再次累加，窗口计数<strong>偏高</strong>（至少一次的净效果），且不同恢复次数结果不一致，破坏可复现性。</p>
+            <p><strong>5.</strong> 期望各 50000：$\chi^{2}=\frac{1200^{2}}{50000}+\frac{1200^{2}}{50000}=28.8+28.8=57.6 &gt; 3.84$，存在显著 SRM，实验结论不可信。可能原因：分流哈希偏斜或桶映射错误；埋点在对照组漏报 / 实验组多报；某过滤条件只对一组生效（如版本、地区、登录态）；数据管线丢数或去重口径不一致。应先修分流与埋点、重跑 A/A 校验，再解读实验。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 10 ===== -->
+      <h2 id="s10">10 · 本章小结</h2>
+      <div class="table-wrap"><table><thead><tr><th>主题</th><th>要点</th></tr></thead><tbody>
+        <tr><td>规模效应</td><td>标准误按 $1/\sqrt{n}$ 收缩，p 值对微小差异敏感；改报效应量 + 区间；i.i.d. 松动要用 $n_{eff}$</td></tr>
+        <tr><td>抽样</td><td>蓄水池抽样给等概率 $k/N$；一致性哈希保证用户级整体入样；代表性优先于样本量</td></tr>
+        <tr><td>计算模型</td><td>map / shuffle / reduce；RDD 血缘容错；DataFrame 列裁剪与谓词下推；倾斜用 salting</td></tr>
+        <tr><td>可合并统计量</td><td>$(n,S,Q)$ 逐分量相加；$\mathrm{Var}=Q/n-(S/n)^{2}$；用平移或 Welford 避免灾难性抵消</td></tr>
+        <tr><td>存储</td><td>行式 OLTP / 列式 OLAP；Parquet + Arrow + 分区裁剪；数据湖 / 仓 / 湖仓的口径可追溯</td></tr>
+        <tr><td>流式</td><td>事件时间 + 水位线；滚动 / 滑动 / 会话窗口；迟到数据；精确一次依赖三件套</td></tr>
+        <tr><td>近似算法</td><td>Bloom $p\approx(1-e^{-kn/m})^{k}$；HLL $\approx1.04/\sqrt{m}$；CMS 只高估；误差须连同方向交付</td></tr>
+        <tr><td>实验与质量</td><td>分层哈希正交 + 卡方校验 + SRM；护栏指标；网络效应按簇分流；序贯检验防窥探；血缘与漂移监控</td></tr>
+      </tbody></table></div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：规模化统计。</strong>把 1.2 万行扩展为 1.2 亿条日志，用可合并充分统计量与近似算法重算指标。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="current" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://www.mmds.org/" target="_blank" rel="noopener">Mining of Massive Datasets（第 3 版）</a> <span class="muted small">（2021 · 已核验）</span><span class="fr-why">为什么读：MMDS 第 2 章 MapReduce 与第 4 章流式/草图算法的标准教材。</span></span></div><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="../resources.html#r-b14">Designing Data-Intensive Applications</a> <span class="muted small">（2017 · 权威共识）</span><span class="fr-why">为什么读：DDIA 讲存储引擎、复制与流批一致性的工程权衡。</span></span></div><div class="fr-item"><span class="fr-tag">论文</span><span class="fr-body"><a href="../resources.html#r-p03">MapReduce: Simplified Data Processing on Large Clusters</a> <span class="muted small">（2004 · 权威共识）</span><span class="fr-why">为什么读：MapReduce 原始论文。</span></span></div><div class="fr-item"><span class="fr-tag">工具</span><span class="fr-body"><a href="https://spark.apache.org/" target="_blank" rel="noopener">Apache Spark</a> <span class="muted small">（2014 · 权威共识）</span><span class="fr-why">为什么读：Spark 官方文档：RDD / DataFrame 的聚合语义与容错。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div><a class="btn" href="../index.html">← 返回首页</a> <a class="btn" href="../stages/big-data.html">阶段页</a> <a class="btn" href="../roadmap.html">路线图</a></div>
+        <button class="btn primary" data-complete-btn="m11">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m08-experiment.html"><span class="dir">← 阶段 1 · 上一篇</span><span class="ttl">08 · 实验设计与因果推断</span></a>
+        <a class="next" href="m09-ml-stats.html"><span class="dir">进入阶段 3 →</span><span class="ttl">09 · 机器学习的统计基础</span></a>
+      </nav>
+      </div>
+      </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索阶段、概念、资源、论文…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索全站内容。例如：置信区间、Transformer、共形预测、DeepSeek-R1。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

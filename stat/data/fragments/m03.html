@@ -1,0 +1,428 @@
+<!-- 深度片段 · 03 概率论基础 -->
+<!-- 已就近放置的图示 ID：data-figure="flow-bayes-update" data-figure="flow-hypothesis-test" data-classic="0"；其余图示由脚本补入汇总 -->
+
+<h2 id="d-deep-1">深度专题一 · 基础率谬误：为什么「99% 准确」的检测仍会大量误报</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把阳性预测值写成基础率的函数，并解出可用的阈值</h3></div>
+  <p class="dt-lead">对应本章第 3 节（#s3）「条件概率为什么不能互换」与第 4 节（#s4）「全概率公式如何拆分」，并回答本章提问「基础率极低时，为什么高灵敏度的检测仍会产生大量误报」。正文例 4.1 已用患病率 1%、灵敏度 90%、假阳性率 5% 算出后验 15.4%，例 4.2 讲了复检与似然比；这里换一组更极端的数字，把结论写成一般函数与可操作的阈值公式。</p>
+
+  <h4>背景：一个让医生也翻车的问卷</h4>
+  <p>1978 年 Casscells 等人给哈佛医学院的学生与医生出了一道题：某病患病率 $1/1000$，检测对患者 100% 阳性、对健康人仍有 5% 假阳性，问「检测阳性者真患病的概率」。多数人答 95%，正确答案约 2%。此后 Gigerenzer 等人用「自然频数」（把概率改写成「1000 人里有几人」）反复证明：只要把数字换成人数，错误率大幅下降。问题不在算术，而在人们默认把 $P(+\mid D)$ 当成了 $P(D\mid +)$，并且忽略了那个极小的先验。</p>
+  <p>正文已经演示过一次（15.4%），本专题要再推一步：即便把检测做到「灵敏度 99%、特异度 99%」这种近乎完美的水平，只要基础率足够低，阳性里绝大多数仍会是误报。这不是检测不行，是<strong>乘法结构</strong>决定的。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>「检测准确率 99%」听起来像是「阳性者九成九真患病」，但这句广告词其实混了两个方向的概率：它说的是<strong>病人有多大概率被检出</strong>、<strong>健康人有多大概率被误报</strong>；你真正想要的是反过来那个——<strong>阳性的人里有多大比例真患病</strong>。方向一反过来，中间就隔着一个基础率。</p>
+  <p>打个比方：在一百万粒白沙里找一粒红沙，筛子再准，只要它每筛一百粒白沙就误留一粒，漏进来的白沙也是一万粒，远多过那一粒红沙。病人极少、健康人极多时，<strong>健康人的巨大基数乘以一个很小的假阳性率</strong>，乘出来的人数照样淹没真阳性。所以提高灵敏度（别漏掉红沙）帮助有限，提高特异度（别误留白沙）才是关键——因为它直接缩小那个巨大的乘数。</p>
+  <p>于是「这个检测准不准」根本没有唯一答案：必须连同「在什么样的人群里用」一起回答。同一个检测，在专科门诊（基础率高）很可靠，在全民筛查（基础率极低）就会制造海量误报。</p>
+
+  <h4>形式化</h4>
+  <p>记号：$D$ = 患病，$D^c$ = 健康，$+$ = 检测阳性。基础率（患病率）$p=P(D)$，灵敏度 $Se=P(+\mid D)$，特异度 $Sp = P(-\mid D^c)$，假阳性率 $FPR = 1 - Sp$。下面每个公式配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">全概率：所有阳性从哪来</div>
+    $$ P(+) = Se\cdot p + (1-Sp)(1-p) $$
+    <div class="f-note">白话：阳性总数 = 病人里被检出的（真阳性）+ 健康人里被误报的（假阳性）；第二项里 $(1-p)$ 是健康人的巨大占比。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">贝叶斯：阳性预测值 PPV</div>
+    $$ \mathrm{PPV} = P(D\mid +) = \frac{Se\cdot p}{Se\cdot p + (1-Sp)(1-p)} $$
+    <div class="f-note">白话：真阳性占全部阳性的比例。分子分母都含 $p$，但分母还额外挂着一个乘着 $(1-p)$ 的假阳性项；$p$ 越小，这一项越压倒分子。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">优势比形式：基础率如何「压倒」检测</div>
+    $$ \frac{P(D\mid +)}{P(D^c\mid +)} = \underbrace{\frac{Se}{1-Sp}}_{\text{似然比 } LR_+}\ \times\ \underbrace{\frac{p}{1-p}}_{\text{先验优势比}} $$
+    <div class="f-note">白话：后验优势比 = 似然比 × 先验优势比。检测只贡献一个乘数 $LR_+$，基础率贡献被乘的那个数；后者极小，乘积就仍然小。这也解释了正文例 4.2 里「似然比 18 看着大、乘上 0.0101 后仍然很小」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">可操作的阈值：阳性更可能是真病的条件</div>
+    $$ \mathrm{PPV} \gt \tfrac12 \iff Se\cdot p \gt (1-Sp)(1-p) \iff p \gt \frac{1-Sp}{Se + 1 - Sp} $$
+    <div class="f-note">白话：解一次不等式就得到基础率的最低门槛。当 $Se=Sp=0.99$ 时门槛为 $0.01/1.00 = 0.01$，即患病率必须超过 1%，一次阳性才更可能是真病而非误报。</div>
+  </div>
+
+  <p>数值演示见代码实验 Part 1：$Se=Sp=0.99$ 给出 $LR_+=99$、先验优势比阈值 $0.010101$、患病率门槛 $0.010000$。表中 $p$ 从 $0.0001$ 升到 $0.5$，PPV 从 $0.009804$ 升到 $0.990000$；$p=0.01$ 时恰好 $0.500000$，逐位验证阈值；而 $p=0.001$（千分之一）时 PPV 只有 $0.090164$——约 91% 的阳性是误报，比正文例 4.1 的 15.4% 更极端。这说明「把灵敏度从 90% 提到 99%」并不能解决问题，真正起作用的是把假阳性率从 5% 压到 1%。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>阳性预测值不是检测的固有属性，而是「检测性能 × 基础率」的联合结果：$P(D\mid +) = \dfrac{Se\,p}{Se\,p + (1-Sp)(1-p)}$。基础率通过先验优势比进入后验，且存在硬门槛 $p \gt \dfrac{1-Sp}{Se+1-Sp}$；低于门槛时，无论灵敏度多高，阳性里都是误报占多数。低基础率场景下，提升特异度比提升灵敏度有效得多。</div>
+
+  <p><strong>边界条件：</strong>在基础率已知且稳定、灵敏度／特异度可从标定人群迁移到待筛人群（无谱偏倚 spectrum bias）、且多次检测相互独立的条件下，本结论成立；在待筛人群基础率与标定人群不同、两次检测同源相关（同批试剂、同一操作者）、或存在未观测亚群异质性的条件下，本结论不成立，应改用分层基础率下的贝叶斯更新、带协变量的 logistic 校准模型，或直接估计各亚群的条件概率，而不是套用单一的 $Se$／$Sp$。</p>
+
+  <p>下图把「先验 → 似然 → 后验 → 下一轮先验」的序贯更新画出来：基础率就是最左边那个先验，它每轮都在场，永远不会被证据「覆盖」掉。</p>
+  <figure data-figure="flow-bayes-update"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 独立 vs 互斥，以及「在什么条件下独立」</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>两个几乎相反的概念，和一个必须说清的「给定谁」</h3></div>
+  <p class="dt-lead">对应本章第 2 节（#s2）「独立与互斥在什么条件下可能同时成立」与第 3 节（#s3）「条件概率为什么不能互换」。正文 2.2 / 3.4 节已给出「互斥且概率为正 ⇒ 必不独立」，并用骰子展示了「不互斥也可能独立」的巧合；这里补齐三处留白：两者究竟何时能共存、条件独立的严格定义、以及「边缘相关但给定 $Z$ 独立」的数值构造。</p>
+
+  <h4>背景：一个高频混淆，以及它背后的因果结构</h4>
+  <p>「互斥」（mutually exclusive）与「独立」（independent）是概率题里最常被互换的一对词，连教材都常要靠「必背结论」来压住。它们其实来自两种完全不同的提问：互斥问「能不能一起发生」，独立问「知道一个发生，会不会改变另一个的概率」。1933 年柯尔莫哥洛夫公理化之后，独立被定义为乘积关系，而互斥只是交集为空；二者的张力用一行代数就能讲清。</p>
+  <p>更深的留白是「条件独立」。正文例 3.2 第 7 步曾点破一个隐含假设：<em>「$C$ 的条件概率只取决于 $B$，与 $A$ 无关」</em>——那其实就是条件独立。把它写清楚，才能明白为什么全概率公式和链式法则不是自动成立的公式，而是<strong>带着假设的工具</strong>；这也正是模块 01 混杂因素在概率层面的对应物。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>互斥说的是「两件事不能一起发生」——一旦知道 A 发生，就能断定 B <strong>绝不可能</strong>发生。这明明是 A 对 B 产生了<strong>最强的影响</strong>，怎么可能叫「毫无影响」？所以只要两件事都有可能发生（概率为正），互斥就一定不独立。唯一的例外是某件事概率为 0（几乎不会发生）：此时「不能一起发生」和「乘积相等」在数值上都是 0，两个定义可以同时满足，但这是退化情形，没有实际意义。</p>
+  <p>条件独立则要换个问法：<strong>「在什么条件下、相对哪个变量独立？」</strong>冰淇淋销量与溺水事故整体上高度相关，只是因为气温这个共同原因同时推高了两者；一旦把气温固定住（只看同为 35℃ 的日子），两者就互不相干了——这叫「给定气温条件独立」。反过来也成立：边缘上互不相干的两个变量，一旦以它们的共同结果作为条件（对撞结构），反而会表现出相关。所以「独立」永远不是一个可以默认的事实，而是需要写明条件集合、并用数据或机制验证的假设。</p>
+
+  <h4>形式化</h4>
+  <div class="formula-box">
+    <div class="f-name">两个定义</div>
+    $$ A\cap B = \varnothing \iff P(A\cap B) = 0, \qquad A \perp B \iff P(A\cap B) = P(A)P(B) $$
+    <div class="f-note">白话：互斥是「交集为空」；独立是「交集的概率恰好等于两个边缘概率的乘积」。前者是集合关系，后者是数值关系。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">两者何时能同时成立</div>
+    $$ P(A\cap B) = 0 \ \text{且}\ P(A\cap B) = P(A)P(B) \iff P(A) = 0 \ \text{或}\ P(B) = 0 $$
+    <div class="f-note">白话：两式同时成立，只能是至少一个事件概率为 0。只要 $P(A) \gt 0$ 且 $P(B) \gt 0$，就有 $P(A)P(B) \gt 0 = P(A\cap B)$，于是必定不独立——这正是正文 3.4 的必背结论，也精准回答了本章第 2 节的提问。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">条件独立的严格定义</div>
+    $$ A \perp B \mid Z \iff P(A\cap B\mid Z) = P(A\mid Z)\,P(B\mid Z) $$
+    <div class="f-note">白话：把样本空间缩小到「$Z$ 发生」之后，再在这个缩小后的空间里判定 A、B 是否独立。边缘独立与条件独立<strong>互不蕴含</strong>。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">链式法则与条件独立带来的简化</div>
+    $$ P(A\cap B\cap C) = P(A)\,P(B\mid A)\,P(C\mid A\cap B) $$
+    $$ C \perp A \mid B \ \Longrightarrow\ P(A\cap B\cap C) = P(A)\,P(B\mid A)\,P(C\mid B) $$
+    <div class="f-note">白话：一般情形要一路连乘；若已知「给定 $B$ 后 $C$ 与 $A$ 无关」，最后一项就能从 $P(C\mid A\cap B)$ 简写成 $P(C\mid B)$。正文例 3.2 第 7 步之所以能填满八格表，靠的正是这个假设；假设不成立时 $P(C)$ 就算不出来。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">边缘相关、给定 $Z$ 却独立（共同原因）</div>
+    $$ P(X{=}1,Y{=}1\mid Z{=}0) = 0.04 = 0.2\times 0.2, \qquad P(X{=}1,Y{=}1\mid Z{=}1) = 0.64 = 0.8\times 0.8 $$
+    $$ P(X{=}1,Y{=}1) = \tfrac12(0.04) + \tfrac12(0.64) = 0.34 \ \neq\ 0.25 = P(X{=}1)P(Y{=}1) $$
+    <div class="f-note">白话：两层内部都严格独立，合并后却出现相关。$Z$ 是同时影响 $X$ 与 $Y$ 的共同原因——这正是模块 01 混杂因素的概率版本，也说明「相关」本身并不足以判断机制。</div>
+  </div>
+
+  <p>数值演示见代码实验 Part 3：两层各 6000 人，层内 $X,Y$ 独立（$0.2\times0.2=0.04$、$0.8\times0.8=0.64$ 逐层精确成立），合并后 $P(X{=}1)=P(Y{=}1)=0.5$ 而 $P(X{=}1,Y{=}1)=0.34\neq0.25$，程序对三层分别打印 <code>indep=True / True / False</code>。不需要任何随机数，全部是整数计数，可逐格复核。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>互斥且概率为正必定不独立；两者只在零概率事件上能共存。「独立」必须指明条件集合：给定 $Z$ 独立与边缘独立互不蕴含，共同原因会让「层内独立、合并相关」，对撞结构会让「边缘独立、条件相关」。因此全概率公式、链式法则与朴素贝叶斯都必须先声明所依赖的条件独立假设，再用分层列联表验证。</div>
+
+  <p><strong>边界条件：</strong>在事件概率严格为正、且讨论无条件（边缘）独立时，「互斥 ⇒ 不独立」成立；在存在零概率事件、或改用条件独立（给定 $Z$）、或涉及对撞（collider）结构的条件下，本结论不成立，应改用条件独立判据 $P(A\cap B\mid Z)=P(A\mid Z)P(B\mid Z)$ 与链式法则逐项写出假设，并用分层列联表或因果图验证，而不是凭直觉套用乘积公式。</p>
+
+  <p>独立性从来不是可以默认的事实。下图是模块 05 的假设检验决策流程，它把「独立、正态性、方差齐性」明确列为前置假设条件，并要求任一条不成立时换用非参数或重抽样方法；本专题正是把其中「独立」这一条拆到最细粒度来审视。</p>
+  <figure data-figure="flow-hypothesis-test"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 全概率公式与贝叶斯公式作为一套可照做的流程</h2>
+<div class="algo-spec">
+  <p>本算法位于「建模 → 评估」链条的<strong>概率推理层</strong>：上游契约是「一组完备互斥的情形划分 + 每类情形下的条件概率」，下游契约是「归一化后的后验概率或优势比」，供模块 07 贝叶斯更新、模块 08 因果推断与模块 12 的分类器使用。</p>
+
+  <h3 id="d-algo-principle">一、原理：先拆证据，再翻转条件</h3>
+  <p>设 $A_1,\dots,A_m$ 是样本空间 $\Omega$ 的一个<strong>划分</strong>（两两互斥且并为全集），$B$ 是观测到的证据。全概率公式先按情形把 $B$ 拆开求和，贝叶斯公式再用这个和作分母把 $P(B\mid A_i)$ 翻转成 $P(A_i\mid B)$。</p>
+  <div class="formula-box">
+    <div class="f-name">划分与全概率公式</div>
+    $$ A_i\cap A_j = \varnothing\ (i\neq j),\qquad \bigcup_{i=1}^{m} A_i = \Omega $$
+    $$ P(B) = \sum_{i=1}^{m} P(B\mid A_i)\,P(A_i) $$
+    <div class="f-note">白话：把「$B$ 发生的总概率」按各种情形分别算出来再加权求和；划分必须穷尽且互不重叠，否则分母会漏项或重复。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">贝叶斯公式</div>
+    $$ P(A_i\mid B) = \frac{P(B\mid A_i)\,P(A_i)}{\displaystyle\sum_{j=1}^{m} P(B\mid A_j)\,P(A_j)} = \frac{P(B\mid A_i)P(A_i)}{P(B)} $$
+    <div class="f-note">白话：后验 = 似然 × 先验 ÷ 证据；分母「证据」正是全概率公式算出的 $P(B)$，它保证所有后验加起来等于 1。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">优势比形式与序贯更新</div>
+    $$ \frac{P(A_i\mid B)}{P(A_i^c\mid B)} = \frac{P(B\mid A_i)}{P(B\mid A_i^c)}\times\frac{P(A_i)}{P(A_i^c)} $$
+    <div class="f-note">白话：每来一条证据，就把当前优势比乘上一个似然比；上一轮的后验直接充当下一轮的先验。正文例 4.2 的「初检阳性 → 复检阳性」用的就是这条迭代。</div>
+  </div>
+  <p><strong>几何解释：</strong>把样本空间画成单位正方形，按划分 $A_i$ 切成若干竖条，条宽是 $P(A_i)$（先验）；每条里按 $P(B\mid A_i)$ 的比例涂色；涂色总面积就是证据 $P(B)$；第 $i$ 条里的涂色占全部涂色的比例，就是后验 $P(A_i\mid B)$。面积图一眼就能看出「基础率极小的竖条再怎么涂色，占总涂色的比例也大不了」。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>写下目标方向。</strong>先明确要的是 $P(A\mid B)$ 还是 $P(B\mid A)$，并把两者分别写出来；方向上搞反是本节最高频的错误。</li>
+    <li><strong>构造划分。</strong>列出 $A_1,\dots,A_m$，检查两两互斥、加起来穷尽；给每块标注先验 $P(A_i)$，并校验 $\sum_i P(A_i)=1$。</li>
+    <li><strong>写似然。</strong>对每块给出 $P(B\mid A_i)$；确认它只依赖于该块。若有多条证据，必须先声明「给定类别后各证据条件独立」，否则不能连乘。</li>
+    <li><strong>算证据。</strong>用全概率公式求 $P(B)=\sum_i P(B\mid A_i)P(A_i)$，顺手校验 $0\le P(B)\le 1$。</li>
+    <li><strong>算后验。</strong>逐块代入 $P(A_i\mid B)=P(B\mid A_i)P(A_i)/P(B)$；分母对所有块相同，只需算一次。</li>
+    <li><strong>双重校验。</strong>① 归一化：$\sum_i P(A_i\mid B)=1$；② 自然频数表：把概率改写成「$N$ 人里各有几人」，逐格数一遍复核。</li>
+    <li><strong>敏感性与报告。</strong>改动先验或似然看重算后验，报告基础率的来源与不确定度；多条证据时做一次「似然比连乘 ↔ 后验」的闭环校验。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>划分：</strong>完备且互斥；每块的先验可靠（或至少能做敏感性分析）。</li>
+    <li><strong>条件概率：</strong>来自与待推断对象同质的标定人群，灵敏度／特异度可迁移（无谱偏倚）。</li>
+    <li><strong>多条证据：</strong>需满足给定类别下的条件独立；否则朴素贝叶斯会重复计数，后验过度自信。</li>
+    <li><strong>数值：</strong>先验不能全为 0（否则后验恒为 0，无法被证据更新），似然不能同时为 0（否则分母为 0）。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>估计（训练）</b> 从 $N$ 条记录统计列联表 $O(N)$ 时间、$O(m)$ 空间（$m$ 为划分数）；<b>推理（单次查询）</b> 全概率求和 $O(m)$ + 逐块后验 $O(m)$，合计 $O(m)$；<b>序贯 $T$ 轮</b> $O(mT)$；<b>空间</b> 仅存先验／似然／后验三个长度 $m$ 的向量，$O(m)$。</div>
+  <p>白话：这套流程本身极轻，成本几乎全在「从数据里把各条件概率统计出来」那一步；一旦表建好，每次推理只是几乘几加，适合在线实时更新。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>把「逆概率」问题化成一套四则运算，方向清晰、可手算、可复核。</li>
+        <li>显式暴露先验，迫使分析者交代基础率来源，天然对抗基础率谬误。</li>
+        <li>优势比形式支持序贯更新：新证据来了不必从头重算。</li>
+        <li>归一化与「自然频数表」提供两道独立校验，工程上容易审计。</li>
+        <li>复杂度 $O(m)$，可嵌入在线服务做实时概率校准。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>结论对先验敏感；先验错（谱偏倚）时，证据再强也可能纠不回来。</li>
+        <li>多条证据的条件独立假设常被违背，导致后验过度自信。</li>
+        <li>划分块数 $m$ 大且数据稀疏时，$P(B\mid A_i)$ 估计极不稳定，需要平滑。</li>
+        <li>只能给出「关联更新」，不能单独支持因果结论（需模块 08 的实验设计）。</li>
+        <li>连续变量或高维特征下，$m$ 爆炸，必须改用参数化模型或共轭结构。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>用全站共用的知学云 2×2 表：按「每周学习时长高／低」划分，观察是否完课。四格计数为</p>
+  <p>$$ \begin{array}{c|cc} & \text{完课} & \text{未完课}\\ \hline \text{高时长} & 3939 & 2071 \\ \text{低时长} & 2028 & 3962 \end{array} $$</p>
+  <p>注意：这里用的是<strong>正文未出现的新算例</strong>（正文例题用的是疾病检测与车间次品），且所有数字与案例文件一致，可跨章对照。设 $A_1$ = 高时长、$A_2$ = 低时长、$B$ = 完课。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知并校验划分。</span>$N = 3939+2071+2028+3962 = 12000$；$n_{A_1} = 6010$，$n_{A_2}=5990$。$P(A_1)=6010/12000=0.500833$，$P(A_2)=5990/12000=0.499167$，两者之和 $=1$，且 $A_1\cap A_2=\varnothing$——划分合法。</div>
+    <div class="solve-step"><span class="ss-k">写似然。</span>$P(B\mid A_1)=3939/6010=0.655408$，$P(B\mid A_2)=2028/5990=0.338564$。二者差距明显，说明「学习时长」携带关于完课的信息。</div>
+    <div class="solve-step"><span class="ss-k">全概率算证据。</span>$P(B)=0.655408\times0.500833 + 0.338564\times0.499167 = 3939/12000 + 2028/12000 = 5967/12000 = 0.497250$，与案例 <code>completed_rate = 0.49725</code> 逐位一致。这里公式自然退化成「把完课人数数一遍」，正是全概率公式的正确性自检。</div>
+    <div class="solve-step"><span class="ss-k">贝叶斯算后验。</span>$P(A_1\mid B) = (3939/12000)/(5967/12000) = 3939/5967 = 0.660131$；$P(A_2\mid B)=2028/5967=0.339869$。</div>
+    <div class="solve-step"><span class="ss-k">归一化校验。</span>$0.660131+0.339869 = 1.000000$ ✓；用人数表复核：完课者共 5967 人，其中高时长 3939 人，占比 $3939/5967$，与公式一致。</div>
+    <div class="solve-step"><span class="ss-k">方向对照（关键）。</span>$P(B\mid A_1)=0.655408$ 而 $P(A_1\mid B)=0.660131$，<strong>数值接近但绝不相等</strong>。此处接近是因为基础率几乎 50%、两组规模几乎相等；换成深度专题一的低基础率场景，二者会差出几十倍（$p=0.001$ 时 $Se=0.99$ 而 PPV 仅 $0.0902$）。绝不能因为「看起来差不多」就混用。</div>
+    <div class="solve-step"><span class="ss-k">优势比闭环校验。</span>先验优势比 $P(B)/P(B^c)=5967/6033=0.989060$；似然比 $LR = P(A_1\mid B)/P(A_1\mid B^c) = (3939/5967)/(2071/6033) = 0.660131/0.343278 = 1.923017$；后验优势比 $=0.989060\times1.923017 = 1.901980$；转回概率 $=1.901980/2.901980 = 0.655408 = P(B\mid A_1)$ ✓，与第 2 步完全吻合。</div>
+    <div class="solve-step"><span class="ss-k">顺带核对优势比 OR。</span>$\mathrm{OR} = (3939\times3962)/(2071\times2028) = 3.7158$，$\ln\mathrm{OR}=1.3126$，$\mathrm{se}_{\ln\mathrm{OR}}=\sqrt{1/3939+1/2071+1/2028+1/3962}=0.0385$，三项都与案例 <code>high_study_2x2</code> 给出的 OR=3.7158、se=0.0385 一致。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>全概率 + 贝叶斯公式（本算法）</th><th>列联表经验频率法</th><th>优势比 · 似然比序贯更新</th><th>朴素代入 $P(B\mid A)$（错误对照）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>划分完备互斥、先验已知、条件概率可迁移</td>
+        <td>已有完整列联表、只需查比例</td>
+        <td>证据按序到达、需连续更新、可给似然比</td>
+        <td>只在 $P(A)=P(B)$ 的极特殊情形才碰巧正确</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>估计 $O(N)$、推理 $O(m)$、空间 $O(m)$</td>
+        <td>建表 $O(N)$、查询 $O(1)$、空间 $O(m^2)$</td>
+        <td>每轮 $O(m)$、$T$ 轮 $O(mT)$、空间 $O(m)$</td>
+        <td>$O(1)$，代价是方向性错误</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>划分数 $m$、先验 $P(A_i)$、似然 $P(B\mid A_i)$、平滑系数</td>
+        <td>分箱口径、零格处理（是否加平滑）</td>
+        <td>似然比、初始先验优势比、证据独立性假设</td>
+        <td>无（把灵敏度直接当后验）</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">方向正确、显式暴露先验、可归一化校验</td>
+        <td>最直观，用人数而不是概率，最不容易算错</td>
+        <td class="best">支持多轮证据，更新成本极低</td>
+        <td>算得最快</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>先验错／谱偏倚／证据相关时后验失真</td>
+        <td>高维稀疏时格子为空，须平滑；难做序贯更新</td>
+        <td>条件独立不成立时连乘会重复计数、过度自信</td>
+        <td>基础率极低时错得离谱（$Se=0.99$ 被当成 PPV）</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>公式与面积图都易讲清；需维护先验来源</td>
+        <td>审计最易（整数计数）；口径要写死</td>
+        <td>需记录每轮似然比与独立性假设，审计成本中等</td>
+        <td>无法解释误报来源，线上风险最高</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="d-code">代码实验 · 基础率阈值、贝叶斯流程与条件独立的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · 整数计数，无随机数 · 2x2 取自知学云案例</span></div>
+  <pre>
+# 深度实验：基础率谬误 / 全概率+贝叶斯流程 / 条件独立
+import math
+
+print("=== Part 1: 基础率决定阳性预测值（灵敏度=特异度=0.99） ===")
+sens, spec = 0.99, 0.99
+fpr = 1 - spec
+print(" prevalence   P(+)       PPV=P(D|+)   1-PPV")
+for p in [0.0001, 0.001, 0.01, 0.02, 0.05, 0.10, 0.50]:
+    pp = sens*p + fpr*(1-p)
+    ppv = sens*p/pp
+    print("   %8.4f  %9.6f   %9.6f   %9.6f" % (p, pp, ppv, 1-ppv))
+thr = fpr/(sens+fpr)
+print(" PPV &gt; 0.5 需要患病率 &gt; %.6f  (= (1-spec)/(sens+1-spec))" % thr)
+print(" 似然比 LR+ = sens/(1-spec) = %.2f ; 先验优势比阈值 = %.6f" % (sens/fpr, fpr/sens))
+
+print()
+print("=== Part 2: 全概率 + 贝叶斯（复用知学云 2x2：高/低学习时长 x 完课） ===")
+a,b,c,d = 3939, 2071, 2028, 3962
+n = a+b+c+d
+p_high = (a+b)/n
+p_low = (c+d)/n
+p_c_given_high = a/(a+b)
+p_c_given_low = c/(c+d)
+p_comp = p_c_given_high*p_high + p_c_given_low*p_low
+p_high_given_comp = p_c_given_high*p_high/p_comp
+p_high_given_not = b/(b+d)
+print(" 2x2 = [[%d,%d],[%d,%d]]  N=%d" % (a,b,c,d,n))
+print(" P(high)=%.6f  P(low)=%.6f  P(complete|high)=%.6f  P(complete|low)=%.6f" % (p_high,p_low,p_c_given_high,p_c_given_low))
+print(" LTP: P(complete)=%.6f = %d/%d" % (p_comp, a+c, n))
+print(" Bayes: P(high|complete)=%.6f = %d/%d" % (p_high_given_comp, a, a+c))
+print(" inverse: P(complete|high)=%.6f vs P(high|complete)=%.6f (不相等)" % (p_c_given_high,p_high_given_comp))
+orv = (a*d)/(b*c)
+print(" OR=(a*d)/(b*c)=%.4f  logOR=%.4f  se_logOR=%.4f" % (orv, math.log(orv), math.sqrt(1/a+1/b+1/c+1/d)))
+prior_odds = (a+c)/(b+d)
+lr = p_high_given_comp/p_high_given_not
+post_odds = prior_odds*lr
+print(" odds check: %.6f x %.6f = %.6f -&gt; P=%.6f" % (prior_odds, lr, post_odds, post_odds/(1+post_odds)))
+
+print()
+print("=== Part 3: 给定 Z 条件独立，边际却不独立（共同原因 Z） ===")
+Z0 = [[240,960],[960,3840]]
+Z1 = [[3840,960],[960,240]]
+def show(name,t):
+    tot = sum(sum(r) for r in t)
+    px = (t[0][0]+t[0][1])/tot
+    py = (t[0][0]+t[1][0])/tot
+    pxy = t[0][0]/tot
+    print(" %-10s P(X=1)=%.4f P(Y=1)=%.4f P(X=1,Y=1)=%.4f product=%.4f indep=%s" % (name,px,py,pxy,px*py,abs(pxy-px*py)&lt;1e-9))
+show("Z=0 层内", Z0)
+show("Z=1 层内", Z1)
+M = [[Z0[i][j]+Z1[i][j] for j in range(2)] for i in range(2)]
+show("合并(边际)", M)
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: 基础率决定阳性预测值（灵敏度=特异度=0.99） ===
+ prevalence   P(+)       PPV=P(D|+)   1-PPV
+     0.0001   0.010098    0.009804    0.990196
+     0.0010   0.010980    0.090164    0.909836
+     0.0100   0.019800    0.500000    0.500000
+     0.0200   0.029600    0.668919    0.331081
+     0.0500   0.059000    0.838983    0.161017
+     0.1000   0.108000    0.916667    0.083333
+     0.5000   0.500000    0.990000    0.010000
+
+ PPV &gt; 0.5 需要患病率 &gt; 0.010000  (= (1-spec)/(sens+1-spec))
+ 似然比 LR+ = sens/(1-spec) = 99.00 ; 先验优势比阈值 = 0.010101
+
+=== Part 2: 全概率 + 贝叶斯（复用知学云 2x2：高/低学习时长 x 完课） ===
+ 2x2 = [[3939,2071],[2028,3962]]  N=12000
+ P(high)=0.500833  P(low)=0.499167  P(complete|high)=0.655408  P(complete|low)=0.338564
+ LTP: P(complete)=0.497250 = 5967/12000
+ Bayes: P(high|complete)=0.660131 = 3939/5967
+ inverse: P(complete|high)=0.655408 vs P(high|complete)=0.660131 (不相等)
+ OR=(a*d)/(b*c)=3.7158  logOR=1.3126  se_logOR=0.0385
+ odds check: 0.989060 x 1.923017 = 1.901980 -&gt; P=0.655408
+
+=== Part 3: 给定 Z 条件独立，边际却不独立（共同原因 Z） ===
+ Z=0 层内     P(X=1)=0.2000 P(Y=1)=0.2000 P(X=1,Y=1)=0.0400 product=0.0400 indep=True
+ Z=1 层内     P(X=1)=0.8000 P(Y=1)=0.8000 P(X=1,Y=1)=0.6400 product=0.6400 indep=True
+ 合并(边际)     P(X=1)=0.5000 P(Y=1)=0.5000 P(X=1,Y=1)=0.3400 product=0.2500 indep=False</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">Part 1 的 LR+=99.00 与门槛 0.010000</span>：$Se/(1-Sp)=0.99/0.01=99$，而 $\mathrm{PPV}\gt0.5$ 要求先验优势比 $p/(1-p) \gt 1/99 = 0.010101$，解得 $p \gt 0.01$。程序直接打印的 $0.010000$ 与公式 $(1-Sp)/(Se+1-Sp)=0.01/1.00$ 完全一致；把 <code>sens, spec</code> 改成别的值，这个门槛会整体移动，但公式结构不变。</p>
+    <p><span class="ci-k">表格七行</span>：$p=0.0001$ 时 $\mathrm{PPV}=0.009804$，即 <code>1-PPV=0.990196</code>——约 99% 的阳性是误报，尽管检测「99% 准确」；$p=0.001$ 时仍只有 $0.090164$（约 91% 误报）；$p=0.01$ 恰好 $0.500000$，逐位验证阈值；$p=0.5$ 时才升到 $0.990000$。<span class="ci-k">P(+) 一列</span>从 0.010098 升到 0.500000，说明低基础率下「阳性」几乎全部由假阳性贡献（$p=0.0001$ 时 $0.0099$ 的假阳性对 $0.000099$ 的真阳性）。这比正文例 4.1 的 15.4% 更极端，正是「提高特异度比提高灵敏度更有效」的数值证据。</p>
+    <p><span class="ci-k">Part 2 的 2x2</span>：$[3939,2071,2028,3962]$ 即案例 <code>high_study_2x2.table</code>，$N=12000$ 与案例 <code>n</code> 一致。<span class="ci-k">P(high)=0.500833、P(low)=0.499167</span> 是划分的两块先验，和为 1；<span class="ci-k">P(complete|high)=0.655408、P(complete|low)=0.338564</span> 是两块似然。</p>
+    <p><span class="ci-k">LTP: 0.497250 = 5967/12000</span>：全概率公式算出的证据，与案例 <code>completed_rate=0.49725</code> 逐位吻合；这里公式自然退化成「把完课人数数一遍」，是正确性自检。<span class="ci-k">Bayes: 0.660131 = 3939/5967</span> 是后验 $P(\text{高时长}\mid\text{完课})$；<span class="ci-k">inverse 一行</span>显示 $0.655408$ 与 $0.660131$ 接近却绝不相等——接近只是因为本例基础率几乎 50%，换成 Part 1 的低基础率场景二者会差出几十倍，这正是本章第 3 节「不能互换」的定量版。</p>
+    <p><span class="ci-k">OR=3.7158、logOR=1.3126、se_logOR=0.0385</span>：与案例给出的 OR=3.7158、se=0.0385 一致，说明同一份数据在不同章节可对照。<span class="ci-k">odds check</span>：先验优势比 $0.989060$ 乘似然比 $1.923017$ 得后验优势比 $1.901980$，转回概率 $0.655408$ 恰等于 $P(\text{complete}\mid\text{high})$，构成「先验 → 证据 → 后验」的闭环校验；改动任一格计数，四个数会一起变，但闭环恒等式始终成立。</p>
+    <p><span class="ci-k">Part 3 三行 indep</span>：$Z=0$ 层内 $0.0400 = 0.2\times0.2$、$Z=1$ 层内 $0.6400 = 0.8\times0.8$，两层都严格条件独立（<code>True / True</code>）；合并后 $P(X{=}1)=P(Y{=}1)=0.5$ 但 $P(X{=}1,Y{=}1)=0.3400 \neq 0.2500$（<code>False</code>）。两层人数各 6000、各格均为整数，可逐格复核，无需随机数。<strong>何时会变</strong>：若两层人数不等，合并的联合概率会随之改变；若在层内引入相关，两层的 <code>indep</code> 都会变成 False。这个构造说明「相关」本身无法区分「直接作用」与「共同原因」——与模块 01 的混杂是同一结构。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>把「已知 $P(B\mid A_i)$ 求 $P(A_i\mid B)$」化为一套可照做的流程：构造划分 → 列先验与似然 → 全概率算证据 → 贝叶斯算后验 → 归一化与频数表双重校验；<strong>不做</strong>因果识别、不做参数拟合、也不自动验证证据间的条件独立。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：完备互斥的划分 $\{A_i\}$、先验 $P(A_i)$、似然 $P(B\mid A_i)$（均无量纲、取值 $[0,1]$）、可选的多轮证据；输出：证据 $P(B)$、后验 $P(A_i\mid B)$（和为 1）、后验优势比与每轮似然比。输出恒为概率，无量纲。</td></tr>
+    <tr><th>适用场景</th><td>医学／质检筛查的阳性解读、垃圾邮件与欺诈检测、逆概率类问题（「高分学员更可能完课」反过来怎么算）、A/B 结果的贝叶斯解读、多轮标注仲裁、以及模块 07 的序贯更新与模块 12 朴素贝叶斯分类器。</td></tr>
+    <tr><th>关键参数</th><td>先验 $P(A_i)$（基础率，最敏感，错则后验系统性偏移）；似然 $P(B\mid A_i)$（灵敏度／特异度，须来自同质标定人群）；划分数 $m$（越大越需平滑）；平滑系数（零格时避免后验恒为 0）；证据间条件独立假设（多条证据时决定能否连乘）。</td></tr>
+    <tr><th>边界条件</th><td>在划分完备互斥、先验可靠、条件概率可迁移、且多条证据给定类别后条件独立时，本方法适用；在谱偏倚（标定人群与待筛人群基础率不同）、证据同源相关、先验全为 0、或似然同时为 0 的条件下不适用，应改用分层基础率下的贝叶斯更新、带协变量的 logistic 校准、或显式建模证据间的依赖结构。</td></tr>
+    <tr><th>常见问题</th><td>① 把 $P(B\mid A)$ 直接当 $P(A\mid B)$；② 划分不穷尽导致分母漏项、后验和不为 1；③ 多条证据不做条件独立检验就连乘似然比；④ 复检时误用原始基础率当先验；⑤ 忽略患病率变化对 PPV 的影响。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>$P(A\mid B)$ 和 $P(B\mid A)$ 什么时候数值很接近？可以互相代替吗？</summary><div class="faq-a">当 $P(A)\approx P(B)$ 且两类的似然差别不大时会接近——代码 Part 2 里 $0.655408$ 与 $0.660131$ 只差约 $0.005$，就是因为基础率几乎 50%、两组人数几乎相等。但<strong>概念上永远不能代替</strong>：严格相等要求 $P(A)=P(B)$ 或似然恒等。换成 Part 1 的 $p=0.001$，$Se=0.99$ 而 PPV 只有 $0.0902$，差了十倍以上。任何时候先写下你要的方向（算法第 1 步）。</div></details>
+  <details><summary>划分漏掉一种情形会怎样？</summary><div class="faq-a">分母 $P(B)=\sum_i P(B\mid A_i)P(A_i)$ 会缺项，被低估；于是各后验 $P(A_i\mid B)$ 被系统性高估，且 $\sum_i P(A_i\mid B)$ 可能大于 1（若你只归一化已列出的块）。所以第 2 步必须显式校验「两两互斥 + 并为全集 + $\sum P(A_i)=1$」。实践中常见漏项是「其他／未知」这一类，务必单独留出一块。</div></details>
+  <details><summary>两条证据能把似然比直接连乘吗？</summary><div class="faq-a">只有在「给定类别后两条证据条件独立」时才可以。若两条证据同源相关（同一批试剂、同一标注员、同一段文本里的重复特征），连乘会把同一份信息数两遍，后验会过度自信（概率被推得过分接近 0 或 1）。这正是朴素贝叶斯的经典失效模式；正确做法是先做条件独立检验，或改用能表达依赖的结构（模块 07、12）。</div></details>
+  <details><summary>复检阳性时，为什么不能用原始患病率当先验？</summary><div class="faq-a">因为初检阳性已经把信息带进来了：此时人群不再是「全体」，而是「初检阳性者」，其患病率已更新为 15.4%（正文例 4.1）。序贯更新的规则是「上一轮后验充当下一轮先验」；若退回 1% 的原始基础率，会得出约 50% 的错误答案。优势比形式把这件事写得很清楚：每轮只是在当前优势比上再乘一个似然比，不会重置。</div></details>
+  <details><summary>检测没变、只是筛查人群换了，PPV 会变吗？</summary><div class="faq-a">会，而且可能剧烈变化，因为 PPV 是「检测 × 基础率」的联合结果。代码 Part 1 里同一组 $Se=Sp=0.99$，患病率从 $0.0001$ 到 $0.5$ 时 PPV 从 $0.0098$ 升到 $0.9900$。所以任何「准确率 99%」的宣传都必须附带适用人群的基础率；把专科门诊的指标直接搬到全民筛查，是谱偏倚的典型表现。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">某检测灵敏度 0.99、特异度 0.99，人群患病率 $p=0.001$。一次阳性者真患病的概率约为？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 0.99</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 0.090</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 0.50</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. 0.010</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$P(+)=0.99\times0.001+0.01\times0.999=0.010980$，$\mathrm{PPV}=0.00099/0.010980=0.090164$，约 91% 的阳性是误报。代码 Part 1 第 2 行即此结果；选 A 就是把 $P(+\mid D)$ 当成了 $P(D\mid +)$。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">$Se=Sp=0.99$ 时，要使一次阳性「更可能是真病而非误报」，患病率必须超过多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 0.0001</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 0.001</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 0.01</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 0.50</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：由 $Se\,p \gt (1-Sp)(1-p)$ 解得 $p \gt (1-Sp)/(Se+1-Sp) = 0.01/1.00 = 0.01$。代码 Part 1 中 $p=0.0100$ 时 PPV 恰好等于 $0.500000$，正是阈值；$p=0.02$ 时升到 $0.668919$。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">两个事件 $A,B$ 互斥且 $P(A)\gt0$、$P(B)\gt0$，则它们？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 必定不独立</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 必定独立</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 可能独立也可能不独立</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 一定是对立事件</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$P(A\cap B)=0$ 而 $P(A)P(B)\gt0$，乘积判据不成立，故必定不独立。两者能同时成立的唯一情形是 $P(A)=0$ 或 $P(B)=0$（零概率退化情形）。互斥也不等于对立：对立还要求并集为全集。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">代码 Part 3 中，两层内 $X,Y$ 都严格独立，合并后却相关。原因是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 样本量太小</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 存在共同原因 $Z$，两层的 $P(X{=}1)$ 不同</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 计算出错</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 两层人数不相等</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$Z=0$ 层 $P(X{=}1)=0.2$、$Z=1$ 层 $P(X{=}1)=0.8$，共同原因同时抬高／压低 $X,Y$，于是合并后 $P(X{=}1,Y{=}1)=0.34\neq0.5\times0.5=0.25$。这是模块 01 混杂因素的概率版本；两层人数其实相等（各 6000），所以 D 不成立。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">知学云 2×2 表中，$P(\text{完课}\mid\text{高时长})=0.655408$、$P(\text{高时长}\mid\text{完课})=0.660131$。下列判断正确的是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 两者相等，可互换</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 两者相差约 10 倍</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 数值接近但绝不相等，只是本例基础率接近 50%</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 后者一定更大</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：两者分母分别是 6010 与 5967，故数值接近；但严格相等要求 $P(A)=P(B)$，本例也不满足。换到低基础率场景（Part 1 的 $p=0.001$），$P(+\mid D)=0.99$ 与 $P(D\mid +)=0.0902$ 会相差十倍以上，绝不能互换。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure data-classic="0"></figure>

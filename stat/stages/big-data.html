@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02 · 大数据分析 · 统计 · 智能学习体系</title>
+<meta name="description" content="阶段 2 大数据分析：学习路径、先修知识、难度层级、核心概念、目标能力、实践任务、评估标准与进阶衔接。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="s2" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+      <article class="module" data-stage="s2">
+      <div class="inner">
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / 阶段 2 · 大数据分析</div>
+        <h1>02 · 大数据分析</h1>
+        <p class="lead">当推断遇上规模。在 TB 级、流式、分布式环境下仍能做出统计上可信的分析。本页给出该阶段的完整学习路径、先修知识、难度层级、核心概念、目标能力、实践任务、评估标准与进阶衔接。</p>
+        <div class="module-meta">
+          <span class="badge brand">阶段 2</span>
+          <span class="badge info">L2 → L3</span>
+          <span class="badge ok">第 7–10 周</span>
+          <span class="badge ">32 学时</span>
+          <span class="badge accent">1 个专题</span>
+          <span class="badge ">更新 2026-11-07</span>
+        </div>
+      </header>
+
+      <div class="callout note">
+        <div class="callout-title">阶段定位</div>
+        <p><strong>2000 年代至今 · 分布式与流式范式</strong>。全站按「统计学 → 大数据分析 → 机器学习 → 深度学习 → 神经网络 → 生成式AI」组织。本路线按「先掌握方法与训练范式，再深入网络结构与机制，最后进入生成式系统」的认知顺序组织。深度学习与神经网络互为表里：阶段四聚焦如何把深层模型训练好，阶段五拆解网络结构本身为何有效，因此顺序上先四后五。</p>
+      </div>
+      <h2 id="path">1 · 学习路径</h2>
+      <p>按下列顺序推进，每一步都对应一个可点击的站内专题；未完成当前步的评估标准前，不建议跳步。</p>
+      <div class="table-wrap"><table><thead><tr><th>步骤</th><th>主题</th><th>要点</th><th>对应专题</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>规模带来的统计问题</strong></td><td>为何 n 变大后 p 值会失效、抽样不再 i.i.d.、偏差被放大</td><td><a href="../modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>2</td><td><strong>分布式计算模型</strong></td><td>MapReduce、Spark RDD/DataFrame、分区与 shuffle、数据倾斜</td><td><a href="../modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>3</td><td><strong>存储与格式</strong></td><td>列式存储、Parquet/Arrow、分区、数据湖与仓、事务与一致性</td><td><a href="../modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>4</td><td><strong>流式与窗口</strong></td><td>事件时间/处理时间、水位线、滑动窗口、精确一次语义</td><td><a href="../modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>5</td><td><strong>近似与草图算法</strong></td><td>Bloom Filter、HyperLogLog、Count-Min Sketch、蓄水池采样</td><td><a href="../modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+<tr><td>6</td><td><strong>大规模实验与数据质量</strong></td><td>分层哈希分流、护栏指标、血缘、缺失与漂移监控</td><td><a href="../modules/m11-big-data.html">11 · 大数据分析的统计基础</a></td></tr>
+</tbody></table></div>
+      <h2 id="prereq">2 · 先修知识</h2>
+      <div class="callout tip"><div class="callout-title">进入本阶段前应具备</div><ul class="check-list">
+<li>阶段一全部内容（尤其抽样、估计、置信区间）</li>
+<li>Python 熟练：函数、迭代器、pandas 基本操作</li>
+<li>SQL 基础：GROUP BY / JOIN / 窗口函数</li>
+<li>命令行与文件系统基本概念</li>
+</ul></div>
+      <h2 id="difficulty">3 · 难度层级</h2>
+      <p>本阶段覆盖 <strong>L2 → L3</strong>。全站统一采用五级难度标尺：</p>
+      <div class="table-wrap"><table><thead><tr><th>层级</th><th>含义</th><th>本阶段</th></tr></thead><tbody>
+<tr><td>L1 入门</td><td>只需基础数学</td><td>—</td></tr>
+<tr><td>L2 基础</td><td>概率与代数</td><td>✓ 覆盖</td></tr>
+<tr><td>L3 进阶</td><td>线代与编程</td><td>✓ 覆盖</td></tr>
+<tr><td>L4 高级</td><td>微积分与框架</td><td>—</td></tr>
+<tr><td>L5 前沿</td><td>读论文与复现</td><td>—</td></tr>
+</tbody></table></div>
+      <h2 id="concepts">4 · 核心概念</h2>
+      <div class="card-grid two">
+<div class="card"><h3>分区与 shuffle</h3><p>分布式聚合的成本中心；理解它才能解释作业为何慢、为何 OOM。</p></div>
+<div class="card"><h3>批式 vs 流式</h3><p>有界数据与无界数据的语义差异，决定窗口、状态与迟到数据处理。</p></div>
+<div class="card"><h3>列式存储与向量化</h3><p>只读取需要的列；Parquet/Arrow 让单机也能做十亿行聚合。</p></div>
+<div class="card"><h3>近似算法与误差界</h3><p>用可控误差换内存与时间；必须能写出误差概率/相对误差上界。</p></div>
+<div class="card"><h3>分流与可交换性</h3><p>哈希分桶保证组间独立；这是大规模 A/B 测试统计有效性的前提。</p></div>
+<div class="card"><h3>数据漂移与血缘</h3><p>分布随时间变化会让校准好的模型与阈值静默失效。</p></div>
+<div class="card"><h3>可扩展统计估计</h3><p>分治合并、在线更新、随机梯度；把估计量改造成可并行的形式。</p></div>
+</div>
+      <h2 id="competencies">5 · 目标能力</h2>
+      <p>完成本阶段后，你应当能够：</p><ul class="check-list">
+<li>能估算一个分析作业的数据量、内存与网络 shuffle 成本</li>
+<li>能为同一指标选择精确算法或近似算法，并说明误差与资源权衡</li>
+<li>能设计分层随机分流与护栏指标，避免网络效应与提前窥探</li>
+<li>能用 DuckDB/Polars/Spark 完成十亿行级聚合与可复现报告</li>
+<li>能识别并定位数据倾斜、重复计数、迟到数据导致的统计偏差</li>
+</ul>
+      <h2 id="tasks">6 · 实践任务</h2>
+      <p>任务按基础 → 进阶 → 挑战分层，均要求提交可复现产物，而非只看结论。</p>
+      <div class="card-grid two">
+<div class="card">
+          <div class="tag-row"><span class="badge ok">基础</span> <span class="badge ">基准脚本 + 对比表</span></div>
+          <h3>十亿行聚合</h3>
+          <p>生成 1 亿行以上合成日志，分别用 pandas、DuckDB、Polars 完成分组统计，记录耗时与峰值内存。</p>
+        </div>
+<div class="card">
+          <div class="tag-row"><span class="badge info">进阶</span> <span class="badge ">实现/调用 + 误差曲线</span></div>
+          <h3>近似去重</h3>
+          <p>实现 HyperLogLog 或用现有库，与精确集合对比，画出相对误差随基数变化的曲线。</p>
+        </div>
+<div class="card">
+          <div class="tag-row"><span class="badge info">进阶</span> <span class="badge ">Spark UI 截图说明 + 前后对比</span></div>
+          <h3>Spark 倾斜诊断</h3>
+          <p>构造长尾 key 数据，观察 stage 耗时分布，用 salting / 两阶段聚合修复并量化改进。</p>
+        </div>
+<div class="card">
+          <div class="tag-row"><span class="badge warn">挑战</span> <span class="badge ">流式作业 + 语义说明</span></div>
+          <h3>流式窗口统计</h3>
+          <p>用事件时间与水位线计算 5 分钟滑动均值，注入迟到事件并解释结果变化。</p>
+        </div>
+<div class="card">
+          <div class="tag-row"><span class="badge warn">挑战</span> <span class="badge ">分流器 + 平衡性检验</span></div>
+          <h3>分层 A/B 分流</h3>
+          <p>实现哈希分桶，验证各层正交性与组间协变量平衡，写一份分流校验报告。</p>
+        </div>
+</div>
+      <h2 id="assessment">7 · 评估标准</h2>
+      <div class="callout exam"><div class="callout-title">达标再进阶</div></div>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>可检验标准</th></tr></thead><tbody>
+<tr><td><strong>规模意识</strong></td><td>能在写 SQL 前估算数据量、shuffle 体积与内存占用，并据此选择引擎。</td></tr>
+<tr><td><strong>误差可解释</strong></td><td>对任何近似结果能给出误差界或置信陈述，而不是只报一个数。</td></tr>
+<tr><td><strong>统计有效性</strong></td><td>能说明大样本下 p 值失效的原因，改用效应量/置信区间/序贯方法。</td></tr>
+<tr><td><strong>可复现</strong></td><td>作业参数、数据版本、随机种子与口径全部记录，结果可重跑一致。</td></tr>
+<tr><td><strong>衔接 readiness</strong></td><td>能把清洗好的特征稳定产出为训练/验证/测试集，理解数据泄漏在管线层面的来源。</td></tr>
+</tbody></table></div>
+      <h2 id="bridge">8 · 进阶衔接</h2>
+      <div class="callout tip">
+        <div class="callout-title">下一阶段：机器学习</div>
+        <p>数据管线打通后，瓶颈从「算得动」转为「预测得准」。下一阶段把统计推断变成可学习的模型：经验风险最小化、正则化与严格评估协议。</p>
+        <p><a class="btn primary" href="machine-learning.html">进入阶段 3 · 机器学习 →</a>
+        <a class="btn" href="../roadmap.html">查看完整路线图</a></p>
+      </div>
+      <h2 id="resources">9 · 本阶段资源（20 条）</h2>
+      <p>下列条目来自全站资源库，均标注来源、年份、权威性、适用阶段与核验状态。完整可筛选版本见 <a href="../resources.html">资源库</a>。</p>
+      <div class="callout note"><div class="callout-title">构成</div><p>标志性书籍 5 · 经典课程 1 · 数据集 2 · 开源资源 1 · 关键论文 2 · 标志性理论 1 · 工具/框架 8</p></div>
+      <div class="res-item" id="r-b22">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name"><a href="https://r4ds.hadley.nz/" target="_blank" rel="noopener">R for Data Science（第 2 版） ↗</a> <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">数据整理与探索性分析的实践手册，官网免费。</p>
+          <div class="res-meta">Wickham, Çetinkaya-Rundel, Grolemund · 2023 · O'Reilly · 一级 · 官方一手 · 统计学 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b21">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">Designing Machine Learning Systems <span class="badge ok">已核验</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">从数据管线到部署监控的系统化工程视角。</p>
+          <div class="res-meta">Chip Huyen · 2022 · O'Reilly · 一级 · 官方一手 · 大数据 · 机器学习</div>
+          <div class="res-meta verify-note">核验备注：多所高校课程大纲列为 2022 年参考书</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-b13">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name"><a href="https://www.mmds.org/" target="_blank" rel="noopener">Mining of Massive Datasets（第 3 版） ↗</a> <span class="badge ok">已核验</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">大规模数据算法教材：MapReduce、局部敏感哈希、流算法、PageRank。</p>
+          <div class="res-meta">Leskovec, Rajaraman, Ullman · 2021 · Cambridge University Press · 一级 · 官方一手 · 大数据</div>
+          <div class="res-meta verify-note">核验备注：高校课程大纲列为 2021 年第 3 版，官网免费下载</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-d16">
+        <div class="res-icon">🗂</div>
+        <div>
+          <div class="res-name">The Pile / C4 / FineWeb <span class="badge warn">待核验</span> <span class="badge ">数据集</span></div>
+          <p class="res-desc">公开预训练语料族，用于研究数据配比、去重与过滤。</p>
+          <div class="res-meta">EleutherAI / Google / Hugging Face · 2020 · 各项目官方仓库 · 一级 · 官方一手 · 大数据 · 生成式AI</div>
+          <div class="res-meta verify-note">核验备注：本轮未逐一核验各语料发布年份，合并为一条待核验条目</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-o10">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://duckdb.org/" target="_blank" rel="noopener">DuckDB / Polars / Apache Arrow ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">列式向量化引擎，让单机也能处理十亿行级分析。</p>
+          <div class="res-meta">各开源项目 · 2019 · 官方站点 · 一级 · 官方一手 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-c14">
+        <div class="res-icon">🎓</div>
+        <div>
+          <div class="res-name"><a href="https://www.kaggle.com/learn" target="_blank" rel="noopener">Kaggle Learn 微课程 ↗</a> <span class="badge info">权威共识</span> <span class="badge ">经典课程</span></div>
+          <p class="res-desc">Python / pandas / 可视化 / ML 的短实践单元。</p>
+          <div class="res-meta">Kaggle · 2018 · 官方平台 · 一级 · 官方一手 · 统计学 · 大数据 · 机器学习</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b14">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">Designing Data-Intensive Applications <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">分布式数据系统的经典：复制、分区、事务、一致性与流批一体。</p>
+          <div class="res-meta">Martin Kleppmann · 2017 · O'Reilly · 一级 · 官方一手 · 大数据</div>
+          <div class="res-meta verify-note">核验备注：第 2 版是否出版及年份待核验，此处仅记录第 1 版</div>
+        </div>
+      </div>
+      <div class="res-item" id="r-o08">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://spark.apache.org/" target="_blank" rel="noopener">Apache Spark ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">内存计算与 DataFrame API，大规模分析主力。</p>
+          <div class="res-meta">Apache 基金会 / UC Berkeley · 2014 · 官方站点 · 一级 · 官方一手 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o09">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://flink.apache.org/" target="_blank" rel="noopener">Apache Flink / Kafka ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">流处理与消息队列，支撑事件时间与水位线语义。</p>
+          <div class="res-meta">Apache 基金会 · 2014 · 官方站点 · 一级 · 官方一手 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o11">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://parquet.apache.org/" target="_blank" rel="noopener">Apache Parquet ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">列式存储格式，谓词下推与压缩的基础。</p>
+          <div class="res-meta">Apache 基金会 · 2013 · 官方站点 · 一级 · 官方一手 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-p04">
+        <div class="res-icon">📄</div>
+        <div>
+          <div class="res-name">Resilient Distributed Datasets <span class="badge info">权威共识</span> <span class="badge ">关键论文</span></div>
+          <p class="res-desc">基于内存与血缘的容错抽象，取代反复落盘的 MapReduce。</p>
+          <div class="res-meta">Zaharia 等 · 2012 · NSDI 2012 · 一级 · 官方一手 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-b19">
+        <div class="res-icon">📘</div>
+        <div>
+          <div class="res-name">Mostly Harmless Econometrics <span class="badge info">权威共识</span> <span class="badge ">标志性书籍</span></div>
+          <p class="res-desc">计量经济学中因果识别的经典，DID / IV / RD 的常用参考。</p>
+          <div class="res-meta">Angrist, Pischke · 2009 · Princeton University Press · 一级 · 官方一手 · 统计学 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o03">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://pandas.pydata.org/" target="_blank" rel="noopener">pandas ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">表格数据处理与描述分析主力。</p>
+          <div class="res-meta">社区开源 · 2008 · 官方站点 · 一级 · 官方一手 · 统计学 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-d15">
+        <div class="res-icon">🗂</div>
+        <div>
+          <div class="res-name"><a href="https://commoncrawl.org/" target="_blank" rel="noopener">Common Crawl ↗</a> <span class="badge info">权威共识</span> <span class="badge ">数据集</span></div>
+          <p class="res-desc">开放网页抓取语料，绝大多数大模型预训练数据的上游。</p>
+          <div class="res-meta">Common Crawl Foundation · 2007 · 官方站点 · 一级 · 官方一手 · 大数据 · 生成式AI</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o07">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://hadoop.apache.org/" target="_blank" rel="noopener">Apache Hadoop / MapReduce ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">分布式存储与批处理的第一代工业标准。</p>
+          <div class="res-meta">Apache 基金会 · 2006 · 官方站点 · 一级 · 官方一手 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-p03">
+        <div class="res-icon">📄</div>
+        <div>
+          <div class="res-name">MapReduce: Simplified Data Processing on Large Clusters <span class="badge info">权威共识</span> <span class="badge ">关键论文</span></div>
+          <p class="res-desc">把大规模计算抽象为 map/shuffle/reduce，开启分布式数据处理时代。</p>
+          <div class="res-meta">Dean, Ghemawat · 2004 · OSDI 2004 · 一级 · 官方一手 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-s10">
+        <div class="res-icon">🔓</div>
+        <div>
+          <div class="res-name">Wikipedia / 斯坦福哲学百科（概念核对） <span class="badge info">权威共识</span> <span class="badge ">开源资源</span></div>
+          <p class="res-desc">用于快速核对术语与历史脉络，正式引用仍需回到一手来源。</p>
+          <div class="res-meta">社区 / 学术机构 · 2001 · 官方站点 · 三级 · 社区维护 · 统计学 · 大数据 · 机器学习 · 深度学习 · 神经网络 · 生成式AI</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o19">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name">PostgreSQL / SQLite <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">SQL 与事务语义的实践载体。</p>
+          <div class="res-meta">各开源项目 · 1996 · 官方站点 · 一级 · 官方一手 · 大数据</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-o01">
+        <div class="res-icon">🧰</div>
+        <div>
+          <div class="res-name"><a href="https://www.python.org/" target="_blank" rel="noopener">Python ↗</a> <span class="badge info">权威共识</span> <span class="badge ">工具/框架</span></div>
+          <p class="res-desc">全阶段通用语言与生态底座。</p>
+          <div class="res-meta">Python Software Foundation · 1991 · 官方站点 · 一级 · 官方一手 · 统计学 · 大数据 · 机器学习 · 深度学习 · 神经网络 · 生成式AI</div>
+          
+        </div>
+      </div>
+      <div class="res-item" id="r-t13">
+        <div class="res-icon">🧭</div>
+        <div>
+          <div class="res-name">潜在结果框架（Rubin 因果模型） <span class="badge info">权威共识</span> <span class="badge ">标志性理论</span></div>
+          <p class="res-desc">用 Y(1)/Y(0) 定义因果效应，指出根本难题与随机化的作用。</p>
+          <div class="res-meta">Donald Rubin · 1974 · Journal of Educational Psychology · 一级 · 官方一手 · 统计学 · 大数据</div>
+          
+        </div>
+      </div>
+      <h2 id="timeline">10 · 本阶段里程碑（1 项）</h2>
+      <div class="timeline">
+      <div class="tl-item">
+          <div class="tl-date">2004</div>
+          <div class="tl-body"><strong>MapReduce</strong>
+            <span class="badge info">权威共识</span>
+            <p>把分布式计算抽象为 map/shuffle/reduce，大数据分析阶段正式开启。</p>
+            <div class="res-meta">Dean, Ghemawat（Google） · OSDI 2004</div>
+            
+          </div>
+        </div>
+</div>
+      <p><a class="btn" href="../timeline.html">查看完整时间线 →</a></p>
+      <div class="flex-between mt-6">
+        <div><a class="btn" href="../index.html">← 返回首页</a> <a class="btn" href="../roadmap.html">路线图</a></div>
+        <button class="btn primary" data-complete-btn="s2">标记本阶段完成</button>
+      </div>
+      <nav class="module-nav">
+        <a class="prev" href="statistics.html"><span class="dir">← 上一阶段</span><span class="ttl">01 · 统计学</span></a>
+        <a class="next" href="machine-learning.html"><span class="dir">下一阶段 →</span><span class="ttl">03 · 机器学习</span></a>
+      </nav>
+      </div>
+      </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索阶段、概念、资源、论文…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索全站内容。例如：置信区间、Transformer、共形预测、DeepSeek-R1。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

@@ -1,0 +1,693 @@
+<!-- 深度片段 · 14 神经网络架构谱系 -->
+<!-- 已就近放置 3 张自绘图示（架构谱系 / Transformer 块 / 学习闭环）与 1 处经典配图标记；其余图示由脚本补入汇总 -->
+
+<h2 id="d-deep-1">深度专题一 · 归纳偏置作为假设类上的硬约束：四种架构在一份小输入上的参数 / 激活 / FLOPs 资源账</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把「结构先验」写成对权重矩阵的等式约束，再用同一份 16 × 8 的输入把四本账逐格算清</h3></div>
+  <p class="dt-lead">本章第 1 节给出了统一框架 $\hat{\mathrm{Err}}(f)\le\hat{\mathrm{Err}}_{\text{train}}(f)+\mathcal O\bigl(\sqrt{\mathrm{complexity}(\mathcal F)/n}\bigr)$，并用一张表列出「MLP 几乎无先验、CNN 局部性、RNN 时序、Transformer 内容寻址」。但那一节没有回答三个更硬的问题：$\mathcal F$ 到底是哪一类函数？「权值共享」在代数上究竟删掉了哪些自由度？以及当输入形状固定下来之后，四种架构的<strong>参数量、激活显存、前向乘加次数、串行深度</strong>分别是多少？本专题把 $\mathcal F$ 写成一个具体的矩阵集合，再对 $n=16$ 个 token、每 token $d=8$ 维、卷积核 $k=3$ 这一份<strong>具体小输入</strong>逐项核算。第 8 节的例 14.4 算的是「一个 12 层 Transformer 的总参数」、例 14.5 算的是「训练 FLOPs 与 KV Cache」，这里是<strong>同一层、同一输入、四种架构的横向账</strong>，两者不重复。</p>
+
+  <h4>背景：从「没有免费午餐」到「先验是一种限制」</h4>
+  <p>Wolpert 与 Macready 在 1990 年代把「没有免费午餐」定理写清楚：若对所有可能的目标函数一视同仁，任何学习算法的平均表现都相同，能胜出只能靠<strong>对任务分布带了假设</strong>。Mitchell 1980 年把这种假设称为归纳偏置（inductive bias）。这里的「偏置」不是统计学里「估计量的系统偏差」，而是一个<strong>限制</strong>：在见到第一条数据之前，就把绝大多数函数从候选集合里划掉。Vapnik 的 VC 维、后来 Rademacher 复杂度与覆盖数，都是给「候选集合有多大」这件事一个可计算的数。</p>
+  <p>谱系因此可以被读成一条「约束不断改写」的线：感知机与 MLP 让每个输出自由连接每个输入；LeCun 1989 年把卷积核在整张图上复用，等价于强迫权重矩阵是<strong>块 Toeplitz</strong>；Elman / Jordan 1990 年把同一套转移矩阵沿时刻反复施加，等价于把跨时刻影响写成 $W_{hh}^{\,j-i}W_{xh}$；Vaswani 2017 年索性把「位置与位置之间的连线强度」从<strong>可学习常数</strong>改成<strong>由输入内容即时算出的函数</strong>。每一步都没改「输入是一堆数字、输出是一堆数字」这件事，改的是「哪些连线允许存在、谁来决定它们的强度」。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把输入想成一块 $16\times8$ 的开关板，共 $128$ 个输入格、$128$ 个输出格。一个「什么先验都不带」的全连接层，等于给「每个输出格 × 每个输入格」都装一个独立旋钮：$128\times128=16384$ 个旋钮，外加 $128$ 个偏置。它什么都能表达，但也意味着「换一批数据就要把 16384 个旋钮全部重新估一遍」。</p>
+  <ul>
+    <li><strong>CNN 说</strong>：不必给每个位置单独配旋钮。同一个 $3\times8\times8$ 的小模板在 16 个位置滑动复用即可。于是 16384 个独立旋钮被压成 $3\times8\times8=192$ 个（再加 8 个偏置）。代价是：模板之外的连线<strong>永远不存在</strong>——哪怕真实规律真的需要第 1 个位置和第 16 个位置直接通话，CNN 也只能通过层层堆叠间接传递。</li>
+    <li><strong>RNN 说</strong>：也不给每个位置配旋钮，只学「一步怎么走」这套规则（$2\times8\times8+8=136$ 个参数），然后把它连做 16 次。旋钮最少，但第 1 步的信息要传到第 16 步，必须经过 15 次接力——而且每接一次就被乘一遍同一个矩阵，信号要么衰减、要么爆炸。</li>
+    <li><strong>Transformer 说</strong>：位置之间的连线强度不该是<strong>学死的常数</strong>，而该由「这两个位置上写了什么」当场决定。参数只有 $4\times8\times8+32=288$ 个（四个投影矩阵），但为了当场算出所有两两关系，必须临时铺开一张 $16\times16$ 的分数表。这张表不是参数，是<strong>随输入变化的中间结果</strong>，正是它带来了平方级的显存与算力。</li>
+  </ul>
+  <p>一句话抓住分界：<strong>强先验把「旋钮数」压小，从而省数据；弱先验把决定权交给数据，但把账记到了「临时计算量」上</strong>。参数量、激活量、FLOPs 是三本不同的账，例 14.4 与例 14.5 已反复强调，本专题给出它们在同一把尺子下的具体数值。</p>
+
+  <h4>形式化：把每种架构写成一个矩阵集合</h4>
+  <p>固定序列长度 $n$ 与每 token 维度 $d$，把输入按行拉直成 $\mathrm{vec}(X)\in\mathbb R^{nd}$。为公平比较，令四种架构的<strong>单层都把 $\mathbb R^{n\times d}$ 映成 $\mathbb R^{n\times d}$</strong>：一个最一般的线性层就是一个矩阵 $W\in\mathbb R^{nd\times nd}$，其第 $(i,a)$ 行第 $(j,b)$ 列的元素表示「输出位置 $i$ 的第 $a$ 个通道」受「输入位置 $j$ 的第 $b$ 个通道」影响的强度。下面每个公式都配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">记号：无约束假设类，以及它的自由度</div>
+    $$ \mathcal F_{\text{MLP}}=\bigl\{\,x\mapsto W\,\mathrm{vec}(x)+b\ :\ W\in\mathbb R^{nd\times nd},\ b\in\mathbb R^{nd}\,\bigr\} $$
+    $$ \dim \mathcal F_{\text{MLP}}=(nd)^{2}+nd,\qquad \mathrm{VCdim}(\text{线性类})\ \approx\ \dim\mathcal F+1 $$
+    <div class="f-note">白话：把 128 个输入标量与 128 个输出标量两两连线，每条线一个可学数字，共 $128^2+128$ 个。对线性/仿射类，「自由度」就等于参数个数，也约等于 VC 维——这就是第 1 节 $\mathrm{complexity}(\mathcal F)$ 在具体架构下的取值。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">CNN：平移等变 = 权重矩阵被约束成块 Toeplitz</div>
+    $$ \mathcal F_{\text{CNN}}=\bigl\{\,W\ :\ W_{(i,a),(j,b)}=0\ \text{当}\ |i-j|\gt\lfloor k/2\rfloor,\quad W_{(i,a),(j,b)}=K_{i-j}[a,b]\,\bigr\} $$
+    $$ \dim\mathcal F_{\text{CNN}}=k\,d^{2}+d\ \ (\text{与 } n \text{ 无关}),\qquad f(T_{\Delta}x)=T_{\Delta}f(x) $$
+    <div class="f-note">白话：第一条把「隔得超过 $k/2$ 个位置的连线」直接置零，这是局部性；第二条要求连线强度只依赖相对位移 $i-j$，这是权值共享。二者合起来正是块 Toeplitz 矩阵。$T_\Delta$ 表示把整条序列平移 $\Delta$ 格，第二条等式说明「先平移再卷积」与「先卷积再平移」结果相同，这就是平移等变。注意等变不是不变：特征图确实跟着动了。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">RNN：时刻共享 = 跨时刻影响被写成矩阵的幂</div>
+    $$ h_t=\phi\bigl(W_{xh}x_t+W_{hh}h_{t-1}+b\bigr),\qquad \frac{\partial h_j}{\partial x_i}=W_{hh}^{\,j-i}W_{xh}\quad (j\ge i) $$
+    $$ \dim\mathcal F_{\text{RNN}}=2d^{2}+d\ \ (\text{与 } n \text{ 无关}),\qquad \bigl\|\tfrac{\partial h_j}{\partial x_i}\bigr\|\ \le\ \rho(W_{hh})^{\,j-i}\,\|W_{xh}\| $$
+    <div class="f-note">白话：同一套 $W_{xh},W_{hh}$ 在每个时刻复用，参数与序列长度无关。但展开后，位置 $i$ 要影响位置 $j$ 必须连乘 $j-i$ 次 $W_{hh}$；只要其谱半径 $\rho\lt1$，影响就按 $\rho^{\,j-i}$ 指数衰减。这一行同时解释了「梯度消失」与「前向长程信号衰减」，是深度专题二路径长度论证的代数起点。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">Transformer：连线强度不是参数，是输入的函数</div>
+    $$ q_i=W^{Q}x_i,\quad k_j=W^{K}x_j,\quad v_j=W^{V}x_j,\qquad a_{ij}=\frac{\exp\bigl(q_i^{\top}k_j/\sqrt{d_k}\bigr)}{\sum_{j'=1}^{n}\exp\bigl(q_i^{\top}k_{j'}/\sqrt{d_k}\bigr)} $$
+    $$ Y=A(X)\,V\,W^{O},\qquad A(X)\in\mathbb R^{n\times n}\ \text{行随机},\qquad \dim\theta=4d^{2}+4d $$
+    <div class="f-note">白话：位置 $j$ 到位置 $i$ 的连线强度 $a_{ij}$ 不再是学出来的常数，而是由两个位置的内容当场算出来、再经 softmax 归一化成一行和为 1 的权重。四个投影矩阵共 $4d^2+4d$ 个参数，与 $n$ 无关；但 $A(X)$ 有 $n^2$ 个元素，且<strong>每次换输入都要重算</strong>，无法折进参数。这正是「参数窄、计算宽」的严格含义。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">把第 1 节的定性说法补成误差分解</div>
+    $$ \mathrm{Err}(\hat f)-\mathrm{Err}(f^{*})=\underbrace{\Bigl[\inf_{f\in\mathcal F}\mathrm{Err}(f)-\mathrm{Err}(f^{*})\Bigr]}_{\text{逼近误差（先验不对就搬不走）}}+\underbrace{\Bigl[\mathrm{Err}(\hat f)-\inf_{f\in\mathcal F}\mathrm{Err}(f)\Bigr]}_{\text{估计误差（随样本量下降）}} $$
+    $$ \mathcal F'\subset\mathcal F\ \Longrightarrow\ \text{逼近误差上升、估计误差下降} $$
+    <div class="f-note">白话：把假设类收窄（$\mathcal F$ 变小），估计误差项因自由度下降而变小——这就是「样本效率提高」；但真实最优函数 $f^{*}$ 更可能落在 $\mathcal F$ 之外，逼近误差项上升——这就是「先验错了，数据再多也填不平」。第 1 节只说了前半句，这里把两半同时摆出来：架构选型就是在这条此消彼长的曲线上选一个点，而不是找「最好的模型」。</div>
+  </div>
+
+  <h4>数值对账：同一份输入、四个架构、四本账</h4>
+  <p>取 $n=16,\ d=8,\ k=3$，故 $nd=128$。约定 <strong>1 次标量乘加 = 1 MAC = 2 FLOPs</strong>（一次乘法加一次加法），激活显存只数「为反向传播必须保留的中间标量数」。所有数值由下方代码实验 Part 1 原样算出：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>架构</th><th>参数量</th><th>前向 MACs</th><th>前向 FLOPs</th><th>激活显存（元素）</th><th>串行深度</th><th>参数随 $n$</th></tr></thead>
+      <tbody>
+        <tr><td>MLP（全连接 $nd\to nd$）</td><td>$\mathbf{16512}$</td><td>16384</td><td>32768</td><td>128</td><td>1</td><td>$O(n^{2}d^{2})$</td></tr>
+        <tr><td>CNN（1D 卷积，$k=3$）</td><td>$\mathbf{200}$</td><td>3072</td><td>6144</td><td>128</td><td>1</td><td>$O(kd^{2})$，与 $n$ 无关</td></tr>
+        <tr><td>RNN（一步转移，共享 16 次）</td><td>$\mathbf{136}$</td><td>2048</td><td>4096</td><td>128</td><td>$\mathbf{16}$</td><td>$O(d^{2})$，与 $n$ 无关</td></tr>
+        <tr><td>Transformer（单头自注意力）</td><td>$\mathbf{288}$</td><td>8192</td><td>16384</td><td>$\mathbf{512}$</td><td>1</td><td>$O(d^{2})$，与 $n$ 无关</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>逐格读这套数。MLP 的 $16512=(128)^2+128$ 个参数里，几乎全部用来描述「任意位置对任意位置」的连线；CNN 用 $200=3\times8^2+8$ 个参数覆盖同样的 $16\times8$ 输出，少两个数量级，代价是 16 个位置共用同一模板。RNN 参数最少（136），但串行深度是 16——这一列与 FLOPs 无关，只数「必须一步接一步做的次数」，深度专题二会把它变成主角。Transformer 的参数（288）只比 RNN 多一点，激活显存却是 512，是其它三者的四倍：$2n^2=512$ 恰好来自 $16\times16$ 的分数矩阵与 $16\times16$ 的 softmax 权重矩阵各一份。</p>
+  <p>再看 FLOPs 的构成，这决定了平方项何时开始咬人：</p>
+  <div class="formula-box">
+    <div class="f-name">自注意力前向的两个来源</div>
+    $$ \mathrm{MACs}_{\text{attn}}=\underbrace{4\,n\,d^{2}}_{Q,K,V,O\ \text{四个投影：}3nd^{2}+nd^{2}}+\underbrace{2\,n^{2}d}_{QK^{\top}\ \text{与}\ AV\ \text{各}\ n^{2}d} $$
+    $$ n=16,\ d=8:\quad 4nd^{2}=4096,\qquad 2n^{2}d=4096,\qquad \text{合计 }8192 $$
+    <div class="f-note">白话：投影部分是 $O(nd^2)$，与序列长度线性相关；注意力分数与加权和是 $O(n^2d)$，与序列长度平方相关。本例恰好 $n=2d=16$，两项打平；一旦 $n$ 超过 $2d$，平方项就压过线性项。代码实验把 $n$ 从 8 加到 256，二次项占比从 $33.3\%$ 升到 $94.1\%$。</div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$n$</th><th>MLP $(nd)^2$</th><th>CNN $n\cdot d\cdot kd$</th><th>RNN $2nd^{2}$</th><th>Transformer $4nd^{2}+2n^{2}d$</th><th>其中 $n^{2}$ 项占比</th></tr></thead>
+      <tbody>
+        <tr><td>8</td><td>4096</td><td>1536</td><td>1024</td><td>3072</td><td>33.3%</td></tr>
+        <tr><td>16</td><td>16384</td><td>3072</td><td>2048</td><td>8192</td><td>50.0%</td></tr>
+        <tr><td>32</td><td>65536</td><td>6144</td><td>4096</td><td>24576</td><td>66.7%</td></tr>
+        <tr><td>64</td><td>262144</td><td>12288</td><td>8192</td><td>81920</td><td>80.0%</td></tr>
+        <tr><td>128</td><td>1048576</td><td>24576</td><td>16384</td><td>294912</td><td>88.9%</td></tr>
+        <tr><td>256</td><td>4194304</td><td>49152</td><td>32768</td><td>1114112</td><td>94.1%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>注意 MLP 的 $O(n^2d^2)$ 比 Transformer 的 $O(n^2d)$ 还差一个 $d$ 因子：全连接层看的是「每个输入标量到每个输出标量」，而注意力的 $n^2$ 只发生在「位置对位置」层面、通道维仍是 $d$。因此「长序列上 MLP 更省」是错的——它只是<strong>没有平方位置项</strong>，却把整个输入拉平后引入了更贵的 $n^2d^2$。这也解释了为什么 CNN / RNN / Transformer 都要靠「权值共享或共享转移」把参数从 $n$ 里摘出来。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>归纳偏置不是「经验偏好」，而是对假设类的<strong>硬约束</strong>：把 $W\in\mathbb R^{nd\times nd}$ 约束成块 Toeplitz（CNN）使自由度从 $(nd)^2+nd$ 降到 $kd^2+d$；约束成时刻共享的 $W_{hh}^{\,j-i}W_{xh}$（RNN）降到 $2d^2+d$，却把串行深度固定为 $n$；把连线强度改成内容寻址的 $A(X)$（Transformer）参数降到 $4d^2+4d$，代价是 $n^2$ 个<strong>随输入变化</strong>的激活。在 $n=16,d=8,k=3$ 上四本账为：MLP $16512/16384/128/1$、CNN $200/3072/128/1$、RNN $136/2048/128/16$、Transformer $288/8192/512/1$（参数 / MACs / 激活元素 / 串行深度）。由误差分解 $\mathrm{Err}(\hat f)-\mathrm{Err}(f^*)=$ 逼近误差 $+$ 估计误差可知：收窄 $\mathcal F$ 只减小估计误差，若 $f^*$ 落在被划掉的区域里，逼近误差永久存在。架构选择就是在这条此消彼长的曲线上定点，而不是挑最新模型。</div>
+
+  <p><strong>边界条件：</strong>在真实函数需要跨任意位置直接交互、且这些位置关系不随平移保持不变（例如绝对坐标回归、表格列之间无顺序、图拓扑不规则）的条件下，「CNN 的平移等变约束只是在删掉无用自由度」不成立，应改用 MLP / Transformer（并显式补位置编码）或 GNN 的置换不变聚合；在序列长度 $n$ 远大于单头维度 $d$、且真实注意力矩阵本质高秩（需精确召回任意远处 token）的条件下，「Transformer 用 $4d^2$ 个参数即可表达所需交互」不成立（$n^2$ 激活与 $n^2d$ 算力主导），应改用 FlashAttention 压显存、稀疏或线性注意力降复杂度，或 SSM 类状态递推；在标注样本极少、而任务结构确实满足强空间/时序先验的条件下，「弱先验模型靠数据能把先验学回来」不成立，应改用 CNN / 预训练迁移，而不是把小数据直接喂给大容量 Transformer。</p>
+
+  <p>下图把本章的架构谱系按「写进结构的先验」定位。读图时配合上表：MLP 在最宽的假设类一端，CNN 与 RNN 分别用局部性与时序递推把类收窄，Transformer 则把「连线由谁决定」从参数搬到了输入；四者的样本效率、外推性与资源账都由此分叉。</p>
+  <figure data-figure="mind-architectures"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · $O(n^{2}d)$ 从何而来、递推为何是 $O(n)$ 串行深度：路径长度 $O(1)$ 对 $O(n)$ 的推导与二次注意力的失效边界</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>区分「总工作量」与「不可并行的串行步数」，再精确回答：平方注意力何时成为瓶颈，稀疏 / 线性 / IO 优化各换走了什么</h3></div>
+  <p class="dt-lead">第 4.3 节说 RNN「串行、无法并行」，第 5 节说注意力「一步看到全序列 + 完全并行」，第 6.1 节写出 $O(n^{2}d+nd^{2})$，第 8 节把 $O(n^{2})$ 收进资源账。这些结论都对，但散落在各处，且没有把最关键的一对概念分开：<strong>总 FLOPs</strong> 与 <strong>路径长度（关键路径 / 最小串行操作数）</strong>。Vaswani 等 2017 年原论文 Table 1 正是用三列——每层复杂度、最小串行操作数、最大路径长度——来对比 Self-Attention / Recurrent / Convolutional。本专题把这三列推导到底，给出「长程依赖路径 $O(1)$ 对 $O(n)$」的严格论证，并精确划定二次注意力成为瓶颈的条件，以及各类近似各自<strong>换走了哪种能力</strong>。</p>
+
+  <h4>背景：两条线索在同一张表上会合</h4>
+  <p>Hochreiter 1991 年与 Bengio 等 1994 年分别指出：沿时间展开的梯度是权重矩阵的连乘，谱半径小于 1 时指数衰减、大于 1 时爆炸，长程依赖因此学不到。Hochreiter &amp; Schmidhuber 1997 年用 LSTM 的加法细胞状态造出「常数误差传送带」，把有效衰减率抬到接近 1，但<strong>没有改变逐步递推的计算结构</strong>。Bahdanau 等 2014 年让解码器直接对全部编码位置加权，第一次把「远处信息」的路径缩到一步；Vaswani 等 2017 年把编码器也换成自注意力，彻底去掉递推，并在 Table 1 里明确写出「Self-Attention: $O(n^2\cdot d)$ 每层、$O(1)$ 串行操作、$O(1)$ 最大路径长度」对「Recurrent: $O(n\cdot d^2)$、$O(n)$、$O(n)$」。</p>
+  <p>2019 年之后，长上下文需求把 $n$ 从几百推到几十万，二次项从「可接受」变成「必须先解决」：Child 等 2019 稀疏 Transformer、Beltagy 等 2020 Longformer、Zaheer 等 2020 BigBird 走稀疏模式；Wang 等 2020 Linformer、Choromanski 等 2020 Performer、Katharopoulos 等 2020 Linear Transformers 走低秩 / 核化；Dao 等 2022 FlashAttention 走 IO 重排；Gu &amp; Dao 2023 Mamba 回到线性递推。它们的差别，只有把「路径长度 / 总工作量 / 精确召回」三个轴分开才说得清。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>先分清两种「慢」。第一种是<strong>活儿多</strong>：一百个人各算各的，只要有一百张桌子就能同时干完，这叫总 FLOPs 大但可并行。第二种是<strong>必须排队</strong>：传话游戏里第 1 个人把话传给第 2 个人、再传给第 3 个人……哪怕有一万张桌子，第 16 个人也得等前 15 次接力做完，这叫串行深度大。GPU 能消灭第一种慢，消灭不了第二种。</p>
+  <p>更糟的是，传话游戏里的「话」还会<strong>失真</strong>：每接力一次都被乘上同一个衰减因子，传 64 次后原话只剩千分之一。LSTM 的常数误差传送带相当于把「每步衰减率」调到几乎 1，话不糊了，但仍然要传 64 次、仍然排 64 步队。注意力则是把所有人拉进一间视频会议室：任意两人直接对话，一次就到，且一百对对话互不依赖、可以同时进行。代价是会议室里要贴一张 $n\times n$ 的「谁和谁说了什么」记录表——这就是 $O(n^2)$ 的显存与算力。</p>
+  <p>所以「自注意力用 $O(n^2)$ 换 $O(1)$ 路径长度」是两笔不同的交易：拿<strong>可并行的总工作量</strong>换<strong>不可并行的串行步数</strong>。理解这一点，才能判断什么时候这笔交易划算、什么时候该反悔。</p>
+
+  <h4>形式化：路径长度的推导</h4>
+  <p>定义 $\mathrm{PL}(i\to j)$ 为「从输入位置 $i$ 到输出位置 $j$ 的最短信息通路上，必须<strong>串行</strong>执行的非线性变换次数」；$\mathrm{PL}=\max_{i,j}\mathrm{PL}(i\to j)$ 就是原论文 Table 1 的「Maximum Path Length」。下面每个公式都配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">递推：信息必须穿过 $n-1$ 次复合</div>
+    $$ h_t=\phi\bigl(W_{xh}x_t+W_{hh}h_{t-1}+b\bigr),\qquad h_n=\underbrace{\Phi\circ\Phi\circ\cdots\circ\Phi}_{n-1\ \text{次}}(x_1,\dots,x_n) $$
+    $$ \mathrm{PL}_{\text{RNN}}(1\to n)=n-1=O(n),\qquad \text{Sequential ops}=O(n) $$
+    <div class="f-note">白话：$h_t$ 只依赖 $h_{t-1}$ 与 $x_t$，所以 $x_1$ 要影响 $h_n$，只能沿 $h_1\to h_2\to\cdots\to h_n$ 逐跳前进，共 $n-1$ 跳。这不是实现不好，是递推式本身规定的依赖关系：下一时刻必须等上一时刻算完，无法并行。代码实验 Part 3 里 $n=16$ 对应路径 15、$n=128$ 对应 127，而注意力恒为 1。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">递推：连乘导致信号与梯度同样指数衰减</div>
+    $$ \frac{\partial h_n}{\partial h_1}=\prod_{t=2}^{n}W_{hh}^{\top}\,\mathrm{diag}\bigl(\phi'(h_{t-1})\bigr),\qquad \frac{\partial h_n}{\partial x_1}=W_{hh}^{\,n-1}W_{xh} $$
+    $$ \Bigl\|\frac{\partial h_n}{\partial x_1}\Bigr\|\ \le\ \rho^{\,n-1}\,\|W_{xh}\|,\qquad \rho=\rho(W_{hh})\cdot\max|\phi'|\lt 1 $$
+    <div class="f-note">白话：第一式是 BPTT 的连乘，第二式说明<strong>前向信号</strong>也按同一因子 $\rho^{\,n-1}$ 衰减——不只是梯度训不动，是远处信息根本传不过来。取 $\rho=0.9$：$n=16$ 时 $0.9^{15}=0.2059$，$n=64$ 时 $0.9^{63}=1.310\times10^{-3}$，$n=128$ 时 $1.545\times10^{-6}$（代码实验 Part 3 原样输出）。把 $\rho$ 抬到 $0.99$ 也只是把衰减推迟，$n=128$ 仍剩 $0.279$。LSTM 令 $f_t\approx1$ 使有效 $\rho\approx1$，但 $\mathrm{PL}=O(n)$ 不变。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">自注意力：任意两位置一层直连</div>
+    $$ y_i=\sum_{j=1}^{n}a_{ij}\,v_j,\qquad a_{ij}=\mathrm{softmax}_{j}\Bigl(\frac{q_i^{\top}k_{j'}}{\sqrt{d_k}}\Bigr),\qquad q_i,k_j,v_j\ \text{均由 } x_i,x_j \text{ 直接线性投影得到} $$
+    $$ \mathrm{PL}_{\text{Attn}}(i\to j)=1=O(1)\quad(\forall\, i,j,\ \forall\, n),\qquad \text{Sequential ops}=O(1) $$
+    <div class="f-note">白话：$y_i$ 的求和里直接出现每一个 $v_j$，而 $a_{ij}$ 又直接由 $x_i$ 与 $x_j$ 算出，中间没有任何「必须经过第 $i+1$ 个状态」的限制。所以无论相隔多远，一层就到。所有 $n^{2}$ 个分数彼此独立，GPU 可以把它们同时算完——总工作量是 $O(n^2d)$，但墙钟上的关键路径仍是 $O(1)$。这就是「用可并行的算力换不可并行的深度」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">两本账并列：工作量 vs 关键路径</div>
+    $$ \text{Recurrent:}\quad \mathrm{FLOPs}=O(nd^{2}),\quad \mathrm{Mem}=O(nd),\quad \mathrm{Sequential}=O(n),\quad \mathrm{PL}=O(n) $$
+    $$ \text{Attention:}\quad \mathrm{FLOPs}=O(n^{2}d+nd^{2}),\quad \mathrm{Mem}=O(n^{2}),\quad \mathrm{Sequential}=O(1),\quad \mathrm{PL}=O(1) $$
+    <div class="f-note">白话：递推总活儿少、显存少，但必须排 $n$ 步队且长程信号衰减；注意力总活儿多、显存多，但一步并行且长程保真。两张表不能只看一列：大模型训练之所以选注意力，是因为在足够多的 GPU 上「$n^2$ 个独立乘加」比「$n$ 次串行且不可拆」更快。</div>
+  </div>
+
+  <h4>精确回答：二次注意力何时成为瓶颈</h4>
+  <p>「$O(n^2)$ 很贵」这句话必须落到具体条件上，否则会误导选型。可以写成三条可判定的不等式。</p>
+  <div class="formula-box">
+    <div class="f-name">条件一：计算量的交叉点</div>
+    $$ 2n^{2}d\ \gt\ 4nd^{2}\quad\Longleftrightarrow\quad n\ \gt\ 2d $$
+    <div class="f-note">白话：注意力自身有两项，$O(n^2d)$ 的分数/加权和与 $O(nd^2)$ 的四个投影。二者相等处是 $n=2d$。单头 $d_k=64$ 时 $n=128$ 就交叉，真实上下文 4K、32K、128K 全都远在其右，平方项占比 $2n/(2n+4d)\to1$。代码实验里 $d=8$、$n=256$ 时占比已达 $94.1\%$。反过来，在 $n\le2d$ 的短序列上主导项是 FFN 的 $O(nd^2)$，此时优化注意力是打错靶子。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">条件二：显存与带宽的交叉点</div>
+    $$ \text{注意力中间量}=n^{2}\ \text{元素/头}\ \Rightarrow\ \text{FP16 下}\ 2n^{2}\ \text{字节},\qquad n=32768:\ 2n^{2}\approx2.15\times10^{9}\ \text{B}\approx2\ \text{GB/头/层} $$
+    <div class="f-note">白话：真正先撞墙的常常不是 FLOPs 而是要把 $n\times n$ 矩阵写回 HBM。分数矩阵与 softmax 权重矩阵各一份，单头单层在 32K 上下文就约 2 GB；乘上头数、层数、batch 后立刻不可行，且这些矩阵是<strong>数据相关</strong>的，不能像权重那样预先驻留或跨请求复用。这正是 FlashAttention 的靶点。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">条件三：prefill 与 decode 的瓶颈会迁移</div>
+    $$ \text{prefill: } O(n^{2}d)\ \text{计算},\qquad \text{decode/步: } O(nd)\ \text{计算（有 KV Cache）},\qquad \text{KV Cache}=O(Lnd)\ \text{显存} $$
+    <div class="f-note">白话：处理整段提示时是 $n^2$ 计算瓶颈；逐 token 生成时每步只算新的一行，退化为线性，但 KV Cache 随 $n$、层数 $L$、并发线性增长，长上下文服务里常比权重还大（例 14.5 已算过 batch=32 时 1.13 GiB 对权重 210 MiB）。所以「$O(n^2)$ 是唯一瓶颈」只在 prefill 与训练前向成立；decode 阶段瓶颈会搬到显存带宽。</div>
+  </div>
+  <p>把三条合起来：<strong>当且仅当 $n\gg d$、且 $n\times n$ 中间量必须被物化（或 $n^{2}$ MACs 压过设备的算力/带宽）时，二次注意力才是首要瓶颈</strong>。短序列、小 batch、算力富余而显存不紧时，首要成本往往在 FFN 的 $O(nd^2)$、嵌入表与通信。</p>
+
+  <h4>各类近似各换走了什么</h4>
+  <p>把三条轴摆出来：$\mathrm{PL}$（并行深度）、总 $\mathrm{FLOPs}$、以及<strong>精确召回</strong>（能否让任意两个位置以任意强度直接交互）。精确全注意力是唯一同时拿到 $\mathrm{PL}=O(1)$ 与完整两两点对点表达力的方法；任何次二次方法必须至少放弃其中一项。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>方法</th><th>做法</th><th>复杂度</th><th>路径长度</th><th>换走了什么</th></tr></thead>
+      <tbody>
+        <tr><td>精确全注意力</td><td>$A=\mathrm{softmax}(QK^\top/\sqrt d)$</td><td>$O(n^{2}d)$，显存 $O(n^{2})$</td><td>$O(1)$</td><td>无（基准）</td></tr>
+        <tr><td>稀疏 / 固定模式</td><td>$A\odot M$，$M$ 为窗口+跨步+全局的 0/1 掩码</td><td>$O(nwd)$ 或 $O(n\sqrt n\,d)$</td><td>$O(n/w)$，加膨胀/全局可到 $O(\log n)$</td><td>放弃了「任意 $(i,j)$ 直连」：未被掩码覆盖的位置对必须多跳才能互通</td></tr>
+        <tr><td>线性 / 核化注意力</td><td>$\phi(Q)\bigl(\phi(K)^\top V\bigr)$，利用结合律先算后两个</td><td>$O(nd^{2})$，显存 $O(d^{2})$</td><td>$O(1)$</td><td>放弃了精确 softmax 核：用显式特征映射或低秩假设近似 $A$，当 $A$ 高秩、近 one-hot 时误差显著</td></tr>
+        <tr><td>IO 感知（FlashAttention）</td><td>分块 + 在线 softmax，数学完全不变</td><td>计算仍 $O(n^{2}d)$，显存降 $O(n)$</td><td>$O(1)$</td><td>不换精度，只把成本从 HBM 读写搬到 SRAM；需要专用融合 kernel</td></tr>
+        <tr><td>状态空间 / 线性递推</td><td>$h_t=\bar A h_{t-1}+\bar B x_t$，固定维状态压缩历史</td><td>$O(nd)$，decode $O(1)$ 状态</td><td>$O(n)$（训练可卷积并行）</td><td>放弃了「按内容精确召回任意特定历史 token」：固定维状态是信息瓶颈</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>稀疏方法（Longformer / BigBird）保留 softmax 的精确形式，只把 $(i,j)$ 对砍到 $O(nw)$ 条；BigBird 用「局部窗口 + 随机 + 全局」证明在 $O(n)$ 条边下仍是通用逼近、图灵完备，但常数变差，且「某两个特定远位置恰好要直接对齐」时只能多跳。线性方法（Linformer / Performer / Linear Transformer）把 $\mathrm{softmax}(QK^\top)V$ 重写成 $\phi(Q)(\phi(K)^\top V)$，靠结合律把 $n\times n$ 消掉，代价是把本来数据相关、可高秩、可近 one-hot 的 $A$ 强行放进低秩或固定核特征里——<strong>联想回忆、逐字复制、键值检索</strong>这类需要「锐利精确匹配」的任务最先掉点，这也正是 SSM/Mamba 公认的弱项。FlashAttention 不碰数学，只把 $n\times n$ 矩阵切成块在 SRAM 内做在线 softmax、不写回 HBM，于是显存从 $O(n^2)$ 降到 $O(n)$、带宽大省，但 FLOPs 仍是 $O(n^2d)$。由此得到一条可操作的判据：<strong>显存/带宽先撞墙用 FlashAttention；算力先撞墙且能接受精度损失才用稀疏或线性</strong>。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>路径长度衡量的是<strong>不可并行的串行步数</strong>，与总 FLOPs 是两本账。递推 $h_t=\phi(W_{xh}x_t+W_{hh}h_{t-1})$ 迫使 $x_1$ 经 $n-1$ 次复合才能影响 $h_n$，故 $\mathrm{PL}=O(n)$，且 $\|\partial h_n/\partial x_1\|\le\rho^{\,n-1}\|W_{xh}\|$ 使前向信号与梯度同步指数衰减（$\rho=0.9,n=64$ 时仅 $1.310\times10^{-3}$）；LSTM 把有效 $\rho$ 抬到约 1 却不改变 $\mathrm{PL}$。自注意力 $y_i=\sum_j a_{ij}v_j$ 让任意两位置一层直连，$\mathrm{PL}=O(1)$，且 $n^2$ 个分数互相独立、可被并行压成 $O(1)$ 墙钟深度——代价是 $O(n^2d)$ 计算与 $O(n^2)$ 数据相关激活。二次项成为首要瓶颈的精确条件是 $n\gt2d$（计算交叉）、或 $n\times n$ 中间量必须物化（显存/带宽交叉）；prefill 成立而 decode 会迁移到 KV Cache 带宽。稀疏注意力换走「任意位置对直连」，线性/核化注意力换走「精确 softmax 核与高秩表达」，FlashAttention 不换精度只换 IO，SSM 换走「精确内容寻址召回」。</div>
+
+  <p><strong>边界条件：</strong>在任务需要在超长序列中精确召回任意一个特定历史 token（逐字复制、键值检索、关联回忆），且真实注意力矩阵本质高秩、无法被固定稀疏模式或低秩核特征覆盖的条件下，「稀疏 / 线性注意力以可忽略精度损失把 $O(n^2)$ 降到 $O(n)$」本结论不成立，应改用精确注意力配 FlashAttention 压显存、或检索式外部记忆把「召回」从参数化注意力里拆出去；在序列长度 $n\lesssim2d$、batch 很小、算力富余而显存并非瓶颈的条件下，「$O(n^2)$ 是首要瓶颈」不成立，应改用 FFN 的 $O(nd^2)$ 优化、混合专家与通信/带宽调优；在流式低延迟、状态必须保持 $O(1)$ 的边缘推理条件下，「用 $O(n^2)$ 换 $O(1)$ 路径长度值得」不成立，应改用 SSM / 线性递推或小型 GRU，把长程记忆交给固定维状态。</p>
+
+  <p>下图是单个 Transformer 编码器块的结构：多头自注意力子层正是 $n^2$ 分数矩阵产生的地方，前馈子层则是 $O(nd^2)$ 的来源。把本专题的两本账对到图上——注意力子层负责 $\mathrm{PL}=O(1)$ 与 $O(n^2)$ 激活，残差与 LayerNorm 不改变复杂度量级，位置编码负责补回注意力天生缺失的顺序信息。</p>
+  <figure data-figure="stack-transformer"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 缩放点积自注意力：3 个 token / 4 维输入上的一次完整前向手算</h2>
+<div class="algo-spec">
+  <p>本算法位于「数据采集 → 存储计算 → 建模 → 评估 → 部署运维」链条的<strong>建模环节</strong>，是本章第 5 节 $\mathrm{Attention}(Q,K,V)=\mathrm{softmax}(QK^\top/\sqrt{d_k})V$ 的完整落地。上游契约是「一份已投影好的 $Q,K,V$ 矩阵，形状分别为 $n\times d_k$、$n\times d_k$、$n\times d_v$」；下游契约是「一个 $n\times d_v$ 的输出矩阵，外加（训练时）可供反向传播使用的 $n\times n$ 注意力权重」。选它作经典算法，是因为它<strong>只需要加、乘、除以一个常数、指数与归一化</strong>，一次完整前向可以完全用初中算术手算到底；正文例 14.3 已在 $n=2,d=2$ 上算过带因果掩码的版本，这里不重复，改用 <strong>3 个 token、4 维</strong>的更大玩具，把 $Q,K,V$、原始分数、缩放、softmax、加权和、因果掩码<strong>七步全走一遍</strong>，并补上一个统计视角：它其实就是 Nadaraya–Watson 核回归。</p>
+
+  <h3 id="d-algo-principle">一、原理：内容寻址的加权平均，也就是一个核回归估计</h3>
+  <p>注意力要回答一个很朴素的问题：<strong>为了写出第 $i$ 个位置的输出，该把其余每个位置的内容按多大比例抄过来？</strong>做法是让第 $i$ 个位置举着一张「查询」$q_i$，去和每个位置的「键」$k_j$ 打分，分数越高说明越相关；把分数归一化成权重后，对各自的「值」$v_j$ 做加权平均。写全就是：</p>
+  <div class="formula-box">
+    <div class="f-name">缩放点积自注意力</div>
+    $$ \mathrm{Attention}(Q,K,V)=\mathrm{softmax}\Bigl(\frac{QK^{\top}}{\sqrt{d_k}}\Bigr)V,\qquad S=\frac{QK^{\top}}{\sqrt{d_k}},\quad A_{ij}=\frac{e^{S_{ij}}}{\sum_{j'}e^{S_{ij'}}} $$
+    $$ y_i=\sum_{j=1}^{n}A_{ij}\,v_j,\qquad \sum_{j}A_{ij}=1,\quad A_{ij}\ge0 $$
+    <div class="f-note">白话：$QK^\top$ 的第 $(i,j)$ 格是 $q_i$ 与 $k_j$ 的点积，衡量「查询 $i$ 有多想看位置 $j$」；除以 $\sqrt{d_k}$ 是把分数拉回合适尺度（第 5.1 节已证 $\mathrm{Var}(q^\top k)=d_k$，此处不重复推导）；softmax 把每一行变成和为 1 的权重；最后用这些权重对 $V$ 的各行加权求和，得到第 $i$ 行输出。</div>
+  </div>
+  <p><strong>统计与几何解释：</strong>把 $q_i$ 看成待估点、$k_j$ 看成样本点、$v_j$ 看成样本响应，则 $y_i=\sum_j w(q_i,k_j)v_j$、$w(q,k)=\frac{\exp(q^\top k/\sqrt{d_k})}{\sum_{j'}\exp(q^\top k_{j'}/\sqrt{d_k})}$ 正是统计学里的 <strong>Nadaraya–Watson 核回归估计量</strong>，核取指数型 $K(u)=e^{u}$。换句话说，注意力不是什么全新的运算，而是「用可学习的投影把数据搬到一个空间，再在那里做一次非参数核平滑」。这也解释了它的两个性质：权重非负且行和为 1（输出是 $V$ 行向量的凸组合，故不会外推到训练数据张成的范围之外），以及 softmax 的「锐度」由 $\sqrt{d_k}$ 与分数尺度共同决定——与第 1 阶段核回归、第 12 章核技巧里的「相似度归一化」是同一条线索。几何上，输出 $y_i$ 落在 $\{v_1,\dots,v_n\}$ 的凸包里。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>准备 $Q,K,V$。</strong>由输入 $X\in\mathbb R^{n\times d}$ 分别乘 $W^Q,W^K\in\mathbb R^{d\times d_k}$、$W^V\in\mathbb R^{d\times d_v}$；自注意力里三者来自同一份 $X$，交叉注意力里 $Q$ 来自解码器、$K,V$ 来自编码器。本例直接给定投影结果以便手算。</li>
+    <li><strong>算原始分数。</strong>$S^{\text{raw}}=QK^\top$，得到 $n\times n$ 矩阵，$S^{\text{raw}}_{ij}=q_i\cdot k_j$。这是 $n^2$ 个点积，本例 $n=3$ 故 9 个。</li>
+    <li><strong>缩放。</strong>$S=S^{\text{raw}}/\sqrt{d_k}$。本例 $d_k=4$，$\sqrt{d_k}=2$，所有分数除以 2。这一步只改数值尺度，不改排序。</li>
+    <li><strong>（可选）加掩码。</strong>自回归解码把第 $i$ 行中 $j\gt i$ 的分数置为 $-\infty$（实现里用 $-10^{9}$ 之类的大负数代替，避免 Inf-NaN）；编码器通常不加，但要加 padding 掩码屏蔽补齐位。<strong>必须在 softmax 之前加</strong>，加到之后会得到「已泄露但重新归一化」的非法权重。</li>
+    <li><strong>逐行 softmax。</strong>对第 $i$ 行先减去该行最大值再取指数、除以行和（数值稳定）：$A_{ij}=\frac{e^{S_{ij}-\max_j S_{ij}}}{\sum_{j'}e^{S_{ij'}-\max_j S_{ij}}}$。减法不改变结果，只防止 $e^{S}$ 溢出。</li>
+    <li><strong>加权求和。</strong>$O=AV$，第 $i$ 行 $o_i=\sum_j A_{ij}v_j$。检查每行权重和为 1、输出维度为 $d_v$。</li>
+    <li><strong>（多头时）拼接与输出投影。</strong>把 $h$ 个头的 $O$ 按列拼成 $n\times(hd_v)$ 再乘 $W^O$；多头不改变总参数量（$h\cdot d\cdot d_k=d^2$）。训练时把 $A$ 与 $S$ 留作反向传播的中间量，这正是 $O(n^2)$ 激活显存的来源；推理时若用 FlashAttention 则不物化 $A$。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>数据与结构：</strong>输入是可视为「一组 / 一串 token」的集合或序列（文本、图像 patch、语音帧、图节点）；需要捕捉<strong>两两之间内容相关</strong>的长程依赖。若数据是无顺序、无空间结构的表格列，全局交互没有对应先验，宜用 <a href="m12-ml-algorithms.html">模块 12</a> 的树模型或小型 MLP。</li>
+    <li><strong>规模：</strong>$n$ 与 $d_k$ 需使 $n^2d$ 与 $n^2$ 显存可承受；$n\gg d_k$ 时必须配 FlashAttention、稀疏或线性近似。短序列（$n\le2d$）时瓶颈在 FFN 而非注意力。</li>
+    <li><strong>分布假设：</strong>几乎不假设数据分布，这是它容量高的原因；但也意味着<strong>位置信息为零</strong>——注意力对输入置换等变，必须显式注入绝对 / 相对位置编码或 RoPE，否则「词序颠倒」输出只会同幅颠倒而不被察觉。</li>
+    <li><strong>因果性：</strong>自回归生成必须用因果掩码（上三角屏蔽）；理解 / 分类任务用双向注意力。掩码方向写反是「训练 loss 低、生成胡言乱语」的头号原因。</li>
+    <li><strong>失效边界：</strong>需要精确外推到训练范围之外、或任务需要严格的平移等变 / 局部性先验而数据很少时，单独的全注意力不是好选择；此时应叠加强先验（CNN）、预训练迁移或检索式外部记忆。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>训练 / prefill 前向</b> 计算 $O(n^{2}d_k+n^{2}d_v+nd(d_k+d_v))$（四个投影 $O(nd^2)$、分数与加权和各 $O(n^2d)$）；<b>激活显存</b> $O(n^{2})$ 存 $S$ 与 $A$，加 $O(nd)$ 存 $Q,K,V,O$；<b>反向</b> 约为前向 2 倍 FLOPs，且必须保留 $A$ 用于 $\partial L/\partial S$。<b>自回归 decode（带 KV Cache）</b> 每步只需算新 token 的一行分数，计算 $O(nd)$、新增显存 $O(d)$，但 KV Cache 累计 $O(Lnd)$ 随长度、层数、并发线性增长。<b>空间（参数）</b> $4d^{2}+4d$，与 $n$ 无关；<b>对比</b> RNN 为 $O(nd^2)$ 计算、$O(nd)$ 显存，但串行深度 $O(n)$；FlashAttention 把激活显存降到 $O(n)$，FLOPs 不变。<b>调参</b> 头数 $h$（$d_k=d/h$）、$d_{ff}$、层数 $L$ 与上下文上限 $n_{\max}$ 共同决定实际成本。</div>
+  <p>白话：贵在「$n\times n$ 的分数表」，不贵在参数。深度专题一已算出 $n=16,d=8$ 时单头注意力的 $2n^2d=4096$ MACs 与 $2n^2=512$ 个激活元素；把 $n$ 翻到 32，这一项就变四倍。乘以 batch、头数与层数之前，先确认平方项是不是当前设备上最先撞墙的那一项。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>长程依赖路径 $O(1)$：任意两位置一层直连，梯度与前向信号都不随距离指数衰减。</li>
+        <li>完全可并行：$n^2$ 个分数互相独立，训练墙钟深度与 $n$ 无关，规模扩展性好。</li>
+        <li>内容寻址：连线强度由输入当场决定，比 CNN 的固定模板、RNN 的固定转移更灵活，表达力上限高。</li>
+        <li>可解释性有抓手：$A$ 是一个行随机矩阵，可视化后能粗略看出「模型在看哪里」（但不等价于因果解释）。</li>
+        <li>结构统一：同一套 $QKV$ 既能做自注意力也能做交叉注意力，编码器 / 解码器 / 多模态可复用。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>$O(n^2d)$ 计算与 $O(n^2)$ 数据相关激活，长上下文下先撞显存/带宽墙。</li>
+        <li>置换等变、无内置位置与局部性先验，顺序全靠位置编码补，外推到训练长度之外会退化。</li>
+        <li>输出是 $V$ 的凸组合，无法外推到训练数据张成的范围之外；单层注意力本身是线性的（非线性全靠 FFN 与多层堆叠）。</li>
+        <li>注意力权重不是因果解释：高权重不等于「因为」，且多头、多层后权重会弥散、难以归因。</li>
+        <li>掩码、$\sqrt{d_k}$、softmax 数值稳定三处实现细节极敏感，写反或溢出会造成「训练正常、推理崩坏」。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>取 3 个 token、$d_k=d_v=4$，故 $\sqrt{d_k}=2$。给定投影结果（行对应 token 1、2、3）：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>矩阵</th><th>第 1 行</th><th>第 2 行</th><th>第 3 行</th></tr></thead>
+      <tbody>
+        <tr><th>$Q$</th><td>$(1,0,1,0)$</td><td>$(0,1,0,1)$</td><td>$(1,1,0,0)$</td></tr>
+        <tr><th>$K$</th><td>$(1,0,0,0)$</td><td>$(0,1,0,0)$</td><td>$(0,0,1,1)$</td></tr>
+        <tr><th>$V$</th><td>$(1,2,0,0)$</td><td>$(0,1,3,0)$</td><td>$(2,0,1,1)$</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>$n=3,\ d_k=d_v=4,\ \sqrt{d_k}=2$。目标：先算双向自注意力的 $O=AV$，再加因果掩码算 $O_{\text{causal}}$。所有数值与代码实验 Part 2 逐位一致。</div>
+    <div class="solve-step"><span class="ss-k">第 2 步：原始分数 $S^{\text{raw}}=QK^\top$。</span>逐格点积，例如 $S^{\text{raw}}_{11}=1\cdot1+0\cdot0+1\cdot0+0\cdot0=1$，$S^{\text{raw}}_{12}=1\cdot0+0\cdot1+1\cdot0+0\cdot0=0$，$S^{\text{raw}}_{13}=1\cdot0+0\cdot0+1\cdot1+0\cdot1=1$。全部 9 格为
+      $$ S^{\text{raw}}=\begin{pmatrix}1&amp;0&amp;1\\0&amp;1&amp;1\\1&amp;1&amp;0\end{pmatrix} $$
+      注意这是 $3\times3$ 而非 $3\times4$：$K^\top$ 把「键的个数」放到列上。</div>
+    <div class="solve-step"><span class="ss-k">第 3 步：缩放。</span>每格除以 $\sqrt{d_k}=2$，得
+      $$ S=\frac{S^{\text{raw}}}{2}=\begin{pmatrix}0.5&amp;0&amp;0.5\\0&amp;0.5&amp;0.5\\0.5&amp;0.5&amp;0\end{pmatrix} $$
+      缩放只改尺度不改排序；本章第 5.1 节已证 $\mathrm{Var}(q^\top k)=d_k$，故 $d_k=4$ 时标准差为 2，除以 2 把方差拉回 1，避免 softmax 饱和。</div>
+    <div class="solve-step"><span class="ss-k">第 5 步：逐行 softmax。</span>用「减去行最大值」的稳定写法。取 $e^{0.5}\approx1.6487$、$e^{0}=1$、$e^{-0.5}\approx0.6065$。第 1 行 $(0.5,0,0.5)$ 减最大值 $0.5$ 得 $(0,-0.5,0)$，指数 $(1,0.6065,1)$，行和 $2.6065$，故权重 $\bigl(\frac{1}{2.6065},\frac{0.6065}{2.6065},\frac{1}{2.6065}\bigr)\approx(\mathbf{0.3837},\mathbf{0.2327},\mathbf{0.3837})$，和为 1。同理第 2 行 $(\mathbf{0.2327},\mathbf{0.3837},\mathbf{0.3837})$、第 3 行 $(\mathbf{0.3837},\mathbf{0.3837},\mathbf{0.2327})$。于是
+      $$ A=\begin{pmatrix}0.3837&amp;0.2327&amp;0.3837\\0.2327&amp;0.3837&amp;0.3837\\0.3837&amp;0.3837&amp;0.2327\end{pmatrix},\qquad \text{每行和}=1 $$
+    </div>
+    <div class="solve-step"><span class="ss-k">第 6 步：加权和 $O=AV$。</span>第 1 行 $o_1=0.3837\,v_1+0.2327\,v_2+0.3837\,v_3$，逐通道算：第 1 通道 $0.3837\cdot1+0.2327\cdot0+0.3837\cdot2=1.1511$；第 2 通道 $0.3837\cdot2+0.2327\cdot1+0=1.0001$；第 3 通道 $0+0.2327\cdot3+0.3837\cdot1=1.0818$；第 4 通道 $0.3837\cdot1=0.3837$。即 $o_1\approx(\mathbf{1.151,\ 1.000,\ 1.0817,\ 0.3837})$。另两行同法：
+      $$ O\approx\begin{pmatrix}1.151&amp;1.000&amp;1.0817&amp;0.3837\\1.000&amp;0.849&amp;1.5346&amp;0.3837\\0.849&amp;1.151&amp;1.3837&amp;0.2327\end{pmatrix} $$
+      输出每行是 $V$ 三行的凸组合（权重非负、和为 1），所以第 4 通道只能来自 $v_3$，数值恰等于第 3 个权重——这是核对加权和有没有算错的一个便宜检查。</div>
+    <div class="solve-step"><span class="ss-k">第 4 步（补）：因果掩码。</span>把第 $i$ 行中 $j\gt i$ 的分数置为 $-\infty$：第 1 行只留 $S_{11}$，softmax 后权重 $(\mathbf{1,0,0})$，故 $o_1^{\text{causal}}=1\cdot v_1=(\mathbf{1,2,0,0})$——位置 1 只能看自己。第 2 行 $(0,0.5,-\infty)$ 的指数为 $(1,1.6487,0)$，行和 $2.6487$，权重 $(\mathbf{0.3775,0.6225,0})$，得 $o_2^{\text{causal}}=(\mathbf{0.3775,1.3775,1.8674,0})$。第 3 行三个位置都满足 $j\le i$，不受掩码影响，仍是 $(\mathbf{0.3837,0.3837,0.2327})$ 与 $o_3=(\mathbf{0.849,1.151,1.3837,0.2327})$。</div>
+    <div class="solve-step"><span class="ss-k">解释与对账。</span>双向时每个位置都「看过」全部 3 个 token；因果时第 1 行输出精确等于 $v_1$，这是自回归解码正确性的最小检验——若掩码方向写反（屏蔽了下三角），第 1 行就会混入未来信息，训练 loss 仍会下降但生成时立刻崩坏。代码实验 Part 2 把上面每一个矩阵、每一行 softmax 与加权和原样复现，因果输出第 1 行正是 $[1.0,2.0,0.0,0.0]=v_1$。把 $K$ 或 $V$ 改一个数字，整张 $A$ 与 $O$ 都会变——这也直观说明注意力权重是<strong>输入的函数</strong>而非可学习常数。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把缩放点积自注意力与三类直接同类/近亲的序列混合器放在一起：LSTM 代表「递推」，1D 卷积代表「固定局部模板」，稀疏 / 线性注意力代表「为长上下文做近似」。最后一列特意选了与全注意力<strong>数学目标相同、只改 IO 顺序</strong>的 FlashAttention 作对照，便于看清「哪些是建模取舍、哪些只是系统工程」。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>缩放点积自注意力（精确全注意力）</th><th>LSTM / 循环层（递推）</th><th>1D 卷积（固定局部模板）</th><th>稀疏 / 线性注意力</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>需两两内容交互的序列/集合；$n^{2}$ 显存与算力可承受；须另补位置编码</td>
+        <td>流式在线、低延迟、状态 $O(1)$；中等长度时序；边缘设备</td>
+        <td>强局部性且平移等变成立；小样本；可变长度输入</td>
+        <td>$n\gg d$ 的超长上下文；可接受近似误差；精确召回要求不高</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>计算 $O(n^{2}d+nd^{2})$；激活显存 $O(n^{2})$；串行深度 $O(1)$</td>
+        <td>计算 $O(nd^{2})$；显存 $O(nd)$；串行深度 $O(n)$</td>
+        <td>计算 $O(nkd^{2})$；显存 $O(nd)$；串行深度 $O(1)$</td>
+        <td>计算 $O(nwd)$ 或 $O(nd^{2})$；显存 $O(nw)$ 或 $O(d^{2})$；串行深度 $O(1)$</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>头数 $h$（$d_k=d/h$）、$d_{ff}$、层数 $L$、上下文上限、$\sqrt{d_k}$ 缩放、掩码方向</td>
+        <td>隐状态维 $d_h$、门控偏置初始化、截断 BPTT 长度、遗忘门偏置</td>
+        <td>核宽 $k$、步长、膨胀率、通道数、padding 方式</td>
+        <td>窗口 $w$ / 全局 token 数、随机特征维、低秩 $r$、块大小（FlashAttention 类）</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">长程依赖路径 $O(1)$、完全可并行、内容寻址表达力最高、权重可作粗粒度归因</td>
+        <td>推理 $O(1)$ 状态、天然时序归纳偏置、小样本稳、低延迟</td>
+        <td class="best">参数与 $n$ 无关、局部先验最省数据、平移等变、训练推理都快</td>
+        <td>把平方项压到近线性，长上下文可行；FlashAttention 类不损失精度</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>$n^{2}$ 计算与显存；置换等变需位置编码；输出为凸组合不能外推；权重不等于因果解释</td>
+        <td>$\mathrm{PL}=O(n)$ 且信号按 $\rho^{n-1}$ 衰减；无法并行；固定维状态是信息瓶颈</td>
+        <td>只能建模局部，跨 $n$ 个位置需 $O(n/k)$ 层；对绝对位置敏感的任务先验有害</td>
+        <td>稀疏放弃任意 $(i,j)$ 直连、$\mathrm{PL}$ 回升到 $O(n/w)$；线性放弃高秩/近 one-hot 的精确召回；FlashAttention 不省 FLOPs</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>中：$A$ 可读但多头多层后弥散；需掩码、数值稳定、KV Cache 与位置编码配套，成本高</td>
+        <td>中：隐状态不可读，但门控值有含义；需 BPTT、梯度裁剪、状态管理，串行慢</td>
+        <td>强：卷积核即模板、感受野可解析递推；无需掩码与位置编码，落地成本最低</td>
+        <td>弱到中：稀疏模式可解释但引入掩码维护；线性核化带近似误差需额外评测；FlashAttention 需专用融合 kernel</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>读表顺序：先确认「任务是否需要任意两位置直接交互」，再确认「$n$ 与 $d$ 的比值决定平方项是否为主导」，最后看延迟与显存预算。全注意力是唯一同时给出 $\mathrm{PL}=O(1)$ 与完整点对点表达力的一格；其余三格各自只放弃其中一项，这正是深度专题二那张「三轴」表的工程版。</p>
+  <p>下图对应原始论文里的整体架构图（离线站点不内嵌外图，按独立标记由脚本生成带准确出处与核验链接的说明）。读图时把本节的 $QKV$ 手算对到「多头自注意力」那一格：$QK^\top$ 是 $3\times3$ 的分数表，$\sqrt{d_k}=2$ 是那一步的缩放，掩码与 softmax 在分数之后、加权和之前。</p>
+  <figure data-classic="0"></figure>
+</div>
+
+<h2 id="d-code">代码实验 · 四种架构资源账、注意力完整前向、路径长度衰减的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 14 神经网络架构谱系
+# 纯 Python 标准库；固定种子 20261107；复用「知学云 · 在线课程完课率」案例数字
+# Part 0: 案例口径
+# Part 1: 四种架构在 n=16, d=8, k=3 上的参数量 / 前向 FLOPs / 激活显存 / 串行深度
+# Part 2: 缩放点积自注意力 3-token / 4-dim 完整前向（Q,K,V, 分数, softmax, 加权和, 因果掩码）
+# Part 3: 长程依赖路径长度 O(1) vs O(n) 与递推信号衰减
+import math
+import random
+
+random.seed(20261107)
+
+
+def mat_mul(A, B):
+    m, p = len(A), len(A[0])
+    q = len(B[0])
+    return [[sum(A[i][k] * B[k][j] for k in range(p)) for j in range(q)] for i in range(m)]
+
+
+def transpose(A):
+    return [list(row) for row in zip(*A)]
+
+
+def softmax(row):
+    mx = max(row)
+    exps = [math.exp(v - mx) for v in row]
+    s = sum(exps)
+    return [e / s for e in exps]
+
+
+def round_row(row, nd=4):
+    return [round(v, nd) for v in row]
+
+
+# ============================================================
+print("=== Part 0: 案例口径（知学云 · 在线课程完课率，N=12000, seed=20261107）===")
+N, COMPLETED = 12000, 5967
+STUDY_MEAN, STUDY_SD = 95.30, 43.43
+QUIZ_MEAN, QUIZ_SD = 79.76, 14.58
+CORR = 0.4792
+B0, B1, R2 = 64.4306, 0.160833, 0.2296
+ATE, Z = 0.1232, 13.4924
+print(f"overall completed : {COMPLETED:,} / {N:,} = {COMPLETED/N:.4f}")
+print(f"study_minutes/week: mean={STUDY_MEAN:.2f}  sd={STUDY_SD:.2f}")
+print(f"quiz_avg          : mean={QUIZ_MEAN:.2f}  sd={QUIZ_SD:.2f}")
+print(f"corr(study, quiz) : {CORR:.4f}")
+print(f"OLS quiz~study : intercept={B0:.4f} slope={B1:.6f} R2={R2:.4f}")
+print(f"ATE : +{ATE:.4f}  z={Z:.4f}")
+print("本片段的架构资源账用一份「干净的小输入形状」手算核对：n=16 个 token、每 token d=8 维、")
+print("卷积核 k=3。案例数字只用于固定全站口径，不参与下列乘加计数。")
+print()
+
+# ============================================================
+print("=== Part 1: 四种架构的资源账（n=16, d=8, k=3；1 MAC = 2 FLOPs）===")
+n, d, k = 16, 8, 3
+nd = n * d
+print(f"输入 X: {n} x {d} = {nd} 个标量；单层输出同形状 {n} x {d}（便于公平比较）")
+print(f"{'架构':&lt;10}{'参数量':&gt;12}{'前向MACs':&gt;12}{'前向FLOPs':&gt;12}{'激活显存(元素)':&gt;16}{'串行深度':&gt;10}")
+
+
+def report(name, params, macs, act, depth):
+    print(f"{name:&lt;10}{params:&gt;12d}{macs:&gt;12d}{2*macs:&gt;12d}{act:&gt;16d}{depth:&gt;10}")
+
+
+# MLP: 全连接 flatten nd -&gt; nd，W in R^(nd x nd)
+mlp_params = nd * nd + nd
+mlp_macs = nd * nd
+mlp_act = nd
+report("MLP", mlp_params, mlp_macs, mlp_act, 1)
+
+# CNN: 1D 卷积，kernel k，d_in=d_out=d，权值共享
+cnn_params = k * d * d + d
+cnn_macs = n * d * (k * d)
+cnn_act = n * d
+report("CNN", cnn_params, cnn_macs, cnn_act, 1)
+
+# RNN: h_t = tanh(W_xh x_t + W_hh h_{t-1} + b)，参数跨时刻共享
+rnn_params = d * d + d * d + d
+rnn_macs = n * (d * d + d * d)
+rnn_act = n * d
+report("RNN", rnn_params, rnn_macs, rnn_act, n)
+
+# Transformer: 单头自注意力 + QKV/O 投影，d_k=d_v=d
+tf_params = 4 * d * d + 4 * d
+qkv_macs = 3 * n * d * d
+score_macs = n * n * d
+av_macs = n * n * d
+out_macs = n * d * d
+tf_macs = qkv_macs + score_macs + av_macs + out_macs
+tf_act = 2 * n * n
+report("Transformer", tf_params, tf_macs, tf_act, 1)
+print()
+print(f"Transformer 的 O(n^2 d) 项 = 2*n^2*d = {2*n*n*d} MACs，O(n d^2) 项 = 4*n*d^2 = {4*n*d*d} MACs。")
+print(f"注意力矩阵是「数据相关」的中间量：{n}^2 = {n*n} 个元素，无法折叠进参数，故激活显存 {tf_act} 最大。")
+print("MLP 参数随 n^2 增长；CNN/RNN/Transformer 靠权值共享或共享转移做到参数与 n 无关，但只有注意力的激活量是 n^2 且随输入变化。")
+print()
+
+print("随 n 增长的总 MACs（d=8, k=3 固定；展示 O(n^2) 何时压过 O(n d^2)）")
+print(f"{'n':&gt;8}{'MLP (nd)^2':&gt;14}{'CNN n*d*k*d':&gt;14}{'RNN 2*n*d^2':&gt;14}{'TF 4nd^2+2n^2d':&gt;18}{'TF中n^2占比':&gt;14}")
+for nn in [8, 16, 32, 64, 128, 256]:
+    m_mlp = (nn * d) ** 2
+    m_cnn = nn * d * (k * d)
+    m_rnn = nn * (2 * d * d)
+    m_tf_lin = 4 * nn * d * d
+    m_tf_quad = 2 * nn * nn * d
+    m_tf = m_tf_lin + m_tf_quad
+    frac = m_tf_quad / m_tf
+    print(f"{nn:&gt;8d}{m_mlp:&gt;14d}{m_cnn:&gt;14d}{m_rnn:&gt;14d}{m_tf:&gt;18d}{frac:&gt;13.1%}")
+print(f"交点：2*n^2*d = 4*n*d^2  -&gt;  n = 2d = {2*d}；本表 d=8，故 n 超过 16 后二次项开始主导 Transformer。")
+print()
+
+# ============================================================
+print("=== Part 2: 缩放点积自注意力 3 token / 4 dim 完整前向 ===")
+Q = [[1, 0, 1, 0],
+     [0, 1, 0, 1],
+     [1, 1, 0, 0]]
+K = [[1, 0, 0, 0],
+     [0, 1, 0, 0],
+     [0, 0, 1, 1]]
+V = [[1, 2, 0, 0],
+     [0, 1, 3, 0],
+     [2, 0, 1, 1]]
+dk = 4
+scale = math.sqrt(dk)
+print(f"d_k = d_v = {dk}, sqrt(d_k) = {scale:.1f}")
+print("Q =", Q)
+print("K =", K)
+print("V =", V)
+S = mat_mul(Q, transpose(K))
+print("原始分数 S = Q K^T =", S)
+Ss = [[v / scale for v in row] for row in S]
+print("缩放分数 S/sqrt(d_k) =", [[round(v, 4) for v in row] for row in Ss])
+A = [softmax(row) for row in Ss]
+print("softmax 权重 A =")
+for i, row in enumerate(A, 1):
+    print(f"  row{i}:", round_row(row), "  sum =", round(sum(row), 6))
+O = mat_mul(A, V)
+print("输出 O = A V =")
+for i, row in enumerate(O, 1):
+    print(f"  row{i}:", round_row(row))
+
+NEG = -1e9
+Ac = []
+for i in range(3):
+    masked = [Ss[i][j] if j &lt;= i else NEG for j in range(3)]
+    Ac.append(softmax(masked))
+print("因果掩码后权重 A_causal =")
+for i, row in enumerate(Ac, 1):
+    print(f"  row{i}:", round_row(row), "  sum =", round(sum(row), 6))
+Oc = mat_mul(Ac, V)
+print("因果输出 O_causal =")
+for i, row in enumerate(Oc, 1):
+    print(f"  row{i}:", round_row(row))
+print("row1 只能看自己 -&gt; 输出恰为 v1 =", V[0])
+print()
+
+# ============================================================
+print("=== Part 3: 路径长度 O(1) vs O(n) 与递推信号衰减 ===")
+print("递推：x_1 的信息传到 x_n 需穿过 h_1-&gt;h_2-&gt;...-&gt;h_n，共 n-1 步，串行深度 O(n)。")
+print("自注意力：任意两位置一层直连，路径长度 = 1（O(1)），与 n 无关。")
+print(f"{'n':&gt;6}{'路径(RNN)':&gt;12}{'路径(Attn)':&gt;12}{'0.9^(n-1)':&gt;14}{'0.99^(n-1)':&gt;14}{'注意力保真':&gt;12}")
+for nn in [2, 4, 8, 16, 32, 64, 128]:
+    print(f"{nn:&gt;6d}{nn-1:&gt;12d}{1:&gt;12d}{0.9**(nn-1):&gt;14.3e}{0.99**(nn-1):&gt;14.3e}{1.0:&gt;12.4f}")
+print("RNN 里 ||dh_n/dh_1|| &lt;= rho^(n-1)：rho=0.9, n=64 时仅 0.9^63 约 1.3e-3，长程信号几乎消失；")
+print("LSTM 用 f_t 约等于 1 把有效 rho 抬到接近 1，但仍需 n 步串行，无法并行且路径长度不变。")
+print("注意：路径长度是「串行操作次数」，不是 FLOPs；注意力的 n^2 次乘加互相独立，可被 GPU 并行压成 O(1) 墙钟深度。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 0: 案例口径（知学云 · 在线课程完课率，N=12000, seed=20261107）===
+overall completed : 5,967 / 12,000 = 0.4973
+study_minutes/week: mean=95.30  sd=43.43
+quiz_avg          : mean=79.76  sd=14.58
+corr(study, quiz) : 0.4792
+OLS quiz~study : intercept=64.4306 slope=0.160833 R2=0.2296
+ATE : +0.1232  z=13.4924
+本片段的架构资源账用一份「干净的小输入形状」手算核对：n=16 个 token、每 token d=8 维、
+卷积核 k=3。案例数字只用于固定全站口径，不参与下列乘加计数。
+
+=== Part 1: 四种架构的资源账（n=16, d=8, k=3；1 MAC = 2 FLOPs）===
+输入 X: 16 x 8 = 128 个标量；单层输出同形状 16 x 8（便于公平比较）
+架构                 参数量      前向MACs     前向FLOPs        激活显存(元素)      串行深度
+MLP              16512       16384       32768             128         1
+CNN                200        3072        6144             128         1
+RNN                136        2048        4096             128        16
+Transformer         288        8192       16384             512         1
+
+Transformer 的 O(n^2 d) 项 = 2*n^2*d = 4096 MACs，O(n d^2) 项 = 4*n*d^2 = 4096 MACs。
+注意力矩阵是「数据相关」的中间量：16^2 = 256 个元素，无法折叠进参数，故激活显存 512 最大。
+MLP 参数随 n^2 增长；CNN/RNN/Transformer 靠权值共享或共享转移做到参数与 n 无关，但只有注意力的激活量是 n^2 且随输入变化。
+
+随 n 增长的总 MACs（d=8, k=3 固定；展示 O(n^2) 何时压过 O(n d^2)）
+       n    MLP (nd)^2   CNN n*d*k*d   RNN 2*n*d^2    TF 4nd^2+2n^2d      TF中n^2占比
+       8          4096          1536          1024              3072        33.3%
+      16         16384          3072          2048              8192        50.0%
+      32         65536          6144          4096             24576        66.7%
+      64        262144         12288          8192             81920        80.0%
+     128       1048576         24576         16384            294912        88.9%
+     256       4194304         49152         32768           1114112        94.1%
+交点：2*n^2*d = 4*n*d^2  -&gt;  n = 2d = 16；本表 d=8，故 n 超过 16 后二次项开始主导 Transformer。
+
+=== Part 2: 缩放点积自注意力 3 token / 4 dim 完整前向 ===
+d_k = d_v = 4, sqrt(d_k) = 2.0
+Q = [[1, 0, 1, 0], [0, 1, 0, 1], [1, 1, 0, 0]]
+K = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 1]]
+V = [[1, 2, 0, 0], [0, 1, 3, 0], [2, 0, 1, 1]]
+原始分数 S = Q K^T = [[1, 0, 1], [0, 1, 1], [1, 1, 0]]
+缩放分数 S/sqrt(d_k) = [[0.5, 0.0, 0.5], [0.0, 0.5, 0.5], [0.5, 0.5, 0.0]]
+softmax 权重 A =
+  row1: [0.3837, 0.2327, 0.3837]   sum = 1.0
+  row2: [0.2327, 0.3837, 0.3837]   sum = 1.0
+  row3: [0.3837, 0.3837, 0.2327]   sum = 1.0
+输出 O = A V =
+  row1: [1.151, 1.0, 1.0817, 0.3837]
+  row2: [1.0, 0.849, 1.5346, 0.3837]
+  row3: [0.849, 1.151, 1.3837, 0.2327]
+因果掩码后权重 A_causal =
+  row1: [1.0, 0.0, 0.0]   sum = 1.0
+  row2: [0.3775, 0.6225, 0.0]   sum = 1.0
+  row3: [0.3837, 0.3837, 0.2327]   sum = 1.0
+因果输出 O_causal =
+  row1: [1.0, 2.0, 0.0, 0.0]
+  row2: [0.3775, 1.3775, 1.8674, 0.0]
+  row3: [0.849, 1.151, 1.3837, 0.2327]
+row1 只能看自己 -&gt; 输出恰为 v1 = [1, 2, 0, 0]
+
+=== Part 3: 路径长度 O(1) vs O(n) 与递推信号衰减 ===
+递推：x_1 的信息传到 x_n 需穿过 h_1-&gt;h_2-&gt;...-&gt;h_n，共 n-1 步，串行深度 O(n)。
+自注意力：任意两位置一层直连，路径长度 = 1（O(1)），与 n 无关。
+     n     路径(RNN)    路径(Attn)     0.9^(n-1)    0.99^(n-1)       注意力保真
+     2           1           1     9.000e-01     9.900e-01      1.0000
+     4           3           1     7.290e-01     9.703e-01      1.0000
+     8           7           1     4.783e-01     9.321e-01      1.0000
+    16          15           1     2.059e-01     8.601e-01      1.0000
+    32          31           1     3.815e-02     7.323e-01      1.0000
+    64          63           1     1.310e-03     5.309e-01      1.0000
+   128         127           1     1.545e-06     2.790e-01      1.0000
+RNN 里 ||dh_n/dh_1|| &lt;= rho^(n-1)：rho=0.9, n=64 时仅 0.9^63 约 1.3e-3，长程信号几乎消失；
+LSTM 用 f_t 约等于 1 把有效 rho 抬到接近 1，但仍需 n 步串行，无法并行且路径长度不变。
+注意：路径长度是「串行操作次数」，不是 FLOPs；注意力的 n^2 次乘加互相独立，可被 GPU 并行压成 O(1) 墙钟深度。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">Part 0 的 0.4973 / 95.30 / 0.4792 / 0.160833</span> 是全站共用的「知学云 · 在线课程完课率」案例口径（$N=12000$、seed $=20261107$），与 <a href="m12-ml-algorithms.html">模块 12</a> 及各章代码实验可逐位对照。本片段的资源账刻意改用一份干净的小输入形状（$n=16,d=8,k=3$）以便手算核对，案例数字只负责固定口径，不参与乘加计数。</p>
+    <p><span class="ci-k">16512 / 200 / 136 / 288</span> 是四种架构的单层参数量。MLP 的 $16512=128^{2}+128$ 把「每个输出标量到每个输入标量」都设成独立旋钮；CNN 的 $200=3\times8^{2}+8$、RNN 的 $136=2\times8^{2}+8$、Transformer 的 $288=4\times8^{2}+32$ 都靠权值共享或共享转移把参数从 $n$ 里摘出来。这四个数就是深度专题一「归纳偏置把 $\dim\mathcal F$ 压小」的可复核版本：$200$ 对 $16512$ 相差约 82 倍。</p>
+    <p><span class="ci-k">16384 / 3072 / 2048 / 8192 MACs</span> 与右侧的 <span class="ci-k">32768 / 6144 / 4096 / 16384 FLOPs</span> 只差一个「1 MAC = 2 FLOPs」的换算，与站内 $C\approx6ND$ 的口径一致（每个参数每 token 前向约 2 FLOPs）。RNN 的 MACs 最小（2048）却排在最后，因为下一列<strong>串行深度 16</strong> 才是它在 GPU 上真正慢的原因；这一列与 FLOPs 完全无关，是深度专题二的核心区分。</p>
+    <p><span class="ci-k">激活显存 128 / 128 / 128 / 512</span>：前三者只需保留 $n\times d=128$ 个隐状态；Transformer 的 $512=2n^{2}$ 来自 $16\times16$ 的分数矩阵与同尺寸的 softmax 权重矩阵各一份。这 $n^{2}$ 个元素是<strong>数据相关</strong>的，换一批输入就要重算、不能像权重那样驻留复用——这正是 FlashAttention 能把显存降到 $O(n)$ 却不改变 FLOPs 的原因。</p>
+    <p><span class="ci-k">4096 与 4096，交点 $n=2d=16$</span>：把 8192 MACs 拆成投影项 $4nd^{2}=4096$ 与注意力项 $2n^{2}d=4096$，本例恰好打平。缩放表里 $n$ 从 8 增到 256，二次项占比 $33.3\%\to50.0\%\to66.7\%\to80.0\%\to88.9\%\to94.1\%$，把「$n\gg d$ 时平方项主导」变成一条可读的曲线。改 $d$ 会整体平移交点，但 $n^{2}$ 与 $nd^{2}$ 的指数不会变——这是结构性的，不是调参能绕过的。</p>
+    <p><span class="ci-k">Part 2 的 $S=[[1,0,1],[0,1,1],[1,1,0]]$</span> 与缩放后的 $[[0.5,0,0.5],\dots]$ 是 $d$ 项点积后除以 $\sqrt{d_k}=2$ 的结果；$A$ 三行（如 $0.3837,0.2327,0.3837$）、$O$ 三行（如 $1.151,1.0,1.0817,0.3837$）与第六步手算逐位一致。$e^{0.5}\approx1.6487$ 与 $e^{-0.5}\approx0.6065$ 决定这一行权重；若忘除 $\sqrt{d_k}$，分数变成 $(1,0,1)$，softmax 会更尖锐（约 $0.4229,0.1542,0.4229$），$d_k=64$ 时几乎 one-hot、梯度趋零。</p>
+    <p><span class="ci-k">因果输出第 1 行 $[1.0,2.0,0.0,0.0]$</span> 精确等于 $v_1$：位置 1 的掩码把 $j\gt1$ 全屏蔽，softmax 只剩一个 1。这是自回归解码正确性的最小检验。第 2 行权重 $0.3775/0.6225$ 来自 $(0,0.5,-\infty)$ 的指数归一化，第 3 行不受掩码影响。把 $K$ 或 $V$ 改一个数字整张表都会重排，直观印证「注意力权重是输入的函数」。</p>
+    <p><span class="ci-k">Part 3 的 $0.9^{63}=1.310\times10^{-3}$ 与 $0.9^{127}=1.545\times10^{-6}$</span>：这是 $\|\partial h_n/\partial x_1\|\le\rho^{\,n-1}\|W_{xh}\|$ 的具体取值。即便把衰减率抬到 $0.99$，$n=128$ 时仍只剩 $0.279$；而注意力一列恒为 $1.0000$。路径长度（RNN 的 $n-1$ 对注意力的 1）与保真度（指数衰减对 1）是两件独立的事，LSTM 只修好后者、修不好前者。</p>
+  </div>
+</div>
+
+<p>下图是本站统一的学习闭环。本片段的两组深度专题与代码实验落在「建模」这一环，但它们的上下游契约很具体：上游必须交出「形状与维度口径一致」的输入（$n,d,k$ 一旦变动，整张资源账要重算），下游的「评估」与「部署运维」则必须承担 $n^{2}$ 激活、KV Cache 与并行度带来的成本；一旦 $n$ 越过 $2d$，先报警的往往是部署环而不是建模环。</p>
+<figure data-figure="flow-learning-loop"></figure>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组内容给出三件东西：把归纳偏置形式化为对假设类 $\mathcal F$ 的等式约束（块 Toeplitz / 矩阵幂 / 内容寻址），并在同一份 $n=16,d=8,k=3$ 输入上核算四种架构的参数、激活显存、FLOPs 与串行深度；把注意力的 $O(n^{2}d)$ 与递推的 $O(n)$ 路径长度严格推导出来，给出二次项成为瓶颈的精确条件与各类近似的取舍；以及把缩放点积自注意力在 3 token / 4 维上完整手算一遍。<strong>不做</strong>训练、不做收敛性证明、也不替代真实硬件上的 profiler 测量。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：序列长度 $n$、每 token 维度 $d$、头维 $d_k$、卷积核 $k$、层数 $L$、batch、数值精度字节数；注意力前向另需 $Q\in\mathbb R^{n\times d_k},K\in\mathbb R^{n\times d_k},V\in\mathbb R^{n\times d_v}$。输出：参数量（个）、MACs / FLOPs（次）、激活显存（元素或字节）、串行深度（步）、$n\times n$ 注意力权重 $A$ 与 $n\times d_v$ 输出 $O$。参数量与 FLOPs 无量纲计数；显存按每元素字节数换算为 B / MiB。</td></tr>
+    <tr><th>适用场景</th><td>架构选型评审（先验与样本量、数据结构的匹配）、长上下文可行性预判（$n$ 与 $d$ 的比值决定平方项是否主导）、训练/推理显存预算与 KV Cache 估算、注意力实现的正确性核对（掩码方向、$\sqrt{d_k}$、softmax 稳定写法）、以及讲解「为什么大模型用注意力而边缘端用递推 / 卷积」。</td></tr>
+    <tr><th>关键参数</th><td>$n$（序列长度，$n^{2}$ 项对其最敏感，超过 $2d$ 后主导）、$d$ 与 $d_k=d/h$（$n=2d$ 是计算交叉点）、$k$（卷积核，决定 CNN 参数 $kd^{2}$ 与感受野）、$h$（头数，不改变总参数但影响每头 $d_k$）、$L$ 与 batch（KV Cache $=O(Lnd)$ 线性放大）、上下文上限 $n_{\max}$（决定 KV Cache 与位置编码外推）、掩码类型（因果 / 双向 / padding）。</td></tr>
+    <tr><th>边界条件</th><td>在真实函数需要任意跨位置交互且不满足平移等变的条件下「CNN 约束只是删无用自由度」不成立，应改用 MLP / Transformer + 位置编码或 GNN；在 $n\gtrsim10^{5}$ 或需精确召回任意远 token、注意力矩阵高秩的条件下「稀疏/线性近似无损」不成立，应改用精确注意力 + FlashAttention 或检索式外部记忆；在 $n\lesssim2d$ 且显存富余时「$O(n^{2})$ 是首要瓶颈」不成立，应优先优化 FFN 的 $O(nd^{2})$ 与通信；在流式 $O(1)$ 状态的边缘推理中「用平方代价换 $O(1)$ 路径」不成立，应改用 SSM / 线性递推 / 小型 GRU。</td></tr>
+    <tr><th>常见问题</th><td>（1）把参数量与激活显存、训练 FLOPs 混成一笔账；（2）以为多头会按 $h$ 倍放大参数或以为注意力天然带位置信息；（3）掩码加到 softmax 之后、或用 $-\infty$ 参与运算导致 NaN；（4）看到「$O(n^2)$」就一律上线性注意力，忽略精确召回任务的掉点。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>为什么 $n=16,d=8$ 时 Transformer 的 FLOPs（16384）比 MLP（32768）还少？是不是算错了？</summary><div class="faq-a">没算错，恰恰说明「平方」要分层面看。MLP 把 $nd=128$ 个输入标量全连到 $128$ 个输出标量，复杂度 $O(n^{2}d^{2})$；注意力只在「位置对位置」层面是 $n^{2}$，通道维仍是 $d$，复杂度 $O(n^{2}d)$。本例 $d=8$，故 MLP 比注意力多一个 $d$ 因子。真正会随 $n$ 失控的是注意力的 $2n^{2}d$ 项，但 MLP 的 $n^{2}d^{2}$ 增长更快——这也是为什么长序列上没人用拉平后的全连接层。代码实验缩放表里 $n=256$ 时 MLP 已达 4194304 MACs，而 Transformer 为 1114112。</div></details>
+  <details><summary>多头注意力把头数从 8 加到 16，参数量会翻倍吗？</summary><div class="faq-a">不会。多头把 $d$ 维投影拆成 $h$ 个 $d_k=d/h$ 的子空间，每个头有 $W_i^Q,W_i^K,W_i^V,W_i^O\in\mathbb R^{d\times d_k}$，总和 $h\cdot4d d_k=4d^{2}$，与 $h$ 无关（例 14.4 已逐层核算）。变化的是每头维度 $d_k$：$\sqrt{d_k}$ 缩放因子变小、每头的 $n^{2}d_k$ 计算减半，但 $h$ 翻倍后总计算仍约 $n^{2}d$。真正随 $h$ 变的是工程开销（更多小矩阵乘、显存碎片）与表达的组织方式，不是参数账。</div></details>
+  <details><summary>因果掩码为什么必须加在 softmax 之前？加到之后会怎样？</summary><div class="faq-a">softmax 需要「全部候选分数」一起归一化。若在 softmax 之后把未来位置权重清零，那些位置已经参与了分母：剩下的权重被重新放大，模型在训练时实际上已经用过未来信息，只是输出被抹掉了。结果是训练 loss 很低、自回归生成时立刻崩坏。正确做法是把第 $i$ 行 $j\gt i$ 的分数置为 $-\infty$（实现用 $-10^{9}$ 之类的大负数避免 Inf-NaN），再整行做 softmax。代码实验 Part 2 中第 1 行掩码后权重为 $(1,0,0)$、输出精确等于 $v_1$，就是这个最小检验。</div></details>
+  <details><summary>FlashAttention 号称把显存从 $O(n^2)$ 降到 $O(n)$，是不是就不用管长上下文的算力了？</summary><div class="faq-a">不能。FlashAttention 的数学与全注意力完全相同，FLOPs 仍是 $O(n^{2}d)$，它只是用分块 + 在线 softmax 避免把 $n\times n$ 矩阵写回 HBM，省的是显存与带宽。所以「显存/带宽先撞墙」时它立竿见影，「算力先撞墙」时它帮不上忙，得改用稀疏/线性注意力（有精度代价）或减少上下文。例 14.5 里 batch=32 的 KV Cache 已达 1.13 GiB，属于另一笔线性增长的账，FlashAttention 也不解决。</div></details>
+  <details><summary>线性注意力在哪些任务上最先掉点？</summary><div class="faq-a">在需要「锐利、近 one-hot、按内容精确召回某个特定远位置」的任务上：逐字复制、键值检索、联想回忆、长文档里定位一个罕见实体。它们要求注意力矩阵 $A$ 高秩且稀疏尖锐，而线性/核化方法用 $\phi(Q)(\phi(K)^\top V)$ 把 $A$ 强行压进低秩或固定特征映射，Linformer 更直接假设 $A$ 有效秩 $r\ll n$。这与 SSM/Mamba「固定维状态压缩历史」的弱项同源。若任务只需聚合全局统计（分类、摘要），近似误差通常不明显。</div></details>
+  <details><summary>RNN 的 FLOPs 明明最小，为什么大模型训练反而选注意力？</summary><div class="faq-a">因为 FLOPs 是「总活儿」，而墙上时间由「不可并行的串行步数」决定。RNN 的 $h_t$ 依赖 $h_{t-1}$，16 个时刻必须排 16 步队，且 $\|\partial h_j/\partial x_i\|\le\rho^{\,j-i}\|W_{xh}\|$ 让长程信号指数衰减（代码里 $\rho=0.9,n=64$ 只剩 $1.310\times10^{-3}$）。注意力的 $n^{2}$ 个分数互相独立，GPU 可以一次并行算完，关键路径是 $O(1)$。用「可并行的总工作量」换「不可并行的串行深度」，在多卡环境下是划算的；在单核、流式、低延迟的边缘端，结论会反过来。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$n=16,d=8$ 的单层：CNN 的权值共享把权重矩阵约束成块 Toeplitz 后，参数量约为多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. $16512$，与 MLP 相同</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. $200=kd^{2}+d$，与 $n$ 无关</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. $2048=n\cdot kd^{2}$，随 $n$ 线性增长</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. $512=2n^{2}$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：局部性把隔得超过 $k/2$ 的连线置零、权值共享让强度只依赖相对位移，二者合起来是块 Toeplitz；自由度为核内 $k d^{2}$ 加 $d$ 个偏置 $=3\times64+8=200$，与序列长度 $n$ 无关。16512 是无约束 MLP 的 $(nd)^2+nd$；2048 是本例 RNN 的 $2nd^2$；512 是注意力的 $2n^2$ 个激活元素。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">代码实验 Part 1 里，Transformer 的激活显存是 512 而其余三者都是 128。最合理的解释是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. Transformer 的参数量最大</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. Transformer 有 16 个时刻的隐状态要存</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 需保留 $n\times n$ 的分数矩阵与 softmax 权重矩阵各一份，共 $2n^{2}=512$，且随输入变化</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. KV Cache 在单层就要占 512 个元素</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：Transformer 参数只有 288，比 MLP 的 16512 小得多，故 A 错；16 个时刻的隐状态是 RNN 的 $O(nd)=128$，故 B 错；KV Cache 是跨层、跨 decode 步累计的 $O(Lnd)$，不属于这层的前向激活，故 D 错。$A=\mathrm{softmax}(QK^\top/\sqrt{d_k})$ 是数据相关的 $n\times n$ 矩阵，加上分数矩阵 $S$ 共 $2n^2=512$ 个必须为反向传播保留的元素，这正是 FlashAttention 要消灭的对象。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">关于「路径长度」，下列说法正确的是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 自注意力的 $\mathrm{PL}=O(1)$ 而递推的 $\mathrm{PL}=O(n)$；前者指不可并行的串行步数，与总 FLOPs 是两本账</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 注意力 FLOPs 是 $O(n^2)$，所以路径长度也是 $O(n^2)$</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. LSTM 用遗忘门把 $\mathrm{PL}$ 从 $O(n)$ 降到了 $O(1)$</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 增加 GPU 数量能把 RNN 的 $O(n)$ 串行深度降为 $O(1)$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mathrm{PL}$ 数的是最短通路上必须串行执行的非线性变换次数。$y_i=\sum_j a_{ij}v_j$ 里每个 $v_j$ 直接出现，故一层直连、$\mathrm{PL}=O(1)$；$h_t$ 依赖 $h_{t-1}$ 迫使 $x_1$ 走 $n-1$ 跳，$\mathrm{PL}=O(n)$。LSTM 令 $f_t\approx1$ 只把有效衰减率 $\rho$ 抬到约 1（修好信号保真），递推结构没变，$\mathrm{PL}$ 与串行性都没变，故 C 错。GPU 能并行互不依赖的乘加，但消不掉 $h_t$ 对 $h_{t-1}$ 的真实依赖，故 D 错。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">代码实验 Part 3 中 $\rho=0.9$、$n=64$ 时 $0.9^{63}=1.310\times10^{-3}$。这个数刻画的是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 64 步递推的总 FLOPs 相对注意力的比例</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. softmax 在 $d_k=64$ 时的饱和程度</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 注意力在 64 个 token 上的最大权重</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. $\|\partial h_n/\partial x_1\|\le\rho^{\,n-1}\|W_{xh}\|$ 给出的长程信号（及梯度）衰减上界</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：把递推展开，$\partial h_n/\partial x_1=W_{hh}^{\,n-1}W_{xh}$，取范数得上界 $\rho^{\,n-1}\|W_{xh}\|$。$\rho=0.9,n=64$ 即 $0.9^{63}=1.310\times10^{-3}$，说明原点信息传到第 64 步只剩约千分之一——前向信号与 BPTT 梯度同样衰减。它既不是 FLOPs 比、也不是 softmax 饱和（那是 $\sqrt{d_k}$ 要防的问题），更与注意力权重无关。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">在 $n=16,d=8$ 上，$2n^{2}d=4096$ 与 $4nd^{2}=4096$ 恰好相等。据此判断？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 任意 $n$ 下注意力两项都相等</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 说明注意力没有平方复杂度</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 交点是 $n=2d$；$n$ 超过它之后 $O(n^{2}d)$ 项开始主导，代码里 $n=256$ 时占比达 $94.1\%$</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 应把 $d$ 调大以消除平方项</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：令 $2n^{2}d=4nd^{2}$ 得 $n=2d$。本例 $d=8$ 故交点 $n=16$；缩放表显示 $n=8$ 时二次项占 $33.3\%$、$n=32$ 占 $66.7\%$、$n=256$ 占 $94.1\%$，单调趋近 1。A、B 与表相悖；D 把 $d$ 调大虽能推迟交点（$2d$ 变大），但 $nd^{2}$ 与 $n^{2}d$ 都随之上升，平方项的指数不会消失，不是消除而是搬移。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">某任务需要在 10 万 token 长文档里「精确召回并逐字复制一个罕见编号」。下列选择最合适的是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q6" value="A"> A. 直接用 Performer / 线性注意力，因为 $O(nd^{2})$ 最省</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="B"> B. 精确注意力 + FlashAttention（或检索式外部记忆），因为线性/低秩近似会丢掉高秩、近 one-hot 的精确召回</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="C"> C. 固定窗口 sparse attention，因为局部窗口足够覆盖任意远位置</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="D"> D. 加大 $\sqrt{d_k}$ 的缩放因子</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：精确召回要求 $A$ 高秩且尖锐，线性/核化注意力用 $\phi(Q)(\phi(K)^\top V)$ 或低秩 $r\ll n$ 近似，Linformer 更假设 $A$ 有效秩很小，恰好在这类任务上最先掉点（与 SSM 固定状态弱项同源），故 A 错；固定窗口只保留 $O(nw)$ 条边，任意远位置对需多跳，$\mathrm{PL}$ 回升到 $O(n/w)$，故 C 错；缩放因子只影响 softmax 锐度、不恢复被近似丢掉的秩，故 D 错。FlashAttention 数学不变、只把 $n^2$ 显存降到 $O(n)$，是显存瓶颈下的标准答案。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>

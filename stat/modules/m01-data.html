@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01 · 数据与统计思维 · 统计 · 智能学习体系</title>
+<meta name="description" content="统计学导论：总体与样本、数据类型与测量尺度、抽样方法与偏差、研究设计、混杂因素与常见统计陷阱。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m01" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 1 · <a href="../stages/statistics.html">统计学</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l1">L1 入门</span> · 6 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">初中数学 · 上一篇：无（本站起点）</span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m02-descriptive.html">02 · 描述统计与可视化</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node current" href="m01-data.html">01 数据与统计思维</a><span class="dep-arrow">→</span><a class="dep-node" href="m02-descriptive.html">02 描述统计与可视化</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：总体, 样本, 参数, 统计量, 测量尺度, 随机抽样, 混杂因素, 选择偏差</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>为什么「样本量足够大」不能修补一个系统性偏差？ <a class="q-anchor" href="#s4">→ 对应讲解</a></li><li>名义 / 有序 / 区间 / 比率四种尺度，分别允许哪些统计运算？ <a class="q-anchor" href="#s3">→ 对应讲解</a></li><li>观察研究与随机实验在因果结论上的差别从何而来？ <a class="q-anchor" href="#s5">→ 对应讲解</a></li><li>同一个数据集，换个分组方式为什么可能得到相反结论？ <a class="q-anchor" href="#s6">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+    <article class="module" data-module="m01">
+
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/statistics.html">阶段 1 · 统计学</a> / 01 · 数据与统计思维</div>
+        <h1>01 · 数据与统计思维</h1>
+        <p class="lead">
+          统计学是「在不确定性下，从数据中提取可靠结论」的科学。本模块建立最底层的认知框架：
+          数据是怎么来的、属于什么类型、会以什么方式骗我们。这些内容不涉及复杂计算，
+          却决定后续所有方法论是否用在正确的地方。
+        </p>
+        <div class="module-meta">
+          <span class="badge ok">入门</span>
+          <span class="badge">6 学时</span>
+          <span class="badge">前置：初中数学</span>
+          <span class="badge brand">阶段一 · 入门筑基</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>说清统计学两大分支（描述统计 / 推断统计）各自解决什么问题</li>
+          <li>区分总体、样本、参数、统计量，并能互相指认</li>
+          <li>掌握四种测量尺度（名义/有序/区间/比率），会判断变量属于哪一类</li>
+          <li>理解随机抽样为什么重要，识别常见抽样偏差</li>
+          <li>能从混杂与因果的角度审视「两变量相关」的结论</li>
+          <li>识别幸存者偏差、辛普森悖论、回归均值等经典陷阱</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 什么是统计学</h2>
+
+      <h3 id="s1-1">1.1 两大分支</h3>
+      <p>统计学（Statistics）研究如何<strong>收集、整理、分析、解释数据</strong>，并在此基础上做出合理决策。它分为两大分支：</p>
+      <ul>
+        <li><strong>描述统计（Descriptive Statistics）</strong>：把一堆数据浓缩成几个数字或一张图，让人一眼看懂。例如「全班平均分 78 分，标准差 12 分」。对应模块 02。</li>
+        <li><strong>推断统计（Inferential Statistics）</strong>：只观察到部分数据（样本），却要对更大的整体（总体）下结论，并量化结论的不确定性。例如「抽样 1000 人，推断全国支持率，误差 ±3%」。对应模块 04–05。</li>
+      </ul>
+
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          直觉：描述是「总结已看到的」，推断是「猜测没看到的」
+        </div>
+        <p>推断统计是本课程的重心，因为现实世界里我们几乎永远只能看到部分数据：临床试验只用几百名患者、上线 A/B 测试只覆盖一部分流量、训练 AI 模型用的数据只是真实世界的一个采样。</p>
+      </div>
+
+      <h3 id="s1-2">1.2 统计学解决的问题类型</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>问题类型</th><th>典型提问</th><th>对应方法（后续模块）</th></tr></thead>
+          <tbody>
+            <tr><td>比较差异</td><td>新药比安慰剂有效吗？改版后转化率提升了吗？</td><td>假设检验（05）、A/B 测试（08）</td></tr>
+            <tr><td>建立关系</td><td>广告投入和销售额有什么关系？</td><td>相关分析（02）、回归（06）</td></tr>
+            <tr><td>预测</td><td>给定特征，房价/用户流失概率是多少？</td><td>回归与分类（06）、机器学习（09）</td></tr>
+            <tr><td>归因因果</td><td>是药物治好了病人，还是病人本来就会好？</td><td>实验设计（08）、因果推断（08）</td></tr>
+            <tr><td>量化不确定性</td><td>这个预测的可信范围有多大？</td><td>置信区间（05）、贝叶斯（07）、共形预测（10）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 核心概念：总体、样本、参数、统计量</h2>
+
+      <p>这四个词是统计学的词汇表基石，务必分清<strong>「谁是真值、谁是估计」</strong>：</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>概念</th><th>符号惯例</th><th>定义</th><th>例子（某市居民身高）</th></tr></thead>
+          <tbody>
+            <tr><td><strong>总体</strong> Population</td><td>—</td><td>研究对象的全体</td><td>该市全部约 800 万居民</td></tr>
+            <tr><td><strong>样本</strong> Sample</td><td>—</td><td>从总体中抽取的一部分个体</td><td>随机抽取的 2000 人</td></tr>
+            <tr><td><strong>参数</strong> Parameter</td><td>$\mu,\ \sigma,\ p$</td><td>描述<strong>总体</strong>的数字特征（真值，通常未知）</td><td>全体居民的真实平均身高 $\mu$</td></tr>
+            <tr><td><strong>统计量</strong> Statistic</td><td>$\bar{x},\ s,\ \hat{p}$</td><td>由<strong>样本</strong>计算出的数字特征（可算，会波动）</td><td>2000 人的样本均值 $\bar{x}$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点
+        </div>
+        <p>「用样本统计量估计总体参数」是推断统计的主线。但样本统计量<strong>每次抽样都会变</strong>（抽样波动），这是推断必须带不确定性度量（如置信区间、p 值）的根本原因。看到「样本均值 168.2cm」而不给误差范围，等于只说了一半的话。</p>
+      </div>
+
+      <h3 id="s2-1">2.1 个体、变量与数据集</h3>
+      <ul>
+        <li><strong>个体（Element）</strong>：数据收集的基本单位（一个人、一台设备、一次对话、一张图片）。</li>
+        <li><strong>变量（Variable）</strong>：个体的某个特征（身高、性别、响应时间）。</li>
+        <li><strong>观测值（Observation）</strong>：某个个体所有变量的取值组合（数据表中的一行）。</li>
+      </ul>
+      <p>把数据想成一张表：<strong>行是个体，列是变量</strong>。在 AI 语境中，一行通常是一个训练样本（例如一段文本、一张图片），一列是一个特征（feature）。</p>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 数据类型与测量尺度</h2>
+
+      <h3 id="s3-1">3.1 定量 vs 定性</h3>
+      <ul>
+        <li><strong>定性数据（Qualitative / 分类数据）</strong>：描述类别。如性别、职业、血型、图像类别标签。</li>
+        <li><strong>定量数据（Quantitative / 数值数据）</strong>：可以做算术运算的数值。如身高、收入、点击次数。</li>
+      </ul>
+      <p>定量数据再分两类：</p>
+      <ul>
+        <li><strong>离散型（Discrete）</strong>：取值可数（如一天的订单数：0, 1, 2, …）。</li>
+        <li><strong>连续型（Continuous）</strong>：取值在区间内任意实数（如温度、时长）。注意：实际测量到的连续数据总带有精度限制。</li>
+      </ul>
+
+      <h3 id="s3-2">3.2 四种测量尺度</h3>
+      <p>测量尺度决定了「哪些统计操作是合法的」。这是本节最重要的一张表：</p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>表 3.1 测量尺度及其允许的运算（√ 允许 / × 不允许）</caption>
+          <thead>
+            <tr><th>尺度</th><th>含义</th><th>例子</th><th>比较大小</th><th>加减</th><th>乘除/均值</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>名义</strong> Nominal</td>
+              <td>只有类别标签，无顺序</td>
+              <td>血型、城市、模型名称</td>
+              <td>×（只能判等）</td><td>×</td><td>×</td>
+            </tr>
+            <tr>
+              <td><strong>有序</strong> Ordinal</td>
+              <td>类别有顺序，但间距不等</td>
+              <td>满意度（差/中/好）、学历、比赛名次</td>
+              <td>√</td><td>×</td><td>×</td>
+            </tr>
+            <tr>
+              <td><strong>区间</strong> Interval</td>
+              <td>有等距单位，但零点是人为设定</td>
+              <td>摄氏温度、日期、标准化考试分</td>
+              <td>√</td><td>√</td><td>√（无绝对零点，比值无意义）</td>
+            </tr>
+            <tr>
+              <td><strong>比率</strong> Ratio</td>
+              <td>有绝对零点，比值有意义</td>
+              <td>身高、收入、时长、计数</td>
+              <td>√</td><td>√</td><td>√（「A 是 B 的两倍」成立）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          经典误用：给名义/有序数据算平均值
+        </div>
+        <p>「三个候选人的编号是 1、2、3，平均编号 2」没有意义（名义）。「满意度评分 1–5 分，平均 3.6 分」在严格意义上也不成立（有序），实践中人们常把它当区间尺度近似处理，但要清楚这是<strong>有损近似</strong>，且必须说明假设。同样，「今天的气温 20℃ 是昨天 10℃ 的两倍」是错误说法——摄氏度是区间尺度。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.1</span>
+          <span class="ex-title">判断下列变量的测量尺度</span>
+        </div>
+        <div class="example-body">
+          <p>（a）电商平台的用户 ID；（b）快递配送等级（当日达 / 次日达 / 三日达）；（c）标准大气压下的摄氏温度；（d）用户下单金额（元）。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>（a）<strong>名义</strong>：ID 只是标签，大小与先后无意义。<br>
+              （b）<strong>有序</strong>：有快慢顺序，但「当日达与次日达之差」不等于「次日达与三日达之差」。<br>
+              （c）<strong>区间</strong>：单位等距，但 0℃ 不是「没有温度」，比值无意义。<br>
+              （d）<strong>比率</strong>：有绝对零点（0 元 = 没有金额），「花 200 元是 100 元的两倍」成立。</p>
+              <p><strong>结论：</strong>判断尺度的关键问句是——① 类别还是数值？② 有没有顺序？③ 间距是否相等？④ 有没有绝对零点？</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 数据从哪里来：抽样方法与偏差</h2>
+
+      <h3 id="s4-1">4.1 为什么必须随机抽样</h3>
+      <p>推断统计的合法性来自一个假设：<strong>样本能代表总体</strong>。使样本具有代表性的最可靠手段是<em>随机化</em>——让总体中每个个体都有已知的、非零的被抽中概率。非随机的「方便样本」（convenience sample）会产生系统性偏差（bias），且<strong>偏差无法通过增加样本量消除</strong>。</p>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          偏差 vs 波动：一个关键区分
+        </div>
+        <p><strong>随机误差（波动）</strong>：这次抽到的样本均值偏高、下次偏低，但长期平均会回到真值附近——<em>可以用更大样本量缓解</em>。<br>
+        <strong>系统偏差</strong>：抽样方式本身让数据整体偏离真值（比如只在网上发问卷）——<em>加大样本量只会让你更精确地错下去</em>。这是初学者最容易犯的错。</p>
+      </div>
+
+      <h3 id="s4-2">4.2 常见抽样方法</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>方法</th><th>做法</th><th>优点</th><th>风险 / 适用</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>简单随机抽样</strong> SRS</td>
+              <td>每个个体等概率被抽中（抽签/随机数）</td>
+              <td>无偏、理论干净</td>
+              <td>总体大时实施成本高</td>
+            </tr>
+            <tr>
+              <td><strong>分层抽样</strong> Stratified</td>
+              <td>先按关键特征分层（如年龄），层内随机抽</td>
+              <td>保证子群覆盖，精度更高</td>
+              <td>需要事先知道分层变量</td>
+            </tr>
+            <tr>
+              <td><strong>整群抽样</strong> Cluster</td>
+              <td>随机抽若干群（如学校），群内全调查</td>
+              <td>省钱省事，适合地理分散总体</td>
+              <td>群内相似导致精度下降</td>
+            </tr>
+            <tr>
+              <td><strong>系统抽样</strong> Systematic</td>
+              <td>每 $k$ 个抽一个（如每 50 人抽 1）</td>
+              <td>实施简单</td>
+              <td>若数据有周期性规律会出偏差</td>
+            </tr>
+            <tr>
+              <td><strong>自愿样本</strong> Voluntary</td>
+              <td>谁愿意谁参加（网络问卷常见）</td>
+              <td>成本极低</td>
+              <td><strong>严重偏差</strong>：只有特定人群会响应</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s4-3">4.3 无回答与覆盖偏差</h3>
+      <p>两类隐蔽偏差在实践中极其常见：</p>
+      <ul>
+        <li><strong>无回答偏差（Non-response bias）</strong>：拒答者与应答者系统性不同。例如收入调查中，高收入者更可能拒答 → 结果低估平均收入。</li>
+        <li><strong>覆盖偏差（Coverage bias）</strong>：抽样框没有覆盖总体的某些部分。例如用固定电话号码簿抽样，会漏掉没有固定电话的家庭。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.1</span>
+          <span class="ex-title">为四项调研任务设计抽样方案</span>
+        </div>
+        <div class="example-body">
+          <p>某市场研究公司要完成以下四项调查。请为每一项选出合适的抽样方法（简单随机 / 系统 / 分层 / 整群），说明理由，并指出该方法最可能带来的偏差风险。</p>
+          <ol>
+            <li>从某市 20 万户居民中抽取 800 户，调查「家庭月用电量」。已知该市城区、郊县、农村三部分户数比例明确，且三地用电水平差异很大。</li>
+            <li>某工厂一天连续生产 24000 件同类产品（已按生产顺序编号），质检部门需从中抽取 200 件做破坏性检测。</li>
+            <li>全国有 3000 所小学，要估计小学生的课外阅读时长。方案：先随机抽 100 所小学，抽中的学校全员做问卷。</li>
+            <li>估计全市 15 万名在职职工的通勤满意度，公司打算在几个写字楼门口发问卷，回收约 2000 份。</li>
+          </ol>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（1）分层抽样。</strong>先按「城区 / 郊县 / 农村」把总体分成三层，再按各层户数比例把 800 个名额分到三层，<em>层内</em>再做简单随机抽样。理由：层内同质、层间差异大，分层既保证每一层都被抽到（不会出现某层一个样本也没有），估计总体均值时精度也高于直接抽 800 户。</p>
+              <p>风险：分层变量必须事先掌握（本题已知各区户数，所以可行）；若按与目标变量无关的特征分层（如按门牌号尾数分层），精度提升有限。</p>
+              <p><strong>（2）系统抽样。</strong>间隔 $k = 24000/200 = 120$：先在第 1 到 120 件中随机抽一个作为起点，之后每隔 120 件抽一件。理由：实施简单，样本均匀分布在整条生产线上，适合流水线上逐件生产、编号连续的总体。</p>
+              <p>风险：<strong>周期性风险</strong>。若生产存在与 120 同周期的规律（例如每 120 件换一种原料批次、每两小时换一次班次），样本就会系统性地只覆盖某一种状态。规避办法：改随机起点，或改为「按班次分层、层内系统抽样」。</p>
+              <p><strong>（3）整群抽样。</strong>把每所学校看作一个群，随机抽 100 所学校，群内全员调查。理由：成本低、组织方便，适合「个体分散在全国、难以逐个接触」的总体。</p>
+              <p>风险：群内相似导致<strong>有效样本量小于名义样本量</strong>——同一学校的学生家庭背景、作息高度相似，等于只提供「1 个」独立信息，估计标准误时必须乘以设计效应。更优方案是<strong>两阶段抽样</strong>：第一阶段抽学校，第二阶段在被抽中的学校内再随机抽学生。</p>
+              <p><strong>（4）不能这样做。</strong>在写字楼门口拦访是<strong>方便抽样</strong>：样本集中在少数几栋楼，而且愿意停下来填问卷的人本身就有特定画像（工作强度、通勤距离）。这是严重的<strong>自选样本</strong>，样本量再大也救不了。</p>
+              <p>正确做法：以全市职工名册为抽样框做<strong>简单随机抽样</strong>，并按行业或区域做<strong>分层抽样</strong>保证各行业都被覆盖；线上发放并追踪回收率，把「愿意回答」与「不愿回答」的差异当作<strong>无回答偏差</strong>单独分析（追访不响应者，或做加权调整）。</p>
+              <p><strong>方法选择速查：</strong>总体大、个体可及 → 简单随机；总体按顺序排列且编号连续 → 系统；已知重要子群差异大 → 分层；个体难触及但「群」容易整体接近 → 整群。</p>
+              <p><strong>易错提示：</strong>① 把「方便抽样 + 大样本」当成可靠方案（样本量解决不了系统偏差）；② 用系统抽样却忽略生产或排队的周期性；③ 整群抽样时把「问卷份数」当成「独立样本量」，从而低估抽样误差。</p>
+              <p><strong>应用/AI 关联：</strong>模型评测集抽样、用户调研、线上实验流量分配遵循同一套逻辑——<strong>训练集要分层</strong>（否则长尾人群被整体忽略），<strong>评测集要随机</strong>（否则指标只反映「出题人喜欢的那类样本」），标注任务若整群交给同一位标注员，也会引入同类系统差异，这就是整群抽样里的设计效应。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.2</span>
+          <span class="ex-title">辨析四类抽样误差与偏差</span>
+        </div>
+        <div class="example-body">
+          <p>下面四个场景都出现了「数字与真值不一致」。请判断各属于哪一类问题：① 抽样波动（随机误差）；② 覆盖偏差；③ 无回答偏差；④ 选择性偏差（含幸存者偏差）。并回答：哪一种能靠「增大样本量」解决？</p>
+          <ol>
+            <li>用同一份抽样框、同一套方案重复抽样三次，样本均值分别为 12.1、11.8、12.4。</li>
+            <li>用 2015 年登记的手机号段名册作抽样框，调查 2025 年全市居民的通勤满意度。</li>
+            <li>满意度问卷发出 1000 份、回收 600 份；分析发现回收者中「体验好」的比例明显高于全体用户。</li>
+            <li>某 AI 团队统计「线上模型平均分」，口径只包含仍在维护、且有连续评测记录的模型版本；已经下线的早期版本因缺少评测记录而不在统计范围内。</li>
+          </ol>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（1）① 抽样波动。</strong>同一总体重复抽样必然得到不同的统计量，这是随机性本身。样本均值的期望等于总体均值 $\mu$，其波动大小约为 $\sigma/\sqrt{n}$。<strong>增大样本量可以减小它</strong>——这是四类问题中唯一一类能靠样本量解决的。</p>
+              <p><strong>（2）② 覆盖偏差。</strong>抽样框漏掉了 2015 年之后新办的号段、只用固定电话的家庭、以及不登记手机号的人群，抽样框本身就不等于总体。<strong>增大样本量无效</strong>——只会把同样的错误重复更多次。补救办法是更新抽样框、多渠道覆盖，或对未覆盖人群单独抽样。</p>
+              <p><strong>（3）③ 无回答偏差。</strong>体验差的人更不愿意评价，因此回收的 600 份不是总体的随机子样。回收率只有 60%，这本身就是一个必须报告的指标。<strong>增大样本量无效</strong>（只是发出更多同样有偏的问卷）。补救办法：追访不响应者、分析不响应者的可得特征并加权、报告回收率。</p>
+              <p><strong>（4）④ 选择性偏差 / 幸存者偏差。</strong>只有「活下来」的模型版本进入统计，早期失败的版本因没有评测记录被系统性排除，于是高估了整体水平。这与例 6.1 的「成功企业都在开放式办公室」是同一个机制。<strong>增大样本量无效</strong>。补救办法：把已下线版本的评测日志一并纳入，或按「上线—下线」全生命周期定义样本。</p>
+              <p><strong>判别口诀：</strong>问自己一句「把样本量翻倍，这个偏差会变小吗？」会变小的只有随机误差；不会变小的都是系统偏差，必须回头改抽样框、问卷流程或统计口径。另外别忘了<strong>混杂</strong>（第 5 节）：它不是抽样误差，但同样能制造虚假关联，而且同样无法靠加大样本量解决。</p>
+              <p><strong>易错提示：</strong>最常见的两个错误是：① 看到「样本量大」就默认结论可靠（记住：<em>大样本让错误结论更精确</em>）；② 把「重复抽样数字不同」当成出错了（那是正常的抽样波动，恰恰是推断统计要量化的对象）。</p>
+              <p><strong>应用/AI 关联：</strong>在机器学习流水线里同样要区分：训练集太小是<strong>方差</strong>问题（可加数据缓解），训练集有偏（比如全是某类用户、某家医院的数据）是<strong>偏差</strong>问题（只能靠重新取数解决）。评测集只收「有反馈的样本」会形成幸存者偏差；用线上日志做训练/评测划分而不按时间或用户切分，会造成信息泄漏（leakage），本质上也是一种抽样框错误。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 研究设计：观察 vs 实验</h2>
+
+      <h3 id="s5-1">5.1 两类研究</h3>
+      <ul>
+        <li><strong>观察性研究（Observational）</strong>：只记录自然发生的数据，不干预。如问卷调查、日志分析、队列研究。能发现<em>关联</em>。</li>
+        <li><strong>实验（Experiment）</strong>：研究者主动施加处理（treatment），并<strong>随机分配</strong>处理给受试对象。如随机对照试验（RCT）、A/B 测试。能支持<em>因果</em>结论。</li>
+      </ul>
+
+      <h3 id="s5-2">5.2 混杂因素</h3>
+      <p><strong>混杂因素（Confounder）</strong>是同时影响「处理」与「结果」的第三方变量，会制造虚假关联。</p>
+
+      <div class="formula-box">
+        <div class="f-name">混杂的因果结构</div>
+        $$ \text{混杂因子 } Z \;\longrightarrow\; \begin{cases} X & (\text{处理}) \\ Y & (\text{结果}) \end{cases} $$
+        <div class="f-note">此时观测到的 $X$ 与 $Y$ 的相关中，混入了 $Z$ 的共同作用。随机化使 $X$ 与 $Z$ 独立，从而切断这条虚假路径。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 5.1</span>
+          <span class="ex-title">咖啡与肺癌：一个著名的混杂案例</span>
+        </div>
+        <div class="example-body">
+          <p>观察研究发现「喝咖啡的人患肺癌率更高」。能否得出「咖啡致癌」？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>不能。<strong>吸烟</strong>是混杂因素：吸烟者更常喝咖啡（影响 $X$），吸烟也导致肺癌（影响 $Y$）。观测到的关联主要来自「吸烟」这个共同原因，而非咖啡本身。</p>
+              <p><strong>正确做法：</strong>① 随机分配喝咖啡（伦理上难）；或 ② 观察研究中控制吸烟状态（分层分析、多变量回归——见模块 06、08）。</p>
+              <p><strong>启示：</strong>看到「A 与 B 相关」，第一反应应是问：有没有第三个变量同时影响 A 和 B？</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 6 ===== -->
+      <h2 id="s6">6 · 六个必须内化的统计陷阱</h2>
+
+      <h3 id="s6-1">6.1 相关不等于因果</h3>
+      <p>相关（correlation）只刻画两个变量的<em>共同变动</em>，而因果（causation）要求排除混杂、反向因果与巧合。判断因果的黄金标准是<strong>随机化实验</strong>；观察数据中的因果结论需要专门的方法论（见模块 08）。</p>
+
+      <h3 id="s6-2">6.2 幸存者偏差</h3>
+      <p>只统计「存活/留存/成功」的个体，会系统性高估成功概率。</p>
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.1</span>
+          <span class="ex-title">「成功企业都在开放式办公室」</span>
+        </div>
+        <div class="example-body">
+          <p>媒体统计发现成功公司多采用开放式办公，建议照做。这个推理错在哪？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>样本只包含<strong>存活下来的公司</strong>。大量采用开放式办公但失败的公司没有被统计进来，造成「开放式办公 → 成功」的假象。这种偏差叫<strong>幸存者偏差（Survivorship bias）</strong>。</p>
+              <p>军事史上经典案例：返航战机弹孔集中在机翼与机身，而引擎处弹孔少——加固应该做在<em>弹孔少</em>的引擎处，因为中弹引擎的飞机没能返航（统计不到）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s6-3">6.3 辛普森悖论</h3>
+      <p>分组比较时 A 优于 B，合并数据后却 B 优于 A。原因通常是<strong>两组的样本构成不同</strong>（组别本身是混杂因素）。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.2</span>
+          <span class="ex-title">两种疗法的治愈率（辛普森悖论经典算例）</span>
+        </div>
+        <div class="example-body">
+          <p>某医院两种疗法对轻症、重症患者的治愈率如下：</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>病情</th><th>疗法 A 治愈率</th><th>疗法 A 人数</th><th>疗法 B 治愈率</th><th>疗法 B 人数</th></tr></thead>
+              <tbody>
+                <tr><td>轻症</td><td>93%（93/100）</td><td>100</td><td>87%（87/100）</td><td>100</td></tr>
+                <tr><td>重症</td><td>73%（73/100）</td><td>100</td><td>69%（198/287）</td><td>287</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>问：哪种疗法更好？合并全部病人后结论会反转吗？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>分层看：</strong>轻症组 A(93%) &gt; B(87%)；重症组 A(73%) &gt; B(69%)。每一层都是 A 更好。</p>
+              <p><strong>合并看：</strong></p>
+              <ul>
+                <li>疗法 A：总治愈 $(93+73)/(100+100)=166/200=\mathbf{83\%}$</li>
+                <li>疗法 B：总治愈 $(87+198)/(100+287)=285/387\approx\mathbf{73.6\%}$</li>
+              </ul>
+              <p>此例中合并后仍是 A 好。现在改变构成——若 B 组绝大多数是易治的轻症，A 组绝大多数是难治的重症，合并数字就可能反超，形成悖论。本例的深意是：<strong>当组别（病情）分布不均衡时，合并率会被构成比扭曲</strong>。</p>
+              <p><strong>正确做法：</strong>分析时按混杂变量分层，或使用回归/标准化方法（模块 06、08）控制构成差异。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.3</span>
+          <span class="ex-title">辛普森悖论复现：这次分组结论真的反转了</span>
+        </div>
+        <div class="example-body">
+          <p>某医院对同一种肾结石疾病采用两种疗法，各治疗 100 名患者：</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>病情</th><th>疗法 A：治愈 / 该病情人数</th><th>疗法 B：治愈 / 该病情人数</th></tr></thead>
+              <tbody>
+                <tr><td>轻症（易治）</td><td>9 / 10</td><td>72 / 90</td></tr>
+                <tr><td>重症（难治）</td><td>45 / 90</td><td>4 / 10</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>请回答：（1）分开看轻症、重症，哪种疗法更好？（2）把 200 名患者合在一起看哪种疗法更好？（3）为什么会这样？给出你推荐的决策方式。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 分组看：</strong></p>
+              <ul>
+                <li>轻症：疗法 A 治愈率 $9/10 = 90\%$，疗法 B $72/90 = 80\%$ → <strong>A 更好</strong>。</li>
+                <li>重症：疗法 A 治愈率 $45/90 = 50\%$，疗法 B $4/10 = 40\%$ → <strong>A 更好</strong>。</li>
+              </ul>
+              <p>两个分层里 A 都更好。</p>
+              <p><strong>第 2 步 合并看（注意这一步会翻转）：</strong></p>
+              <ul>
+                <li>疗法 A：总治愈 $(9+45)/(10+90) = 54/100 = 54\%$。</li>
+                <li>疗法 B：总治愈 $(72+4)/(90+10) = 76/100 = 76\%$。</li>
+              </ul>
+              <p>合并后<strong>疗法 B 看起来大幅领先（76% vs 54%）</strong>，与分组结论完全相反——这就是辛普森悖论。</p>
+              <p><strong>第 3 步 原因：两组的面貌根本不同。</strong>疗法 A 组里 <strong>90% 是重症</strong>患者（90/100），疗法 B 组里 <strong>90% 是轻症</strong>患者（90/100）。轻症本来就容易治好，所以 B 的平均分被大量容易的病例「抬」了起来。<strong>病情（轻/重症）就是混杂因素</strong>，它同时影响「选了哪种疗法」和「能不能治好」。</p>
+              <p><strong>第 4 步 用标准化把构成差异消掉：</strong>全体 200 人中轻症 100 人、重症 100 人，各占 50%。按这个共同的标准构成重新加权：</p>
+              <ul>
+                <li>疗法 A：$0.5 \times 90\% + 0.5 \times 50\% = 70\%$。</li>
+                <li>疗法 B：$0.5 \times 80\% + 0.5 \times 40\% = 60\%$。</li>
+              </ul>
+              <p>标准化之后，<strong>A 明显更好</strong>，与分层结论一致。</p>
+              <p><strong>结论与决策建议：</strong>合并率之所以骗人，是因为它把「构成比」当成了「效果」。正确做法是 ① 先看分层率；② 用分层分析或回归（模块 06）控制病情；③ 用<strong>随机对照试验</strong>让两组的病情构成自然接近——本例中 A 组重症占 90%、B 组只占 10%，这本身说明「选疗法」和「病情严重程度」之间存在系统关联（比如医生把重症患者都安排到 A），这本身就是需要警惕的混杂。</p>
+              <p><strong>易错提示：</strong>① 看到「B 组总治愈率更高」就下结论——这是辛普森悖论最经典的翻车点；② 只报合并率而不报分层构成；③ 把「轻度患者更愿意选 B」这类<strong>自选择（选择偏差）</strong>误当成「B 更好」；④ 认为分层后结论反转 = 数据有错——往往不是错，而是合并方式有偏。</p>
+              <p><strong>应用/AI 关联：</strong>推荐系统里「新版模型整体 CTR 更高」常常是辛普森悖论：新版被更多推给了高活跃用户（易点击），而不是算法真的更好。标准的做法是<strong>按用户活跃度分层报告</strong>，或用随机对照 / A/B 测试保证流量随机分配（模块 08）。同理，医疗 AI 模型若只在「轻症」病历上训练与评测，就会高估在重症上的效果。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s6-4">6.4 回归均值</h3>
+      <p>极端表现之后，下一次测量往往会向平均值靠拢——即使没有任何真实变化。原因是<strong>极端值中包含了运气成分</strong>。</p>
+      <ul>
+        <li>「运动员登上杂志封面后表现下滑」——不是封面诅咒，而是入选封面本身就因为他处于状态峰值。</li>
+        <li>「对差生辅导后成绩提升」——部分提升来自回归均值，需要对照组才能分离真实效果（模块 08 的 RCT 正是为此）。</li>
+      </ul>
+
+      <h3 id="s6-5">6.5 数据窥探与 p-hacking</h3>
+      <p>反复尝试不同分组、不同指标、不同子集直到出现「显著」结果（$p&lt;0.05$），是把假设检验当抽奖。<strong>显著性水平 $\alpha$ 的含义建立在「事先固定检验方案」之上</strong>；试 20 次总有 1 次「显著」（纯偶然）。对策：预注册分析计划、报告全部尝试、用多重比较校正（模块 05、08）。</p>
+
+      <h3 id="s6-6">6.6 图表误导</h3>
+      <ul>
+        <li><strong>截断纵轴</strong>：柱状图从 30 起画，0.5 的差异被视觉放大成「翻倍」。</li>
+        <li><strong>双轴把戏</strong>：两条曲线用左右不同刻度，强行制造「同步/背离」印象。</li>
+        <li><strong>不当基线</strong>：比率变化用「百分点」与「百分比」混淆（20%→25% 是提升 5 个百分点，相对提升 25%）。</li>
+      </ul>
+
+      <!-- ===== 7 ===== -->
+      <div id="examples"></div><h2 id="s7">7 · 本章例题精讲</h2>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.1</span>
+          <span class="ex-title">识别总体与参数</span>
+        </div>
+        <div class="example-body">
+          <p>一家互联网公司想了解「App 日活跃用户的平均使用时长」。随机抽取 500 名日活用户，得到平均使用时长 23.6 分钟。</p>
+          <p>请指出：总体、样本、参数、统计量分别是什么？「23.6 分钟」是参数还是统计量？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <ul>
+                <li><strong>总体</strong>：该 App 的全部日活跃用户（注意不是全部注册用户——研究问题是关于日活的）。</li>
+                <li><strong>样本</strong>：被随机抽取的 500 名日活用户。</li>
+                <li><strong>参数</strong>：全体日活用户的真实平均使用时长 $\mu$（未知，是我们想估计的）。</li>
+                <li><strong>统计量</strong>：样本均值 $\bar{x}=23.6$ 分钟。</li>
+              </ul>
+              <p><strong>结论：</strong>23.6 分钟是<strong>统计量</strong>，它是参数 $\mu$ 的一个估计值。严谨的说法是「估计日活用户平均使用时长约为 23.6 分钟」，并补充误差范围（模块 05 的置信区间）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.2</span>
+          <span class="ex-title">抽样方案诊断</span>
+        </div>
+        <div class="example-body">
+          <p>某研究者想调查「本校学生每周学习时长」，采用以下方案：周一中午在图书馆门口拦访 200 名学生。请指出该方案的问题。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>三重问题：</p>
+              <ol>
+                <li><strong>覆盖偏差</strong>：图书馆门口只覆盖「去图书馆的学生」，不去图书馆的学生完全没机会被抽中。</li>
+                <li><strong>时间偏差</strong>：周一中午在图书馆的学生，其学习习惯可能与周末/晚上学习的学生不同。</li>
+                <li><strong>方便抽样</strong>：非随机，无法保证代表性；样本量 200 不能弥补设计缺陷。</li>
+              </ol>
+              <p><strong>改进方案</strong>：以学生名册为抽样框做<strong>简单随机抽样</strong>（或按年级/专业<strong>分层抽样</strong>），通过线上问卷+提醒提高应答率，并统计无回答者的特征差异。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.3</span>
+          <span class="ex-title">测量尺度决定分析方法</span>
+        </div>
+        <div class="example-body">
+          <p>某 App 收集了用户满意度：「非常不满意 / 不满意 / 一般 / 满意 / 非常满意」（记为 1–5）。分析师报告「平均满意度 3.8」。这个数字可以怎么质疑？更稳妥的汇总方式是什么？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>质疑：</strong>满意度是<strong>有序尺度</strong>。「满意」与「非常满意」之间的距离未必等于「不满意」与「一般」之间的距离。因此算术平均值严格来说不合法——它假设了等距。</p>
+              <p><strong>更稳妥的方式：</strong></p>
+              <ul>
+                <li>报告<strong>各档占比</strong>（如「非常满意 32%，满意 41%…」）；</li>
+                <li>报告<strong>中位数</strong>（有序尺度下合法）与<strong>众数</strong>；</li>
+                <li>使用适合有序数据的统计方法（如 Mann-Whitney 检验、有序 Logistic 回归）。</li>
+              </ul>
+              <p><strong>实践折中：</strong>业界常用均值，但必须注明「按区间尺度近似处理」的假设，并同时给出分布占比。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.4</span>
+          <span class="ex-title">挑战题：一次完整的调研设计审查（AI 团队版）</span>
+        </div>
+        <div class="example-body">
+          <p>某 AI 创业团队准备上线一款「AI 简历筛选助手」，并向客户宣称：「经 500 家企业试用，该助手筛出的简历通过率比人工筛选高出 30%，平均每份简历节省 8 分钟」。以下是团队内部记录：</p>
+          <ul>
+            <li><strong>数据字典：</strong>① 用户编号 UID（字符串，如 <code>u_00317</code>）；② 简历星级评分（1–5 星）；③ 简历筛选耗时（秒，精确到整数）；④ 企业规模（小/中/大）；⑤ 候选人是否通过初筛（是/否）；⑥ 求职者的学历层次（高中/大专/本科/硕士/博士）。</li>
+            <li><strong>试用情况：</strong>500 家企业全部来自公司创始人过去在创业社群里的好友网络；试用企业中仅 42 家回复了详细反馈；回复的 42 家里有 30 家表示「非常满意」，5 家表示「不太满意」，其余未表态。</li>
+            <li><strong>计时方式：</strong>「节省 8 分钟」来自 3 家主动发来表扬邮件的企业。</li>
+          </ul>
+          <p>请完成四项审查：（a）给上述 6 个变量判定测量尺度，并填出「该尺度下可以做什么、不能做什么」；（b）指出这次调查的总体、样本、参数、统计量；（c）找出报告中至少三处统计陷阱并说明理由；（d）给出改进的调研方案。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）测量尺度与可用统计对照表：</strong></p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>变量</th><th>尺度</th><th>可以做什么</th><th>不能做什么</th></tr></thead>
+                  <tbody>
+                    <tr><td>UID</td><td>名义</td><td>计数、去重、分组</td><td>不能求均值/方差，不能比大小</td></tr>
+                    <tr><td>星级评分</td><td>有序</td><td>中位数、众数、占比、分组比较</td><td>严格意义下不能求均值与标准差（比值无意义）</td></tr>
+                    <tr><td>筛选耗时</td><td>比率</td><td>均值、标准差、中位数、IQR</td><td>不能与别的量纲直接比较；不能把不同时期的数据混算</td></tr>
+                    <tr><td>企业规模</td><td>有序（可用名义处理）</td><td>按层分组比较</td><td>不能直接求平均企业规模当作代表值</td></tr>
+                    <tr><td>是否通过初筛</td><td>名义（0/1）</td><td>比例、频数、卡方检验</td><td>不能取「平均通过率」之外的连续处理</td></tr>
+                    <tr><td>学历层次</td><td>有序</td><td>中位数、秩相关、分层</td><td>不能假定相邻层次「差距相等」来求均值</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p><strong>关键提醒：</strong>「筛选耗时（秒，精确到整数）」是<strong>比率尺度</strong>（有绝对零点 0 秒），所以「节省 8 分钟」这类比值表述本身是合法的；但耗时<strong>右偏</strong>（少数超慢案例拉长尾部），报告中必须同时给中位数与四分位数（模块 02）。而「星级评分」是有序尺度，「平均满意度 4.6 分」严格不成立，只能报占比与中位数。</p>
+              <p><strong>（b）总体、样本、参数、统计量：</strong></p>
+              <ul>
+                <li><strong>总体</strong>：所有可能使用 AI 简历筛选助手的企业（理想情况下是目标行业全部企业）。</li>
+                <li><strong>样本</strong>：实际参与并留下反馈的 42 家企业（真正进入统计口径的甚至只有 30 家表态「非常满意」+ 5 家「不太满意」）。</li>
+                <li><strong>参数</strong>：全体试用企业中「通过率提升幅度」的真实均值 $\mu$ 与「平均节省时间」的真实均值 $\sigma_t$（未知真值）。</li>
+                <li><strong>统计量</strong>：由这 42（或 35）家算出的样本均值、样本比例，如「非常满意占 $30/35 \approx 85.7\%$」「平均节省 8 分钟」。</li>
+              </ul>
+              <p><strong>一句话结论：</strong>「通过率高 30%」「节省 8 分钟」都是<strong>统计量</strong>，不是参数；且由于样本有严重偏差，它们连「总体参数的良好估计」都算不上。</p>
+              <p><strong>（c）报告中的统计陷阱（至少找出三处）：</strong></p>
+              <ol>
+                <li><strong>自愿样本 / 覆盖偏差（最致命）</strong>：500 家企业全部来自创始人的熟人网络，不是随机抽样；意愿本身与「是否好用」高度相关。这是系统偏差，<strong>样本量再大也无济于事</strong>。</li>
+                <li><strong>无回答偏差</strong>：500 家里只有 42 家回复（回复率 8.4%）。回复的企业很可能是用得比较顺的那批。报告完全没提回复率，等于隐瞒了最关键的信息。</li>
+                <li><strong>幸存者偏差</strong>：那 12 家明确表示「不太满意」或未表态的企业被略去不计——只统计「活下来（满意）」的样本，成功率必然被高估。这与例 6.1 的成功企业样本完全同类。</li>
+                <li><strong>自我选择与断言偏差</strong>：3 家主动发表扬邮件的企业，其「8 分钟」是被选出来汇报的数字，不构成随机样本；并且团队没有报告均值之外的中位数与分布，也没有对照组。</li>
+                <li><strong>缺少对照组 / 无法归因</strong>：「比人工筛选高出 30%」里的「人工筛选」本身在什么时期、由谁筛、面对哪类简历都未说明；筛选效果与「简历质量构成」的差异（混杂）没有排除。</li>
+                <li><strong>量纲与显著性缺失</strong>：「30%」是相对提升还是绝对提升？「平均每份节省 8 分钟」是均值还是中位数（耗时通常右偏）？样本量 42 时 30% 的差异是否只是抽样波动（模块 05 的检验）？都没交代。</li>
+              </ol>
+              <p><strong>（d）改进方案：</strong></p>
+              <ul>
+                <li><strong>抽样</strong>：从目标行业的完整企业名录（抽样框）里做<strong>简单随机抽样</strong>，或按企业规模做<strong>分层抽样</strong>保证大企业也被覆盖；确保抽样框覆盖非熟人网络的企业（用行业名录 + 随机起点）。</li>
+                <li><strong>随机对照</strong>：把企业随机分成「用 AI 助手」与「仍用原人工流程」两组做 A/B 测试（模块 08），这样「是否使用」与「企业好不好」之间不会产生选择关联。</li>
+                <li><strong>对比口径固定</strong>：同一批简历分别走两条流程，比较<strong>同一批</strong>简历的初筛通过率与耗时；统一计时方式（服务器日志而非用户自述），并同时报均值、中位数与四分位数。</li>
+                <li><strong>分层报告</strong>：按企业规模、候选人学历层次分层报告通过率，避免辛普森悖论（例 6.3）。</li>
+                <li><strong>追踪无回答</strong>：记录回复率，对未回复者做追访与加权调整；报告「$n=500$ 发出 / 42 回复 / 35 有效」这类完整漏斗。</li>
+                <li><strong>预注册分析方案</strong>：事先固定指标定义与主指标，避免 p-hacking（见 6.5 节）。</li>
+              </ul>
+              <p><strong>易错提示：</strong>① 看到「500 家企业」就认为样本很大、结论可靠——<strong>样本量与代表性是两回事</strong>；② 把「没有负面反馈」当成「全员满意」——沉默的 458 家不是数据；③ 把统计量当参数报告；④ 相对提升与绝对提升混用（30% 是 $9$ 个百分点还是 $1.3$ 倍）。</p>
+              <p><strong>应用/AI 关联：</strong>这正是 AI 产品团队最常犯的错误：<strong>用「主动给你发好评的用户」训练和评估产品</strong>。用户反馈回路（feedback loop）会让模型持续朝着「容易得到正反馈的方向」优化，忽略沉默用户与差评用户——这与幸存者偏差是同一个机制的两种表现。落地做法：为评测集建立<strong>随机抽样 + 分层覆盖</strong>的规范；反馈数据入库时记录「是否主动上报」这一标记，评估时不要只看它。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 01 数据与统计思维 -->
+
+
+<h2 id="d-deep-1">深度专题一 · 为什么「样本量足够大」修不好一个系统性偏差：MSE 的偏差—方差分解</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把「误差」拆成两块，才能看清大样本到底修掉了什么</h3></div>
+  <p class="dt-lead">对应本章第 4 节（#s4）的提问「为什么样本量足够大不能修补一个系统性偏差」，并衔接第 5 节（#s5）观察与实验、第 6 节（#s6）换个分组就反转。正文已用文字点明「大样本让错误结论更精确」；这里把它写成可计算、可验证的恒等式。</p>
+
+  <h4>背景：一个反复出现的历史教训</h4>
+  <p>1936 年美国《文学文摘》寄出约一千万份民调、回收约二百四十万份，预测兰登会击败罗斯福，结果惨败；同期盖洛普只用约五万人的配额样本却预测正确。失败不是因为样本不够大，而是<strong>抽样框</strong>（汽车登记、电话簿、杂志订户）在经济大萧条时期系统性地偏向较富裕人群，且愿意寄回问卷的人本身政治倾向更强——这是覆盖偏差与无回答偏差的叠加。同期大量医学与工业研究还反复发现：增加观测数能让曲线更平滑，却无法把截距搬回真值。</p>
+  <p>这段历史逼出一个必须分清的问题：误差究竟由哪几部分组成，哪一部分会随样本量 <code>n</code> 缩小？统计学给出的答案是「偏差—方差分解」（bias–variance decomposition）。它也是后续模块 09 讨论模型泛化误差时同一条恒等式的统计版本。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把每一次抽样估计想成打靶。理想结果是弹孔<strong>既密集、又围绕靶心</strong>。现实中「打不准」有两种完全不同的样子：</p>
+  <ul>
+    <li><strong>整体偏一侧</strong>：所有弹孔都落在靶心右上方。这是<em>系统偏差</em>，来自抽样框漏掉某类人、只有某类人愿意回答、或测量口径整体偏高。多打几发不会把它搬回来。</li>
+    <li><strong>四处散开</strong>：弹孔围绕某个中心乱跳。这是<em>随机波动</em>，来自「这次恰好抽到谁」。多打几发、取平均，散开程度会变小。</li>
+  </ul>
+  <p>用一个数衡量「总共差多少」时，最方便的是把每次误差先平方再平均（平方让正负不抵消，也惩罚大误差）。奇妙的是，这个数恰好等于「整体偏移量的平方」加「分散程度」两项之和——而且<strong>没有交叉项</strong>。于是结论立刻清楚：增大样本量只压第二项，第一项纹丝不动。当第一项不为零时，样本量再大，总误差也停在一个正数下限上，永远到不了 0。</p>
+  <p>这正是「大样本让错误结论更精确」的数学含义：你确实把置信区间压得很窄，只是它紧紧围绕着一个错误的中心。</p>
+
+  <h4>形式化</h4>
+  <p>设总体真值为 $\theta$（例如全体学员每周学习分钟数的真实均值 $\mu$），基于 $n$ 个观测的估计量记作 $\hat\theta_n$。下面每个公式都配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">均方误差 MSE</div>
+    $$ \mathrm{MSE}(\hat\theta_n) = E\left[(\hat\theta_n - \theta)^2\right] $$
+    <div class="f-note">白话：把「反复抽样得到的估计值与真值之差」先平方、再求平均；平方保证正负误差不互相抵消，也让大误差更显眼。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">偏差与方差</div>
+    $$ \mathrm{Bias}(\hat\theta_n) = E[\hat\theta_n] - \theta, \qquad \mathrm{Var}(\hat\theta_n) = E\left[(\hat\theta_n - E[\hat\theta_n])^2\right] $$
+    <div class="f-note">白话：偏差是「长期平均落在真值的哪一侧、偏多少」；方差是「每一次估计围绕自己的长期平均抖得多厉害」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">分解的推导（加一项、减一项、再展开）</div>
+    $$ \hat\theta_n - \theta = \big(\hat\theta_n - E[\hat\theta_n]\big) + \big(E[\hat\theta_n] - \theta\big) $$
+    $$ E\left[(\hat\theta_n-\theta)^2\right] = \mathrm{Var}(\hat\theta_n) + \mathrm{Bias}(\hat\theta_n)^2 + 2\,\mathrm{Bias}(\hat\theta_n)\cdot E\big[\hat\theta_n - E[\hat\theta_n]\big] $$
+    <div class="f-note">白话：把误差拆成「抖动部分」与「固定偏移部分」；第三项是交叉项，但抖动部分减去自己的平均值后期望为 0，所以整项消失。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">偏差—方差恒等式</div>
+    $$ \mathrm{MSE}(\hat\theta_n) = \mathrm{Bias}(\hat\theta_n)^2 + \mathrm{Var}(\hat\theta_n) $$
+    <div class="f-note">白话：总误差 = 偏了多少的平方 + 抖了多少；两块相加，互不掩盖，也互不抵消。</div>
+  </div>
+
+  <p>现在把两种抽样机制代进去。若用<strong>简单随机抽样</strong>（SRS），样本均值 $\bar{X}_n$ 是无偏的，且方差按 $1/n$ 收缩：</p>
+
+  <div class="formula-box">
+    <div class="f-name">无偏抽样：大样本确实有用</div>
+    $$ E[\bar{X}_n] = \mu, \qquad \mathrm{Var}(\bar{X}_n) = \frac{\sigma^2}{n}, \qquad \mathrm{MSE}(\bar{X}_n) = \frac{\sigma^2}{n} \to 0 $$
+    <div class="f-note">白话：随机化把偏差项清零，只剩按 $1/n$ 缩小的方差项；这时增大 $n$ 才能把误差压到任意小，这叫一致性。</div>
+  </div>
+
+  <p>若抽样机制把总体偷偷换成「被观测到的子总体」（例如只回访学习时长不小于 $c$ 的活跃学员），估计量不再收敛到 $\mu$，而是收敛到子总体均值 $\mu_{\mathrm{sel}}$：</p>
+
+  <div class="formula-box">
+    <div class="f-name">有偏抽样：误差存在正数下限</div>
+    $$ \hat\theta_n \xrightarrow{\ p\ } \mu_{\mathrm{sel}}, \qquad b = \mu_{\mathrm{sel}} - \mu \neq 0 $$
+    $$ \mathrm{MSE}(\bar{X}_n^{\mathrm{sel}}) = b^2 + \frac{\sigma_{\mathrm{sel}}^2}{n}, \qquad \lim_{n\to\infty}\mathrm{MSE}(\bar{X}_n^{\mathrm{sel}}) = b^2 \gt 0 $$
+    <div class="f-note">白话：无论 $n$ 多大，方差项都会被 $1/n$ 磨掉，但偏差的平方 $b^2$ 是一个常数地板，顶住总误差降不下去。</div>
+  </div>
+
+  <p>数值演示见下方代码实验 Part 1：复用知学云案例的 $\mu=95.2964$、$\sigma=43.4274$、$N=12000$，只回访 $X \ge Q_3 = 125.1$ 的活跃学员，得 $\mu_{\mathrm{sel}}=150.5769$、$b=+55.2805$、$b^2=3055.93$、$\sigma_{\mathrm{sel}}^2=454.95$。表中 $n$ 从 30 增到 6000，有偏估计的 MSE 几乎不动（3071 → 3056），无偏 SRS 的 MSE 却从 58.78 降到 0.35。这是「大 $n$ 只修方差、不修偏差」的直接证据。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>$\mathrm{MSE}=\mathrm{Bias}^2+\mathrm{Var}$。增大样本量只影响 $\mathrm{Var}\approx\sigma_{\mathrm{sel}}^2/n$，不影响 $\mathrm{Bias}^2$。因此「样本量足够大」<strong>只有在估计量无偏时才保证结论可靠</strong>；面对选择偏差、覆盖偏差、无回答偏差与幸存者偏差，正确动作不是加样本，而是修抽样框、引入随机化、或先做偏差校正（后分层加权、倾向得分加权、工具变量），再谈样本量。</div>
+
+  <p><strong>边界条件：</strong>在偏差项本身随样本量变化（例如无回答率随调查投入下降、或测量偏差可通过重复标定逐步收敛）的条件下，本结论不成立，应改用随 $n$ 衰减的偏差模型 $b(n)$ 或先做后分层／倾向得分／工具变量等偏差校正，再讨论方差项；若偏差是常数且与 $n$ 无关，则本结论成立。</p>
+
+  <p>下图把「总体 → 抽样设计 → 样本 → 估计」这条链路画出来：偏差主要在<strong>抽样设计与测量</strong>两处注入，样本量只作用于链路末端的波动。</p>
+  <figure class="figure" id="fig-flow-sampling">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="从总体到结论的数据链路"><rect class="dg-box muted" x="20.0" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="73.6" y="94.0" text-anchor="middle">总体</text><text class="dg-ts" x="73.6" y="111.0" text-anchor="middle">参数 θ 固定未知</text><rect class="dg-box warn" x="153.2" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="206.79999999999998" y="94.0" text-anchor="middle">抽样设计</text><text class="dg-ts" x="206.79999999999998" y="111.0" text-anchor="middle">随机化是关键</text><line class="dg-edge" x1="127.19999999999999" y1="97.0" x2="153.2" y2="97.0"/><polygon class="dg-edge" points="153.2,97.0 145.8952884775015,100.26208362447656 145.8952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box alt" x="286.4" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">样本</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">统计量 θ̂ 随机</text><line class="dg-edge" x1="260.4" y1="97.0" x2="286.4" y2="97.0"/><polygon class="dg-edge" points="286.4,97.0 279.0952884775015,100.26208362447656 279.0952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="419.59999999999997" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="473.2" y="94.0" text-anchor="middle">估计与推断</text><text class="dg-ts" x="473.2" y="111.0" text-anchor="middle">区间 / 检验</text><line class="dg-edge" x1="393.59999999999997" y1="97.0" x2="419.59999999999997" y2="97.0"/><polygon class="dg-edge" points="419.59999999999997,97.0 412.2952884775015,100.26208362447656 412.2952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="552.8" y="66" width="107.2" height="62" rx="8"/><text class="dg-t" x="606.4" y="94.0" text-anchor="middle">结论</text><text class="dg-ts" x="606.4" y="111.0" text-anchor="middle">带不确定性</text><line class="dg-edge" x1="526.8" y1="97.0" x2="552.8" y2="97.0"/><polygon class="dg-edge" points="552.8,97.0 545.4952884775015,100.26208362447656 545.4952884775015,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">从总体到结论的数据链路</span>
+    <span class="fig-note">偏差主要来自抽样与测量环节；样本量只降低方差，不能消除系统偏差。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../modules/m01-data.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 辛普森悖论作为「聚合伪影」：合并率其实是加权平均</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>反转不是数据出错，而是把不同构成的两组人混在一起再平均</h3></div>
+  <p class="dt-lead">对应本章第 6 节（#s6）「同一个数据集换个分组方式为什么可能得到相反结论」，并回扣第 5 节（#s5）的混杂与随机化。正文第 6 节用肾结石疗法的数字演示了「分层都赢、合并却输」；这里不重复那组数字，而是回答「凭什么会这样」——给出一个可推导的分解式与一个反转判据。</p>
+
+  <h4>背景：从「怪现象」到「可推导的恒等式」</h4>
+  <p>E. H. Simpson 在 1951 年系统讨论了「分组比较与合并比较方向相反」的现象，但 Pearson、Yule 等人在更早的列联表研究中已注意到同类结构。长期它被当成悖论甚至数据错误；现代因果推断把它讲清楚了：合并率不是「效应的估计」，而是<strong>效应与样本构成的混合</strong>。只要两组的构成不同，混合就会污染比较。这与本章正文的「混杂因素」是同一件事的代数写法。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>比较两种教学方案的平均完课率。方案 A 恰好被分到很多基础薄弱的学员（难教、完课率低），方案 B 恰好被分到很多基础扎实的学员（易教、完课率高）。即便 A 在<strong>每一类</strong>学员里都教得更好，把两类人混在一起算「总平均」时，A 因为背了太多难教的学生，总分被拉低；B 因为学生本来就容易教，总分被抬高。</p>
+  <p>错不在任何一个数字，错在<strong>把难度不同的两类人、按不同的比例混在一起再平均</strong>。这个「不同的比例」就是混杂变量 $Z$（学员基础）同时影响「分到哪个方案」与「能否完课」的结果。随机化的作用正是让两组构成在期望上相同，于是混合自然公平——这解释了为什么随机实验能支持因果、观察研究不能（#s5）。</p>
+  <p>反过来想更清楚：如果先规定「比较时两类人各占一半」，再分别算 A、B 的加权平均，那么「每层 A 都不差」就直接推出「总体 A 不差」，绝不会反转。这个动作叫<strong>标准化</strong>。</p>
+
+  <h4>形式化</h4>
+  <p>设样本按某个混杂变量分成 $K$ 层（$k=1,\dots,K$），例如「老用户／新用户」或「轻症／重症」。处理组 $g\in\{A,B\}$ 在第 $k$ 层的成功率为 $p_{g,k}$，该层人数占本组总人数的比例为 $w_{g,k}$（满足 $\sum_k w_{g,k}=1$）。下面每个公式配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">合并率是加权平均</div>
+    $$ P_g = \sum_{k=1}^{K} w_{g,k}\, p_{g,k} $$
+    <div class="f-note">白话：合并率就是把各层的率按「该层在本组里占多少人」加权求平均；权重一变，平均值就变，哪怕各层的率一个都没动。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">差值的分解：效应项 + 构成项</div>
+    $$ P_A - P_B = \sum_{k=1}^{K} w_{A,k}\left(p_{A,k} - p_{B,k}\right) \;+\; \sum_{k=1}^{K}\left(w_{A,k} - w_{B,k}\right) p_{B,k} $$
+    <div class="f-note">白话：第一项是「同一批人换个方案能好多少」（真实效应，只取 A 的权重）；第二项是「两组的人本来就不一样」带来的偏移（构成差异）。</div>
+  </div>
+
+  <p>若每一层 A 都不差，即对所有 $k$ 有 $p_{A,k} \ge p_{B,k}$，则第一项（效应项）必定非负。可是第二项（构成项）可以是一个绝对值很大的负数：当 A 把大量权重压在 $p_{B,k}$ 很低的「难层」时，$(w_{A,k}-w_{B,k})p_{B,k}$ 逐层累加为负。于是出现反转，其精确判据是</p>
+
+  <div class="formula-box">
+    <div class="f-name">反转发生的条件</div>
+    $$ \sum_{k=1}^{K}\left(w_{B,k} - w_{A,k}\right) p_{B,k} \gt \sum_{k=1}^{K} w_{A,k}\left(p_{A,k} - p_{B,k}\right) $$
+    <div class="f-note">白话：构成差异带来的「拖拽」超过层内真实优势时，合并结论翻转。注意左边只跟权重和 B 的层率有关，与 A 的效果无关。</div>
+  </div>
+
+  <p>要消掉这个拖拽，只需对两组使用<strong>同一套权重</strong> $w_k$（通常取全体样本中各层的占比）重新加权，即标准化：</p>
+
+  <div class="formula-box">
+    <div class="f-name">共同权重标准化：永不反转</div>
+    $$ P_g^{*} = \sum_{k=1}^{K} w_k\, p_{g,k}, \qquad P_A^{*} - P_B^{*} = \sum_{k=1}^{K} w_k\left(p_{A,k} - p_{B,k}\right) \ge 0 $$
+    <div class="f-note">白话：只要每层 A 都不差、且两组用同一套权重，差值就是一堆非负数之和，必定不反转；符号只由各层效应决定，构成被彻底消掉。</div>
+  </div>
+
+  <p>与因果的衔接（#s5）：当 $Z$ 同时影响「选了哪个处理」与「结果」时，$w_{A,k}\neq w_{B,k}$ 是系统性的而非偶然；随机化使处理 $X$ 与 $Z$ 独立（$X \perp Z$），于是 $E[w_{A,k}] = E[w_{B,k}]$，构成项在期望上为 0。这就是为什么随机对照试验不必事后做标准化，而观察研究必须做——或者干脆用带交互项的回归控制构成。</p>
+
+  <p>数值演示见代码实验 Part 2（一组全新的数字，不复用正文的肾结石算例）：两方案在「老用户／新用户」两层的率分别为 $p_A=(0.84,\,0.30)$、$p_B=(0.7125,\,0.20)$，权重为 $w_A=(0.2,\,0.8)$、$w_B=(0.8,\,0.2)$。合并得 $P_A=0.4080 \lt P_B=0.6100$（看似 B 更好），分解给出效应项 $+0.1055$、构成项 $-0.3075$、净差 $-0.2020$；用共同权重 $w=(0.5,0.5)$ 标准化后 $P_A^{*}=0.5700 \gt P_B^{*}=0.4563$（A 更好）。构成拖拽 $-0.3075$ 的绝对值是层内优势 $+0.1055$ 的近三倍，反转由此而来。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>合并率是「效应 + 构成」的加权和，不是效应的估计。反转<strong>当且仅当</strong>两组构成权重不同且构成项压过效应项时才可能；用共同权重做标准化后，只要每层方向一致就必定不反转。随机化在期望上令 $w_{A,k}=w_{B,k}$，等价于自动做了一次标准化——这正是观察研究与随机实验在因果结论上差别的代数根源。</div>
+
+  <p><strong>边界条件：</strong>在各层处理效应方向一致（不存在效应异质性／交互作用）、且所选分层变量是唯一混杂的条件下，本结论成立；在层间效应方向相反（例如 A 对轻症更好、对重症更差）或存在未观测混杂的条件下，本结论不成立，应改用分层报告各层效应、带交互项的回归，或随机化实验，而不是强行给一个统一的「A 更好」结论。</p>
+
+  <p>最后一道常被忽略的关卡是<strong>聚合所用的测量尺度</strong>：分层变量是名义 / 有序 / 区间 / 比率中的哪一类，决定了「按层计数」「按层求平均」是否合法。名义变量（渠道、城市）只能计数与分组；有序变量（满意度档位）可报中位数但严格不能求均值；只有比率尺度才允许把层率加权平均成 $P_g$。把有序尺度当等距数据直接求平均，是合并率出错的另一个隐蔽来源，也是下面这张图强调的口径。</p>
+  <figure class="figure" id="fig-matrix-measurement">
+  <svg class="dia" viewBox="0 0 680 142" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="四种测量尺度与合法运算"><text class="dg-th" x="340.0" y="24" text-anchor="middle">测量尺度：可允许的运算逐级增加</text><rect class="dg-box muted" x="20.0" y="42" width="149.5" height="68" rx="8"/><text class="dg-t" x="94.75" y="73.0" text-anchor="middle">名义 Nominal</text><text class="dg-ts" x="94.75" y="90.0" text-anchor="middle">= ≠ · 众数、频数</text><rect class="dg-box alt" x="183.5" y="42" width="149.5" height="68" rx="8"/><text class="dg-t" x="258.25" y="73.0" text-anchor="middle">有序 Ordinal</text><text class="dg-ts" x="258.25" y="90.0" text-anchor="middle">+ 中位数、秩</text><rect class="dg-box" x="347.0" y="42" width="149.5" height="68" rx="8"/><text class="dg-t" x="421.75" y="73.0" text-anchor="middle">区间 Interval</text><text class="dg-ts" x="421.75" y="90.0" text-anchor="middle">+ 均值、标准差</text><rect class="dg-box ok" x="510.5" y="42" width="149.5" height="68" rx="8"/><text class="dg-t" x="585.25" y="73.0" text-anchor="middle">比率 Ratio</text><text class="dg-ts" x="585.25" y="90.0" text-anchor="middle">+ 比值、变异系数</text></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">四种测量尺度与合法运算</span>
+    <span class="fig-note">尺度决定哪些统计运算有意义：对名义变量求均值是无意义的；比率尺度有绝对零点，可求比值。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="../modules/m01-data.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 随机抽样设计（SRS / 分层 / 整群）</h2>
+<div class="algo-spec">
+  <p>本算法位于「数据采集 → 存储计算 → 建模 → 评估 → 部署运维」链条的<strong>最上游采集环节</strong>：它决定下游所有统计量的入样概率与权重，是模块 05 置信区间、模块 08 A/B 测试、模块 12 训练／评测集划分的共同前提。上游契约是「一份能枚举的抽样框」，下游契约是「每个样本的权重 $w_i=1/\pi_i$ 与设计效应 deff」。</p>
+
+  <h3 id="d-algo-principle">一、原理：入样概率决定无偏性</h3>
+  <p>概率抽样（probability sampling）要求总体中每个单元 $i$ 都有<strong>已知且非零</strong>的入样概率 $\pi_i$。只要这个条件成立，Horvitz–Thompson 估计量 $\hat\tau = \sum_{i\in s} y_i / \pi_i$ 对总体总量就是无偏的——偏差分析里「清零 Bias 项」靠的正是这条，而不是靠样本量大。</p>
+  <div class="formula-box">
+    <div class="f-name">Horvitz–Thompson 与均值估计</div>
+    $$ \hat\tau = \sum_{i \in s} \frac{y_i}{\pi_i}, \qquad \hat\mu = \frac{\sum_{i\in s} w_i y_i}{\sum_{i\in s} w_i}, \qquad w_i = \frac{1}{\pi_i} $$
+    <div class="f-note">白话：被抽中概率越小的单元，代表越多没被抽到的同类人，所以要给它更大的权重；权重就是入样概率的倒数。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">三种设计的方差</div>
+    $$ \mathrm{Var}_{\text{SRS}}(\bar{x}) = \left(1-\frac{n}{N}\right)\frac{S^2}{n} $$
+    $$ \mathrm{Var}_{\text{str}}(\bar{x}_{st}) = \sum_{h=1}^{H}\left(\frac{N_h}{N}\right)^2\left(1-\frac{n_h}{N_h}\right)\frac{S_h^2}{n_h} $$
+    $$ \mathrm{Var}_{\text{clu}}(\bar{x}) \approx \mathrm{deff}\cdot\frac{\sigma^2}{n}, \qquad \mathrm{deff} = 1 + (m-1)\rho $$
+    <div class="f-note">白话：SRS 的方差随 $1/n$ 收缩并含有限总体校正 $(1-n/N)$；分层把「层间差异」固定掉，只剩层内方差之和；整群因群内个体太像（组内相关 $\rho$）要乘设计效应 deff，$\rho$ 越大有效样本量越小。</div>
+  </div>
+  <p><strong>几何解释：</strong>SRS 把样本点均匀撒在整个总体里；分层先把总体切成若干块、再在每块里撒点，保证每块都有代表；整群是整块整块地取，块内点彼此太近，信息大量重复。三种设计的差别，本质上是「样本点在总体中铺得有多均匀」。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>定义目标总体与抽样框。</strong>写出研究问题要推广到谁，列出可枚举的全部单元（或全部「群」）；先检查覆盖偏差：抽样框里有没有整类人根本不在里面。</li>
+    <li><strong>选设计。</strong>有可靠分层变量且层间差异大 → 分层；个体地理分散、只有「群」能整体接触 → 整群；否则用简单随机抽样 SRS。</li>
+    <li><strong>定样本量。</strong>由允许误差 $e$ 与 $\mathrm{Var}=\sigma^2/n$ 反解 $n \approx z^2\sigma^2/e^2$；若用整群，先把 $n$ 乘以 deff 再定群数。</li>
+    <li><strong>分配名额。</strong>分层按比例分配 $n_h = n\,N_h/N$，或用 Neyman 分配 $n_h \propto N_h S_h$（波动大的层多抽）；整群确定群数 $a$ 与群内大小 $m$。</li>
+    <li><strong>用固定随机种子抽取，并记录入样概率。</strong>每个单元保存 $\pi_i$，据此构造权重 $w_i=1/\pi_i$；系统抽样要额外检查周期性。</li>
+    <li><strong>估计并计算设计方差。</strong>用加权均值 $\hat\mu$；分层逐层算方差再求和，整群把 SRS 方差乘上 deff；同时报告设计效应供下游使用。</li>
+    <li><strong>诊断与补偿。</strong>报告回收率，追访无回答者，对未覆盖或未响应人群做加权／后分层调整；把漏斗「发出 $n$ ／回收 $r$ ／有效 $m$」完整写进报告。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>SRS：</strong>有完整、可等概率枚举的抽样框；总体规模适中；单元之间差异不呈周期性排列。</li>
+    <li><strong>分层抽样：</strong>事先掌握一个与结果强相关的分层变量（如地区、年级、病情），且层内同质、层间差异大；各层都要有样本。</li>
+    <li><strong>整群抽样：</strong>个体难逐个接触但「群」（学校、班级、门店）容易整体接近；预算优先于精度；能接受群内相似带来的精度损失。</li>
+    <li><strong>共同前提：</strong>研究目标是<em>推断总体</em>而非只描述手头这批数据；单元可被唯一识别；测量尺度合法（名义／有序变量可作分层标签，比率变量才可切段或求均值）。</li>
+  </ul>
+  <p>选择分层变量前还必须先过一道上游约束：它的测量尺度决定了哪些运算合法——对名义尺度（如城市、渠道）求均值无意义，只能计数与分组；有序尺度可分层但不能直接求均值；比率尺度才可切段或加权平均。完整口径见深度专题二旁的测量尺度图示。</p>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>抽取（训练）</b> SRS 建框 $O(N)$ ／ 蓄水池抽样 $O(N)$ 时间 $O(n)$ 空间；分层 $O(N+H+n)$；整群 $O(A\cdot m)$；<b>估计（推理）</b> 单次加权 $O(n)$，方差 $O(n)$（分层 $O(n+H)$）；<b>空间</b> 存完整抽样框 $O(N)$，流式蓄水池仅 $O(n)$，权重表 $O(n)$。</div>
+  <p>白话：这一步几乎不「训练模型」，成本主要是把抽样框读一遍并保存抽中的 $n$ 个单元；真正昂贵的往往是获取抽样框本身（数据库全表扫描），而不是抽样动作。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>入样概率已知 → 可构造无偏估计量，从根上消除 $\mathrm{Bias}^2$ 项（呼应深度专题一）。</li>
+        <li>方差有闭式公式，能事先算样本量、事后给标准误与置信区间。</li>
+        <li>分层抽样在层间差异大时精度显著高于同样本量的 SRS。</li>
+        <li>整群抽样大幅降低差旅、组织与标注成本，适合地理分散总体。</li>
+        <li>权重 $w_i$ 可一路传递到加权回归、A/B 分析， lineage 清晰。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>依赖完整抽样框；框错（覆盖偏差）时任何设计都救不回来。</li>
+        <li>分层变量选错或与结果无关时，精度提升有限甚至更差。</li>
+        <li>整群抽样因 $\mathrm{deff}\gt 1$ 损失有效样本量，名义 $n$ 会高估精度。</li>
+        <li>无回答、不依从仍会产生系统偏差，必须额外追访与加权。</li>
+        <li>加权后方差公式变复杂，工程上容易误用「未加权」的标准误。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>取一个 $N=8$ 的微型总体，8 个单元的每周学习分钟数为</p>
+  <p>$$ 40,\ 55,\ 60,\ 70,\ 80,\ 95,\ 110,\ 130 $$</p>
+  <p>用三种设计各抽 $n=2$ 个单元估计总体均值 $\mu$。所有数字都能用笔算复核。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>$\mu = 640/8 = 80$；离差平方和 $\sum(x_i-\mu)^2 = 6350$；总体方差 $\sigma^2 = 6350/8 = 793.75$，用于无偏公式的 $S^2 = 6350/7 = 907.1429$。</div>
+    <div class="solve-step"><span class="ss-k">SRS：代入有限总体校正。</span>$\pi_i = 2/8 = 0.25$，权重 $w_i = 4$；$\mathrm{Var}(\bar{x}) = (1-2/8)\times 907.1429/2 = 0.75 \times 453.5714 = 340.1786$，标准误 $\sqrt{340.1786} = 18.44$。</div>
+    <div class="solve-step"><span class="ss-k">分层：按「低／高」切成两层。</span>低层 $\{40,55,60,70\}$：$\mu_1=56.25$，$S_1^2=156.25$；高层 $\{80,95,110,130\}$：$\mu_2=103.75$，$S_2^2=456.25$。各层抽 $n_h=1$，权重 $N_h/N=0.5$。</div>
+    <div class="solve-step"><span class="ss-k">分层：逐层代入再求和。</span>$\mathrm{Var}(\bar{x}_{st}) = 0.5^2\times(1-1/4)\times 156.25/1 + 0.5^2\times(1-1/4)\times 456.25/1 = 0.1875\times(156.25+456.25) = 0.1875\times 612.5 = 114.8438$，标准误 $10.72$。</div>
+    <div class="solve-step"><span class="ss-k">比较。</span>方差从 $340.1786$ 降到 $114.8438$，下降 $1-114.8438/340.1786 = 66.2\%$。原因是层间差异（$56.25$ 与 $103.75$）被固定，不再进入抽样波动。</div>
+    <div class="solve-step"><span class="ss-k">整群：把两层当作两个同质群，各抽 1 群（$m=4$）。</span>抽中低群得 $56.25$、抽中高群得 $103.75$，两群均值平均为 $80$，抽样分布方差 $= \big((56.25-80)^2 + (103.75-80)^2\big)/2 = (564.0625+564.0625)/2 = 564.0625$。</div>
+    <div class="solve-step"><span class="ss-k">整群：与同样本量的 SRS 对照。</span>$n=4$ 的 SRS 方差 $= (1-4/8)\times 907.1429/4 = 0.5\times 226.7857 = 113.3929$；比值 $564.0625/113.3929 = 4.9744$。有效样本量约 $4/4.97 \lt 1$：群内个体太像，四份问卷只提供了不到一个独立信息。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>$\mathrm{deff}\approx 1+(m-1)\rho$ 是超大总体近似（$m=4,\rho\to 1$ 时上界为 $4$）；本例分母含有限总体校正，故实测比值 $4.97$ 略超该上界。结论不变：整群抽样必须用 deff 折算，不能把问卷份数当独立样本量。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把三种概率抽样设计与最常见的「方便／自愿样本」放在一起对照。最后一列是<strong>反例</strong>：它不是概率抽样，$\pi_i$ 未知，因此无法进入无偏框架。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>简单随机抽样 SRS</th><th>分层抽样</th><th>整群抽样</th><th>方便／自愿样本（反例）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>完整可枚举抽样框、总体适中、无周期性</td>
+        <td>已知强相关分层变量，层内同质层间异质</td>
+        <td>个体难触及、群易整体接近，预算优先</td>
+        <td>无抽样框、只求「有人填就行」的场景（严格说不适合作推断）</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>抽取 $O(N)$，估计 $O(n)$，空间 $O(n)$（蓄水池）</td>
+        <td>抽取 $O(N+H+n)$，估计 $O(n+H)$</td>
+        <td>抽取 $O(A\cdot m)$，估计 $O(n)$，方差需乘 deff</td>
+        <td>采集 $O(r)$ 最低，但偏差分析成本无限（不可修正）</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>样本量 $n$、随机种子、是否放回</td>
+        <td>层数 $H$、分配方式（比例 / Neyman）、各层 $n_h$</td>
+        <td>群数 $a$、群内大小 $m$、组内相关 $\rho$、deff</td>
+        <td>无（响应者自选择，$\pi_i$ 完全未知）</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">理论最干净、无偏、方差闭式</td>
+        <td class="best">精度最高：层间差异被消掉</td>
+        <td>成本最低、组织最省</td>
+        <td>回收快、成本极低</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>大总体实施成本高；框有覆盖偏差即失效</td>
+        <td>分层变量须事先已知；选错变量收益归零</td>
+        <td>$\rho$ 大时 deff 高，名义 $n$ 严重高估精度</td>
+        <td>系统偏差与 $n$ 无关，$\mathrm{Bias}^2$ 永远顶住 MSE</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>权重恒为 $N/n$，最易审计；需全量框</td>
+        <td>权重按层固定，易解释；需维护分层字典</td>
+        <td>需报告 deff 与设计方差，审计成本中等</td>
+        <td>无法给标准误，只能报「收到多少份」，不可复现</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="d-code">代码实验 · 偏差—方差分解与聚合反转的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验：为什么大样本修不好选择偏差（MSE = 偏差^2 + 方差）
+# 纯 Python 标准库；固定种子 20261107；数字复用「知学云」案例
+import random, math
+
+random.seed(20261107)
+N = 12000
+MU, SD = 95.2964, 43.4274
+pop = [random.gauss(MU, SD) for _ in range(N)]
+m0 = sum(pop) / N
+s0 = math.sqrt(sum((x - m0) ** 2 for x in pop) / N)
+pop = [MU + (x - m0) * SD / s0 for x in pop]
+mu = sum(pop) / N
+sigma2 = sum((x - mu) ** 2 for x in pop) / N
+
+CUT = 125.1
+sel = [x for x in pop if x &gt;= CUT]
+mu_sel = sum(sel) / len(sel)
+var_sel = sum((x - mu_sel) ** 2 for x in sel) / len(sel)
+bias = mu_sel - mu
+
+print("=== Part 1: MSE = bias^2 + variance ===")
+print("population: N=%d  mu=%.4f  sigma^2=%.4f  sigma=%.4f" % (N, mu, sigma2, math.sqrt(sigma2)))
+print("frame coverage: X &gt;= %.1f -&gt; %d/%d = %.4f" % (CUT, len(sel), N, len(sel)/N))
+print("selected pool:  mu_sel=%.4f  var_sel=%.4f" % (mu_sel, var_sel))
+print("bias = mu_sel - mu = %+.4f   bias^2 = %.4f" % (bias, bias*bias))
+print()
+print("    n    bias^2    var_sel/n   MSE=sum   MSE_mc_biased   MSE_mc_srs")
+R = 300
+for n in [30, 100, 1000, 6000]:
+    acc_b = 0.0
+    acc_s = 0.0
+    for _ in range(R):
+        xb = sum(random.choice(sel) for _ in range(n)) / n
+        xs = sum(random.choice(pop) for _ in range(n)) / n
+        acc_b += (xb - mu) ** 2
+        acc_s += (xs - mu) ** 2
+    print("%6d  %8.4f  %11.4f  %8.4f  %14.4f  %11.4f" %
+          (n, bias*bias, var_sel/n, bias*bias + var_sel/n, acc_b/R, acc_s/R))
+print()
+print("=== Part 2: Simpson / 聚合伪影（新数据：两种教学方案 x 学员基础） ===")
+A = [[84, 16], [120, 280]]
+B = [[285, 115], [20, 80]]
+pa = [r[0]/sum(r) for r in A]
+pb = [r[0]/sum(r) for r in B]
+wa = [sum(r) for r in A]; wa = [w/sum(wa) for w in wa]
+wb = [sum(r) for r in B]; wb = [w/sum(wb) for w in wb]
+crude_a = sum(w*p for w,p in zip(wa,pa))
+crude_b = sum(w*p for w,p in zip(wb,pb))
+print(" stratum        p_A      p_B     w_A     w_B")
+for k in range(2):
+    print("  %2d          %7.4f  %7.4f  %6.2f  %6.2f" % (k+1, pa[k], pb[k], wa[k], wb[k]))
+print("crude  A=%.4f  B=%.4f  diff=%+.4f  (B 更好)" % (crude_a, crude_b, crude_a-crude_b))
+effect = sum(wa[k]*(pa[k]-pb[k]) for k in range(2))
+compos = sum((wa[k]-wb[k])*pb[k] for k in range(2))
+print("decompose: effect=%+.4f + composition=%+.4f = %+.4f" % (effect, compos, effect+compos))
+w = [(A[k][0]+A[k][1]+B[k][0]+B[k][1])/1000.0 for k in range(2)]
+std_a = sum(w[k]*pa[k] for k in range(2))
+std_b = sum(w[k]*pb[k] for k in range(2))
+print("common weights w=%s" % [round(x,4) for x in w])
+print("standardized A=%.4f  B=%.4f  diff=%+.4f  (A 更好)" % (std_a, std_b, std_a-std_b))
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: MSE = bias^2 + variance ===
+population: N=12000  mu=95.2964  sigma^2=1885.9391  sigma=43.4274
+frame coverage: X &gt;= 125.1 -&gt; 2967/12000 = 0.2472
+selected pool:  mu_sel=150.5769  var_sel=454.9466
+bias = mu_sel - mu = +55.2805   bias^2 = 3055.9322
+
+    n    bias^2    var_sel/n   MSE=sum   MSE_mc_biased   MSE_mc_srs
+    30  3055.9322      15.1649  3071.0970       3098.1408      58.7842
+   100  3055.9322       4.5495  3060.4816       3060.4768      20.3353
+  1000  3055.9322       0.4549  3056.3871       3050.8481       1.9397
+  6000  3055.9322       0.0758  3056.0080       3059.5326       0.3475
+
+=== Part 2: Simpson / 聚合伪影（新数据：两种教学方案 x 学员基础） ===
+ stratum        p_A      p_B     w_A     w_B
+   1           0.8400   0.7125    0.20    0.80
+   2           0.3000   0.2000    0.80    0.20
+crude  A=0.4080  B=0.6100  diff=-0.2020  (B 更好)
+decompose: effect=+0.1055 + composition=-0.3075 = -0.2020
+common weights w=[0.5, 0.5]
+standardized A=0.5700  B=0.4563  diff=+0.1137  (A 更好)</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">mu / sigma^2 / sigma</span> = 95.2964 / 1885.9391 / 43.4274，来自案例字段 <code>study_minutes_week</code> 的 mean=95.30、sd=43.43。程序先把随机数线性重标定到这两个数，保证「总体真值」与全站 15 章可对照；改 <code>MU, SD</code> 会整体平移或缩放，但不改变结论结构。</p>
+    <p><span class="ci-k">2967/12000 = 0.2472</span> 是只回访「学习时长不小于 $Q_3=125.1$」的学员所占比例，正好约四分之一，与案例 <code>q3=125.1</code> 对应；<code>CUT</code> 调高，回访人群更少、更极端，$b$ 会更大。</p>
+    <p><span class="ci-k">mu_sel=150.5769</span> 是回访人群的平均学习时长，比总体真值高 <code>b=+55.2805</code> 分钟——这就是选择偏差，且它与 $n$ 完全无关。<span class="ci-k">bias^2=3055.9322</span> 是 $\mathrm{MSE}$ 的常数地板；<span class="ci-k">var_sel=454.9466</span> 是方差项的分子。</p>
+    <p><span class="ci-k">表格四行</span>：<code>var_sel/n</code> 从 15.1649 降到 0.0758，严格按 $1/n$；<code>MSE=sum</code> 列因此从 3071.0970 只降到 3056.0080，几乎不动——它已收敛到 $b^2$。对照 <code>MSE_mc_srs</code> 一列从 58.7842 降到 0.3475，说明<strong>同一份总体、同样增大 $n$，只要抽样无偏，误差就能趋近 0</strong>。差异的全部来源就是抽样机制，而非样本量。</p>
+    <p><span class="ci-k">MSE_mc_biased 与 MSE=sum 的微小出入</span>（如 $n=30$ 时 3098.14 对 3071.10）来自蒙特卡洛重复次数 <code>R=300</code> 的抽样抖动；把 R 调大两列会更贴合，公式列永远是精确值。这是「模拟验证恒等式」而非「用模拟替代公式」。</p>
+    <p><span class="ci-k">Part 2 的分层表</span>：<code>p_A=(0.84,0.30)</code> 与 <code>p_B=(0.7125,0.20)</code> 逐层都是 A 更高，但权重 <code>w_A=(0.2,0.8)</code>、<code>w_B=(0.8,0.2)</code> 相差极大——A 八成是难转化的新用户，B 八成是易转化的老用户。<span class="ci-k">crude 0.4080 对 0.6100</span> 是合并率，看似 B 大幅领先；<span class="ci-k">effect=+0.1055</span> 是层内真实优势之和，<span class="ci-k">composition=-0.3075</span> 是构成拖拽，两者相加恰为 <code>diff=-0.2020</code>，与合并率差值逐位吻合，验证了分解恒等式。</p>
+    <p><span class="ci-k">standardized 0.5700 对 0.4563</span>：改用共同权重 $w=(0.5,0.5)$ 后差值变为 $+0.1137$，结论翻回 A 更好。何时会变？只要改动 <code>A</code>/<code>B</code> 里任何一层的分子或分母，$p$、$w$、合并率、标准化率都会跟着变；但只要两组权重相同，反转就永远不会出现——这正是关键结论的可复现版本。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>概率抽样设计与偏差—方差诊断：给出入样概率、权重与设计方差，把总误差拆成 $\mathrm{Bias}^2$ 与 $\mathrm{Var}$，判断「加样本」是否有效；<strong>不做</strong>因果识别、不做模型拟合、也不自动修正未知的混杂。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：可枚举抽样框（单元 ID + 分层/群标签 + 目标变量的测量尺度）、允许误差 $e$、随机种子；输出：样本 ID 集合、每单元权重 $w_i=1/\pi_i$、加权均值 $\hat\mu$、设计方差与标准误、设计效应 deff、回收漏斗。量纲与原变量一致，方差为原量纲平方。</td></tr>
+    <tr><th>适用场景</th><td>总体推断（民调、质检、完课率估计）、训练／评测集划分、A/B 流量分配、模型评测集抽样、标注任务分派；凡是「只能看到部分数据却要对整体下结论」的场合。</td></tr>
+    <tr><th>关键参数</th><td>样本量 $n$（误差按 $1/\sqrt{n}$ 缩小）；分层变量与层数 $H$（与目标变量越相关收益越大，默认比例分配）；群内大小 $m$ 与组内相关 $\rho$（决定 deff）；截断阈值 $c$（决定选择偏差 $b$，越严偏差越大）；随机种子（决定可复现性）。</td></tr>
+    <tr><th>边界条件</th><td>在抽样框覆盖不全、或存在未观测混杂与未知无回答机制的条件下，本方法不适用，应改用多渠道覆盖 + 追访 + 后分层／倾向得分加权（偏差校正）或随机化实验；在只需描述手头样本、不需外推时，应改用描述统计（模块 02）而非抽样推断。</td></tr>
+    <tr><th>常见问题</th><td>① 把「样本量大」当成「结论可靠」；② 整群抽样把问卷份数当独立样本量；③ 忽略回收率与无回答偏差；④ 分层变量选错却以为精度一定提升。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>样本量翻一倍，误差会减半吗？</summary><div class="faq-a">不会。对<strong>无偏</strong>估计量，$\mathrm{MSE}=\sigma^2/n$，标准误按 $1/\sqrt{n}$ 缩小，$n$ 翻倍只让误差降到原来的 $1/\sqrt{2}\approx 0.707$；想误差减半要 $n$ 变四倍。而对<strong>有偏</strong>估计量，$\mathrm{MSE}=b^2+\sigma_{\mathrm{sel}}^2/n$，$n$ 翻倍只动第二项，总误差几乎不变——代码实验 Part 1 的表格就是这句话的数值版。</div></details>
+  <details><summary>分层抽样为什么能降方差？是不是分层越细越好？</summary><div class="faq-a">因为分层把「层与层之间的差异」从抽样波动里固定掉了，方差只剩各层内部波动的加权和（见算法第六步：$340.18 \to 114.84$）。但层数不是越多越好：每层都要有样本，层太细会导致某些层 $n_h$ 极小甚至为 0，反而放大方差并增加无回答风险；且分层变量必须与目标变量相关，按门牌号尾数分层几乎无收益。</div></details>
+  <details><summary>整群抽样收了 1000 份问卷，能写成 n=1000 吗？</summary><div class="faq-a">不能。群内个体相似（组内相关 $\rho \gt 0$），有效样本量约为 $n/\mathrm{deff}$，其中 $\mathrm{deff}=1+(m-1)\rho$。算法第六步里名义 $n=4$ 的整群抽样方差是同样本量 SRS 的 $4.97$ 倍，有效样本量不到 1。报告时必须同时给出群数、deff 与设计方差，否则标准误会被严重低估，置信区间虚假地窄。</div></details>
+  <details><summary>做了加权，是不是就把偏差修好了？</summary><div class="faq-a">只对「已观测且入样概率已知」的偏差有效，例如覆盖偏差、按设计不等概率抽样、可追踪的无回答。对未观测混杂、未知的响应机制、以及测量口径本身的系统偏移，加权修不了——它们仍在 $\mathrm{Bias}^2$ 里。此时应改用随机化实验、追访不响应者、或后分层／倾向得分／工具变量，并在报告里明说哪些偏差已被处理、哪些没有。</div></details>
+  <details><summary>随机化能修掉测量偏差吗？</summary><div class="faq-a">不能。随机化切断的是「处理 $X$ 与混杂 $Z$」之间的关联（#s5 的因果结构），它让两组构成可比；但如果仪器整体偏高 2 个单位、或问卷措辞引导回答，两组会一起偏高，偏差项依然存在。测量偏差要靠校准、重复测量、盲法与统一口径解决，属于采样链路的「测量环节」，不在随机化的职责范围内。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">某估计量偏差 $b=3$、方差 $\mathrm{Var}=4/n$。当 $n=100$ 时，$\mathrm{MSE}$ 等于多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 9.04</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 0.04</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 9.00</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. 13.00</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mathrm{MSE}=b^2+\mathrm{Var}=3^2+4/100=9+0.04=9.04$。容易错选 C（漏了方差项）或 B（漏了偏差项）；偏差的平方 9 是地板，与 $n$ 无关。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">只回访「学习时长不低于 Q3」的学员，把样本量从 1 万增到 100 万，样本均值会怎样？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 逐渐趋近全体学员的真实均值</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 逐渐趋近「回访人群」的均值，与真值保持固定差距</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 收敛到 0</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 随机乱跳，没有极限</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：抽样框被换成子总体，估计量收敛到 $\mu_{\mathrm{sel}}$ 而非 $\mu$，差距 $b=\mu_{\mathrm{sel}}-\mu$ 是常数。代码实验 Part 1 中 $\mu_{\mathrm{sel}}=150.5769$、$\mu=95.2964$，差距 $+55.2805$ 不随 $n$ 改变。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">若每一层方案 A 的率都不低于方案 B，用同一套共同权重做标准化后，结论是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 仍可能反转，取决于样本量</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 一定不反转，A 不输</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 等于合并率</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 无法计算</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$P_A^{*}-P_B^{*}=\sum_k w_k(p_{A,k}-p_{B,k})$，是若干非负数之和，必 $\ge 0$。反转只可能来自两组权重不同；随机化在期望上令权重相同，等价于自动标准化。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">下列哪一种做法能让两组在各层的构成权重在期望上相等，从而支持因果结论？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 把样本量增大到原来的十倍</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 随机分配处理（随机对照实验）</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 只分析报告中最有利的那一层</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 在写字楼门口拦访更多人</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：随机化使处理 $X$ 与混杂 $Z$ 独立，于是 $E[w_{A,k}]=E[w_{B,k}]$，构成项期望为 0（#s5）。A 只缩小方差、不消偏差；C 属于挑层报告（数据窥探）；D 是方便抽样，偏差更大。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">整群抽样中群内个体高度相似（$\rho$ 接近 1）时，有效样本量与名义样本量的关系是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 有效样本量大于名义样本量</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 有效样本量小于名义样本量</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 两者恒相等</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 与设计效应 deff 无关</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mathrm{deff}=1+(m-1)\rho \gt 1$，有效样本量约 $n/\mathrm{deff}$，故小于名义样本量。算法第六步中 $\rho$ 极大时名义 $n=4$ 的方差是 SRS 的 $4.97$ 倍，等于只提供了不到一个独立信息。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure class="figure-placeholder" id="fig-classic-m01-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 1-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">Anscombe 四重奏：四组散点与同一条回归线</span>
+    <span class="fig-note">四组数据均值、方差、相关系数与线性回归系数几乎相同，散点形态却分别是线性、曲线、离群点与垂直堆叠。用于说明「先看图再算统计量」不是建议而是必需。</span>
+    <span class="fig-src">来源：Anscombe, F. J. (1973), Graphs in Statistical Analysis, The American Statistician 27(1):17–21；本站资源库概念核对条目 s10 · 查看：<a href="https://www.statlearning.com/" target="_blank" rel="noopener">https://www.statlearning.com/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+<h2 id="d-figures">本章图示汇总</h2>
+<figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s8">8 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>判断下列变量的测量尺度：① 鞋码；② 电话号码；③ 体重（kg）；④ 血型；⑤ 温度（K，开尔文）；⑥ 比赛排名。</li>
+          <li>某新闻称「调查显示 90% 的人支持新政策」，样本来自某网站的自愿投票。这个结论可靠吗？为什么？</li>
+          <li>一项研究发现「使用某学习 App 的学生成绩更高」。请给出至少两种可能的混杂解释，并说明如何设计才能支持因果结论。</li>
+          <li>某医院统计显示：该院去年心脏病手术死亡率从 8% 降到 5%。是否说明手术技术提升了？（提示：想想转诊与轻症比例的变化）</li>
+          <li>用「样本统计量是随机的、总体参数是固定的」这句话，解释为什么报告「转化率 3.2%」必须附带样本量。</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> ① 鞋码：有序（间距不严格相等，实践中常近似比率）；② 电话号码：名义；③ 体重：比率；④ 血型：名义；⑤ 开尔文温度：比率（绝对零度有意义）；⑥ 排名：有序。</p>
+            <p><strong>2.</strong> 不可靠。自愿投票是方便样本，愿意投票的人可能更关心该政策或观点更强；且重复投票、样本自选择都会造成系统偏差。样本量大也救不了偏差。</p>
+            <p><strong>3.</strong> 混杂解释：① 学习动机强的学生更可能主动用 App（动机 → 使用与成绩）；② 家庭经济条件好的学生既有设备使用 App，又有更多教育资源。设计方案：随机分配学生使用/不使用 App（RCT），比较成绩差异；或观测数据中控制动机、家庭背景等协变量。</p>
+            <p><strong>4.</strong> 不一定。可能是因为更多轻症患者接受了手术（适应证扩大），导致总体死亡率下降，而技术没变。应按手术风险等级分层比较死亡率。</p>
+            <p><strong>5.</strong> 总体转化率 $p$ 是固定常数；每次抽样得到的 $\hat{p}$ 会波动。$n=100$ 时 $\hat{p}=3.2\%$ 与 $n=100\,000$ 时的 $3.2\%$，可信程度天差地别——不报样本量等于隐瞒关键信息。定量刻画见模块 05。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 9 ===== -->
+      <h2 id="s9">9 · 本章小结</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>概念</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>描述 vs 推断</td><td>描述总结已见数据；推断从样本推广到总体并量化不确定性</td></tr>
+            <tr><td>参数 vs 统计量</td><td>参数是总体真值（未知），统计量是样本计算值（可算、会波动）</td></tr>
+            <tr><td>测量尺度</td><td>名义/有序/区间/比率决定哪些运算合法；勿给分类数据算均值</td></tr>
+            <tr><td>随机抽样</td><td>随机化保证代表性；系统偏差无法靠加大样本量消除</td></tr>
+            <tr><td>观察 vs 实验</td><td>观察发现关联；随机实验支持因果</td></tr>
+            <tr><td>六大陷阱</td><td>相关≠因果、幸存者偏差、辛普森悖论、回归均值、p-hacking、图表误导</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：数据理解与偏差识别。</strong>判断每个字段的测量尺度；识别自愿报名样本带来的选择偏差与混杂。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="current" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning with Python</a> <span class="muted small">（2023 · 已核验）</span><span class="fr-why">为什么读：第 1–2 章用大量图形说明「描述先于建模」，与本章测量尺度、图形误导直接对应。</span></span></div><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="../resources.html#r-b16">Computer Age Statistical Inference</a> <span class="muted small">（2016 · 权威共识）</span><span class="fr-why">为什么读：第 1 章梳理统计推断的思想史，帮助理解「随机化为何是因果推断的基石」。</span></span></div><div class="fr-item"><span class="fr-tag">理论</span><span class="fr-body"><a href="../resources.html#r-t13">潜在结果框架（Rubin 因果模型）</a> <span class="muted small">（1974 · 权威共识）</span><span class="fr-why">为什么读：潜在结果框架的原始概念条目，为模块 08 的因果推断埋下术语锚点。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div class="muted small">继续学习下一章，或标记本章完成以记录进度。</div>
+        <button class="btn primary" data-complete-btn="m01">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="../stages/statistics.html"><span class="dir">← 阶段 1 总览</span><span class="ttl">01 · 统计学</span></a>
+        <a class="next" href="m02-descriptive.html"><span class="dir">下一篇 →</span><span class="ttl">02 · 描述统计与可视化</span></a>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索概念、公式、例题…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索章节、概念、公式或例题。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

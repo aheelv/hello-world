@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12 · 经典机器学习算法 · 统计 · 智能学习体系</title>
+<meta name="description" content="经典机器学习算法：算法地图与判别式/生成式、线性模型与正则化、逻辑回归与 softmax、朴素贝叶斯与 KNN、决策树分裂准则、SVM 与核方法、Bagging/Boosting 集成、聚类降维与嵌套交叉验证、概率校准与 Brier 分数。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m12" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 3 · <a href="../stages/machine-learning.html">机器学习</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l3">L3 进阶</span> · 10 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 09 · 上一篇：<a href="m09-ml-stats.html">09 · 机器学习的统计基础</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m13-deep-training.html">13 · 深度学习的训练范式</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m11-big-data.html">11 大数据分析的统计基础</a><span class="dep-arrow">→</span><a class="dep-node" href="m09-ml-stats.html">09 机器学习的统计基础</a><span class="dep-arrow">→</span><a class="dep-node current" href="m12-ml-algorithms.html">12 经典机器学习算法</a><span class="dep-arrow">→</span><a class="dep-node" href="m13-deep-training.html">13 深度学习的训练范式</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：逻辑回归, 决策树, 支持向量机, 核技巧, Bagging, Boosting, 集成学习, K 均值, 超参数</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>逻辑回归是「回归」还是「分类」？它的输出该如何解释？ <a class="q-anchor" href="#s2">→ 对应讲解</a></li><li>SVM 的核技巧为什么能避免显式高维计算？ <a class="q-anchor" href="#s5">→ 对应讲解</a></li><li>Bagging 与 Boosting 分别主要降低方差还是偏差？ <a class="q-anchor" href="#s6">→ 对应讲解</a></li><li>类别不平衡、代价敏感、校准不良，三者应分别用什么手段处理？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+      <article class="module" data-stage="s3">
+      <div class="inner">
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/machine-learning.html">阶段 3 · 机器学习</a> / 12 · 经典机器学习算法</div>
+        <h1>12 · 经典机器学习算法</h1>
+        <p class="lead">模块 09 给出了「训练即估计、评估即推断」的统计语言，本章把这套语言落到具体算法族上：每个模型无非是<strong>假设空间 + 损失函数 + 优化方式 + 评估协议</strong>四件事的不同选择。线性模型、树、SVM、集成、聚类各占一方，差别在于归纳偏置、损失形状与偏差-方差的账本怎么记。学完应能按任务选算法、按统计理由解释它为何有效，并在无泄漏的协议下给出可信结论。</p>
+        <div class="module-meta">
+          <span class="badge brand">阶段 3 · 机器学习</span>
+          <span class="badge info">L3 进阶</span>
+          <span class="badge">10 学时</span>
+          <span class="badge">前置：模块 09</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>用「任务 → 算法 → 损失 → 评估」四列地图定位任一经典算法，说清判别式与生成式的分界</li>
+          <li>从偏差-方差与先验分布两个角度解释岭、Lasso、弹性网为何能压方差或产生稀疏</li>
+          <li>手算逻辑回归概率与优势比、决策树的基尼与信息增益、SVM 的几何间隔</li>
+          <li>解释 Bagging 降方差、Boosting 降偏差的机制，并完成一轮 AdaBoost 权重更新</li>
+          <li>设计嵌套交叉验证与概率校准，避免选择偏差，正确报告 PCA 解释率与 Brier 分数</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 算法地图</h2>
+
+      <h3 id="s1-1">1.1 一个统一视图</h3>
+      <p>承接模块 09 的经验风险最小化 $\hat\theta=\arg\min_{\theta}\frac{1}{n}\sum_{i=1}^{n}L(y_i,f_\theta(x_i))$：换一个假设空间 $\mathcal{F}$、换一个损失 $L$、换一个正则项，就得到一个新算法。所谓「算法地图」就是把这四列对齐，避免「拿着随机森林去拟合一个本该线性可分的物理规律」这类归纳偏置错配。</p>
+
+      <h3 id="s1-2">1.2 监督、无监督、半监督</h3>
+      <ul>
+        <li><strong>监督学习</strong>：有标签 $y$，学 $P(Y\mid X)$ 或直接学判别函数；分类、回归。</li>
+        <li><strong>无监督学习</strong>：只有 $X$，学 $P(X)$ 或数据结构；聚类、降维、密度估计。</li>
+        <li><strong>半监督 / 自监督</strong>：少量标签 + 大量无标签，用一致性正则、伪标签或预训练任务把无标签数据的结构「借」给监督目标。</li>
+      </ul>
+
+      <h3 id="s1-3">1.3 判别式与生成式</h3>
+      <p><strong>判别式</strong>模型直接建模决策边界 $P(Y\mid X)$ 或 $f(X)$（逻辑回归、SVM、树、神经网络）；<strong>生成式</strong>模型先建模 $P(X\mid Y)$ 与 $P(Y)$，再用贝叶斯公式反推 $P(Y\mid X)$（LDA、朴素贝叶斯）。生成式在小样本、缺失数据与异常检测上有优势，判别式通常在大样本下渐近更准——这正是「偏差-方差」在两类模型上的分工。</p>
+      <div class="table-wrap"><table><thead><tr><th>任务</th><th>候选算法</th><th>典型损失</th><th>主要评估</th></tr></thead><tbody>
+        <tr><td>回归</td><td>线性 / 岭 / Lasso、回归树、GBDT</td><td>平方损失 $(y-\hat y)^{2}$</td><td>MSE、$R^{2}$、残差诊断</td></tr>
+        <tr><td>二分类</td><td>逻辑回归、SVM、朴素贝叶斯、树</td><td>交叉熵、合页损失、指数损失</td><td>AUC、F1、Brier、校准曲线</td></tr>
+        <tr><td>多分类</td><td>softmax 回归、随机森林、XGBoost</td><td>多类交叉熵</td><td>宏/微平均 F1、混淆矩阵</td></tr>
+        <tr><td>聚类</td><td>K-means、层次聚类、DBSCAN</td><td>簇内平方和、链接准则</td><td>轮廓系数、稳定性</td></tr>
+        <tr><td>降维</td><td>PCA、因子分析</td><td>重构误差 / 方差最大化</td><td>累计解释率、下游任务表现</td></tr>
+      </tbody></table></div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 线性模型家族</h2>
+
+      <h3 id="s2-1">2.1 从最小二乘到正则化</h3>
+      <p>普通最小二乘 $\hat\beta^{\text{OLS}}=(X^{\top}X)^{-1}X^{\top}y$ 在高维或共线时方差极大。正则化在损失上加惩罚，把系数向 0 收缩：</p>
+      <p>$$ \hat\beta_{\text{ridge}}=\arg\min_{\beta}\Bigl\{\sum_{i=1}^{n}(y_i-x_i^{\top}\beta)^{2}+\lambda\|\beta\|^{2}\Bigr\} $$</p>
+      <p>岭用 $\ell_2$、Lasso 用 $\ell_1$、弹性网是二者凸组合。$\lambda$ 增大 → 系数被压向 0 → <strong>偏差上升、方差下降</strong>；调 $\lambda$ 就是在偏差-方差曲线上找最低点（模块 09 第 2 节）。</p>
+
+      <h3 id="s2-2">2.2 先验视角</h3>
+      <p>正则化等价于最大后验估计（MAP）：<strong>岭</strong>对应系数的高斯先验 $\beta_j\sim N(0,\tau^{2})$，$\lambda=\sigma^{2}/\tau^{2}$，先验越「紧」收缩越强；<strong>Lasso</strong> 对应拉普拉斯先验，其尖峰在 0 处使解恰好落在坐标轴上，于是产生<strong>稀疏性</strong>与变量筛选。这个视角把「惩罚项」翻译成「对参数的先验信念」。</p>
+      <div class="table-wrap"><table><thead><tr><th>模型</th><th>惩罚</th><th>解的性质</th><th>适用</th></tr></thead><tbody>
+        <tr><td>OLS</td><td>无</td><td>无偏但方差大</td><td>$n &gt;  p$、无共线</td></tr>
+        <tr><td>岭 Ridge</td><td>$\lambda\|\beta\|^{2}$</td><td>系数整体收缩，无稀疏</td><td>共线、预测优先</td></tr>
+        <tr><td>Lasso</td><td>$\lambda\|\beta\|_1$</td><td>部分系数恰为 0</td><td>高维、要解释 / 筛变量</td></tr>
+        <tr><td>弹性网</td><td>$\lambda\bigl(\frac{1-\alpha}{2}\|\beta\|^{2}+\alpha\|\beta\|_1\bigr)$</td><td>收缩 + 稀疏，成组选变量</td><td>$p &gt;  n$、变量相关成组</td></tr>
+      </tbody></table></div>
+
+      <h3 id="s2-3">2.3 正交设计下的解析解</h3>
+      <p>若 $X^{\top}X=\mathrm{diag}(d_1,\dots,d_p)$，岭解可逐坐标写出 $\hat\beta^{\text{ridge}}_j=\frac{d_j}{d_j+\lambda}\hat\beta^{\text{OLS}}_j$：收缩因子只由 $d_j$ 与 $\lambda$ 决定，与 $y$ 无关，因此最容易看清偏差与方差如何此消彼长。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 12.1</span>
+          <span class="ex-title">岭回归的收缩、偏差与方差手算</span>
+        </div>
+        <div class="example-body">
+          <p>正交设计 $X^{\top}X=\mathrm{diag}(4,\ 4)$，OLS 估计 $\hat\beta^{\text{OLS}}=(2.0,\ -1.0)$，误差方差 $\sigma^{2}=1$。① 取 $\lambda=4$，求岭估计；② 求 OLS 与岭的系数方差，说明方差缩小几倍；③ 求岭估计的偏差；④ 若同样数据用 Lasso 软阈值 $\hat\beta_j=\mathrm{sign}(\hat\beta^{\text{OLS}}_j)\max\{|\hat\beta^{\text{OLS}}_j|-\lambda_{L},\ 0\}$ 且 $\lambda_{L}=1$，结果是什么，说明稀疏性。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：岭估计</strong></p>
+              $$ \text{收缩因子}=\frac{d_j}{d_j+\lambda}=\frac{4}{4+4}=0.5 $$
+              $$ \hat\beta^{\text{ridge}}=0.5\times(2.0,\ -1.0)=(\mathbf{1.0},\ -0.5) $$
+              <p><strong>第二步：方差</strong></p>
+              $$ \mathrm{Var}(\hat\beta^{\text{OLS}}_j)=\frac{\sigma^{2}}{d_j}=\frac{1}{4}=0.25 $$
+              $$ \mathrm{Var}(\hat\beta^{\text{ridge}}_j)=\frac{\sigma^{2}d_j}{(d_j+\lambda)^{2}}=\frac{1\times 4}{8^{2}}=\frac{4}{64}=0.0625 $$
+              <p>方差缩小到 $0.0625/0.25=\mathbf{1/4}$，正是收缩因子 $0.5$ 的平方。</p>
+              <p><strong>第三步：偏差</strong></p>
+              $$ \mathrm{E}[\hat\beta^{\text{ridge}}_j]=0.5\,\beta_j\ \Longrightarrow\ \mathrm{Bias}=-0.5\,\beta_j $$
+              <p>即 $\beta=(2,-1)$ 时偏差为 $(-1.0,\ +0.5)$。<strong>代价明账</strong>：每个坐标方差省下 $0.1875$，但引入平方偏差 $1.0^{2}=1$ 与 $0.5^{2}=0.25$。$\lambda$ 是否划算取决于真系数大小——真系数本来就接近 0 时，岭稳赚；真系数很大时，偏差可能吃掉全部收益。这就是「用验证集调 $\lambda$」的统计理由。</p>
+              <p><strong>第四步：Lasso 软阈值</strong></p>
+              $$ \hat\beta_1=\mathrm{sign}(2.0)\max\{2.0-1,\ 0\}=1.0,\qquad \hat\beta_2=\mathrm{sign}(-1.0)\max\{1.0-1,\ 0\}=0 $$
+              <p>第二个系数被<strong>精确压到 0</strong>，模型只剩一个变量——Lasso 的稀疏性来自 $\ell_1$ 惩罚在 0 处的尖点（拉普拉斯先验），而岭只会把 $-1.0$ 缩成 $-0.5$ 却不会归零。高维筛变量时这个差别是选择依据。</p>
+              <p><strong>易错提示：</strong>① 正则化前未标准化特征，$\ell_1/\ell_2$ 惩罚对量纲大的变量不公平；② 把「岭能筛变量」当真（岭只收缩不归零）；③ 用训练集上的 MSE 挑 $\lambda$（一定选中 $\lambda=0$），必须靠验证集或交叉验证；④ 混淆 $\lambda$ 与弹性网混合参数 $\alpha$，二者是不同旋钮。</p>
+              <p><strong>应用关联：</strong>$\lambda$ 与「先验精度」「权重衰减」「早停」属于同一类复杂度控制；Lasso 的稀疏性对应可解释性与特征工程成本。在表格数据上，带正则的线性模型常常是 GBDT 之前最值得先跑的强基线。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 逻辑回归与多分类 softmax</h2>
+
+      <h3 id="s3-1">3.1 对数几率与交叉熵</h3>
+      <p>逻辑回归不直接拟合概率，而是拟合<strong>对数几率（log-odds）</strong>：$\log\frac{p}{1-p}=w^{\top}x+b$。取 sigmoid 反解即得到概率；用极大似然估计等价于最小化交叉熵。</p>
+      <div class="formula-box">
+        <div class="f-name">逻辑回归与 softmax</div>
+        $$ p(y=1\mid x)=\frac{1}{1+\exp(-w^{\top}x-b)},\qquad \log\frac{p}{1-p}=w^{\top}x+b $$
+        $$ L(w)=-\frac{1}{n}\sum_{i=1}^{n}\bigl[y_i\log p_i+(1-y_i)\log(1-p_i)\bigr] $$
+        $$ p_k=\frac{\exp(z_k)}{\sum_{j=1}^{K}\exp(z_j)},\qquad L_{CE}=-\sum_{k=1}^{K}y_k\log p_k $$
+        <div class="f-note">
+          $K$ 类时把线性得分 $z_k$ 经 softmax 归一为概率；softmax 是 sigmoid 的多类推广，交叉熵是伯努利/多项分布的最大似然负对数。<strong>系数 $\beta_j$ 的含义是对数几率的变化量</strong>，$\exp(\beta_j)$ 才是优势比。
+        </div>
+      </div>
+
+      <h3 id="s3-2">3.2 优势比与可解释性</h3>
+      <p>优势（odds）$=p/(1-p)$；某特征增加 1 单位，优势乘以 $\exp(\beta_j)$，这个倍数叫<strong>优势比 OR</strong>，与 $x$ 的取值无关——这正是线性对数几率假设的便利与局限。注意 $\exp(\beta_j)$ 不等于「概率乘以多少」：概率被压在 $[0,1]$ 里，靠近 1 时同样的 OR 对应的概率增量很小。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 12.2</span>
+          <span class="ex-title">逻辑回归概率与优势比计算</span>
+        </div>
+        <div class="example-body">
+          <p>已拟合模型 $\log\frac{p}{1-p}=-2+0.8x_1-0.5x_2$。样本 $(x_1,x_2)=(3,1)$。① 求线性得分 $z$ 与预测概率 $p$（取 $\exp(0.1)\approx1.1052$）；② 求优势 odds；③ 若 $x_1$ 增加 1 个单位，优势比 OR 是多少，新的优势与概率是多少；④ 分类阈值由 $0.5$ 改为 $0.4$，该样本的预测类别如何变化。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：线性得分与概率</strong></p>
+              $$ z=-2+0.8\times 3-0.5\times 1=-2+2.4-0.5=-0.1 $$
+              $$ p=\frac{1}{1+\exp(-z)}=\frac{1}{1+\exp(0.1)}=\frac{1}{2.1052}\approx\mathbf{0.4750} $$
+              <p><strong>第二步：优势</strong></p>
+              $$ \text{odds}=\frac{p}{1-p}=\exp(z)=\exp(-0.1)\approx\mathbf{0.9048} $$
+              <p>校验：$0.4750/0.5250\approx0.9048$，与 $\exp(z)$ 一致——这就是「对数几率是线性的」的直接结果。</p>
+              <p><strong>第三步：优势比</strong></p>
+              $$ OR=\exp(\beta_1)=\exp(0.8)\approx\mathbf{2.2255} $$
+              <p>$x_1$ 从 3 到 4 使 $z$ 从 $-0.1$ 升到 $0.7$，新优势 $=\exp(0.7)=2.0138$，恰为 $0.9048\times2.2255=2.0138$ ✓；新概率 $=\frac{2.0138}{1+2.0138}\approx0.6682$。注意概率只从 $0.475$ 升到 $0.668$（增量 $0.193$），而优势翻了 2.23 倍——<strong>OR 不是概率比</strong>。</p>
+              <p><strong>第四步：阈值变化</strong></p>
+              <p>$p=0.475 &lt; 0.5$ 时判负类；阈值降到 $0.4$ 后 $0.475 &gt; 0.4$，改判正类。阈值应按业务代价（漏报成本 vs 误报成本）在验证集上确定，绝不能在测试集上反复挑。</p>
+              <p><strong>易错提示：</strong>① 把 $\exp(\beta_j)$ 读成「概率提升倍数」；② 忽略 $x_2$ 的负系数与量纲，跨变量比较 $\beta$ 大小（未标准化时系数不可直接比重要性）；③ 把 sigmoid 输出当作已校准概率——逻辑回归通常校准尚可，但树与集成模型往往过度自信，需 Platt / isotonic 校准（见第 8 节）；④ 类别极不均衡时仍用 $0.5$ 阈值。</p>
+              <p><strong>应用关联：</strong>风控评分卡、医学风险模型都靠「系数 = 对数几率增量、$\exp(\beta)$ = 优势比」提供可解释性；softmax 则是神经网络分类头的标准输出，交叉熵与模块 10 的语言模型目标同源。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ①：概率输出不等于「可信的概率」
+        </div>
+        <p>逻辑回归、朴素贝叶斯、树模型给出的都是<strong>模型分数</strong>，是否等于真实频率需要校准检验（可靠性图、Brier 分数）。排序好（AUC 高）与概率准是两件事；把未校准的 0.9 直接当「90% 会发生」去定价或做风控阈值，会系统性误判。校准必须用独立校准集，不能在同一批数据上既校准又评估。</p>
+      </div>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 判别分析、朴素贝叶斯与 KNN</h2>
+
+      <h3 id="s4-1">4.1 生成式路线</h3>
+      <p>生成式模型先假设类条件密度 $P(X\mid Y=k)$，再用贝叶斯公式</p>
+      <p>$$ P(Y=k\mid X=x)=\frac{\pi_k f_k(x)}{\sum_{j=1}^{K}\pi_j f_j(x)} $$</p>
+      <p>分类。LDA 假设各类是<strong>共享协方差矩阵</strong>的高斯分布，把后验的对数比化简成 $x$ 的线性函数，于是决策边界是线性的；QDA 允许各类协方差不同，边界是二次的；朴素贝叶斯进一步假设特征在给定类别下条件独立，$f_k(x)=\prod_j P(x_j\mid Y=k)$，用极强的偏差换取极低方差，在文本与高维小样本上反而稳健。</p>
+
+      <h3 id="s4-2">4.2 贝叶斯最优分类器与 KNN</h3>
+      <p>若真实分布已知，最优决策是取后验最大的类（贝叶斯最优分类器），其错误率是不可约下限。KNN 不估计分布，直接用局部投票近似这个规则：在 $x$ 的 $k$ 个近邻里多数表决。<strong>维度灾难</strong>是它的命门：维度升高后「邻域」体积相对整个空间几乎为空，所有点都变得几乎等距，距离度量失去分辨力，$k$ 近邻不再是局部。</p>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>生成式（LDA / 朴素贝叶斯）</th><th>判别式（逻辑回归 / SVM）</th></tr></thead><tbody>
+        <tr><td>建模对象</td><td>$P(X\mid Y)$ 与 $P(Y)$</td><td>$P(Y\mid X)$ 或决策边界</td></tr>
+        <tr><td>假设强度</td><td>强（分布族 + 条件独立）</td><td>弱（只定边界形状）</td></tr>
+        <tr><td>小样本</td><td>方差低，常更稳</td><td>易过拟合</td></tr>
+        <tr><td>大样本</td><td>模型错配导致偏差上限</td><td>渐近更准</td></tr>
+      </tbody></table></div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ②：维度灾难不是「特征多一点」那么简单
+        </div>
+        <p>高维下 KNN 的距离集中、朴素贝叶斯的条件独立假设被违背、LDA 的协方差估计需要 $n &gt;  p^{2}$ 才稳定，三者都会静默失效。<strong>先降维或加正则再谈距离</strong>；也不要因为朴素贝叶斯「朴素」就轻视它——在文本分类里，强假设带来的低方差常常胜过更「正确」但高方差的模型。</p>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 决策树与分裂准则</h2>
+
+      <h3 id="s5-1">5.1 分裂准则</h3>
+      <p>树用轴平行切分递归地降低节点不纯度。CART 用<strong>基尼不纯度</strong>，ID3/C4.5 用<strong>信息熵与信息增益</strong>；分裂收益 = 父节点不纯度减去子节点不纯度的加权和。</p>
+      <div class="formula-box">
+        <div class="f-name">基尼不纯度与信息增益</div>
+        $$ G(t)=1-\sum_{k}p_k^{2},\qquad \Delta G=G(t)-\frac{n_L}{n}G(t_L)-\frac{n_R}{n}G(t_R) $$
+        $$ H(t)=-\sum_{k}p_k\log_2 p_k,\qquad IG=H(t)-\sum_{j\in\{L,R\}}\frac{n_j}{n}H(t_j) $$
+        <div class="f-note">
+          $p_k$ 是节点中第 $k$ 类占比，$n_L,n_R$ 为左右子节点样本数。信息增益偏向取值多的特征（切得越碎熵降越多），C4.5 用<strong>增益率</strong>除以分裂信息来校正。基尼计算更快、无需 $\log$，是 CART 与多数 GBDT 的默认。
+        </div>
+      </div>
+
+      <h3 id="s5-2">5.2 剪枝、单调性与可解释性</h3>
+      <p>完全生长的树会把噪声也切进去（高方差）。<strong>预剪枝</strong>限制深度、叶节点最小样本数、最小增益；<strong>后剪枝</strong>先长满再按代价复杂度 $\min$ 目标回剪，通常更稳。树的独特优势是可解释性与对<strong>单调约束</strong>的支持：若业务要求「收入越高额度越高」，可强制分裂只沿单调方向；同时树对特征量纲、异常值不敏感，却对训练集的微小扰动敏感——这正是 Bagging 与随机森林的用武之地。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 12.3</span>
+          <span class="ex-title">基尼与信息增益手算：选哪个划分</span>
+        </div>
+        <div class="example-body">
+          <p>父节点 10 个样本：6 正（+）、4 负（−）。候选划分 X：左 5 个（4 正 1 负）、右 5 个（2 正 3 负）；候选划分 Y：左 5 个（5 正 0 负）、右 5 个（1 正 4 负）。取 $\log_2 0.6\approx-0.737$，$\log_2 0.4\approx-1.322$，$\log_2 0.8\approx-0.322$，$\log_2 0.2\approx-2.322$。① 算父节点基尼与熵；② 分别算 X、Y 的加权基尼与基尼增益；③ 算 X、Y 的信息增益；④ 两个准则各选谁，结论是否一致。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：父节点不纯度</strong></p>
+              $$ G_{\text{父}}=1-0.6^{2}-0.4^{2}=1-0.36-0.16=\mathbf{0.48} $$
+              $$ H_{\text{父}}=-0.6\log_2 0.6-0.4\log_2 0.4\approx 0.6\times0.737+0.4\times1.322=\mathbf{0.971} $$
+              <p><strong>第二步：划分 X 的基尼</strong></p>
+              $$ G_X^{L}=1-0.8^{2}-0.2^{2}=0.32,\qquad G_X^{R}=1-0.4^{2}-0.6^{2}=0.48 $$
+              $$ \bar G_X=0.5\times0.32+0.5\times0.48=0.40,\qquad \Delta G_X=0.48-0.40=\mathbf{0.08} $$
+              <p><strong>第三步：划分 Y 的基尼</strong></p>
+              $$ G_Y^{L}=1-1^{2}-0^{2}=0,\qquad G_Y^{R}=1-0.2^{2}-0.8^{2}=0.32 $$
+              $$ \bar G_Y=0.5\times0+0.5\times0.32=0.16,\qquad \Delta G_Y=0.48-0.16=\mathbf{0.32} $$
+              <p><strong>第四步：信息增益</strong></p>
+              <p>划分 X：$H_X^{L}=-(0.8\log_2 0.8+0.2\log_2 0.2)\approx0.8\times0.322+0.2\times2.322=0.722$；$H_X^{R}=-(0.4\log_2 0.4+0.6\log_2 0.6)\approx0.971$。</p>
+              $$ IG_X=0.971-\bigl(0.5\times0.722+0.5\times0.971\bigr)=0.971-0.8465=\mathbf{0.1245} $$
+              <p>划分 Y：$H_Y^{L}=0$（纯节点），$H_Y^{R}\approx0.722$。</p>
+              $$ IG_Y=0.971-0.5\times0.722=\mathbf{0.610} $$
+              <p><strong>第五步：结论</strong></p>
+              <p>基尼增益 $0.32 &gt; 0.08$、信息增益 $0.610 &gt; 0.1245$，<strong>两个准则一致选划分 Y</strong>：它把一个子节点切成了纯类。这说明好划分通常对具体准则不敏感；但在多分类、类别不均衡或连续特征阈值搜索时，基尼与熵可能给出不同排序，实务上以验证集表现为准。</p>
+              <p><strong>易错提示：</strong>① 忘记按 $n_L/n,\ n_R/n$ <strong>加权</strong>，直接平均子节点不纯度；② 信息增益未用增益率校正，偏爱取值多的 ID 类特征（甚至把用户 ID 当分裂点）；③ 用训练集上的增益挑树深度却不剪枝，得到高方差的「记忆树」；④ 连续特征只在少数分位点找阈值，漏掉最优切点。</p>
+              <p><strong>应用关联：</strong>CART 用基尼、C4.5 用增益率、XGBoost/LightGBM 用带正则的二阶梯度增益，本质都是「父不纯度 − 子不纯度加权和」这一模板的变体。理解手算，就能读懂分裂输出与特征重要性。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 6 ===== -->
+      <h2 id="s6">6 · 支持向量机与核方法</h2>
+
+      <h3 id="s6-1">6.1 最大间隔与对偶</h3>
+      <p>SVM 不只要分开两类，还要<strong>把间隔拉到最大</strong>：固定函数间隔 $\min_i y_i(w^{\top}x_i+b)=1$ 后，几何间隔为 $1/\|w\|$，于是最大化间隔等价于最小化 $\frac{1}{2}\|w\|^{2}$。软间隔引入松弛与惩罚 $C$，在「间隔宽度」与「误分类代价」间权衡；拉格朗日对偶把问题写成只含内积 $x_i^{\top}x_j$ 与乘子 $\alpha_i$ 的形式，为核技巧打开大门。</p>
+      <div class="formula-box">
+        <div class="f-name">SVM 原始问题、RBF 核与判定函数</div>
+        $$ \min_{w,b}\ \frac{1}{2}\|w\|^{2}\quad \text{s.t.}\quad y_i\bigl(w^{\top}x_i+b\bigr)\geq 1 $$
+        $$ K(x,z)=\exp\Bigl(-\gamma\|x-z\|^{2}\Bigr),\qquad f(x)=\sum_{i=1}^{n}\alpha_i y_i K(x_i,x)+b $$
+        <div class="f-note">
+          $\mathrm{RBF}$ 核把样本隐式映射到无穷维特征空间，$\gamma$ 控制单个支持向量的影响范围：$\gamma$ 过大 → 边界崎岖、过拟合；过小 → 欠拟合。非线性核的容量可用 <strong>VC 维</strong>刻画（二维线性分类器 VC 维 $=3$），核矩阵越「灵活」，需要的样本越多。只有 $\alpha_i &gt; 0$ 的支持向量参与最终判定，解是稀疏的。
+        </div>
+      </div>
+
+      <h3 id="s6-2">6.2 核技巧与计算代价</h3>
+      <p>核技巧的精髓是：<strong>永远不显式计算高维映射 $\phi(x)$</strong>，只算 $K(x_i,x_j)=\phi(x_i)^{\top}\phi(x_j)$。代价是训练要存 $n\times n$ 核矩阵，$n$ 到十万级就吃力；这也是大规模场景下线性 SVM 或随机特征近似更常用的原因。多分类需 OvR / OvO 组合，概率输出还要额外做 Platt 缩放。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 12.4</span>
+          <span class="ex-title">SVM 间隔计算与「缩放陷阱」</span>
+        </div>
+        <div class="example-body">
+          <p>二维线性 SVM 得超平面 $3x_1+4x_2-12=0$，即 $w=(3,4)$、$b=-12$；正类支持向量 $(3,1)$、负类支持向量 $(1,2)$ 满足函数间隔 $\pm1$。① 求 $\|w\|$ 与几何间隔；② 验证两个支持向量；③ 求点 $(4,3)$ 到超平面的距离并判断类别；④ 若把 $w,b$ 同乘 2 得到 $w'=(6,8),b'=-24$，几何间隔变了吗，若直接套 $2/\|w'\|$ 会错在哪。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：范数与间隔</strong></p>
+              $$ \|w\|=\sqrt{3^{2}+4^{2}}=5,\qquad \text{几何间隔}=\frac{2}{\|w\|}=\frac{2}{5}=\mathbf{0.4} $$
+              <p>单侧间隔（超平面到支持向量所在边界）为 $1/\|w\|=0.2$，两侧合计 $0.4$。</p>
+              <p><strong>第二步：验证支持向量</strong></p>
+              $$ (3,1):\ w^{\top}x+b=9+4-12=+1\ (y=+1)\ \checkmark $$
+              $$ (1,2):\ w^{\top}x+b=3+8-12=-1\ (y=-1)\ \checkmark $$
+              <p>两者函数间隔恰为 $\pm1$，正是规范化后的支持向量；决策边界 $3x_1+4x_2-12=0$ 位于它们正中间。</p>
+              <p><strong>第三步：点 $(4,3)$</strong></p>
+              $$ \frac{w^{\top}x+b}{\|w\|}=\frac{12+12-12}{5}=\frac{12}{5}=\mathbf{2.4} $$
+              <p>值为正且绝对值为 $2.4 &gt; 1$，判为正类且远离边界，不是支持向量。这里函数间隔是 12（远大于 1），说明它被正确分类且留有很大余量。</p>
+              <p><strong>第四步：缩放辨析</strong></p>
+              <p>$(w',b')=2(w,b)$ 定义的是<strong>同一条超平面</strong>，但支持向量的函数间隔也变成 $\pm2$。几何间隔是 <strong>函数间隔 ÷ $\|w\|$</strong>，缩放时两者同比例变化，所以几何间隔仍是 $2/\|w'\|=2/10=0.2$？不对——按新规范，两侧间隔 $=2\times(2/10)=0.4$，<strong>不变</strong>。若机械地套「间隔 $=2/\|w\|$」于未归一化的 $w'$，会得到 $0.2$，错在<strong>忘了函数间隔已被缩放、公式的前提是固定 $\min y_i(w^{\top}x_i+b)=1$</strong>。这正是 SVM 必须显式约束函数间隔为 1、再最小化 $\frac{1}{2}\|w\|^{2}$ 的原因：否则 $w$ 可任意缩放，「最大间隔」没有定义。</p>
+              <p><strong>易错提示：</strong>① 混淆函数间隔与几何间隔，或省略归一化约束导致间隔可任意放大；② 把「点到超平面距离」当间隔（间隔由支持向量决定，不是任意点）；③ $\gamma$ 与 $C$ 不调就上 RBF 核，边界要么过平要么过曲折；④ 忽略核方法在 $n$ 很大时的 $O(n^{2})$ 存储与 $O(n^{3})$ 训练代价。</p>
+              <p><strong>应用关联：</strong>间隔思想对应模块 09 提到的「提高间隔均值 ≈ 降偏差、压缩预测波动 ≈ 降方差」，也是 Boosting 与深度学习里 margin 理论的源头；文本、生物信息等高维小样本曾是 RBF-SVM 的主场，如今多被线性模型 + 核近似或深度模型取代。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 7 ===== -->
+      <h2 id="s7">7 · 集成学习</h2>
+
+      <h3 id="s7-1">7.1 Bagging 与随机森林：降方差</h3>
+      <p>自助采样出 $B$ 个训练集、并行训练后平均：</p>
+      <p>$$ \hat f_{\text{bag}}(x)=\frac{1}{B}\sum_{b=1}^{B}\hat f^{(b)}(x) $$</p>
+      <p>若成员方差 $\sigma^{2}$、两两相关系数 $\rho$，平均后方差 $=\rho\sigma^{2}+\frac{1-\rho}{B}\sigma^{2}$。<strong>降方差靠两条：多成员平均（$B &gt; 1$）与降低相关性（$\rho &lt; 1$）</strong>。随机森林在 Bagging 基础上每次分裂只看随机特征子集，把 $\rho$ 压低，代价是单树偏差略升，通常净赚。方差下限 $\rho\sigma^{2}$ 与 $B$ 无关——树堆得再多也突破不了相关性天花板。</p>
+
+      <h3 id="s7-2">7.2 Boosting：降偏差</h3>
+      <p>Boosting 串行累加弱学习器，每轮专攻前一轮的残差（负梯度）：</p>
+      <p>$$ F_m(x)=F_{m-1}(x)+\nu\,h_m(x) $$</p>
+      <p>$\nu$ 是学习率（收缩）。AdaBoost 等价于前向分步加性模型 + 指数损失；梯度提升把它推广到任意可微损失；<strong>XGBoost</strong> 用二阶泰勒展开 + 显式正则 + 列块并行，<strong>LightGBM</strong> 用直方图算法与 leaf-wise 生长进一步提速。轮数过多会开始拟合噪声、抬高方差，必须靠验证集早停。</p>
+      <div class="table-wrap"><table><thead><tr><th>维度</th><th>Bagging / 随机森林</th><th>Boosting / AdaBoost / GBDT</th></tr></thead><tbody>
+        <tr><td>训练方式</td><td>并行、独立</td><td>串行、依赖前一轮</td></tr>
+        <tr><td>主要作用</td><td><strong>降方差</strong></td><td><strong>降偏差</strong>（兼降方差）</td></tr>
+        <tr><td>基学习器</td><td>深树、高方差低偏差</td><td>浅树 / 树桩、高偏差低方差</td></tr>
+        <tr><td>对噪声</td><td>较稳健</td><td>较敏感（错分样本权重放大）</td></tr>
+        <tr><td>关键旋钮</td><td>$B$、特征子集大小</td><td>轮数 $m$、学习率 $\nu$、早停</td></tr>
+      </tbody></table></div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 12.5</span>
+          <span class="ex-title">AdaBoost 一轮权重更新</span>
+        </div>
+        <div class="example-body">
+          <p>3 个样本，标签 $y=(+1,+1,-1)$，初始权重 $w_i=1/3$。弱分类器 $h_1$ 预测 $(+1,-1,-1)$，只有样本 2 分错。① 求加权错误率 $\epsilon_1$；② 求 $\alpha_1=\frac{1}{2}\ln\frac{1-\epsilon_1}{\epsilon_1}$；③ 按 $w_i\leftarrow w_i\exp(-\alpha_1 y_i h_1(x_i))$ 更新并归一化；④ 说明组合分类器 $F_1=\alpha_1 h_1$ 对样本 2 的判决，以及为什么需要后续轮次。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：加权错误率</strong></p>
+              $$ \epsilon_1=\sum_{i:\ h_1(x_i)\neq y_i}w_i=\frac{1}{3}\approx0.333 $$
+              <p><strong>第二步：分类器权重</strong></p>
+              $$ \alpha_1=\frac{1}{2}\ln\frac{1-1/3}{1/3}=\frac{1}{2}\ln 2\approx\mathbf{0.3466} $$
+              <p>$\epsilon_1 &lt; 0.5$ 故 $\alpha_1 &gt; 0$，这个弱学习器比随机猜测好，有权投票。若 $\epsilon_1\ \geq\ 0.5$，$\alpha_1\ \leq\ 0$，应停止或翻转其输出。</p>
+              <p><strong>第三步：权重更新</strong></p>
+              <p>取 $\exp(-\alpha_1)=1/\sqrt{2}\approx0.7071$、$\exp(+\alpha_1)=\sqrt{2}\approx1.4142$：</p>
+              $$ w_1':\ y_1h_1=+1\ \Rightarrow\ \tfrac{1}{3}\times0.7071=0.2357 $$
+              $$ w_2':\ y_2h_1=-1\ \Rightarrow\ \tfrac{1}{3}\times1.4142=0.4714 $$
+              $$ w_3':\ y_3h_1=+1\ \Rightarrow\ \tfrac{1}{3}\times0.7071=0.2357 $$
+              $$ Z=0.2357+0.4714+0.2357=0.9428 $$
+              $$ w=\Bigl(\frac{0.2357}{0.9428},\ \frac{0.4714}{0.9428},\ \frac{0.2357}{0.9428}\Bigr)=\mathbf{(0.25,\ 0.50,\ 0.25)} $$
+              <p>分错的样本 2 权重从 $1/3$ 升到 $0.50$，正好翻倍；分对的两个降到 $0.25$。<strong>下一轮弱学习器被迫更关注样本 2</strong>——这就是 Boosting 逐步削减偏差的机制。漂亮的整数结果来自 $\epsilon=1/3$ 时 $\alpha=\frac{1}{2}\ln 2$。</p>
+              <p><strong>第四步：当前组合判决</strong></p>
+              $$ F_1(x_2)=\alpha_1 h_1(x_2)=0.3466\times(-1)=-0.3466\ \Rightarrow\ \mathrm{sign}=-1 $$
+              <p>样本 2 仍被判为负类（真标签 $+1$），依旧错分；需要第 2 轮把权重集中在它上面，产生能纠正它的 $h_2$ 并累加进 $F_2$。这也说明单轮 Boosting 并不能立刻修好所有错误，偏差是逐轮下降的。</p>
+              <p><strong>易错提示：</strong>① 忘记除以归一化常数 $Z$，权重和不为 1；② 用 $\log_2$ 或 $\log_{10}$ 代替自然对数 $\ln$，$\alpha$ 数值错；③ $\epsilon\ \geq\ 0.5$ 时仍继续加权（权重为负或发散）；④ AdaBoost 对标签噪声与离群点敏感——错分样本权重会被反复放大，需早停或改用鲁棒损失。</p>
+              <p><strong>应用关联：</strong>AdaBoost 的「指数损失 + 前向分步」视角直接通向梯度提升：把指数损失换成任意可微损失、把残差换成负梯度，就是 GBDT；XGBoost 再加二阶项与正则项。轮数与学习率是一对旋钮（总收缩量 $\approx m\nu$），与模块 09 的早停、验证集选超参完全同源。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ③：训练误差继续降，不等于泛化误差继续降
+        </div>
+        <p>Boosting 的训练损失几乎总随轮数单调下降，但验证误差会在某轮之后回升（开始拟合噪声）。<strong>不要拿训练曲线当学习曲线</strong>：轮数 $m$ 是超参数，必须由验证集早停决定。同理，随机森林把树数 $B$ 加到几百之后几乎无收益，要继续降方差只能降成员相关性 $\rho$。</p>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <h2 id="s8">8 · 无监督与模型选择</h2>
+
+      <h3 id="s8-1">8.1 聚类与轮廓系数</h3>
+      <p><strong>K-means</strong> 交替做「分配到最近质心」与「重算质心」，最小化簇内平方和；对初值敏感（用 k-means++）、只适合近似球状等方差簇。<strong>层次聚类</strong>从 $\binom{n}{2}$ 个样本对的距离出发，按 single / complete / average / Ward 链接自底向上合并，产出树状图，代价 $O(n^{2})$ 存储。<strong>轮廓系数</strong>衡量「簇内紧密度 vs 与最近其他簇的分离度」：</p>
+      <p>$$ s(i)=\frac{b(i)-a(i)}{\max\{a(i),\ b(i)\}},\qquad -1\ \leq\ s(i)\ \leq\ 1 $$</p>
+      <p>其中 $a(i)$ 是同簇平均距离、$b(i)$ 是最近异簇平均距离；均值越接近 1 越说明簇结构清晰，可用于选 $k$。</p>
+
+      <h3 id="s8-2">8.2 PCA：方差最大化</h3>
+      <p>主成分分析找一组正交方向，使投影方差依次最大；等价于对协方差矩阵做特征分解，第 $j$ 个主成分解释方差 $\lambda_j/\sum_k\lambda_k$。累计解释率决定保留几个主成分——它衡量的是<strong>保留了多少变异</strong>，而不是「对预测有多大用」：小方差方向有时恰好携带类别判别信息，此时应改用 LDA 或监督降维。</p>
+
+      <h3 id="s8-3">8.3 模型选择、校准与 Brier 分数</h3>
+      <p>超参搜索若与评估共用同一份交叉验证，选出的最低误差是<strong>多个噪声实现的最小值</strong>，系统性乐观（winner's curse）；正确做法是<strong>嵌套交叉验证</strong>（外层评估、内层选择）或独立测试集，并把标准化 / 特征选择放进内层 Pipeline 防泄漏。概率模型还需校准：</p>
+      <p>$$ \text{Brier}=\frac{1}{n}\sum_{i=1}^{n}(p_i-y_i)^{2} $$</p>
+      <p>Brier 分数同时度量分辨力与校准（越小越好），配合可靠性图与 Platt scaling / isotonic 回归修正系统性过度自信。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 12.6</span>
+          <span class="ex-title">PCA 方差解释率</span>
+        </div>
+        <div class="example-body">
+          <p>10 维数据协方差矩阵的特征值（已排序）为 $4,\ 2,\ 1,\ 1,\ 0.5,\ 0.5,\ 0.4,\ 0.3,\ 0.2,\ 0.1$。① 求总方差与前 2 个主成分的累计解释率；② 逐个给出累计解释率，要保留至少 90% 方差最少需要几个主成分；③ 若只降到 2 维，损失多少方差，说明什么风险；④ 为什么 PCA 前通常要标准化。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：总方差与前两个主成分</strong></p>
+              $$ \text{总方差}=\sum_{j=1}^{10}\lambda_j=4+2+1+1+0.5+0.5+0.4+0.3+0.2+0.1=\mathbf{10.0} $$
+              $$ \text{累计解释率}(2)=\frac{4+2}{10}=\mathbf{60\%} $$
+              <p><strong>第二步：累计表</strong></p>
+              <div class="table-wrap"><table><thead><tr><th>$k$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr></thead><tbody>
+                <tr><td>累计 $\lambda$</td><td>4.0</td><td>6.0</td><td>7.0</td><td>8.0</td><td>8.5</td><td>9.0</td><td>9.4</td><td>9.7</td><td>9.9</td><td>10.0</td></tr>
+                <tr><td>解释率</td><td>40%</td><td>60%</td><td>70%</td><td>80%</td><td>85%</td><td><strong>90%</strong></td><td>94%</td><td>97%</td><td>99%</td><td>100%</td></tr>
+              </tbody></table></div>
+              $$ \frac{4+2+1+1+0.5+0.5}{10}=\frac{9.0}{10}=90\%\ \Longrightarrow\ k_{\min}=\mathbf{6} $$
+              <p>$k=5$ 时只有 85%，不够；$k=6$ 首次达到 90%。</p>
+              <p><strong>第三步：降到 2 维的代价</strong></p>
+              <p>只保留前 2 个主成分，损失 $1-60\%=\mathbf{40\%}$ 的方差。风险在于：被丢掉的小方差方向可能是判别关键（例如类别差异恰好落在第 7 个主成分上），此时降维会损害下游分类；且 PCA 是<strong>无监督</strong>的，它优化的是重构 / 方差，不是预测目标。</p>
+              <p><strong>第四步：为什么要标准化</strong></p>
+              <p>PCA 对变量的尺度敏感：若「年收入」以元计（量级 $10^{5}$）、「年龄」以年计（量级 $10^{1}$），协方差会被前者主导，第一主成分几乎就是「收入」本身，与数据结构无关。标准化（每列减均值除标准差）等价于对<strong>相关矩阵</strong>而非协方差矩阵做 PCA，让各变量公平参与。</p>
+              <p><strong>易错提示：</strong>① 未标准化就 PCA；② 把「累计解释率高」当成「下游任务一定好」；③ 对异常值不处理（PCA 用平方损失，离群点会显著拉动主成分）；④ 在训练集与测试集上分别拟合 PCA（必须只在训练集 fit，再 transform 测试集，否则数据泄漏）。</p>
+              <p><strong>应用关联：</strong>PCA 用于可视化、去噪、缓解多重共线性与压缩；解释率曲线是选 $k$ 的常用工具。它与第 2 节岭回归的关系是「都在处理高维方差」，只是一个无监督降维、一个有监督收缩。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 12.7</span>
+          <span class="ex-title">嵌套交叉验证设计辨析</span>
+        </div>
+        <div class="example-body">
+          <p>某团队流程：① 在全部 1000 条数据上做 5 折 CV 网格搜索（$C$、$\gamma$ 共 20 组），取最佳组合准确率 94.2%；② 把 94.2% 作为模型泛化性能写进报告；③ 网格搜索前先对<strong>全数据</strong>做了标准化与方差筛选。① 指出三处统计问题；② 给出正确的嵌套 CV 方案（外层/内层折数、超参在哪选、结果怎么汇总）；③ 若外层 5 折测试准确率为 $0.91,\ 0.89,\ 0.92,\ 0.90,\ 0.88$，报告什么数值，与 94.2% 的差说明什么；④ 说明预处理应放在哪里。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：三处问题</strong></p>
+              <ul>
+                <li><strong>选择偏差（winner's curse）</strong>：94.2% 是 20 组超参里<strong>最小的那个噪声实现</strong>，用同一批 CV 既选又评，估计系统性乐观；</li>
+                <li><strong>把 CV 最优分数当泛化估计</strong>：CV 分数不是独立测试集上的无偏估计，尤其当搜索空间大、样本少时；</li>
+                <li><strong>预处理泄漏</strong>：标准化与方差筛选用了<strong>全数据</strong>（含验证折），验证折的均值/方差/筛选结果渗入训练，进一步抬高分数。</li>
+              </ul>
+              <p><strong>第二步：正确的嵌套 CV</strong></p>
+              <ul>
+                <li><strong>外层</strong> 5 折：每折用 4/5 训练、1/5 测试，只用于<strong>评估</strong>；</li>
+                <li>在每个外层训练折<strong>内部</strong>再切内层 3 折（或 5 折），对 20 组超参做网格搜索，选出该折最佳组合；</li>
+                <li>用该组合在<strong>整个外层训练折</strong>重训，在<strong>外层测试折</strong>上得到一个误差 $e_k$；</li>
+                <li>汇总 5 个 $e_k$ 的均值与标准差，报告 $\bar e\pm s$。成本是 $5\times3\times20=300$ 次训练——嵌套 CV 的代价就在这里。</li>
+              </ul>
+              <p>等价的更省方案：三层切分 train / val / test，只在 val 上选超参，test 到最后<strong>只用一次</strong>。</p>
+              <p><strong>第三步：汇总与差值</strong></p>
+              $$ \bar e=\frac{0.91+0.89+0.92+0.90+0.88}{5}=\mathbf{0.900},\qquad s\approx0.0158 $$
+              <p>应报告「外层 5 折准确率 $0.900\pm0.016$」而不是 94.2%。二者相差约 <strong>4.2 个百分点</strong>，这就是选择偏差 + 预处理泄漏共同制造的<strong>乐观偏差</strong>；搜索空间越大、样本越少，这个差距越大。</p>
+              <p><strong>第四步：预处理放哪</strong></p>
+              <p>标准化、缺失填充、特征筛选都必须封装进 <strong>Pipeline</strong>，在<strong>每一折的训练部分内部 fit</strong>，再用同一套参数 transform 该折的验证/测试部分。这样任何来自验证折的分布信息都不会进入训练流程。</p>
+              <p><strong>易错提示：</strong>① 用单一 CV 的最优分数汇报泛化性能；② 预处理在切分之前用全数据 fit；③ 外层折数太少导致 $\bar e$ 方差大，却报出很窄的区间；④ 选定超参后又在测试集上反复调阈值/校准，测试集被「用旧」。</p>
+              <p><strong>应用关联：</strong>AutoML 与小样本论文复现都把嵌套 CV 作为评估协议底线；它与模块 09 的「训练/验证/测试三分」「信息准则修正选择乐观偏差」是同一条纪律，也与模块 11 大数据实验里的「提前窥探」共享「多次选择会抬高最优值」的统计根源。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点 ④：选超参的那一折，不能同时用来打分
+        </div>
+        <p>「在同一批数据上挑最好的、再报告它有多好」是建模里最隐蔽也最普遍的乐观来源：从 $M$ 个候选里取最小值，期望上就比真值低一截。<strong>选择过程本身也是一次估计</strong>，必须被外层评估隔离；预处理泄漏则是它的工程版。凡是「离线很漂亮、上线就掉」的案例，先查这两条。</p>
+      </div>
+
+      <!-- ===== 9 ===== -->
+      <div id="examples"></div><!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 12 经典机器学习算法 -->
+
+
+<h2 id="d-deep-1">深度专题一 · 为什么 Bagging 降方差、Boosting 降偏差：从「平均值的方差」到「残差的逐轮收缩」</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把第 7 节那行没推导的公式补成一份可逐行核对的账，并说清两者为何攻击的是误差的不同部分</h3></div>
+  <p class="dt-lead">本章第 7.1 节直接写出了 $\hat f_{\text{bag}}(x)=\frac1B\sum_b \hat f^{(b)}(x)$ 与「平均后方差 $=\rho\sigma^2+\frac{1-\rho}{B}\sigma^2$」，第 7.2 节写出 $F_m=F_{m-1}+\nu h_m$，但都没有回答两个更根本的问题：那行方差公式里的 $\rho$ 到底从哪来、交叉项为什么恰好收成这一项？以及为什么同样是「把一堆弱模型拼起来」，一个主要压方差、另一个主要压偏差？本专题把 <a href="m09-ml-stats.html">模块 09</a> 的偏差—方差分解搬到集成学习上，给出推导、数值对账与精确的失效条件。</p>
+
+  <h4>背景：两条曾各自独立发展的线索</h4>
+  <p>Bagging 出自 Breiman 1996 年的「Bootstrap AGgregatING」，动机非常工程化：决策树这类估计量对训练集的微小扰动极不稳定（换几十条记录，树形就变），于是用自助采样造出许多训练集、各自长一棵树、再取平均（分类投票），把这种不稳定性「平均掉」。2001 年同一位作者加上「每次分裂只看随机特征子集」，把成员之间的相关性进一步压低，就有了随机森林。Boosting 则出自计算学习理论：Schapire 1990 与 Freund、Schapire 1997 的 AdaBoost 回答的是「若存在一个略好于随机猜测的弱学习器，能否把它提升成任意精度的强学习器」，做法是串行地让新成员专攻前面分错的样本。Friedman、Hastie、Tibshirani 2000 年把 AdaBoost 解释为「前向分步加性模型 + 指数损失」，Friedman 2001 年再推广为任意可微损失下的梯度提升，两条线索才在「加性模型」层面汇合。</p>
+  <p>汇合之后反而更容易混淆：既然都是「一堆模型相加/平均」，为什么教科书坚持说分工不同？答案不在「几个模型」，而在两件事——<strong>成员是同时独立产生、还是串行依赖产生</strong>，以及<strong>组合后预测函数的期望变没变</strong>。下面把这两点写成公式。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>先想象射箭。一个人射 20 支箭，落点是一个散布的云团：云团中心离靶心的距离是<strong>偏差</strong>（系统性瞄歪了），云团自己的大小是<strong>方差</strong>（手抖）。</p>
+  <ul>
+    <li><strong>Bagging 的做法</strong>：找 20 个同样瞄法的人各射一支，把 20 个落点取平均当最终成绩。手抖的方向各不一样，平均后互相抵消，云团缩小——<strong>方差降了</strong>。但 20 个人用的是同一把瞄歪的枪，平均落点的中心还是那个偏掉的位置——<strong>偏差一点没动</strong>。这解释了为什么随机森林要用「深树」：深树本身偏差小、方差大，正好是「只差方差」的对象；若换成浅树桩，平均再多次也修不好欠拟合。</li>
+    <li><strong>Boosting 的做法</strong>：第一个人先射一箭，记下「离靶心还差多少」（残差）；第二个人不重新瞄靶心，而是专门去补这个差值；第三个人再补剩下的差值……每一轮都在直接削减「当前整体离真值还差多少」，于是<strong>偏差逐轮下降</strong>。代价是：到了后面，剩下的「差值」里越来越多是噪点而非信号，继续补就会把噪声也刻进模型，方差开始上升——这正是第 7.2 节要求验证集早停的原因。</li>
+  </ul>
+  <p>一句话抓住分界：<strong>取平均不改变「平均预测」本身，所以动不了偏差；逐轮补残差改变的是「预测整体是多少」，所以能动偏差，但代价是引入串行相关与过拟合风险</strong>。下面这两行直觉会被写成严格的期望与协方差运算。</p>
+
+  <h4>形式化：先固定随机性，再拆协方差</h4>
+  <p>固定一个测试点 $x$，把随机性全部归到训练集抽样上。设有 $B$ 个基学习器 $\hat f_1(x),\dots,\hat f_B(x)$，它们<strong>同分布但不必独立</strong>（自助采样天然让它们共享大部分样本）。记 $\mathrm{E}[\hat f_b(x)]=\bar f(x)$、$\mathrm{Var}[\hat f_b(x)]=\sigma^2$，任意两个不同成员的相关系数为 $\rho$。下面每个公式都配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">记号与假设</div>
+    $$ \hat f_{\mathrm{bag}}(x)=\frac1B\sum_{b=1}^{B}\hat f_b(x),\qquad \mathrm{E}\bigl[\hat f_b(x)\bigr]=\bar f(x),\qquad \mathrm{Var}\bigl[\hat f_b(x)\bigr]=\sigma^2 $$
+    $$ \mathrm{Corr}\bigl[\hat f_b(x),\hat f_{b'}(x)\bigr]=\rho\ (b\ne b')\ \Longrightarrow\ \mathrm{Cov}\bigl[\hat f_b,\hat f_{b'}\bigr]=\rho\sigma^2 $$
+    <div class="f-note">白话：所有成员「平均水平」一样、各自抖动幅度 $\sigma$ 一样、两两相似程度 $\rho$ 一样。真实情形下这些量随 $b$ 变，但取共同值已能暴露全部结构；$\rho$ 的取值由自助采样重叠率与特征扰动强度决定，随机森林调的就是它。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第一步：平均值的期望不变，所以偏差不变</div>
+    $$ \mathrm{E}\bigl[\hat f_{\mathrm{bag}}(x)\bigr]=\frac1B\sum_{b=1}^{B}\mathrm{E}\bigl[\hat f_b(x)\bigr]=\frac1B\cdot B\,\bar f(x)=\bar f(x) $$
+    $$ \mathrm{Bias}\bigl[\hat f_{\mathrm{bag}}(x)\bigr]=\bar f(x)-f(x)=\mathrm{Bias}\bigl[\hat f_1(x)\bigr] $$
+    <div class="f-note">白话：一堆数取平均，平均值还是那个平均值。偏差定义为「无限多批数据下的平均预测离真值多远」，它只由单个成员的期望决定；$B$ 堆再多，$\mathrm{Bias}$ 一项都原封不动。这是「Bagging 不降偏差」最硬的一句话，也是它与 Boosting 的根本分界。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第二步：方差 = 自身方差之和 + 所有两两协方差之和</div>
+    $$ \mathrm{Var}\Bigl(\frac1B\sum_{b=1}^{B}\hat f_b\Bigr)=\frac{1}{B^{2}}\Bigl[\sum_{b=1}^{B}\mathrm{Var}(\hat f_b)+\sum_{b\ne b'}\mathrm{Cov}(\hat f_b,\hat f_{b'})\Bigr] $$
+    <div class="f-note">白话：和的方差不是方差的简单相加，还要把所有「两两一起抖」的协方差项算进去。方括号里第一项是 $B$ 个自己，共 $B\sigma^2$；第二项是有序对 $(b,b')$、$b\ne b'$，共 $B(B-1)$ 个，每个 $\rho\sigma^2$。很多推导丢的正是这第二项——它恰恰是 Bagging 收不了尾的原因。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第三步：代入、约分，得到本章第 7 节那一行</div>
+    $$ \mathrm{Var}\Bigl(\frac1B\sum_{b=1}^{B}\hat f_b\Bigr)=\frac{1}{B^{2}}\bigl[B\sigma^{2}+B(B-1)\rho\sigma^{2}\bigr]=\frac{\sigma^{2}}{B}+\frac{B-1}{B}\rho\sigma^{2} $$
+    $$ =\ \rho\sigma^{2}+\frac{(1-\rho)\sigma^{2}}{B} $$
+    <div class="f-note">白话：把 $\frac{B-1}{B}=1-\frac1B$ 拆开、与 $\frac{\sigma^2}{B}$ 合并，就得到「一块与 $B$ 无关的地板 $\rho\sigma^2$，加一块能被 $B$ 压掉的 $\frac{(1-\rho)\sigma^2}{B}$」。只有第二项随成员数增加而消失，第一项永远搬不走。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第四步：三个极限与边际收益</div>
+    $$ \lim_{B\to\infty}\mathrm{Var}(\hat f_{\mathrm{bag}})=\rho\sigma^{2},\qquad \rho=0:\ \frac{\sigma^{2}}{B},\qquad \rho=1:\ \sigma^{2} $$
+    $$ \mathrm{Var}(B)-\mathrm{Var}(2B)=\frac{(1-\rho)\sigma^{2}}{2B},\qquad \frac{\partial\,\mathrm{Var}}{\partial B}=-\frac{(1-\rho)\sigma^{2}}{B^{2}} $$
+    <div class="f-note">白话：$\rho=0$（成员完全独立）时方差一路降到 0；$\rho=1$（成员一模一样）时堆多少棵树都白费；一般情形停在地板 $\rho\sigma^2$。边际收益按 $1/B^2$ 衰减，所以树数从 200 加到 400 几乎看不出变化——第 7 节「把 $B$ 加到几百之后几乎无收益」的定量依据就在这里。要继续降方差，唯一出路是把 $\rho$ 压低（随机特征子采样、更大的 bootstrap 扰动），而不是继续堆 $B$。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第五步：Boosting 为什么能降偏差（平方损失下的残差递推）</div>
+    $$ F_m(x)=F_{m-1}(x)+\nu\,h_m(x),\qquad h_m=\arg\min_{h\in\mathcal H}\ \sum_{i=1}^{n}\bigl(r_{i,m-1}-h(x_i)\bigr)^{2} $$
+    $$ r_{i,m}=y_i-F_m(x_i),\qquad \|r_m\|^{2}=\|r_{m-1}\|^{2}-\nu(2-\nu)\|h_m\|^{2}\ \le\ \|r_{m-1}\|^{2}\quad(0\lt\nu\lt2) $$
+    <div class="f-note">白话：平方损失下负梯度就是残差 $r_{i,m-1}=y_i-F_{m-1}(x_i)$；新成员 $h_m$ 是残差在弱学习器空间 $\mathcal H$ 上的最小二乘投影，于是投影与残差正交，勾股定理直接给出残差平方和每轮减少 $\nu(2-\nu)\|h_m\|^2$。训练残差单调下降 = 近似误差（偏差）被逐轮削掉，这就是「Boosting 降偏差」的严格版本。$\nu$ 是学习率（收缩），取 $0\lt\nu\le1$ 时下降最稳。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第六步：代价——串行相关把方差抬回来</div>
+    $$ \mathrm{Var}(F_m)=\nu^{2}\sum_{m'=1}^{m}\mathrm{Var}(h_{m'})+2\nu^{2}\sum_{m'\lt m''}\mathrm{Cov}(h_{m'},h_{m''}) $$
+    <div class="f-note">白话：$h_m$ 依赖 $F_{m-1}$，成员之间不再独立，协方差项为正；且随着残差里的信号被吃光，后几轮拟合的越来越是噪声。所以 Boosting 的偏差单调降、方差却随轮数 $m$ 升，验证误差呈 U 形——早停就是在两者相交前踩刹车。这也说明「降偏差」与「降泛化误差」不是同一件事。</div>
+  </div>
+
+  <h4>数值对账：公式里的每一项都能用代码复现</h4>
+  <p>取案例 <code>quiz_avg</code> 的残差方差 $\sigma^2=163.6845$ 作为基学习器抖动量级（量纲只整体缩放，结构不变）。用「一因子模型」$\hat f_b=\sigma(\sqrt{\rho}\,z_0+\sqrt{1-\rho}\,z_b)$ 造出$\mathrm{Var}=\sigma^2$、$\mathrm{Corr}=\rho$ 的成员，重复 30000 次取平均值的样本方差，与解析式逐格对照（全部数值见下方代码实验 Part 1）：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$\rho$</th><th>$B=1$</th><th>$B=5$</th><th>$B=20$</th><th>$B=100$</th><th>地板 $\rho\sigma^2$</th></tr></thead>
+      <tbody>
+        <tr><td>$0.0$（独立）</td><td>163.6845</td><td>32.7369</td><td>8.1842</td><td>1.6368</td><td>0.0000</td></tr>
+        <tr><td>$0.3$</td><td>163.6845</td><td>72.0212</td><td>54.8343</td><td>50.2511</td><td>49.1053</td></tr>
+        <tr><td>$0.7$</td><td>163.6845</td><td>124.4002</td><td>117.0344</td><td>115.0702</td><td>114.5791</td></tr>
+        <tr><td>$1.0$（全同）</td><td>163.6845</td><td>163.6845</td><td>163.6845</td><td>163.6845</td><td>163.6845</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>读法：$\rho=0.7$ 时把 $B$ 从 20 加到 100，方差只从 117.0344 挪到 115.0702，离地板 114.5791 已经很近；$\rho=1$ 时四列完全相同。蒙特卡洛列与解析列的相对误差都在 $\pm1.6\%$ 以内（30000 次重复的标准误量级），差异来自有限抽样而非公式。</p>
+  <p>再看分工本身。代码实验 Part 2 在 8 个点 $y=(2,2,5,5,2,2,5,5)$ 上用「两叶回归桩」做两类集成：单个最优桩的训练 MSE 是 $1.5000$，这是桩模型族的<strong>偏差地板</strong>；前向分步 Boosting 逐轮把它压到 $2.2500\to1.5000\to1.1667\to\cdots\to0.0267$（8 轮，单调下降）；而 12000 棵自助采样桩取平均后 MSE 停在 $1.2538$，$B=400$ 之后再加树几乎不动。两个数字并排摆在一起，就是「一个动偏差、一个动方差」最干净的证据。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>$\mathrm{Var}\bigl(\frac1B\sum_b\hat f_b\bigr)=\rho\sigma^2+\frac{(1-\rho)\sigma^2}{B}$，而 $\mathrm{E}[\frac1B\sum_b\hat f_b]=\mathrm{E}[\hat f_1]$：Bagging 只削减随 $B$ 消失的那一项，偏差完全不变，且方差存在与 $B$ 无关的下限 $\rho\sigma^2$；要继续降方差只能压 $\rho$。Boosting 以 $F_m=F_{m-1}+\nu h_m$ 让训练残差按 $\|r_m\|^2=\|r_{m-1}\|^2-\nu(2-\nu)\|h_m\|^2$ 单调下降，从而逐轮削偏差，但串行相关与后期拟合噪声会把方差抬回来，必须验证集早停。因此「用深树做 Bagging、用浅树桩做 Boosting」不是习惯，而是两种误差账目的必然选择。</div>
+
+  <p><strong>边界条件：</strong>在基学习器两两相关系数 $\rho\to1$（既未做自助采样、也未做随机特征子采样，所有成员在同一份数据上训练同一个确定性模型）的条件下，方差下限 $\rho\sigma^2$ 几乎等于单模型方差，「Bagging 降方差」本结论不成立，应改用随机森林式的特征子采样或 bootstrap 重采样先把 $\rho$ 压下来；在标签噪声比例高、弱学习器容量过大使得后期残差里主要是噪声的条件下，「Boosting 逐轮降偏差」对<strong>测试</strong>误差不再成立，应改用鲁棒损失（Huber／分位数）、行/列子采样与验证集早停；在基学习器本身已偏差主导（例如用树桩拟合强非线性关系）且轮数受限的条件下，本结论不成立，应改用加大单模型容量、增加特征或换更灵活的模型族先降偏差，而不是继续堆集成。</p>
+
+  <p>下图把本章的算法族按「是否监督 / 输出类型 / 模型族」定位：Bagging 与 Boosting 都落在「集成」一格，但一个挑高方差低偏差的深树、一个挑高偏差低方差的浅树，正好对应上面两条误差账目。选基学习器前先判断当前误差是谁主导，再看这张谱系。</p>
+  <figure class="figure" id="fig-tree-ml-algorithms">
+  <svg class="dia" viewBox="0 0 680 224" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="经典机器学习算法的分类谱系"><text class="dg-th" x="340.0" y="24" text-anchor="middle">按学习范式与模型族定位算法</text><rect class="dg-box alt" x="20.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="122.0" y="73.0" text-anchor="middle">监督 · 回归</text><text class="dg-ts" x="122.0" y="90.0" text-anchor="middle">线性 / 岭 / Lasso</text><rect class="dg-box" x="238.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="340.0" y="73.0" text-anchor="middle">监督 · 分类</text><text class="dg-ts" x="340.0" y="90.0" text-anchor="middle">逻辑回归 / SVM / 树</text><rect class="dg-box info" x="456.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="558.0" y="73.0" text-anchor="middle">无监督</text><text class="dg-ts" x="558.0" y="90.0" text-anchor="middle">KMeans / PCA / 层次聚类</text><rect class="dg-box muted" x="20.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="122.0" y="155.0" text-anchor="middle">生成式</text><text class="dg-ts" x="122.0" y="172.0" text-anchor="middle">LDA / 朴素贝叶斯</text><rect class="dg-box muted" x="238.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="340.0" y="155.0" text-anchor="middle">判别式</text><text class="dg-ts" x="340.0" y="172.0" text-anchor="middle">逻辑回归 / SVM</text><rect class="dg-box ok" x="456.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="558.0" y="155.0" text-anchor="middle">集成</text><text class="dg-ts" x="558.0" y="172.0" text-anchor="middle">RF / GBDT / XGBoost</text></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">经典机器学习算法的分类谱系</span>
+    <span class="fig-note">按「是否监督 / 输出类型 / 模型族」定位算法；选择时先看数据规模、可解释性要求与特征类型。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="../modules/m12-ml-algorithms.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 核技巧为什么不必写出高维坐标：Mercer 条件、Gram 矩阵半正定，以及它在什么规模上失效</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>「只算内积」省掉的不是坐标，而是整个优化问题对坐标的依赖；但代价被搬到了样本数 n 上</h3></div>
+  <p class="dt-lead">本章第 6.2 节留了一句话：「永远不显式计算高维映射 $\phi(x)$，只算 $K(x_i,x_j)=\phi(x_i)^\top\phi(x_j)$」。本专题回答三个没有被展开的问题：凭什么算法全程可以只要内积而不要坐标？一个「看起来像相似度」的函数要满足什么<strong>精确条件</strong>才是合法核（不是任意对称函数都行）？以及核方法把维度灾难换成规模灾难之后，究竟在哪一个 $n$ 上撞墙？</p>
+
+  <h4>背景：从「势函数」到表示定理</h4>
+  <p>Mercer 1909 年研究积分方程时证明：满足一定条件的对称核可以展开成 $\sum_k\lambda_k\psi_k(x)\psi_k(z)$ 且 $\lambda_k\ge0$；Aronszajn 1950 年把它整理成再生核希尔伯特空间（RKHS）理论。机器学习这一侧的「核技巧」通常追溯到 Aizerman、Braverman 与 Rozonoer 1964 年关于势函数法的观察：若算法只用到样本两两之间的内积，就可以把内积替换成一个满足条件的函数，隐式地在高维空间中做线性算法。Boser、Guyon 与 Vapnik 1992 年把它装进最大间隔 SVM，Cortes 与 Vapnik 1995 年补上软间隔，核方法由此成为高维小样本时代的主力。</p>
+  <p>Vapnik 的措辞很精确：核技巧<strong>不是</strong>「解决了高维计算」，而是「根本不进入高维空间」。这个措辞里埋着本专题的两条主线——合法性条件（凭什么能这么换）与容量/规模（换完之后账记在哪里）。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>设想你要给全班同学排座位，规则只涉及「任意两人合得来程度」。你手上有一张 $n\times n$ 的<strong>关系表</strong>，从不需要知道每个人住在哪条街、门牌几号。核技巧就是这个道理：SVM 的训练与判定里，样本 $x_i$ 从来不单独出现，永远以「$x_i$ 和 $x_j$ 的内积」成对出现；于是把每个内积替换成表里的一格 $K(x_i,x_j)$，整个算法照跑不误，而 $\phi(x)$ 的坐标一次都不用写。RBF 核对应的 $\phi$ 甚至是<strong>无穷维</strong>的——它根本没法写出来，但表里的每个数都能一秒钟算出来。</p>
+  <p>第二个直觉关于「容量」。初学者常以为「映射到无穷维 = 模型无限复杂 = 必然过拟合」，这不对。$n$ 个训练点撑起的 Gram 矩阵最多只有 $n$ 个自由度，就像一张 100 行的表最多记录 100 个独立方向；真正决定容量的是这张表特征值衰减得多快，以及正则化 $\lambda$ 把小特征值方向压得多狠，而不是 $\dim\mathcal H$ 是有限还是无穷。</p>
+  <p>第三个直觉关于「合法」。不是随便一个「越像分越高」的对称函数都能当核。核必须真的等于某个空间里的内积，否则「$K(x,z)=\phi(x)^\top\phi(z)$」这句话就是假的，SVM 对偶不再是凸二次规划、表示定理不再成立。快速自检的办法是柯西—施瓦茨不等式：内积必满足 $K(x,z)^2\le K(x,x)K(z,z)$；把某个非对角元素改得比两个对角元的几何平均还大，就一定不是核。代码实验 Part 3 正是这么造反例的。</p>
+
+  <h4>形式化：内积替换、表示定理与 Mercer 判据</h4>
+  <div class="formula-box">
+    <div class="f-name">核技巧恒等式：一个能写出来的例子</div>
+    $$ K(x,z)=\bigl(1+x^{\top}z\bigr)^{2}=1+2x^{\top}z+(x^{\top}z)^{2}=\phi(x)^{\top}\phi(z) $$
+    $$ \phi(x)=\bigl(1,\ \sqrt2\,x_1,\dots,\sqrt2\,x_p,\ x_1^{2},\dots,x_p^{2},\ \sqrt2\,x_1x_2,\dots\bigr) $$
+    <div class="f-note">白话：把 $(1+x^\top z)^2$ 展开，每一 monomial 都能拆成「只含 $x$ 的量 × 只含 $z$ 的量」，于是把它收成一个显式特征向量 $\phi(x)$ 与 $\phi(z)$ 的内积。一维特例下 $\phi(x)=(1,\sqrt2 x,x^2)$，维度 3；但算法只需返回标量 $(1+xz)^2$，从不构造这个三维向量。代码实验 Part 3 把「显式 $\phi$ 的 Gram」与「核函数的 Gram」逐位相减，最大差是 $0.00\times10^{0}$。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">为什么全程不需要坐标：表示定理</div>
+    $$ f^{*}=\arg\min_{f\in\mathcal H_{K}}\ \sum_{i=1}^{n}L\bigl(y_i,f(x_i)\bigr)+\lambda\|f\|_{\mathcal H_{K}}^{2}\ \Longrightarrow\ f^{*}(x)=\sum_{i=1}^{n}\alpha_i K(x_i,x) $$
+    <div class="f-note">白话：RKHS 里带正则的经验风险最小化，其最优解必然是「以训练点为中心的核函数」的线性组合。整条式子只出现 $K(x_i,x)$ 这类标量，从未出现单独的 $\phi(x)$。训练求的是 $n$ 个系数 $\alpha_i$，预测算的是 $n$ 个核值；高维坐标被彻底绕过。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">SVM 对偶：所有 $x$ 都只以内积成对出现</div>
+    $$ \max_{\alpha}\ \sum_{i=1}^{n}\alpha_i-\frac12\sum_{i=1}^{n}\sum_{j=1}^{n}\alpha_i\alpha_j y_i y_j K(x_i,x_j),\quad 0\le\alpha_i\le C,\ \sum_{i=1}^{n}\alpha_i y_i=0 $$
+    $$ f(x)=\sum_{i=1}^{n}\alpha_i y_i K(x_i,x)+b $$
+    <div class="f-note">白话：把 $w=\sum_i\alpha_i y_i\phi(x_i)$ 代回原始问题，$\|w\|^2$ 与 $w^\top\phi(x)$ 全部化成 $\phi(x_i)^\top\phi(x_j)=K(x_i,x_j)$。$K$ 只在对偶目标与判定函数里以成对形式出现，$\phi$ 一次也没单独露面——这就是「不显式计算高维映射」的严格含义，也说明只有 $\alpha_i\gt0$ 的支持向量参与最终判定。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">合法核的充要条件：Mercer / Gram 矩阵半正定</div>
+    $$ K(x,z)=K(z,x)\quad\text{且}\quad \sum_{i=1}^{n}\sum_{j=1}^{n}c_i c_j K(x_i,x_j)\ \ge\ 0 $$
+    <div class="f-note">白话：$K$ 必须对称，并且对<strong>任意</strong> $n$、任意点集 $\{x_i\}$、任意实系数 $c_i$ 都非负。等价说法：$n\times n$ 的 Gram 矩阵 $K_{ij}=K(x_i,x_j)$ 半正定，即全部特征值 $\ge0$；再等价地，存在某个特征映射使 $K(x,z)=\langle\phi(x),\phi(z)\rangle$。这三条互为充要条件，「任意点集」四个字不能省——只在手头这批样本上 PSD 不足以称为 Mercer 核。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">Mercer 定理的谱形式与必要自检</div>
+    $$ K(x,z)=\sum_{k=1}^{\infty}\lambda_k\,\psi_k(x)\psi_k(z),\qquad \lambda_1\ge\lambda_2\ge\cdots\ge0 $$
+    $$ \text{必要条件：}\ K(x,z)^{2}\ \le\ K(x,x)\,K(z,z) $$
+    <div class="f-note">白话：在紧区域上连续的合法核可展开成非负特征值 $\lambda_k$ 的级数，$\psi_k$ 就是隐式特征坐标；$\lambda_k$ 衰减越快，有效维度越低。第二行是柯西—施瓦茨，用来一票否决非法核：代码里把 $K_{01}$ 改成 100，而 $K_{00}=4$、$K_{11}=25$、$\sqrt{K_{00}K_{11}}=10$，立刻违反，Gram 最小特征值变成 $-89.9412$。常见反例还有 $\tanh(a\,x^\top z+b)$ 型 sigmoid 核（多数参数下不 PSD）与未经 PSD 化的「神经网络学到的相似度」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">封闭性质：为什么 RBF 核是合法的</div>
+    $$ K_1,K_2\ \text{合法}\ \Longrightarrow\ K_1+K_2,\ cK_1\ (c\gt0),\ K_1K_2,\ K_1\otimes K_2,\ \lim K_m\ \text{均合法} $$
+    $$ K_{\mathrm{RBF}}(x,z)=\exp\bigl(-\gamma\|x-z\|^{2}\bigr)=e^{-\gamma\|x\|^{2}}e^{-\gamma\|z\|^{2}}\exp\bigl(2\gamma\,x^{\top}z\bigr) $$
+    <div class="f-note">白话：合法核对加法、正数倍、乘法、张量积与逐点极限都封闭。RBF 核可以写成「两个只含单点的正因子 × 线性核的指数级数」，而 $e^{t}=\sum_m t^m/m!$ 的每一项都是合法核的非负组合，故 RBF 合法、且对应无穷维 $\phi$。这解释了它的容量从哪来，也说明「无穷维」并不神秘。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">容量由谱控制，不由维数控制</div>
+    $$ \hat{\mathfrak R}_n(\mathcal H_K)\ \le\ \frac{B}{n}\sqrt{\mathrm{tr}(K)}=\frac{B}{\sqrt n}\sqrt{\frac1n\sum_{i=1}^{n}K(x_i,x_i)} $$
+    <div class="f-note">白话：在半径 $\|f\|_{\mathcal H}\le B$ 的球内，经验 Rademacher 复杂度被 $\sqrt{\mathrm{tr}(K)}/n$ 控制。$\mathrm{tr}(K)=\sum_i\lambda_i$ 只与 Gram 矩阵的迹（核值对角和）有关，与 $\dim\mathcal H$ 无关；$\lambda_k$ 衰减快时有效自由度很小。因此「映射到无穷维必然过拟合」是错的，真正的旋钮是 $\gamma$、$C$、$\lambda$ 与特征值谱。</div>
+  </div>
+
+  <h4>数值对账：合法、非法与规模墙</h4>
+  <p>代码实验 Part 3 给出四组可复核的数：显式 $\phi$ 与核函数 Gram 逐位差 $=0.00\times10^{0}$；4 个点上多项式核的特征值为 $[0,\ 0.0910,\ 4.2498,\ 413.6592]$，<strong>最小恰为 0</strong>——因为 $\phi$ 只有 3 维，4 个点撑出的 Gram 秩最多 3，所以是半正定但秩亏，Cholesky 有零主元却仍「成功」（没有负主元）；把某个非对角元改成 100 后，Cholesky 失败、最小特征值 $-89.9412$。对 3 组各 6 个随机点，合法核的最小特征值都在 $\pm10^{-15}$ 量级（浮点零），印证「任意点集」都 PSD。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$n$</th><th>Gram 项数 $n^2$</th><th>内存（8 字节/项）</th><th>精确求解 $\approx n^3/3$ FLOPs</th></tr></thead>
+      <tbody>
+        <tr><td>100</td><td>$10^4$</td><td>0.0001 GB</td><td>$3.33\times10^{5}$</td></tr>
+        <tr><td>1,000</td><td>$10^6$</td><td>0.0080 GB</td><td>$3.33\times10^{8}$</td></tr>
+        <tr><td>10,000</td><td>$10^8$</td><td>0.8000 GB</td><td>$3.33\times10^{11}$</td></tr>
+        <tr><td>100,000</td><td>$10^{10}$</td><td>80.0000 GB</td><td>$3.33\times10^{14}$</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>另一张表把「显式 $\phi$ 的成本」摆出来：$p$ 维输入的二次多项式核，$\dim\phi=1+p+\frac{p(p+1)}2$；$p=1000$ 时约 $5.0\times10^5$ 维，$n=10^4$ 个样本显式存下来要 40 GB，$p=10^4$ 时要 4001 GB。核技巧用 $O(n^2)$ 的 Gram 换掉了 $O(n\cdot p^2)$ 的显式特征——当 $p^2\gg n$ 时大赚，当 $n$ 涨到十万级时反被 $n^2$ 拖垮。此外预测成本 $O(\#SV\cdot d)$ 会随支持向量数线性增长，且 $n$ 大时 Gram 谱趋于病态（条件数变差），数值求解也更不稳。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>核技巧成立的全部依据是「算法只以内积形式使用样本」：由表示定理 $f^*(x)=\sum_i\alpha_i K(x_i,x)$，训练与判定全程只需 Gram 矩阵的标量值，从不构造 $\phi(x)$ 的坐标。一个函数能当核的充要条件是：对称，且对<strong>任意</strong>有限点集其 Gram 矩阵半正定（等价 Mercer 非负谱分解、等价存在某个内积空间使 $K=\langle\phi(x),\phi(z)\rangle$）；容量由 $\mathrm{tr}(K)$ 与特征值衰减控制，而非 $\dim\mathcal H$。代价是 $O(n^2)$ 存储、$O(n^3)$ 精确训练、$O(\#SV)$ 预测：核方法把维度灾难翻译成了规模灾难。</div>
+
+  <p><strong>边界条件：</strong>在 $K$ 不对称、或存在某组样本使 Gram 矩阵出现负特征值（例如 $\tanh(a\,x^\top z+b)$ 型 sigmoid 核在多数参数下、或由神经网络学到的未经 PSD 化的相似度）的条件下，「核技巧等价于某个高维内积」不成立，表示定理与凸优化保证全部失效，应改用 PSD 投影（把负特征值截断为 0 或取绝对值、加对角抖动）或改用显式特征映射加线性模型；在 $n\gtrsim10^5$ 的条件下，精确核方法的 $O(n^2)$ 存储与 $O(n^3)$ 训练不再可行，「用核换维度很划算」本结论不成立，应改用随机傅里叶特征、Nyström 低秩近似、线性 SVM，或换参数化深度模型与 <a href="m13-deep-training.html">模块 13</a> 的小批量训练范式。</p>
+
+  <p>下图是本站统一的学习闭环。核方法位于「建模」这一环，但它的上下游契约很特殊：上游必须交出一份「相似度可被验证为 Mercer 核」的特征口径，下游则必须承担 Gram 矩阵随 $n$ 平方增长的存储与评估成本；一旦 $n$ 越过十万量级，闭环里的「评估」与「部署运维」两环会先于建模环报警。</p>
+  <figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · CART 决策树：基尼不纯度与一次完整的最优切分手算</h2>
+<div class="algo-spec">
+  <p>本算法位于「数据采集 → 存储计算 → 建模 → 评估 → 部署运维」链条的<strong>建模环节</strong>，是本章第 5 节分裂准则的完整落地，也是第 7 节集成方法默认的基学习器。上游契约是「一份特征值可比大小、标签为类别或连续值的训练集」；下游契约是「一组（特征、阈值）分裂规则、每个叶的类别分布，以及一条从根到叶的可读路径」。选它作经典算法，是因为它<strong>不需要任何矩阵运算或梯度</strong>，一次完整的最优切分可以完全用初中算术手算到底，是「贪心 + 不纯度」这一族算法最短的一座桥；正文例 12.3 已用 10 个样本手算过基尼与信息增益（两个现成的 5/5 划分），这里不重复，改为对<strong>连续数值特征穷举全部候选阈值</strong>，并把第二层切分也走完。</p>
+
+  <h3 id="d-algo-principle">一、原理：在每个节点贪心地最小化加权不纯度</h3>
+  <p>CART（Classification And Regression Trees，Breiman 等 1984）用轴平行切分把特征空间递归地划成超矩形，叶上输出一个常数（分类取多数类及其概率，回归取均值）。设节点 $t$ 有 $n$ 个样本、$K$ 个类别，第 $k$ 类占比 $p_k=n_k/n$，基尼不纯度定义为</p>
+  <div class="formula-box">
+    <div class="f-name">基尼不纯度与一次分裂的收益</div>
+    $$ G(t)=1-\sum_{k=1}^{K}p_k^{2},\qquad \Delta G(j,s)=G(t)-\frac{n_L}{n}G(t_L)-\frac{n_R}{n}G(t_R) $$
+    $$ (j^{*},s^{*})=\arg\max_{j,s}\ \Delta G(j,s),\qquad t_L=\{x_i:\ x_{i,j}\le s\},\quad t_R=\{x_i:\ x_{i,j}\gt s\} $$
+    <div class="f-note">白话：$G(t)$ 等于「从该节点随机抽两个样本、类别不同的概率」——全纯时为 0，两类各半时为 $1-0.5^2-0.5^2=0.5$。一次分裂的收益就是「父节点不纯度 − 左右子节点不纯度按样本数的加权和」，切得越「把类分开」收益越大。CART 在每个节点遍历所有特征 $j$ 与所有阈值 $s$，取收益最大者，是贪心而非全局最优（全局最优树是 NP-hard）。</div>
+  </div>
+  <p><strong>几何与统计解释：</strong>几何上，每个分裂是一条垂直于某个坐标轴的超平面，整棵树是一个分段常数函数，能表达非线性与特征交互，却无法表达斜边界与光滑外推。统计上，在平方损失/0-1 损失下，「叶内取多数类/均值」正是该叶上经验风险的最小解；基尼是 0-1 损失的一个计算更快、更平滑的替代（无需 $\log$，且对类别数变化更稳），与第 5 节的信息熵 $H(t)=-\sum_k p_k\log_2 p_k$ 常给出相同的划分排序。CART 用基尼、C4.5 用增益率校正后的信息增益，XGBoost/LightGBM 用带正则的二阶梯度增益，本质都是「父不纯度 − 子不纯度加权和」这一模板。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>设定停止条件。</strong>先定最大深度 <code>max_depth</code>、叶节点最小样本数 <code>min_samples_leaf</code>、最小增益 <code>min_impurity_decrease</code>、以及节点纯度阈值；这些是预剪枝旋钮，必须在验证集上选。</li>
+    <li><strong>对当前节点逐个特征排序。</strong>取该节点样本，对每个连续特征 $j$ 按 $x_{i,j}$ 升序排列；候选阈值只取<strong>相邻不同取值之间的中点</strong>（$n$ 个不同值最多 $n-1$ 个候选），因为阈值在同一区间内移动不改变划分。本例单特征、8 个不同值，故 7 个候选。</li>
+    <li><strong>逐候选算不纯度。</strong>对每个 $(j,s)$ 统计左右子集的类别计数，算 $G_L,G_R$、加权不纯度 $\bar G=\frac{n_L}{n}G_L+\frac{n_R}{n}G_R$，再算收益 $\Delta G=G(t)-\bar G$。</li>
+    <li><strong>取收益最大者切分。</strong>若最大 $\Delta G$ 小于等于阈值、节点已纯、或样本数不足，则不再切分，把该节点标为叶并输出多数类（分类）或均值（回归）。</li>
+    <li><strong>递归。</strong>对左右子节点重复第 2–4 步，直到全部停止；记录每个内部节点的 $(j,s)$ 与每个叶的类别分布。</li>
+    <li><strong>后剪枝（可选，通常更稳）。</strong>先长满再自底向上回剪，最小化代价复杂度 $C_\alpha(T)=R(T)+\alpha|T|$，用验证集或交叉验证选 $\alpha$；它比预剪枝更少「过早停在一个坏切分上」。</li>
+    <li><strong>推理与记账。</strong>新样本从根按 $(j,s)$ 逐层下降到叶，输出叶的多数类或该类占比；同时记录深度、叶数、训练误差与特征重要性（按各分裂的 $\Delta G$ 加权累计）。缺失值可用替代分裂（surrogate split）或默认方向处理。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>特征类型：</strong>数值与类别混合皆可；只比较大小，故<strong>不需要标准化</strong>，对单调变换不敏感，对异常值不敏感。名义类别变量需按类别子集切分（或先编码）。</li>
+    <li><strong>数据规模：</strong>中小规模表格数据最合适；$n$ 与 $p$ 适中时训练极快。高维稀疏文本、图像原始像素上单树表现差，宜先降维或换线性/深度模型。</li>
+    <li><strong>分布假设：</strong>几乎无假设；能拟合非线性与交互。但<strong>类别不平衡</strong>时基尼被多数类主导，需 <code>class_weight</code> 或调整先验；连续目标改用平方误差与叶内均值（回归树）。</li>
+    <li><strong>模型角色：</strong>单棵树高方差，通常作为随机森林 / GBDT 的基学习器使用；单独使用必须剪枝或限制深度。允许单调约束时可强制分裂方向，适合风控评分卡。</li>
+    <li><strong>失效边界：</strong>真实边界为线性/斜向/光滑时，轴平行台阶需要极深的树才能逼近；树<strong>不能外推</strong>（超出训练范围的输出恒为叶常数）；训练集微小扰动可导致完全不同的树形（高方差）。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>训练</b> 单个含 $n_t$ 个样本的节点：对每个特征排序 $O(n_t\log n_t)$、再线性扫描全部候选阈值 $O(n_t)$，合计 $O(p\,n_t\log n_t)$；平衡树把所有层加起来为 $O(p\,n\log^{2}n)$，预排序特征后可降到 $O(p\,n\log n)$ 每层；极不平衡的最坏情形为 $O(p\,n^{2}\log n)$。<b>推理</b> 单样本 $O(\text{depth})$，平衡树约 $O(\log n)$，最坏 $O(n)$。<b>空间</b> 存树 $O(\text{节点数})$，每内部节点存 $(j,s)$ 与子指针、每叶存 $K$ 个计数，合计 $O(\text{叶数}\cdot K)$；训练时若缓存 $p$ 列排序索引为 $O(pn)$，逐特征原地排序可降为 $O(n)$。<b>调参</b> 深度/叶最小样本/增益阈值 × K 折 CV 会把训练成本乘上 $K\cdot M$（$M$ 为候选组合数）。</div>
+  <p>白话：CART 贵在「每个节点把特征排一次序」，而不是在数据行数；$p$ 很小、$n$ 很大时它仍很便宜，这解释了它在表格数据上作为基学习器的地位。代价是 $p$ 很大且 $n$ 也大时排序与缓存开销上升，此时工业实现改用直方图近似（把连续特征分箱，LightGBM 即此思路）。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>白盒可解释：每个预测都能写成一串「若 $x_j\le s$ 则…」的规则，可直接讲给业务方与合规审计。</li>
+        <li>无需特征缩放、对单调变换与离群点稳健，数值/类别混合特征开箱即用。</li>
+        <li>自动捕捉非线性与特征交互，支持单调约束，缺失值可用替代分裂处理。</li>
+        <li>训练与推理都快，基尼只需计数、无需 $\log$、无需矩阵求逆或梯度。</li>
+        <li>分裂收益天然给出特征重要性；作为集成基学习器时可用深树（Bagging）或浅桩（Boosting）灵活配账。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>高方差：训练集换几条记录树形就可能大变，单棵树泛化差，必须剪枝或集成。</li>
+        <li>轴平行边界难以表达斜向/线性关系，需要很深的树；<strong>不能外推</strong>到训练范围之外。</li>
+        <li>贪心分裂不保证全局最优；一次糟糕的早期切分无法在后续挽回。</li>
+        <li>基尼/信息增益偏向取值多的特征（易把 ID 类字段当分裂点），需增益率校正或特征约束。</li>
+        <li>类别不平衡时偏向多数类；叶内样本少时类别概率估计极不稳定，需拉普拉斯平滑或校准。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>为可手算，另设一个 8 行玩具集：单连续特征 $x$ 取「周学习时长（单位：10 小时）」，标签 $y$ 取「是否完课」（0/1），量纲口径沿用知学云案例的学习时长与完课标记，但这 8 行是专门设计的小型确定性数据，便于逐位复核。数据按 $x$ 升序排列：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>行</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr></thead>
+      <tbody>
+        <tr><th>$x$</th><td>1.2</td><td>2.4</td><td>3.7</td><td>4.9</td><td>6.1</td><td>7.3</td><td>8.5</td><td>9.8</td></tr>
+        <tr><th>$y$</th><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>$n=8$，0 类 5 个、1 类 3 个。父节点 $G(t)=1-(5/8)^2-(3/8)^2=1-25/64-9/64=30/64=\mathbf{0.46875}$。二分类可简写为 $G=2p(1-p)$，$p=3/8$ 时 $2\times0.375\times0.625=0.46875$，一致。</div>
+    <div class="solve-step"><span class="ss-k">列出全部候选阈值。</span>相邻 $x$ 的中点共 7 个：$1.80,\ 3.05,\ 4.30,\ 5.50,\ 6.70,\ 7.90,\ 9.15$。阈值落在相邻两点之间任意位置划分都不变，故只需这 7 个（这就是「完整切分搜索」）。</div>
+    <div class="solve-step"><span class="ss-k">算 $s=1.80$。</span>左 $\{0\}$ 纯，$G_L=0$；右 $\{0,0,0,1,1,1,0\}$ 中 4 个 0、3 个 1，$G_R=1-(4/7)^2-(3/7)^2=24/49=0.48980$；加权 $\bar G=\frac18\cdot0+\frac78\cdot0.48980=\mathbf{0.42857}$，$\Delta G=0.46875-0.42857=\mathbf{0.04018}$。</div>
+    <div class="solve-step"><span class="ss-k">算 $s=3.05$。</span>左 $\{0,0\}$ 纯，$G_L=0$；右 3 个 0、3 个 1，$G_R=1-0.5^2-0.5^2=0.5$；加权 $\bar G=\frac68\cdot0.5=\mathbf{0.37500}$，$\Delta G=\mathbf{0.09375}$。</div>
+    <div class="solve-step"><span class="ss-k">算 $s=4.30$。</span>左 $\{0,0,0\}$ 纯；右 $\{0,1,1,1,0\}$ 中 2 个 0、3 个 1，$G_R=1-(2/5)^2-(3/5)^2=12/25=0.48$；加权 $\bar G=\frac58\cdot0.48=\mathbf{0.30000}$，$\Delta G=\mathbf{0.16875}$。</div>
+    <div class="solve-step"><span class="ss-k">算 $s=5.50$（关键一步）。</span>左 $\{0,0,0,0\}$ 纯，$G_L=0$；右 $\{1,1,1,0\}$ 中 1 个 0、3 个 1，$G_R=1-(1/4)^2-(3/4)^2=1-1/16-9/16=6/16=\mathbf{0.37500}$；加权 $\bar G=\frac48\cdot0+\frac48\cdot0.375=\mathbf{0.18750}$，$\Delta G=0.46875-0.18750=\mathbf{0.28125}$。目前最大。</div>
+    <div class="solve-step"><span class="ss-k">算 $s=6.70$。</span>左 $\{0,0,0,0,1\}$ 中 4 个 0、1 个 1，$G_L=1-(4/5)^2-(1/5)^2=8/25=0.32$；右 $\{1,1,0\}$ 中 1 个 0、2 个 1，$G_R=1-(1/3)^2-(2/3)^2=4/9=0.44444$；加权 $\bar G=\frac58\cdot0.32+\frac38\cdot0.44444=0.2+0.16667=\mathbf{0.36667}$，$\Delta G=\mathbf{0.10208}$。</div>
+    <div class="solve-step"><span class="ss-k">算 $s=7.90$ 与 $s=9.15$。</span>$7.90$：左 4 个 0、2 个 1 得 $G_L=16/36=0.44444$，右 $\{1,0\}$ 得 $G_R=0.5$，加权 $\bar G=\frac68\cdot0.44444+\frac28\cdot0.5=0.33333+0.125=\mathbf{0.45833}$，$\Delta G=\mathbf{0.01042}$；$9.15$：左 4 个 0、3 个 1 得 $G_L=24/49=0.48980$，右 $\{0\}$ 纯，加权 $\bar G=\frac78\cdot0.48980=\mathbf{0.42857}$，$\Delta G=\mathbf{0.04018}$。</div>
+    <div class="solve-step"><span class="ss-k">选出根切分。</span>7 个增益里 $\mathbf{0.28125}$ 最大且唯一，对应 $x\le5.50$：左 4 行全为 0（已成纯叶，停止），右 4 行 $\{1,1,1,0\}$ 的 $G=0.37500$ 继续切。</div>
+    <div class="solve-step"><span class="ss-k">第二层：对右子节点穷举。</span>候选阈值 $6.70,\ 7.90,\ 9.15$。$6.70$：左 $\{1\}$ 纯、右 $\{1,1,0\}$ 的 $G=4/9$，加权 $\bar G=\frac34\cdot0.44444=\mathbf{0.33333}$，$\Delta G=\mathbf{0.04167}$；$7.90$：左 $\{1,1\}$ 纯、右 $\{1,0\}$ 的 $G=0.5$，加权 $\bar G=\frac24\cdot0.5=\mathbf{0.25000}$，$\Delta G=\mathbf{0.12500}$；$9.15$：左 $\{1,1,1\}$ 纯、右 $\{0\}$ 纯，加权 $\bar G=\mathbf{0}$，$\Delta G=\mathbf{0.37500}$。取 $9.15$，两侧 Gini 均为 0。</div>
+    <div class="solve-step"><span class="ss-k">写出最终树并解释。</span>三条规则：$x\le5.50\Rightarrow 0$；$5.50\lt x\le9.15\Rightarrow 1$；$x\gt9.15\Rightarrow 0$。训练 $8/8$ 全对，3 个叶。最后一条规则只为单独捞出第 8 行那个「学习时长最高却未完课」的样本——这是典型的<strong>过拟合信号</strong>：一个仅支撑 1 条记录的叶在真实数据上极可能只是噪声。工程上应设 <code>min_samples_leaf=2</code> 或最小增益阈值把它剪掉，再用验证集确认。这也正是深度专题一所说「单棵树高方差、须剪枝或集成」的具体样子；代码实验 Part 4 会把上面每一个 $\bar G$ 与 $\Delta G$ 原样复现一遍。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把 CART 与三个直接同类/近亲算法放在一起：C4.5 代表「换分裂准则」的树，随机森林与 GBDT 分别代表深度专题一里 Bagging 与 Boosting 两条集成路线。最后一列特意选了与 CART 共用基学习器、却把误差账目反过来记的 GBDT，便于对照。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>CART（基尼）</th><th>ID3 / C4.5（信息增益 / 增益率）</th><th>随机森林（Bagging + CART）</th><th>GBDT（Boosting + CART）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>分类/回归表格数据；数值与类别混合；中小规模；需白盒规则</td>
+        <td>离散特征为主的多分类；C4.5 可处理连续与缺失；倾向可解释规则</td>
+        <td>高方差单树不稳、样本量中等以上；可并行、对噪声较稳</td>
+        <td>追求精度的表格回归/排序；弱学习器为浅树；须验证集早停</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>训练 $O(pn\log^2 n)$，最坏 $O(pn^2\log n)$；推理 $O(\log n)$；空间 $O(\text{叶数}\cdot K)$</td>
+        <td>同阶，但每节点需算 $\log_2$ 与增益率的分裂信息，常数更大；剪枝再乘一遍</td>
+        <td>训练 $B$ 倍单树 + 特征子采样；可完全并行；推理 $O(B\log n)$；空间 $O(B\cdot$树$)$</td>
+        <td>训练 $m$ 轮串行不可并行；每轮还需算负梯度/二阶量；推理 $O(m\cdot$深度$)$</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td><code>max_depth</code>、<code>min_samples_leaf</code>、<code>min_impurity_decrease</code>、剪枝 $\alpha$、类别权重</td>
+        <td>增益率阈值、剪枝置信度、离散化分箱数、是否用增益率校正多取值偏置</td>
+        <td>树数 $B$（过几百无收益）、每次分裂的候选特征数 $m_{try}$（压 $\rho$ 的关键）、叶最小样本</td>
+        <td>轮数 $m$、学习率 $\nu$、树深度、子采样比例、早停 patience（$m\nu$ 为有效收缩量）</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">一次切分可完全手算；无需缩放；规则可直接审计；训练推理都极快</td>
+        <td>增益率天然抑制「多取值特征」偏置；信息熵有信息论解释</td>
+        <td class="best">把高方差深树平均掉，抗噪声、不易过拟合；并行与 OOB 误差都方便</td>
+        <td>逐轮降偏差，表格数据上常取得最强精度；可配任意可微损失</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>高方差、轴平行、不能外推、贪心非全局、类别不平衡偏多数类；线性/斜边界与高维稀疏数据不适用</td>
+        <td>增益率可能过度偏爱取值少的特征；多分类 $\log$ 计算与缺失处理更复杂</td>
+        <td>偏差地板不变（专题一）：基学习器欠拟合时堆树无用；$\rho\to1$ 时方差下限不降；模型不再可解释</td>
+        <td>对标签噪声与离群点敏感；轮数过多方差回升、必须早停；调参耦合强、串行慢</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>最强：一棵树即一份规则表；无需特征工程与缩放，落地与审计成本最低</td>
+        <td>强：规则可读；但剪枝与离散化流程需额外维护</td>
+        <td>弱：只剩特征重要性与 OOB；需维护 $B$ 棵树、随机种子与并行调度，内存随 $B$ 线性增长</td>
+        <td>弱：需记录 $\nu,m$、每轮残差与早停点；SHAP 等解释工具成为额外工程依赖，成本最高</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>六维口径由下图统一约定，保证全站各章的「横向对比」在同一套标准下展开，不随章节改变；读表时先锁定「当前误差由偏差还是方差主导」，再在同一列里找对应的旋钮。</p>
+  <figure class="figure" id="fig-matrix-algo-compare">
+  <svg class="dia" viewBox="0 0 680 224" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="算法横向对比的六个固定维度"><text class="dg-th" x="340.0" y="24" text-anchor="middle">统一横向对比口径</text><rect class="dg-box muted" x="20.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="122.0" y="73.0" text-anchor="middle">适用条件</text><text class="dg-ts" x="122.0" y="90.0" text-anchor="middle">数据假设 / 规模</text><rect class="dg-box alt" x="238.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="340.0" y="73.0" text-anchor="middle">时间与空间复杂度</text><text class="dg-ts" x="340.0" y="90.0" text-anchor="middle">训练 / 推理</text><rect class="dg-box" x="456.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="558.0" y="73.0" text-anchor="middle">关键超参数</text><text class="dg-ts" x="558.0" y="90.0" text-anchor="middle">敏感性与默认建议</text><rect class="dg-box ok" x="20.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="122.0" y="155.0" text-anchor="middle">优点</text><text class="dg-ts" x="122.0" y="172.0" text-anchor="middle">何时优先选</text><rect class="dg-box warn" x="238.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="340.0" y="155.0" text-anchor="middle">局限与失效边界</text><text class="dg-ts" x="340.0" y="172.0" text-anchor="middle">何时不该用</text><rect class="dg-box info" x="456.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="558.0" y="155.0" text-anchor="middle">可解释性 / 工程成本</text><text class="dg-ts" x="558.0" y="172.0" text-anchor="middle">落地的隐性代价</text></svg>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">算法横向对比的六个固定维度</span>
+    <span class="fig-note">所有章节的「横向对比」统一按这六栏展开，保证全站术语与评价口径一致。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="../CHAPTER-SPEC.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-code">代码实验 · 相关基学习器的方差公式、Bagging/Boosting 的分工、核技巧与 CART 切分的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 12 经典机器学习算法
+# 纯 Python 标准库；固定种子 20261107；复用「知学云 · 在线课程完课率」案例数字
+# Part 0: 案例数值口径
+# Part 1: 相关基学习器平均的方差公式 Var = rho*s2 + (1-rho)*s2/B（解析 vs 蒙特卡洛）
+# Part 2: Bagging 降方差但偏差地板不动 / Boosting 逐轮降偏差（8 点回归桩）
+# Part 3: 核技巧（显式 phi 与多项式核逐位一致）/ Mercer-PSD 判据 / 大 n 失效
+# Part 4: CART 在 8 行数值数据上按基尼穷举最优切分（与 d-algo 手算逐位对照）
+import math
+import random
+
+random.seed(20261107)
+
+
+def gauss():
+    return random.gauss(0.0, 1.0)
+
+
+# ============================================================
+print("=== Part 0: 案例口径（知学云 · 在线课程完课率，N=12000, seed=20261107）===")
+B0, B1 = 64.4306, 0.160833
+SD_Y, SD_X, R2 = 14.5763, 43.4274, 0.2296
+VAR_Y = SD_Y ** 2
+VAR_F = (B1 ** 2) * (SD_X ** 2)
+SIGMA2 = VAR_Y - VAR_F
+SIGMA = math.sqrt(SIGMA2)
+print(f"OLS quiz~study: intercept={B0:.4f} slope={B1:.6f} R2={R2:.4f}")
+print(f"Var(quiz)={VAR_Y:.4f}  Var(f)={VAR_F:.4f}  残差 sigma^2={SIGMA2:.4f}  sigma={SIGMA:.4f}")
+print("本实验把案例残差方差 sigma^2 作为「基学习器在测试点预测抖动」的量级；")
+print("方差公式与量纲无关，换别的 sigma^2 只会整体缩放，结构不变。")
+print()
+
+# ============================================================
+print("=== Part 1: 相关基学习器的平均方差 = rho*s2 + (1-rho)*s2/B ===")
+print(f"构造 f_b = sigma*(sqrt(rho)*z0 + sqrt(1-rho)*z_b)，则 Var(f_b)=s2、Corr(f_b,f_b')=rho")
+print(f"重复抽样 R={30000} 次，B 取 1/5/20/100；MC 为平均值的样本方差")
+RHOS = [0.0, 0.3, 0.7, 1.0]
+BS = [1, 5, 20, 100]
+BMAX = max(BS)
+R1 = 30000
+print(f"{'rho':&gt;5} {'B':&gt;4} {'theory':&gt;12} {'MC var':&gt;12} {'rel.err':&gt;9} {'floor=rho*s2':&gt;13}")
+for rho in RHOS:
+    sr = math.sqrt(rho)
+    s1 = math.sqrt(1.0 - rho)
+    acc = {B: [0.0, 0.0] for B in BS}   # [sum, sumsq]
+    for _ in range(R1):
+        z0 = gauss()
+        run = 0.0
+        for b in range(1, BMAX + 1):
+            run += gauss()
+            if b in acc:
+                avg = SIGMA * (sr * z0 + s1 * run / b)
+                acc[b][0] += avg
+                acc[b][1] += avg * avg
+    for B in BS:
+        s, ss = acc[B]
+        mean = s / R1
+        mc = ss / R1 - mean * mean
+        theory = rho * SIGMA2 + (1.0 - rho) * SIGMA2 / B
+        rel = (mc - theory) / theory * 100.0
+        print(f"{rho:5.1f} {B:4d} {theory:12.4f} {mc:12.4f} {rel:+8.2f}% {rho * SIGMA2:13.4f}")
+    print()
+print("读法：rho=0 时方差按 s2/B 一路降到 0；rho=0.3 时 B 再大也停在 floor=49.1053 附近；")
+print("rho=0.7 的 floor=114.5791；rho=1（成员完全相同）时 Bagging 毫无收益。")
+print("B 从 20 加到 100 的边际收益已被相关性吃光：rho=0.7 时仅从 117.03 降到 115.07。")
+print()
+
+# ============================================================
+print("=== Part 2: Bagging 降方差 / Boosting 降偏差（8 点回归桩，标签 y=[2,2,5,5,2,2,5,5]）===")
+XS = [1, 2, 3, 4, 5, 6, 7, 8]
+Y = [2.0, 2.0, 5.0, 5.0, 2.0, 2.0, 5.0, 5.0]
+N = len(Y)
+
+
+def mse(pred):
+    return sum((p - y) ** 2 for p, y in zip(pred, Y)) / N
+
+
+def fit_stump(pts):
+    """pts: [(x,y),...]；返回 (best_sse, threshold, left_mean, right_mean)。"""
+    pts = sorted(pts, key=lambda t: t[0])
+    best = None
+    for s in range(1, len(pts)):
+        if pts[s - 1][0] == pts[s][0]:
+            continue
+        thr = (pts[s - 1][0] + pts[s][0]) / 2.0
+        left = [y for x, y in pts if x &lt;= thr]
+        right = [y for x, y in pts if x &gt; thr]
+        ml = sum(left) / len(left)
+        mr = sum(right) / len(right)
+        sse = sum((y - ml) ** 2 for y in left) + sum((y - mr) ** 2 for y in right)
+        if best is None or sse &lt; best[0]:
+            best = (sse, thr, ml, mr)
+    return best
+
+
+def stump_predict(model, x):
+    _, thr, ml, mr = model
+    return ml if x &lt;= thr else mr
+
+
+f0 = sum(Y) / N
+print(f"F0 = 常数均值 = {f0:.4f}  训练 MSE = {mse([f0] * N):.4f}")
+best1 = fit_stump(list(zip(XS, Y)))
+print(f"单个最优回归桩: 阈值={best1[1]:.1f}  训练 MSE={best1[0] / N:.4f}（这是「桩」模型族的偏差地板）")
+
+# --- Boosting：前向分步，逐轮拟合残差，nu=1 ---
+F = [f0] * N
+print("Boosting（nu=1，每轮用 2 叶桩拟合当前残差）：")
+print(f"{'round':&gt;6} {'train MSE':&gt;12} {'残差 SSE':&gt;12}")
+print(f"{0:6d} {mse(F):12.4f} {sum((y - p) ** 2 for p, y in zip(F, Y)):12.4f}")
+for m in range(1, 9):
+    r = [y - p for y, p in zip(Y, F)]
+    h = fit_stump(list(zip(XS, r)))
+    F = [p + stump_predict(h, x) for p, x in zip(F, XS)]
+    print(f"{m:6d} {mse(F):12.4f} {sum((y - p) ** 2 for p, y in zip(F, Y)):12.4f}")
+print("训练 MSE 逐轮单调下降 -&gt; Boosting 把「模型族装不下的偏差」一轮轮补回来。")
+print()
+
+# --- Bagging：自助采样若干桩取平均 ---
+NSTUMP = 12000
+stumps = []
+for _ in range(NSTUMP):
+    # 成对抽取 (x,y)，保持每条记录完整，避免 x 与 y 错配
+    sample = []
+    for _ in range(N):
+        i = random.randrange(N)
+        sample.append((XS[i], Y[i]))
+    stumps.append(fit_stump(sample))
+preds = [[stump_predict(h, x) for x in XS] for h in stumps]
+print("Bagging（自助采样 2 叶桩取平均）：")
+print(f"{'B':&gt;6} {'bagged 训练 MSE':&gt;16}")
+for B in [1, 5, 50, 400, 12000]:
+    avg_pred = [sum(preds[j][i] for j in range(B)) / B for i in range(N)]
+    print(f"{B:6d} {mse(avg_pred):16.4f}")
+plateau = mse([sum(preds[j][i] for j in range(NSTUMP)) / NSTUMP for i in range(N)])
+print(f"Bagging 的 MSE 停在 {plateau:.4f} 上下（B=400 之后再加树几乎无收益），")
+print(f"仍远高于 Boosting 第 8 轮的 MSE：平均主要压抖动，剩下的误差是「桩」模型族装不下交替模式的偏差。")
+
+# 单桩在 x=4 处预测值的方差，与 B 桩平均的方差（体现 rho&gt;0 的下限）
+at4 = [p[3] for p in preds]
+vs = sum((v - sum(at4) / NSTUMP) ** 2 for v in at4) / NSTUMP
+
+
+def var_of_group_means(B):
+    gm = [sum(at4[g * B:(g + 1) * B]) / B for g in range(NSTUMP // B)]
+    mu = sum(gm) / len(gm)
+    return sum((v - mu) ** 2 for v in gm) / len(gm)
+
+
+print(f"x=4 处：单桩预测方差={vs:.4f}；50 桩平均的方差={var_of_group_means(50):.4f}"
+      f"（若独立应为 {vs / 50:.4f}）")
+print(f"          400 桩平均的方差={var_of_group_means(400):.4f}（若独立应为 {vs / 400:.4f}）")
+print("本玩具里各桩切点分散、相关性 rho 约等于 0，故方差近似按 1/B 下降（与 Part 1 的 rho=0 行对应）；")
+print("若成员高度相关，则会停在 rho*s2 下限，见 Part 1 的 rho=0.3 / 0.7 行。")
+print()
+
+# ============================================================
+print("=== Part 3: 核技巧 / Mercer-PSD 判据 / 大 n 失效 ===")
+
+
+def phi(x):
+    # K(x,z)=(1+x*z)^2 = 1 + 2xz + x^2 z^2；显式映射 phi=(1, sqrt(2)x, x^2)
+    return (1.0, math.sqrt(2.0) * x, x * x)
+
+
+def dot(a, b):
+    return sum(u * v for u, v in zip(a, b))
+
+
+def k_poly(x, z):
+    return (1.0 + x * z) ** 2
+
+
+def gram(points, fn):
+    n = len(points)
+    return [[fn(points[i], points[j]) for j in range(n)] for i in range(n)]
+
+
+def max_diff(A, B):
+    return max(abs(A[i][j] - B[i][j]) for i in range(len(A)) for j in range(len(A)))
+
+
+def cholesky(A, tol=1e-10):
+    n = len(A)
+    L = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(i + 1):
+            s = A[i][j] - sum(L[i][k] * L[j][k] for k in range(j))
+            if i == j:
+                if s &lt; -tol:
+                    return False, []
+                L[i][i] = math.sqrt(max(s, 0.0))
+            else:
+                L[i][j] = s / L[j][j] if L[j][j] &gt; tol else 0.0
+    return True, [L[i][i] for i in range(n)]
+
+
+def jacobi_eig(A, iters=200):
+    n = len(A)
+    a = [row[:] for row in A]
+    for _ in range(iters):
+        p, q, mx = 0, 1, 0.0
+        for i in range(n):
+            for j in range(i + 1, n):
+                if abs(a[i][j]) &gt; mx:
+                    mx, p, q = abs(a[i][j]), i, j
+        if mx &lt; 1e-12:
+            break
+        app, aqq, apq = a[p][p], a[q][q], a[p][q]
+        theta = 0.5 * math.atan2(2.0 * apq, aqq - app)
+        c, s = math.cos(theta), math.sin(theta)
+        for k in range(n):
+            if k != p and k != q:
+                akp, akq = a[k][p], a[k][q]
+                a[k][p] = a[p][k] = c * akp - s * akq
+                a[k][q] = a[q][k] = s * akp + c * akq
+        a[p][p] = c * c * app - 2 * s * c * apq + s * s * aqq
+        a[q][q] = s * s * app + 2 * s * c * apq + c * c * aqq
+        a[p][q] = a[q][p] = 0.0
+    return sorted(a[i][i] for i in range(n))
+
+
+PTS = [1.0, 2.0, 3.0, 4.0]
+G_phi = gram(PTS, lambda x, z: dot(phi(x), phi(z)))
+G_ker = gram(PTS, k_poly)
+print(f"4 个点上：显式 phi 的 Gram 与核函数 Gram 的最大逐位差 = {max_diff(G_phi, G_ker):.2e}")
+print(f"  K(x,z)=(1+xz)^2 的显式 phi(x)=(1, sqrt(2)x, x^2) 维度=3；核函数从不写出坐标，只返回标量。")
+ok, diag = cholesky(G_ker)
+eig = jacobi_eig(G_ker)
+print(f"多项式核 Gram：Cholesky 成功={ok}，主元={[round(d, 4) for d in diag]}")
+print(f"  特征值={[round(v, 4) for v in eig]}；全部 &gt;=0 即 PSD（半正定）。")
+print(f"  注意最小特征值恰为 0：4 个点、phi 只有 3 维，Gram 秩最多 3 -&gt; 半正定但秩亏，不是严格正定。")
+
+# 对多组随机样本检验 PSD（Mercer 要求对「任意」有限样本成立）
+print("多项式核对 3 组随机样本的 Gram 最小特征值：", end=" ")
+for _ in range(3):
+    rp = [random.uniform(-2.0, 2.0) for _ in range(6)]
+    e = jacobi_eig(gram(rp, k_poly))
+    print(f"{e[0]:+.1e}", end=" ")
+print("（|lambda| 在 1e-12 量级即数值零，全部非负 -&gt; 是合法 Mercer 核）")
+
+# 失效核：把 Gram 的一个非对角元改得过大，破坏 Cauchy-Schwarz / PSD
+G_bad = [row[:] for row in G_ker]
+G_bad[0][1] = G_bad[1][0] = 100.0
+ok2, _ = cholesky(G_bad)
+eig2 = jacobi_eig(G_bad)
+print(f"人为破坏的对称相似度：K01=100，但 K00={G_ker[0][0]:.1f}, K11={G_ker[1][1]:.1f}；")
+print(f"  Cauchy-Schwarz 要求 K01^2 &lt;= K00*K11={G_ker[0][0] * G_ker[1][1]:.0f}，而 100^2=10000，违反。")
+print(f"  Cholesky 成功={ok2}，最小特征值={eig2[0]:.4f}（&lt;0 -&gt; 不是合法核，无法对应任何内积空间）")
+
+print("大 n 的代价（核方法把「维度」换成「样本数」）：")
+print(f"{'n':&gt;8} {'n^2 entries':&gt;14} {'Gram 内存(GB,8B)':&gt;18} {'Cholesky ~n^3/3 FLOPs':&gt;24}")
+for n in [100, 1000, 10000, 100000]:
+    mem = 8.0 * n * n / 1e9
+    flop = n ** 3 / 3.0
+    print(f"{n:8d} {n * n:14d} {mem:18.4f} {flop:24.3e}")
+print(f"{'p(原始维)':&gt;8} {'dim(phi)=1+p+p(p+1)/2':&gt;24} {'n=1e4 显式特征内存(GB)':&gt;24}")
+for p in [10, 100, 1000, 10000]:
+    d = 1 + p + p * (p + 1) // 2
+    print(f"{p:8d} {d:24d} {8.0 * 10000 * d / 1e9:24.4f}")
+print("结论：核技巧省掉显式坐标，但 Gram 是 n*n；n 到 1e5 时内存 80GB、训练 ~3e14 FLOPs 不可行，")
+print("应改用随机傅里叶特征 / Nystrom / 线性模型 + 显式特征，或换参数化深度模型。")
+print()
+
+# ============================================================
+print("=== Part 4: CART 在 8 行数值数据上穷举全部候选阈值，按基尼找最优切分 ===")
+X_CART = [1.2, 2.4, 3.7, 4.9, 6.1, 7.3, 8.5, 9.8]
+Y_CART = [0, 0, 0, 0, 1, 1, 1, 0]
+
+
+def gini(labels):
+    n = len(labels)
+    if n == 0:
+        return 0.0
+    p1 = sum(labels) / n
+    return 1.0 - p1 * p1 - (1 - p1) ** 2
+
+
+def split_report(xs, ys):
+    G = gini(ys)
+    n = len(ys)
+    rows = []
+    for s in range(1, n):
+        thr = (xs[s - 1] + xs[s]) / 2.0
+        L = [y for x, y in zip(xs, ys) if x &lt;= thr]
+        R = [y for x, y in zip(xs, ys) if x &gt; thr]
+        w = (len(L) / n) * gini(L) + (len(R) / n) * gini(R)
+        rows.append((thr, gini(L), gini(R), w, G - w))
+    return G, rows
+
+
+G0, rows = split_report(X_CART, Y_CART)
+print(f"父节点 n=8，0 类 5 个 / 1 类 3 个，G(父) = 1-(5/8)^2-(3/8)^2 = {G0:.5f}")
+print(f"{'阈值':&gt;8} {'G(L)':&gt;9} {'G(R)':&gt;9} {'加权 Gini':&gt;12} {'基尼增益':&gt;12}")
+for thr, gl, gr, w, gain in rows:
+    print(f"{thr:8.2f} {gl:9.5f} {gr:9.5f} {w:12.5f} {gain:12.5f}")
+best = max(rows, key=lambda t: t[4])
+print(f"最优根切分: x &lt;= {best[0]:.2f}，加权 Gini={best[3]:.5f}，基尼增益={best[4]:.5f}")
+
+# 第二层：只对右子节点（x&gt;5.5 的 4 行）继续切
+XR = [x for x in X_CART if x &gt; best[0]]
+YR = [y for x, y in zip(X_CART, Y_CART) if x &gt; best[0]]
+GR, rowsR = split_report(XR, YR)
+print(f"右子节点 n={len(YR)}，标签={YR}，G={GR:.5f}；候选阈值与增益：")
+for thr, gl, gr, w, gain in rowsR:
+    print(f"  x&lt;={thr:.2f}: 加权 Gini={w:.5f}, 基尼增益={gain:.5f}")
+bestR = max(rowsR, key=lambda t: t[4])
+print(f"右子节点最优切分 x &lt;= {bestR[0]:.2f}，增益={bestR[4]:.5f}，两侧 Gini 均=0（纯叶）。")
+print("最终树 3 个叶：x&lt;=5.50 -&gt; 0；5.50&lt;x&lt;=9.15 -&gt; 1；x&gt;9.15 -&gt; 0；训练 8/8 全对。")
+print("与 d-algo 的 step-solve 手算逐位一致。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 0: 案例口径（知学云 · 在线课程完课率，N=12000, seed=20261107）===
+OLS quiz~study: intercept=64.4306 slope=0.160833 R2=0.2296
+Var(quiz)=212.4685  Var(f)=48.7841  残差 sigma^2=163.6845  sigma=12.7939
+本实验把案例残差方差 sigma^2 作为「基学习器在测试点预测抖动」的量级；
+方差公式与量纲无关，换别的 sigma^2 只会整体缩放，结构不变。
+
+=== Part 1: 相关基学习器的平均方差 = rho*s2 + (1-rho)*s2/B ===
+构造 f_b = sigma*(sqrt(rho)*z0 + sqrt(1-rho)*z_b)，则 Var(f_b)=s2、Corr(f_b,f_b')=rho
+重复抽样 R=30000 次，B 取 1/5/20/100；MC 为平均值的样本方差
+  rho    B       theory       MC var   rel.err  floor=rho*s2
+  0.0    1     163.6845     162.2142    -0.90%        0.0000
+  0.0    5      32.7369      32.4358    -0.92%        0.0000
+  0.0   20       8.1842       8.1290    -0.67%        0.0000
+  0.0  100       1.6368       1.6114    -1.56%        0.0000
+
+  0.3    1     163.6845     165.2052    +0.93%       49.1053
+  0.3    5      72.0212      72.5921    +0.79%       49.1053
+  0.3   20      54.8343      55.4036    +1.04%       49.1053
+  0.3  100      50.2511      50.5549    +0.60%       49.1053
+
+  0.7    1     163.6845     164.2564    +0.35%      114.5791
+  0.7    5     124.4002     125.7060    +1.05%      114.5791
+  0.7   20     117.0344     117.7353    +0.60%      114.5791
+  0.7  100     115.0702     115.8711    +0.70%      114.5791
+
+  1.0    1     163.6845     163.3069    -0.23%      163.6845
+  1.0    5     163.6845     163.3069    -0.23%      163.6845
+  1.0   20     163.6845     163.3069    -0.23%      163.6845
+  1.0  100     163.6845     163.3069    -0.23%      163.6845
+
+读法：rho=0 时方差按 s2/B 一路降到 0；rho=0.3 时 B 再大也停在 floor=49.1053 附近；
+rho=0.7 的 floor=114.5791；rho=1（成员完全相同）时 Bagging 毫无收益。
+B 从 20 加到 100 的边际收益已被相关性吃光：rho=0.7 时仅从 117.03 降到 115.07。
+
+=== Part 2: Bagging 降方差 / Boosting 降偏差（8 点回归桩，标签 y=[2,2,5,5,2,2,5,5]）===
+F0 = 常数均值 = 3.5000  训练 MSE = 2.2500
+单个最优回归桩: 阈值=2.5  训练 MSE=1.5000（这是「桩」模型族的偏差地板）
+Boosting（nu=1，每轮用 2 叶桩拟合当前残差）：
+ round    train MSE       残差 SSE
+     0       2.2500      18.0000
+     1       1.5000      12.0000
+     2       1.1667       9.3333
+     3       0.4722       3.7778
+     4       0.2407       1.9259
+     5       0.1636       1.3086
+     6       0.0802       0.6420
+     7       0.0525       0.4198
+     8       0.0267       0.2140
+训练 MSE 逐轮单调下降 -&gt; Boosting 把「模型族装不下的偏差」一轮轮补回来。
+
+Bagging（自助采样 2 叶桩取平均）：
+     B    bagged 训练 MSE
+     1           2.2500
+     5           1.5075
+    50           1.2501
+   400           1.2522
+ 12000           1.2538
+Bagging 的 MSE 停在 1.2538 上下（B=400 之后再加树几乎无收益），
+仍远高于 Boosting 第 8 轮的 MSE：平均主要压抖动，剩下的误差是「桩」模型族装不下交替模式的偏差。
+x=4 处：单桩预测方差=1.0047；50 桩平均的方差=0.0200（若独立应为 0.0201）
+          400 桩平均的方差=0.0026（若独立应为 0.0025）
+本玩具里各桩切点分散、相关性 rho 约等于 0，故方差近似按 1/B 下降（与 Part 1 的 rho=0 行对应）；
+若成员高度相关，则会停在 rho*s2 下限，见 Part 1 的 rho=0.3 / 0.7 行。
+
+=== Part 3: 核技巧 / Mercer-PSD 判据 / 大 n 失效 ===
+4 个点上：显式 phi 的 Gram 与核函数 Gram 的最大逐位差 = 0.00e+00
+  K(x,z)=(1+xz)^2 的显式 phi(x)=(1, sqrt(2)x, x^2) 维度=3；核函数从不写出坐标，只返回标量。
+多项式核 Gram：Cholesky 成功=True，主元=[2.0, 2.1794, 0.6489, 0.0]
+  特征值=[0.0, 0.091, 4.2498, 413.6592]；全部 &gt;=0 即 PSD（半正定）。
+  注意最小特征值恰为 0：4 个点、phi 只有 3 维，Gram 秩最多 3 -&gt; 半正定但秩亏，不是严格正定。
+多项式核对 3 组随机样本的 Gram 最小特征值： -1.9e-15 -9.5e-17 -7.6e-16 （|lambda| 在 1e-12 量级即数值零，全部非负 -&gt; 是合法 Mercer 核）
+人为破坏的对称相似度：K01=100，但 K00=4.0, K11=25.0；
+  Cauchy-Schwarz 要求 K01^2 &lt;= K00*K11=100，而 100^2=10000，违反。
+  Cholesky 成功=False，最小特征值=-89.9412（&lt;0 -&gt; 不是合法核，无法对应任何内积空间）
+大 n 的代价（核方法把「维度」换成「样本数」）：
+       n    n^2 entries     Gram 内存(GB,8B)    Cholesky ~n^3/3 FLOPs
+     100          10000             0.0001                3.333e+05
+    1000        1000000             0.0080                3.333e+08
+   10000      100000000             0.8000                3.333e+11
+  100000    10000000000            80.0000                3.333e+14
+  p(原始维)    dim(phi)=1+p+p(p+1)/2         n=1e4 显式特征内存(GB)
+      10                       66                   0.0053
+     100                     5151                   0.4121
+    1000                   501501                  40.1201
+   10000                 50015001                4001.2001
+结论：核技巧省掉显式坐标，但 Gram 是 n*n；n 到 1e5 时内存 80GB、训练 ~3e14 FLOPs 不可行，
+应改用随机傅里叶特征 / Nystrom / 线性模型 + 显式特征，或换参数化深度模型。
+
+=== Part 4: CART 在 8 行数值数据上穷举全部候选阈值，按基尼找最优切分 ===
+父节点 n=8，0 类 5 个 / 1 类 3 个，G(父) = 1-(5/8)^2-(3/8)^2 = 0.46875
+      阈值      G(L)      G(R)      加权 Gini         基尼增益
+    1.80   0.00000   0.48980      0.42857      0.04018
+    3.05   0.00000   0.50000      0.37500      0.09375
+    4.30   0.00000   0.48000      0.30000      0.16875
+    5.50   0.00000   0.37500      0.18750      0.28125
+    6.70   0.32000   0.44444      0.36667      0.10208
+    7.90   0.44444   0.50000      0.45833      0.01042
+    9.15   0.48980   0.00000      0.42857      0.04018
+最优根切分: x &lt;= 5.50，加权 Gini=0.18750，基尼增益=0.28125
+右子节点 n=4，标签=[1, 1, 1, 0]，G=0.37500；候选阈值与增益：
+  x&lt;=6.70: 加权 Gini=0.33333, 基尼增益=0.04167
+  x&lt;=7.90: 加权 Gini=0.25000, 基尼增益=0.12500
+  x&lt;=9.15: 加权 Gini=0.00000, 基尼增益=0.37500
+右子节点最优切分 x &lt;= 9.15，增益=0.37500，两侧 Gini 均=0（纯叶）。
+最终树 3 个叶：x&lt;=5.50 -&gt; 0；5.50&lt;x&lt;=9.15 -&gt; 1；x&gt;9.15 -&gt; 0；训练 8/8 全对。
+与 d-algo 的 step-solve 手算逐位一致。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">sigma^2=163.6845 / sigma=12.7939</span> 来自案例 <code>quiz_avg</code> 的 $\mathrm{sd}=14.5763$ 与 OLS 斜率 $0.160833$、学习时长 $\mathrm{sd}=43.4274$：$\mathrm{Var}(f)=48.7841$，$\sigma^2=212.4685-48.7841=163.6845$，与 <a href="m09-ml-stats.html">模块 09</a> 的噪声地板逐位一致。本实验只借它当「基学习器抖动」的量级；方差公式对 $\sigma^2$ 是齐次的，改成任何正数都只整体缩放、不改变 $\rho$ 与 $1/B$ 的结构。</p>
+    <p><span class="ci-k">Part 1 的 theory 与 MC var 两列</span>（如 $\rho=0.3,\ B=5$：72.0212 对 72.5921）逐格吻合，相对误差在 $\pm1.6\%$ 内，这是 30000 次重复下样本方差的标准误量级。四行 $\rho$ 把公式的三个极限一次摆齐：$\rho=0$ 时 $163.6845\to1.6368$（恰好 $\sigma^2/B$）；$\rho=0.3$ 时停在 floor 49.1053 附近；$\rho=0.7$ 时 $B$ 从 20 加到 100 只从 117.0344 挪到 115.0702；$\rho=1$ 时四列恒为 163.6845。这正说明「继续堆 $B$」与「压低 $\rho$」是两件事。</p>
+    <p><span class="ci-k">Part 2 的 Boosting 表</span>：训练 MSE 从 $2.2500$ 单调降到 $0.0267$（8 轮），每一步都对应 $\|r_m\|^2=\|r_{m-1}\|^2-\nu(2-\nu)\|h_m\|^2$ 里减去的那一块；单个最优桩的 $1.5000$ 是桩模型族的偏差地板。<span class="ci-k">Bagging 的 1.2538</span> 在 $B=400$ 后就不再下降（$B=50$ 为 1.2501、$B=12000$ 为 1.2538，差异是自助采样抖动），与 Boosting 的 0.0267 相差约 47 倍——「平均只压抖动、不动偏差」在这里变成了可直接读的倍数。</p>
+    <p><span class="ci-k">x=4 处单桩方差 1.0047 与 50 桩平均方差 0.0200</span>：若成员独立应为 $1.0047/50=0.0201$，实测 0.0200，说明本玩具里各桩切点分散、$\rho\approx0$，方差近似按 $1/B$ 下降；这正是 Part 1 中 $\rho=0$ 那一行的真实版。若把每个桩都固定在同一份数据上训练，$\rho\to1$，平均方差就会像 $\rho=1$ 行那样停在 $1.0047$ 附近不再下降。</p>
+    <p><span class="ci-k">Part 3 的 0.00e+00</span> 是「显式 $\phi$ 的 Gram」减「核函数 Gram」的最大逐位差：两者完全相同，证明核技巧没有丢任何信息，只是把三维坐标换成了一个标量函数。<span class="ci-k">特征值 [0, 0.0910, 4.2498, 413.6592]</span> 全部非负即 PSD；最小恰为 0 是因为 4 个点落到 3 维 $\phi$ 空间，Gram 秩最多 3，Cholesky 主元 $[2.0,2.1794,0.6489,0.0]$ 出现零元但没有负元——半正定而非严格正定，这是合法核允许的。</p>
+    <p><span class="ci-k">最小特征值 -89.9412</span> 是人为把 $K_{01}$ 改成 100 之后的结果：$K_{00}K_{11}=100$，$\sqrt{100}=10$，而 $100^2=10000$，柯西—施瓦茨被彻底破坏，Cholesky 失败。这一行把「不是任意对称相似度都能当核」变成了一个可复现的数；3 组随机样本上合法核的最小特征值都在 $\pm10^{-15}$（浮点零）则验证了「任意点集」这一量词。</p>
+    <p><span class="ci-k">n=100000 时 80.0000 GB 与 3.333e+14 FLOPs</span>：核方法把 $O(n\cdot p^2)$ 的显式特征（$p=10^4$ 时 4001 GB）换成 $O(n^2)$ 的 Gram，在 $n$ 小时大赚、在十万级反被拖垮。改 <code>n</code> 列表会整体平移这张表，但 $n^2$ 与 $n^3$ 的指数不变——这是结构性的墙，不是调参能绕过的。</p>
+    <p><span class="ci-k">Part 4 的 7 行 $\bar G$ 与 $\Delta G$</span>（0.42857/0.04018 … 0.18750/0.28125 …）与第六步手算逐位一致，最优切分 $x\le5.50$、第二层 $x\le9.15$、最终 3 叶 8/8 全对都由代码原样复现。把 <code>Y_CART</code> 改一个标签，整张表会重排而树形随之改变——这就是单棵树高方差的直接体现，也是必须剪枝或用集成的原因。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组方法给出三件东西：用 $\rho\sigma^2+(1-\rho)\sigma^2/B$ 定量解释 Bagging 为何只降方差、用残差递推解释 Boosting 为何降偏差；判定一个相似度是否为合法 Mercer 核并给出容量与规模边界；以及用 CART 基尼完成一次可手算的最优切分。<strong>不做</strong>因果识别、不做概率校准、也不替代独立测试集的最终报告。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：特征矩阵 $X$（数值/类别混合，CART 无需缩放；核方法需同尺度与合法 $K$）、标签 $y$（分类 0/1 或连续）、随机种子、成员数 $B$ / 轮数 $m$、相关系数 $\rho$、核参数 $\gamma$ 与惩罚 $C$、树深与叶最小样本。输出：集成预测函数、系数 $\alpha_i$ 或树规则、每个叶的类别分布、Gram 矩阵与其特征值、各候选切分的加权不纯度与增益。方差/不纯度量纲随任务而定，Gini 与相关系数无量纲。</td></tr>
+    <tr><th>适用场景</th><td>表格数据分类/回归的基模型选型与误差诊断（先判断偏差还是方差主导）；高维小样本的非线性分类（核 SVM）；需要白盒规则、单调约束与快速推理的风控/运营场景；评估协议设计中的成员相关性与早停点选择；以及数据规模达到 $10^4$–$10^5$ 时对核方法的可行性预判。</td></tr>
+    <tr><th>关键参数</th><td>$\rho$（成员相关性，越小越好，由 bootstrap 与 $m_{try}$ 控制）、$B$（树数，边际收益按 $1/B^2$ 衰减）、$m,\nu$（Boosting 轮数与学习率，总收缩 $\approx m\nu$，须早停）、$\gamma,C,\lambda$（核宽度、软间隔惩罚、正则，$\gamma$ 过大边界崎岖）、<code>max_depth</code> / <code>min_samples_leaf</code> / <code>min_impurity_decrease</code> / 剪枝 $\alpha$（树的复杂度旋钮，全部由验证集或嵌套 CV 选定）。</td></tr>
+    <tr><th>边界条件</th><td>在 $\rho\to1$ 或基学习器偏差主导的条件下「Bagging 降方差」不成立，应改用随机特征子采样或先加大单模型容量；在标签噪声高、轮数过多时「Boosting 降偏差」对测试误差不成立，应改用鲁棒损失与早停；在 $K$ 非 PSD（sigmoid 核、未投影的 learned similarity）或 $n\gtrsim10^5$ 时核技巧不成立/不可行，应改用 PSD 投影、随机傅里叶特征、Nyström、线性 SVM 或深度模型；在真实边界线性/斜向、需要外推或高维稀疏时单棵树不适用，应改用线性模型、正则化或集成。</td></tr>
+    <tr><th>常见问题</th><td>（1）树数 $B$ 一直加却期待方差继续降；（2）把「任意对称相似度」直接当核用；（3）用训练集上的不纯度挑树深或 $\lambda$；（4）类别不平衡或连续特征阈值只试少数几个分位点。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>随机森林把树数从 200 加到 1000，为什么验证误差几乎不动？</summary><div class="faq-a">因为 $\mathrm{Var}(\frac1B\sum\hat f_b)=\rho\sigma^2+\frac{(1-\rho)\sigma^2}{B}$ 里只有第二项随 $B$ 衰减，且按 $1/B^2$ 递减。代码实验 Part 1 中 $\rho=0.7$ 时 $B=20$ 已是 117.0344、$B=100$ 才 115.0702，离地板 114.5791 只差 0.5。想再降只能压 $\rho$：减小每次分裂的候选特征数 $m_{try}$、加大 bootstrap 扰动、或去掉高度相关的冗余特征。树数够用即可，继续加只增内存与推理时间。</div></details>
+  <details><summary>Bagging 能不能顺便把偏差也降下来？</summary><div class="faq-a">不能。$\mathrm{E}[\hat f_{\mathrm{bag}}]=\frac1B\sum\mathrm{E}[\hat f_b]=\bar f$，所以 $\mathrm{Bias}(\hat f_{\mathrm{bag}})=\mathrm{Bias}(\hat f_1)$ 严格不变。代码实验 Part 2 中 12000 棵桩平均后训练 MSE 仍停在 1.2538，而单个最优桩是 1.5000——平均只把抖动压掉，剩下的是「桩本来就装不下交替模式」的偏差。若基学习器欠拟合，正确动作是加深树、加特征、或改用 Boosting，而不是加 $B$。</div></details>
+  <details><summary>我自定义了一个「样本越像分越高」的对称函数，可以直接当核吗？</summary><div class="faq-a">不能，必须先验证 PSD。充要条件是：对<strong>任意</strong>点集，Gram 矩阵 $K_{ij}=K(x_i,x_j)$ 全部特征值 $\ge0$；快速否决用 $K(x,z)^2\le K(x,x)K(z,z)$。代码实验 Part 3 把 $K_{01}$ 改成 100（而 $\sqrt{K_{00}K_{11}}=10$）后最小特征值变成 $-89.9412$，Cholesky 失败，此时对偶问题不再凸、表示定理不成立。$\tanh(a x^\top z+b)$ 型 sigmoid 核在多数参数下就有这个毛病。修复：加对角抖动、把负特征值截断/取绝对值做 PSD 投影，或改用显式特征加线性模型。</div></details>
+  <details><summary>RBF 核映射到无穷维，为什么没有必然过拟合？</summary><div class="faq-a">容量由 Gram 矩阵的谱而非 $\dim\mathcal H$ 决定：$\hat{\mathfrak R}_n\le\frac{B}{\sqrt n}\sqrt{\mathrm{tr}(K)/n}$，$n$ 个点最多撑起 $n$ 个自由度，且特征值衰减快时有效自由度更少。代码里 4 个点上多项式核的特征值是 $[0,0.0910,4.2498,413.6592]$，一个方向还恰好为零（秩亏）。真正的风险旋钮是 $\gamma$（过大 → 边界崎岖）、$C$（过大 → 不肯容忍误分类）与样本量；用验证集或嵌套 CV 调它们，比担心「无穷维」有用得多。</div></details>
+  <details><summary>数据到了几十万行，还能用核 SVM 吗？</summary><div class="faq-a">精确版基本不行。代码表里 $n=10^5$ 时 Gram 有 $10^{10}$ 项 = 80 GB、Cholesky 约 $3.3\times10^{14}$ FLOPs，且预测成本随支持向量数线性增长。$n\gtrsim10^5$ 应改用随机傅里叶特征 / Nyström 把核近似成显式低维特征后接线性 SVM，或直接用线性模型、直方图 GBDT、<a href="m13-deep-training.html">小批量深度训练</a>。若 $p$ 很大而 $n$ 不大（文本、生物信息），核方法反而是主场——这正是「比较 $p^2$ 与 $n$」的意义。</div></details>
+  <details><summary>CART 的候选阈值为什么只取相邻两点的中点？</summary><div class="faq-a">因为把阈值 $s$ 在 $(x_{(k)},x_{(k+1)})$ 内任意移动，左右子集的样本构成完全不变，$G_L,G_R,\Delta G$ 都是常数，最优点必然可放在端点中点。8 个不同取值因此只有 7 个候选，代码实验 Part 4 正是穷举这 7 个得到唯一最优 $x\le5.50$。若只在少数分位点（如四分位数）试阈值，会漏掉真正的最优切点；工业实现用直方图分箱是在「精度与速度」间折中，不是数学上的等价替代。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$B$ 个同分布基学习器，方差 $\sigma^2$、两两相关系数 $\rho$。取平均后的方差是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. $\sigma^2/B$，与 $\rho$ 无关</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. $\rho\sigma^2+(1-\rho)\sigma^2/B$</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. $\sigma^2$，平均不改变方差</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. $\rho\sigma^2/B+(1-\rho)\sigma^2$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：和的方差 $=\frac{1}{B^2}[B\sigma^2+B(B-1)\rho\sigma^2]=\frac{\sigma^2}{B}+\frac{B-1}{B}\rho\sigma^2=\rho\sigma^2+\frac{(1-\rho)\sigma^2}{B}$。$B\to\infty$ 时收敛到 $\rho\sigma^2$，$\rho=0$ 时退化为 $\sigma^2/B$，$\rho=1$ 时恒为 $\sigma^2$。丢掉 $B(B-1)$ 个协方差项就会误选 A。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">代码实验 Part 2 中，12000 棵自助采样桩取平均的训练 MSE 停在约 1.25，而 Boosting 8 轮降到 0.0267。最合理的解释是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. Bagging 的树数还不够，加到十万棵就能降到 0</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. Bagging 的成员相关，方差下限太高</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. $\mathrm{E}[\frac1B\sum\hat f_b]=\mathrm{E}[\hat f_1]$，平均不改变偏差；剩余误差是桩模型族装不下交替模式的偏差</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. Boosting 用了更大的学习率 $\nu$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：单个最优桩的偏差地板是 1.5000，Bagging 平均只压抖动（实测 1.2538，$B=400$ 后不再降），Boosting 则通过逐轮拟合残差把近似误差本身削掉。A 错在违背 $\rho\sigma^2$ 下限且与 $B$ 的边际收益 $1/B^2$ 衰减矛盾；B 不是主因（本玩具 $\rho\approx0$，50 桩方差 0.0200 已接近独立的 0.0201）；D 错在两处都用同一量级设定且 $\nu$ 只影响速度。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">下列哪个条件<strong>不是</strong>一个函数成为合法 Mercer 核所必需的？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 对称：$K(x,z)=K(z,x)$</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 对任意有限点集，Gram 矩阵全部特征值 $\ge0$</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 满足 $K(x,z)^2\le K(x,x)K(z,z)$</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 能写出有限维的显式坐标 $\phi(x)$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：合法核只需存在某个（可无穷维）希尔伯特空间中的内积表示；RBF 核对应无穷维 $\phi$，永远写不出有限维坐标，却完全合法，故 D 不是必要条件。A、B 是充要条件的两面，C 是内积空间给出的柯西—施瓦茨必要条件（代码反例正是用 $100^2\gt4\times25$ 否决的）。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">代码实验 Part 3 中把 Gram 的 $K_{01}$ 改成 100 后，最小特征值约为 $-89.94$。这说明？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 只是浮点误差，加个小抖动就能当核用</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 该矩阵非半正定，不对应任何内积空间，SVM 对偶不再保证凸与表示定理</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 说明核矩阵秩亏，需要补样本</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 说明 $\gamma$ 取小了，应增大 RBF 带宽</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$K_{00}=4$、$K_{11}=25$，柯西—施瓦茨要求 $|K_{01}|\le\sqrt{100}=10$，而 100 远大于此，必然出现显著负特征值（不是 $10^{-15}$ 量级的浮点零）。此时「$K=\langle\phi(x),\phi(z)\rangle$」为假，优化问题失去凸性。合法核的秩亏表现为特征值恰为 0（如多项式核 4 个点落在 3 维 $\phi$），不是负值。修复要做 PSD 投影，而不是调带宽。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">CART 手算中，父节点 Gini 为 0.46875，7 个候选阈值里 $x\le5.50$ 的加权 Gini 为 0.18750。据此？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 该划分最差，因为加权 Gini 不为 0</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 基尼增益为 0.18750</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 基尼增益为 $0.46875-0.18750=0.28125$，是 7 个候选中最大的，应选它作根切分</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 应继续切左子节点，因为左子节点 Gini 已是 0</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：分裂收益是「父不纯度 − 加权子不纯度」，$0.46875-0.18750=0.28125$，在 7 个候选（0.04018、0.09375、0.16875、0.28125、0.10208、0.01042、0.04018）中唯一最大。左子节点 4 行全为 0 已纯，应停止；真正需要继续切的是右子节点 $\{1,1,1,0\}$，第二层选 $x\le9.15$ 增益 0.37500 把两侧切纯。记住加权时必须用 $n_L/n,n_R/n$，不能直接平均两个子 Gini。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">关于核方法在大规模数据上的表现，下列说法正确的是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q6" value="A"> A. $n=10^5$ 时 Gram 约需 80 GB、精确求解约 $3.3\times10^{14}$ FLOPs，应改用随机特征/Nyström/线性模型</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="B"> B. 只要用 RBF 核，样本越多越准且成本线性增长</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="C"> C. 核技巧的成本是 $O(p^2)$，与 $n$ 无关</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="D"> D. 增大 $n$ 会让 Gram 矩阵条件数自动变好</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：核技巧把「维度成本」换成「样本成本」：Gram 是 $n\times n$，存储 $O(n^2)$、精确训练约 $O(n^3)$、预测 $O(\#SV\cdot d)$。代码表逐行给出 $10^4\to0.8$ GB、$10^5\to80$ GB 的跳跃。B、C 把成本项记反；D 恰好相反，$n$ 增大时谱衰减带来的病态通常更严重。$p$ 大而 $n$ 小才是核方法主场。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure class="figure-placeholder" id="fig-classic-m12-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 12-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">决策树 / SVM / KNN 在同一二维数据上的决策边界对比</span>
+    <span class="fig-note">同一份非线性可分数据上，不同算法给出轴平行、曲线、分片等截然不同的边界，直观呈现「归纳偏置」这一概念。</span>
+    <span class="fig-src">来源：scikit-learn 官方 Classifier comparison 示例图（本站资源库 o05） · 查看：<a href="https://www.statlearning.com/" target="_blank" rel="noopener">https://www.statlearning.com/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s9">9 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>逻辑回归 $\log\frac{p}{1-p}=1+0.6x_1-0.9x_2$，求 $x=(2,1)$ 时的 $p$ 与优势；若 $x_2$ 增加 1，优势比是多少。</li>
+          <li>某节点 8 个样本（5 正 3 负），划分后左 4 个（4 正 0 负）、右 4 个（1 正 3 负）。计算父节点基尼、加权子基尼与基尼增益。</li>
+          <li>超平面 $w=(1,1)$、$b=-2$，支持向量函数间隔为 $\pm1$。求几何间隔；点 $(3,3)$ 的函数间隔与到超平面距离各是多少。</li>
+          <li>AdaBoost 某轮 $\epsilon=0.4$，求 $\alpha$；若 $\epsilon=0.6$ 又该如何处理，说明理由。</li>
+          <li>协方差特征值 $5,\ 3,\ 2,\ 1,\ 1$，求前 3 个主成分的累计解释率；若要达到 95% 需要几个。并说明为何 PCA 前要标准化。</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> $z=1+0.6\times2-0.9\times1=1+1.2-0.9=1.3$；$p=1/(1+\exp(-1.3))\approx1/1.2726\approx0.786$；优势 $=\exp(1.3)\approx3.669$。$x_2$ 增加 1 使 $z$ 减少 0.9，优势乘 $\exp(-0.9)\approx0.407$，即优势比 $OR\approx0.407$（保护因素）。注意是优势比而非概率比。</p>
+            <p><strong>2.</strong> $G_{\text{父}}=1-(5/8)^{2}-(3/8)^{2}=1-0.3906-0.1406=0.4688$；左（纯）$G_L=0$；右 $G_R=1-(1/4)^{2}-(3/4)^{2}=1-0.0625-0.5625=0.375$；加权 $=0.5\times0+0.5\times0.375=0.1875$；基尼增益 $=0.4688-0.1875=\mathbf{0.2813}$。划分很有效（一侧切纯）。</p>
+            <p><strong>3.</strong> $\|w\|=\sqrt{2}$，几何间隔 $=2/\|w\|=\sqrt{2}\approx1.414$；点 $(3,3)$ 的函数间隔 $=3+3-2=4$，到超平面距离 $=4/\sqrt{2}=2\sqrt{2}\approx2.828$。函数是几何的 $\|w\|$ 倍，别把 4 直接当间隔。</p>
+            <p><strong>4.</strong> $\epsilon=0.4$：$\alpha=\frac{1}{2}\ln(0.6/0.4)=\frac{1}{2}\ln 1.5\approx0.2027$，为正，可用。$\epsilon=0.6$：$\alpha=\frac{1}{2}\ln(0.4/0.6)\approx-0.2027$ 为负，说明该弱学习器比随机猜测还差；应<strong>停止训练</strong>，或把它的输出<strong>翻转</strong>（等价于 $\epsilon=0.4$、$\alpha=0.2027$）后再纳入。继续原样加权会把错误方向放大。</p>
+            <p><strong>5.</strong> 总方差 $=5+3+2+1+1=12$；前 3 个和 $=10$，累计解释率 $=10/12\approx83.3\%$。达到 95%：前 4 个 $=11/12\approx91.7\%$ 不够，5 个 $=100\%$，故需 <strong>5 个</strong>。PCA 前必须标准化，否则量纲大的变量（如以元计的收入）会主导协方差矩阵，第一主成分只是那个变量的替身，而非数据的真实结构；标准化等价于对相关矩阵做分解，让各变量公平参与。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 10 ===== -->
+      <h2 id="s10">10 · 本章小结</h2>
+      <div class="table-wrap"><table><thead><tr><th>算法族</th><th>归纳偏置 / 核心量</th><th>统计要点</th></tr></thead><tbody>
+        <tr><td>线性模型</td><td>线性边界 + $\ell_2/\ell_1$ 惩罚</td><td>偏差-方差搬运；岭=高斯先验、Lasso=拉普拉斯先验（稀疏）</td></tr>
+        <tr><td>逻辑回归 / softmax</td><td>对数几率线性、交叉熵</td><td>$\exp(\beta)$ 是优势比不是概率比；输出需校准</td></tr>
+        <tr><td>生成式 / KNN</td><td>$P(X\mid Y)$、局部投票</td><td>贝叶斯最优分类器是错误率下限；维度灾难让距离失效</td></tr>
+        <tr><td>决策树</td><td>轴平行切分、基尼 / 信息增益</td><td>高方差，须剪枝；增益偏向多取值特征，用增益率校正</td></tr>
+        <tr><td>SVM / 核</td><td>最大间隔、$\mathrm{RBF}$ 核、VC 维</td><td>几何间隔 $=2/\|w\|$ 需固定函数间隔为 1；核容量随 $\gamma$ 上升</td></tr>
+        <tr><td>集成</td><td>Bagging 平均、Boosting 累加残差</td><td>前者主降方差（下限 $\rho\sigma^{2}$），后者主降偏差（须早停）</td></tr>
+        <tr><td>无监督</td><td>K-means、层次聚类、PCA</td><td>轮廓系数选 $k$；累计解释率选主成分数；PCA 前必标准化</td></tr>
+        <tr><td>模型选择</td><td>嵌套 CV、校准、Brier</td><td>隔离选择偏差；预处理放内层 Pipeline；小样本必带区间</td></tr>
+      </tbody></table></div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：经典算法。</strong>用逻辑回归、决策树、集成模型预测完课，并按六维口径横向对比。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="current" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning（第 1 版）</a> <span class="muted small">（2013 · 已核验）</span><span class="fr-why">为什么读：ISLR 覆盖线性/逻辑回归、树、SVM、集成的标准推导与 R 实验。</span></span></div><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="../resources.html#r-b04">《机器学习》（西瓜书）</a> <span class="muted small">（2016 · 权威共识）</span><span class="fr-why">为什么读：西瓜书对经典算法的中文系统性讲解。</span></span></div><div class="fr-item"><span class="fr-tag">论文</span><span class="fr-body"><a href="../resources.html#r-p05">Random Forests</a> <span class="muted small">（2001 · 权威共识）</span><span class="fr-why">为什么读：Breiman 随机森林原始论文。</span></span></div><div class="fr-item"><span class="fr-tag">工具</span><span class="fr-body"><a href="https://scikit-learn.org/" target="_blank" rel="noopener">scikit-learn</a> <span class="muted small">（2007 · 权威共识）</span><span class="fr-why">为什么读：scikit-learn 文档：各算法关键参数、默认口径与复杂度说明。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div><a class="btn" href="../index.html">← 返回首页</a> <a class="btn" href="../stages/machine-learning.html">阶段页</a> <a class="btn" href="../roadmap.html">路线图</a></div>
+        <button class="btn primary" data-complete-btn="m12">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m09-ml-stats.html"><span class="dir">← 上一篇</span><span class="ttl">09 · 机器学习的统计基础</span></a>
+        <a class="next" href="m13-deep-training.html"><span class="dir">进入阶段 4 →</span><span class="ttl">13 · 深度学习的训练范式</span></a>
+      </nav>
+      </div>
+      </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索阶段、概念、资源、论文…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索全站内容。例如：置信区间、Transformer、共形预测、DeepSeek-R1。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

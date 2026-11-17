@@ -1,0 +1,388 @@
+<!-- 深度片段 · 模块 06 回归分析 -->
+<!-- 本片段只补充「深度」：正文已有的例题、练习与小结不重复 -->
+
+<h2 id="d-deep-1">深度专题一 · 为什么 $\mathbf{X}^{\top}\mathbf{X}$ 必须可逆：共线性、条件数与岭回归这剂药</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：一个矩阵把「线性代数」和「统计」焊在了一起</h3>
+  <p>正文给出了多元回归的矩阵解 $\hat\beta=(\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}$，并把它和「无完全共线性」假设挂钩。本专题要拆开这个逆矩阵：它<strong>什么时候不存在、快不存在时有多危险、以及为什么加一个 $\lambda\mathbf{I}$ 就能救回来</strong>。</p>
+  <p>这条线索横跨两百年。1805 年 Legendre 与 Gauss 用最小二乘算天体轨道时，解的就是正规方程；20 世纪随着电子计算机出现，人们发现当自变量彼此高度相关时，$\mathbf{X}^{\top}\mathbf{X}$ 接近奇异，系数会剧烈跳动——这在数值分析里叫<strong>病态矩阵</strong>。1970 年 Hoerl 与 Kennard 提出岭回归，本质上是给矩阵对角线加一个正数，用一点偏差换大幅稳定；1996 年 Tibshirani 的 Lasso 又从另一角度给出稀疏解。今天这条线直接延伸到深度学习：权重衰减、共线性特征、双重下降现象，都是同一类问题。</p>
+  <p>对只有初中数学起点的读者，先把一句话记住：<strong>$\mathbf{X}^{\top}\mathbf{X}$ 的「可逆」翻译过来就是「每个自变量都提供了别人提供不了的新信息」</strong>。一旦某个自变量能被其他自变量线性拼出来，这条信息就是重复的，方程组就有无穷多组解，系数无法唯一确定。</p>
+
+  <h3>直觉：三个人抬一根柱子，各出了多大力？</h3>
+  <p>想象三个人一起抬一根柱子，你只知道「总共用了 300 牛」，却没有任何其他信息。问「甲出了多少力」——答不出来，因为甲、乙、丙的出力可以任意分配，只要加起来是 300。这就是<strong>完全共线性</strong>：自变量是「完全同进同退」的，数据里根本不含区分它们的信息。</p>
+  <p>再进一步：若三个人几乎总是同时使劲（相关系数 $0.99$），你虽能勉强分辨，但一点点测量误差就会被放大——今天算出「甲 200、乙 $-50$」，明天换个样本就变成「甲 $-30$、乙 $220$」。系数剧烈跳动、符号翻转、单个 $t$ 检验全不显著，可整体模型又显著。这不是「甲没用力」，而是<strong>「说不清」</strong>：数据的信息量不够把两人分开。</p>
+  <p>几何上更好懂：$\mathbf{X}^{\top}\mathbf{X}$ 刻画了设计矩阵列向量张成的「形状」。可逆意味着这个形状在各个方向都有厚度（像一颗饱满的橄榄球）；接近奇异意味着某个方向被压得极扁（像一张薄饼）。求逆相当于「在每个方向上除以厚度」，扁方向上一除，任何微小噪声都被放大成巨大的系数波动。岭回归做的事很朴素：<strong>给每个方向先垫一个最低厚度 $\lambda$</strong>，不让任何方向被除到爆炸。</p>
+
+  <h3>形式化：从秩、特征值到岭估计</h3>
+  <div class="formula-box">
+    <div class="f-name">正规方程与可解条件</div>
+    $$ \mathbf{X}^{\top}\mathbf{X}\,\hat\beta=\mathbf{X}^{\top}\mathbf{y}, \qquad \hat\beta=(\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y} $$
+    $$ (\mathbf{X}^{\top}\mathbf{X})^{-1}\ \text{存在}\ \Longleftrightarrow\ \mathrm{rank}(\mathbf{X}^{\top}\mathbf{X})=p+1\ \Longleftrightarrow\ \mathbf{X}\ \text{列满秩（无完全共线性）} $$
+    <div class="f-note">白话：$\mathbf{X}$ 是 $n\times(p+1)$ 设计矩阵（第一列全 1 对应截距）。$\mathbf{X}^{\top}\mathbf{X}$ 是 $(p+1)\times(p+1)$ 方阵。它能求逆，当且仅当 $\mathbf{X}$ 的列向量线性无关——即没有哪一列能被其他列线性表出。若 $p\ge n$（特征比样本还多），列数超过维数，必然线性相关，逆一定不存在。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">特征值与条件数：把「病态」量化</div>
+    $$ \mathbf{X}^{\top}\mathbf{X}=Q\,\mathrm{diag}(\lambda_1,\dots,\lambda_{p+1})\,Q^{\top}, \qquad \kappa=\frac{\lambda_{\max}}{\lambda_{\min}}, \qquad \mathrm{Var}(\hat\beta_j)=\frac{\sigma^{2}}{(n-1)s_j^{2}}\cdot\frac{1}{1-R_j^{2}} $$
+    <div class="f-note">白话：把 $\mathbf{X}^{\top}\mathbf{X}$ 做特征分解，$\lambda_j$ 是各方向的「厚度」。$\kappa$ 是最大与最小厚度之比，叫<strong>条件数</strong>：$\kappa$ 越大越病态，求逆时噪声被放大得越狠。第三式是系数方差的精确表达，其中 $\frac{1}{1-R_j^2}$ 正是正文的方差膨胀因子 VIF——$R_j^2$ 越接近 1，分母越小，系数方差越大。$\kappa$ 与 VIF 是同一件事的「整体版」与「逐列版」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">完全共线时发生了什么：无穷多解</div>
+    $$ \text{若 }\mathbf{x}_2 = c\,\mathbf{x}_1,\ \text{则对任意 } t:\quad \beta_1\mathbf{x}_1+\beta_2\mathbf{x}_2=\left(\beta_1 + t c\right)\mathbf{x}_1+\left(\beta_2 - t\right)\mathbf{x}_2 $$
+    <div class="f-note">白话：把一份贡献从 $\beta_2$ 挪到 $\beta_1$，拟合值 $\mathbf{X}\beta$ 分毫不变。于是 $\mathrm{SSE}$ 有无穷多个等价最小点，$\mathbf{X}^{\top}\mathbf{X}$ 有零特征值、行列式为 0，$\det(\mathbf{X}^{\top}\mathbf{X})=0$ 无法求逆。代码实验 [2] 会用一个 $[1,\ x,\ 2x]$ 的设计矩阵把行列式算成 0，再把它稍微扰动一下，看系数如何爆掉。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">岭回归：给对角线垫一层，逆就存在了</div>
+    $$ \hat\beta_{\text{ridge}}=\arg\min_{\beta}\ \| \mathbf{y}-\mathbf{X}\beta \|_2^{2}+\lambda\|\beta\|_2^{2}=\left(\mathbf{X}^{\top}\mathbf{X}+\lambda\mathbf{I}\right)^{-1}\mathbf{X}^{\top}\mathbf{y} $$
+    $$ \lambda_j\ \longrightarrow\ \lambda_j+\lambda, \qquad \kappa_{\text{ridge}}=\frac{\lambda_{\max}+\lambda}{\lambda_{\min}+\lambda}\ \lt\ \kappa $$
+    <div class="f-note">白话：$\lambda\gt0$ 时每个特征值都被加上同一个正数，最小的那个不再接近 0，条件数严格下降，矩阵必定可逆（$\mathbf{X}^{\top}\mathbf{X}$ 半正定 + $\lambda\mathbf{I}$ 正定）。代价是<strong>引入偏差</strong>：估计不再无偏，但方差大幅下降，总误差常更小。$\lambda=0$ 退回 OLS；$\lambda\to\infty$ 把所有系数压向 0。实践里不惩罚截距，且 $\lambda$ 由交叉验证选，不手调。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">贝叶斯视角：岭 = 给系数一个高斯先验</div>
+    $$ \beta_j\ \sim\ N\!\left(0,\ \sigma^{2}/\lambda\right)\ \Longrightarrow\ -\ln p(\beta)=\frac{\lambda}{2\sigma^{2}}\sum_j\beta_j^{2}+\text{常数} $$
+    <div class="f-note">白话：把岭的惩罚项看成「系数本来就不该太大」这一先验信念的负对数。于是「加 $\lambda\|\beta\|_2^2$」等价于「假设系数来自一个以 0 为中心的高斯分布」。这也解释了为什么岭能稳住共线性：当两个变量分不清谁贡献大时，先验会把它们的系数一起往 0 拉，而不是让一个冲到 $+\infty$、另一个冲到 $-\infty$。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    $\mathbf{X}^{\top}\mathbf{X}$ 可逆 $\Leftrightarrow$ 设计矩阵列满秩 $\Leftrightarrow$ 无完全共线性。接近奇异时条件数 $\kappa$ 与 VIF 一起飙升，系数方差被放大、符号可能翻转——这是<strong>「说不清」而不是「没有作用」</strong>。岭回归用 $(\mathbf{X}^{\top}\mathbf{X}+\lambda\mathbf{I})^{-1}$ 把所有特征值垫高 $\lambda$，以少量偏差换取矩阵必定可逆与系数稳定；工程上先查 VIF / 条件数，再决定删冗余特征、合并特征、还是上岭回归或弹性网。
+  </div>
+
+  <p><strong>边界：</strong>在设计矩阵列满秩、样本量充足、自变量之间相关性低且不存在 $p\ge n$ 的条件下，本结论不成立，应改用普通最小二乘（OLS），因为它此时是高斯—马尔可夫意义下的最佳线性无偏估计（BLUE），而岭回归引入的偏差纯属浪费；若目标是「从一堆高度相关特征里挑出少数几个」而非「稳定预测」，则岭也不合适，应改用 Lasso 或弹性网。</p>
+
+  <figure data-figure="matrix-algo-compare"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · $R^2$ 很高却没用：预测 ≠ 因果，零相关 ≠ 独立</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：一个数字骗了整整一代分析师</h3>
+  <p>正文反复警告「$R^2$ 高 ≠ 模型好」，举了伪回归、过拟合、因果误读三类翻车。本专题把这三件事拆成两个更根本的追问：<strong>① 关联紧密为什么既不保证能预测、也不保证能解释因果？② 相关系数为零为什么仍可能存在铁板钉钉的依赖关系？</strong></p>
+  <p>Anscombe 在 1973 年只用了四组散点图就说明：四组数据的均值、方差、相关系数、回归线、$R^2$ 几乎完全相同，但散点形态分别是正态、抛物线、带一个离群点、以及所有点几乎排成一列——本站的经典配图正是其中第 III / IV 组。同一年稍晚，Granger 与 Newbold 系统研究了「伪回归」：两条独立随机游走的 $R^2$ 可以高到 $0.9$ 以上，$t$ 值大得离谱，而二者毫无关系。</p>
+  <p>再往 AI 走一步：推荐系统里「曝光量」与「点击量」、LLM 评测里「模型规模」与「准确率」都是随时间一同上升的序列，直接回归必然得到漂亮的 $R^2$；但用它做外推或因果结论会翻车。这也是为什么正文把「外推、伪回归、因果过度解读」并列为三大陷阱。</p>
+
+  <h3>直觉：把「贴得紧」「猜得准」「因为所以」分开</h3>
+  <p>三个动词对应三件不同的事：</p>
+  <ul>
+    <li><strong>拟合（贴得紧）</strong>：这条线离已有数据点近不近。$R^2$ 只回答这个，而且它是<strong>样本内</strong>指标。</li>
+    <li><strong>预测（猜得准）</strong>：换一批没见过的数据，误差还小不小。要看样本外误差 / 交叉验证；$R^2$ 高但残差有结构、或自变量是共同趋势，样本外就会崩。</li>
+    <li><strong>因果（因为所以）</strong>：主动把 $x$ 改一单位，$y$ 会不会跟着变。这需要随机化或可信的识别策略，与拟合优度几乎无关。</li>
+  </ul>
+  <p>一个刺眼的例子：夏天冰淇淋销量与溺水人数高度相关、$R^2$ 很高，因为二者同受「气温」驱动。用冰淇淋销量<strong>预测</strong>溺水人数在历史数据里甚至挺准（共同趋势还在），但若据此<strong>禁止卖冰淇淋来减少溺水</strong>，就是因果误读。可见「能预测」与「能干预」之间还隔着一道坎。</p>
+  <p>再说零相关。相关系数只检测<strong>直线</strong>关系。若 $Y=X^2$ 且 $X$ 在 $[-1,1]$ 上对称分布，$X$ 变大时 $Y$ 先降后升，正的与负的线性倾向正好抵消，$\mathrm{Cov}(X,Y)=0$。可 $Y$ 完全由 $X$ 决定——知道了 $X$ 就知道了 $Y$，这是能再强一点的依赖吗？<strong>零相关只说明「没有线性成分」，不说明「没有关系」。</strong></p>
+
+  <h3>形式化：把两个反例算到底</h3>
+  <div class="formula-box">
+    <div class="f-name">反例 A：零相关但完全依赖（$X\sim U(-1,1)$，$Y=X^2$）</div>
+    $$ \mathrm{Cov}(X,Y)=\mathbb{E}(X^{3})-\mathbb{E}(X)\mathbb{E}(X^{2})=0-0\cdot\frac13=0 \;\Longrightarrow\; \rho_{X,Y}=0 $$
+    $$ \mathbb{E}(Y\mid |X|\lt 0.3)=0.03, \qquad \mathbb{E}(Y\mid |X|\gt 0.7)=0.73 $$
+    <div class="f-note">白话：第一式里 $\mathbb{E}(X^3)=0$（对称区间上奇函数积分为零）、$\mathbb{E}(X)=0$，所以协方差严格为 0、相关系数为 0。但第二式显示：知道 $|X|$ 小，$Y$ 平均只有 $0.03$；知道 $|X|$ 大，$Y$ 平均 $0.73$——相差 24 倍。$Y$ 由 $X$ 完全决定，依赖强得不能再强。同时 $\rho_{|X|,Y}\approx0.97$，说明「换个能看见的形状，相关立刻冒出来」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">反例 B：伪回归——两条独立随机游走</div>
+    $$ X_t=X_{t-1}+\varepsilon_t,\qquad Y_t=Y_{t-1}+\eta_t,\qquad \varepsilon_t,\eta_t\ \text{相互独立} $$
+    $$ \text{水平值回归：}\ R^{2}\ \text{常}\ \gt 0.5,\ \hat\beta\ \text{「极显著」};\qquad \text{一阶差分回归：}\ R^{2}\approx 0 $$
+    <div class="f-note">白话：两条序列毫无关系，只是都随时间累积漂移。水平值把「共同的时间趋势」当成了「$x$ 对 $y$ 的解释」，于是 $R^2$ 虚高、$t$ 值虚大。做一阶差分 $\Delta X_t,\Delta Y_t$ 后只剩独立噪声，$R^2$ 塌回 0。代码实验 [4] 会真实跑出这两个 $R^2$。<strong>识别伪回归的关键动作是「先判断平稳性、做差分看增量关系」，而不是盯着 $R^2$。</strong></div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">预测与因果的分界：系数到底是什么</div>
+    $$ \hat\beta_1=\frac{\mathrm{Cov}(X,Y)}{\mathrm{Var}(X)}, \qquad Y=\beta_0+\beta_1 X+\varepsilon,\qquad \mathbb{E}(\varepsilon\mid X)\ne 0\ \Rightarrow\ \hat\beta_1\ \text{有偏且不一致} $$
+    <div class="f-note">白话：$\hat\beta_1$ 只是「$X$ 与 $Y$ 的协方差 / $X$ 的方差」这个<strong>关联</strong>比值。要把它读成「$X$ 变动 1 单位导致 $Y$ 变动 $\beta_1$」，必须满足外生性 $\mathbb{E}(\varepsilon\mid X)=0$——即没有遗漏变量、没有反向因果、没有选择性偏差。观察数据里这几乎从不可能自动成立，需要随机实验（A/B / RCT）、工具变量、双重差分等识别策略。样本量再大也修不好系统性偏差。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">$R^2$ 与样本外误差的分家</div>
+    $$ R^{2}=1-\frac{\mathrm{SSE}_{\text{train}}}{\mathrm{SST}_{\text{train}}}, \qquad \mathrm{风险}=\mathbb{E}\left[(Y-\hat f(X))^{2}\ \middle|\ \text{新样本}\right] $$
+    <div class="f-note">白话：$R^2$ 分母分子都只用了训练集；风险用的是新样本。往模型里塞任何变量 $R^2$ 都不会下降（正文的调整 $R^2$ 才对变量数罚款），但新样本上的误差可能一路上升——这就是过拟合。评价预测能力必须用验证集 / 交叉验证，不能看训练 $R^2$。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    $R^2$ 只度量「样本内线性拟合的紧密程度」，它<strong>既不保证样本外预测准，也不蕴含因果</strong>：$\rho=0$ 只排除线性关联，$Y=X^2$ 这类确定性依赖照样存在；伪回归与过拟合则让高 $R^2$ 与真实关系彻底脱钩。正确顺序是——先看散点图与残差图、再做样本外验证、最后只有在随机化或可信识别策略下才谈因果；报告时给出系数区间、适用边界与残差诊断，而不是只报一个 $R^2$。
+  </div>
+
+  <p><strong>边界：</strong>在数据来自随机对照实验、$x$ 由实验者主动分配、模型经残差诊断通过且验证集误差稳定的条件下，本结论不成立，应改用回归系数直接解释为处置效应（ceteris paribus 的因果效应），此时高 $R^2$ 配合显著系数确实支持「$x$ 导致 $y$ 变化」；若目标纯粹是样本内插值预测、且已确认序列平稳无共同趋势，高 $R^2$ 也可作为有效的拟合优度报告，不必一律否定。</p>
+
+  <figure data-figure="flow-regression-diagnose"></figure>
+  <figure data-classic="0"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 普通最小二乘（正规方程）</h2>
+
+<div class="algo-spec">
+
+  <h3>原理：最小化残差平方和，把「拟合」变成一个可解的方程组</h3>
+  <p>给定 $n$ 对观测 $(x_i,y_i)$，简单线性回归设 $y_i=\beta_0+\beta_1 x_i+\varepsilon_i$。最小二乘选择 $(\beta_0,\beta_1)$ 使残差平方和最小：</p>
+  <div class="formula-box">
+    <div class="f-name">目标函数与正规方程（矩阵版）</div>
+    $$ \min_{\beta}\ \mathrm{SSE}(\beta)=\sum_{i=1}^{n}\left(y_i-\mathbf{x}_i^{\top}\beta\right)^{2}=\|\mathbf{y}-\mathbf{X}\beta\|_2^{2} $$
+    $$ \nabla_{\beta}\mathrm{SSE}=-2\mathbf{X}^{\top}(\mathbf{y}-\mathbf{X}\beta)=0 \;\Longrightarrow\; \mathbf{X}^{\top}\mathbf{X}\hat\beta=\mathbf{X}^{\top}\mathbf{y} $$
+    <div class="f-note">白话：把 $\mathrm{SSE}$ 对参数向量求导并令其为 0（$\mathrm{SSE}$ 是开口向上的二次函数，驻点即最小点），得到正规方程。$\mathbf{X}^{\top}\mathbf{X}$ 是 $(p+1)\times(p+1)$ 方阵，$\mathbf{X}^{\top}\mathbf{y}$ 是 $(p+1)$ 维向量，解一个线性方程组即可，无需迭代——这是 OLS 与逻辑回归最本质的差别。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">简单回归的闭式解（$p=1$ 时把 $2\times2$ 逆展开）</div>
+    $$ \hat\beta_1=\frac{S_{xy}}{S_{xx}}=\frac{\sum (x_i-\bar x)(y_i-\bar y)}{\sum (x_i-\bar x)^{2}}, \qquad \hat\beta_0=\bar y-\hat\beta_1\bar x, \qquad R^{2}=\frac{S_{xy}^{2}}{S_{xx}S_{yy}} $$
+    <div class="f-note">白话：分子 $S_{xy}$ 是 $x,y$ 的「同涨同跌」程度，分母 $S_{xx}$ 是 $x$ 自己的波动；两者相除就是「$x$ 每动 1 单位，$y$ 平均动多少」。$R^2$ 等于相关系数 $r$ 的平方，故也可用 $\hat\beta_1=r\,s_y/s_x$ 与 $R^2=r^2$ 从汇总统计量直接算出——下面手算就走这条路。</div>
+  </div>
+  <p>几何解释：$\mathbf{X}\hat\beta$ 是 $\mathbf{y}$ 在 $\mathbf{X}$ 列空间上的<strong>正交投影</strong>，残差向量 $\mathbf{e}=\mathbf{y}-\mathbf{X}\hat\beta$ 与每一列都垂直（这正是 $\mathbf{X}^{\top}\mathbf{e}=0$，即正规方程）。$R^2$ 就是「投影长度平方 / 原向量长度平方」。</p>
+
+  <h3>编号步骤：照着做一遍就会</h3>
+  <ol>
+    <li><strong>整理数据。</strong>写出 $n$ 对 $(x_i,y_i)$，画散点图确认大体线性；确定响应变量 $y$ 与解释变量 $x$。</li>
+    <li><strong>构造设计矩阵。</strong>$\mathbf{X}$ 第一列全为 1（截距），第二列为 $x$；多元时每自变量一列。检查是否列满秩（见深度专题一）。</li>
+    <li><strong>算五个汇总量。</strong>$\bar x,\ \bar y,\ S_{xx},\ S_{xy},\ S_{yy}$（或等价地 $\sum x,\sum y,\sum x^2,\sum xy$）。</li>
+    <li><strong>解正规方程。</strong>$p=1$ 时代入 $\hat\beta_1=S_{xy}/S_{xx}$、$\hat\beta_0=\bar y-\hat\beta_1\bar x$；多元时解 $(\mathbf{X}^{\top}\mathbf{X})\hat\beta=\mathbf{X}^{\top}\mathbf{y}$（高斯消元或 Cholesky，不显式求逆更稳）。</li>
+    <li><strong>算拟合优度。</strong>$\mathrm{SSE}=\sum(y_i-\hat y_i)^2$、$\mathrm{SST}=S_{yy}$、$R^2=1-\mathrm{SSE}/\mathrm{SST}$，并算调整 $R^2$。</li>
+    <li><strong>残差诊断。</strong>画 $e_i$ 对 $\hat y_i$ 的图：查 U 形（非线性）、喇叭口（异方差）、孤立点（影响点）。诊断不过就回到第 1 步换模型。</li>
+    <li><strong>报告与边界。</strong>给出系数、标准误、区间、$R^2$ 与适用 $x$ 范围；明确「关联 ≠ 因果」、禁止样本范围外外推。</li>
+  </ol>
+
+  <h3>适用条件</h3>
+  <ul>
+    <li>数据：$n$ 对独立观测，$y$ 为连续量；$x$ 可为连续或 0/1 编码。</li>
+    <li>假设：线性于参数、随机抽样、无完全共线性、同方差、无自相关、外生性 $\mathbb{E}(\varepsilon\mid x)=0$（高斯—马尔可夫六条）。</li>
+    <li>规模：$n \gt p+1$ 且 $\mathbf{X}^{\top}\mathbf{X}$ 条件数不过大；$p\ge n$ 时必须改用正则化。</li>
+    <li>特征类型：数值型；类别变量需先做哑变量编码（注意别落下「虚拟变量陷阱」造成完全共线性）。</li>
+    <li>工程位置：位于「特征工程 → 建模拟合 → 残差诊断 → 上线预测」链条的建模环节；上游是数据清洗与特征构造，下游是系数解释、样本外评估与监控漂移。</li>
+  </ul>
+
+  <div class="complexity">
+    <span><b>训练（拟合）</b>：时间 $O(np^{2}+p^{3})$，空间 $O(np+p^{2})$</span>
+    <span><b>推理（单个预测）</b>：时间 $O(p)$，空间 $O(p)$</span>
+    <span><b>$p=1$ 特例</b>：训练 $O(n)$、空间 $O(1)$、推理 $O(1)$</span>
+  </div>
+  <p>说明：构造 $\mathbf{X}^{\top}\mathbf{X}$ 需 $O(np^2)$，解 $p+1$ 阶线性方程组需 $O(p^3)$；存 $\mathbf{X}$ 需 $O(np)$、存方阵需 $O(p^2)$。简单回归 $p=1$ 时只剩一次遍历累加（$O(n)$ 时间、$O(1)$ 空间），这正是它能手算、能嵌进边缘设备的原因。工程上通常<strong>不显式求逆</strong>而用 QR / Cholesky 分解，数值更稳（与深度专题一的条件数呼应）。梯度下降等迭代法在 $p$ 极大时更划算，但那是 AI 章节的内容。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>有闭式解，无需迭代、无需调学习率，结果确定可复现。</li>
+        <li>在六条假设下是 BLUE（最佳线性无偏估计），统计性质完备。</li>
+        <li>系数、$R^2$、区间都有清晰解释，可直接做推断与报告。</li>
+        <li>计算极轻，纯标准库几行即可实现，是所有回归方法的基准。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>缺点</h4>
+      <ul>
+        <li>外生性一旦违背（遗漏变量、反向因果），系数有偏且样本量救不回来。</li>
+        <li>对异常点、异方差、非线性敏感；平方损失放大离群点的话语权。</li>
+        <li>$\mathbf{X}^{\top}\mathbf{X}$ 接近奇异时系数爆炸、符号翻转；$p\ge n$ 时无唯一解。</li>
+        <li>只拟合线性（于参数）关系，且只在样本 $x$ 范围内可靠，外推危险。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>示例推演：用贯穿案例的汇总统计量手算到底（学习时长 → 测验均分）</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span> 知学云案例 $n=12000$，$x=$ 每周学习分钟数、$y=$ 测验均分。共享汇总量（与 <code>case-outputs.txt</code> 一致）：$\bar x=95.2964$、$s_x=43.4274$、$\bar y=79.7574$、$s_y=14.5763$、$r=0.4792$；共享 OLS 结果为 $\hat\beta_0=64.4306$、$\hat\beta_1=0.160833$、$R^2=0.2296$。</div>
+    <div class="solve-step"><span class="ss-k">选公式。</span> $p=1$，直接走闭式解；由 $\hat\beta_1=r\,\dfrac{s_y}{s_x}$ 可从汇总量一步得到斜率，避免展开 12000 行（正规方程与它完全等价）。</div>
+    <div class="solve-step"><span class="ss-k">算斜率。</span> $\dfrac{s_y}{s_x}=\dfrac{14.5763}{43.4274}=0.33565$；$\hat\beta_1=0.4792\times0.33565=0.16083\overline{3}$。即每周多学 1 分钟，测验分平均高约 $0.161$ 分；多学 100 分钟约高 $16.1$ 分。</div>
+    <div class="solve-step"><span class="ss-k">算截距。</span> $\hat\beta_0=\bar y-\hat\beta_1\bar x=79.7574-0.160833\times95.2964=79.7574-15.3268=64.4306$。拟合线必过 $(\bar x,\bar y)$，这正是第一步正规方程 $\sum y_i=n\beta_0+\beta_1\sum x_i$ 的结论。</div>
+    <div class="solve-step"><span class="ss-k">算 $R^2$。</span> $R^2=r^2=0.4792^2=0.22963\approx0.2296$。即学习时长解释了测验分约 $23\%$ 的波动，剩下 $77\%$ 来自其他因素与噪声——<strong>这不低，但也远不等于「学习时长决定成绩」</strong>。</div>
+    <div class="solve-step"><span class="ss-k">用矩阵式独立核对。</span> 记 $S_{11}=n$、$S_{1x}=\sum x_i=n\bar x=1\,143\,556.8$、$S_{xx}=\sum x_i^2-n\bar x^2$、$S_{1y}=\sum y_i=n\bar y=957\,088.8$、$S_{xy}=\sum x_iy_i-n\bar x\bar y$，则 $\det=S_{11}S_{xx}-S_{1x}^2$，$\hat\beta_1=\dfrac{S_{11}S_{xy}-S_{1x}S_{1y}}{\det}$、$\hat\beta_0=\dfrac{S_{xx}S_{1y}-S_{1x}S_{xy}}{\det}$。代码实验 [1] 会按这个 $2\times2$ 逆真算一遍并打印 $\mathbf{X}^{\top}\mathbf{X}$ 与 $\det$，结果与上面完全一致。</div>
+    <div class="solve-step"><span class="ss-k">做一次预测并解释边界。</span> $x=150$ 分钟时 $\hat y=64.4306+0.160833\times150=88.56$ 分。$x=0$ 时截距给 $64.43$ 分，但样本里学习时长最小接近 0、且「完全不学」是否线性成立存疑，截距属于<strong>外推产物</strong>，不宜赋予业务解释。</div>
+    <div class="solve-step"><span class="ss-k">诊断与克制。</span> $R^2=0.2296$ 属中等偏低，需查残差图是否 U 形（学时与分数可能非线性）、是否喇叭口（高分端方差更小）。更要把住因果关：这是<strong>观察数据</strong>，学习时长与测验分同受「学习动机、基础水平」驱动，$\hat\beta_1$ 是关联不是「多学 1 分钟就能提分」的处置效应——要因果结论需随机分配学时的实验。</div>
+  </div>
+
+  <h3>横向对比：拟合一条线的四类方法</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>维度</th><th class="best">OLS 正规方程（本算法）</th><th>岭回归（Ridge）</th><th>梯度下降求解</th><th>稳健回归（Huber / 中位数）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td class="best">列满秩、$n \gt p$、六条经典假设成立</td>
+        <td>共线性严重或 $p\ge n$、需稳定系数</td>
+        <td>$p$ 极大、数据无法一次装入内存</td>
+        <td>含异常点、误差重尾、平方损失被少数点绑架</td>
+      </tr>
+      <tr>
+        <th>时间与空间复杂度</th>
+        <td class="best">训练 $O(np^2+p^3)$、推理 $O(p)$；$p=1$ 时 $O(n)$ / $O(1)$</td>
+        <td>与 OLS 同阶，多一个 $\lambda$ 的一维搜索（交叉验证）</td>
+        <td>每轮 $O(np)$，轮数不定；空间 $O(p)$ 起，可小批量</td>
+        <td>迭代重加权，每轮 $O(np)$，轮数多于 OLS</td>
+      </tr>
+      <tr>
+        <th>关键超参数</th>
+        <td class="best">无（闭式解），不需调参</td>
+        <td>$\lambda\ge0$（由交叉验证选）、是否标准化特征</td>
+        <td>学习率、迭代轮数、批量大小、初始化</td>
+        <td>稳健损失的分界常数（Huber $\delta$）</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">一次算完、确定可复现、假设下为 BLUE、解释最完整</td>
+        <td>矩阵必定可逆、系数稳定、对共线性免疫</td>
+        <td>可扩展到海量特征与在线学习，是深度学习的基础</td>
+        <td>极端值不主导结果，重尾数据下更可信</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td class="best">$\mathbf{X}^{\top}\mathbf{X}$ 奇异 / 近奇异、外生性违背、异方差、异常点时失效，应改用岭、稳健回归或因果识别策略</td>
+        <td>引入偏差、系数不再无偏；$\lambda$ 选错会欠拟合或仍不稳定</td>
+        <td>需调参、可能不收敛、结果依赖初始化与随机种子</td>
+        <td>损失非凸时求解更难；效率略低于正态误差下的 OLS</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td class="best">系数 / 区间 / $R^2$ 一套现成语言，纯标准库即可落地</td>
+        <td>需解释「偏差换稳定」，多一步 $\lambda$ 选择</td>
+        <td>黑箱程度高，工程链路（优化器、调度）最重</td>
+        <td>需向业务解释「为什么不用平方损失」，诊断成本略高</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>选择规则：先跑 OLS 作基准并做残差诊断；VIF / 条件数报警则上岭回归；异常点多则换稳健损失；$p$ 大到装不进内存才用梯度下降。<strong>无论选哪个，散点图、残差图与样本外验证都不能省</strong>——这是深度专题二的结论在算法层的落地。</p>
+</div>
+
+<h2 id="d-code">代码实验 · 手算正规方程、看 $\mathbf{X}^{\top}\mathbf{X}$ 奇异、证零相关不独立</h2>
+
+<div class="code-lab">
+  <div class="cl-head">
+    <span class="cl-lang">Python 3 · 纯标准库</span>
+    <span>实验：OLS 正规方程 / 共线性与岭 / 零相关不独立 / 伪回归</span>
+    <span class="cl-grow"></span>
+    <span>固定种子 20261107 · 可复现</span>
+  </div>
+  <pre>__PY_CODE__</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout，逐字粘贴自 Bash 执行结果）</div>
+    <pre>__PY_OUTPUT__</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">[1] 真实数据 OLS</span>程序用与 <code>case-data.py</code> 完全相同的固定种子与生成顺序重建 12000 行数据，再用 $2\times2$ 的 $\mathbf{X}^{\top}\mathbf{X}$ 求逆解正规方程。<code>intercept</code> $=64.4306$、<code>slope</code> $=0.160833$、<code>R2</code> $=0.2296$ 与 <code>case-outputs.txt</code> 的共享数字逐位吻合；<code>shortcut</code> 一行用 $\hat\beta_1=r\,s_y/s_x$、$R^2=r^2$ 独立核对，同样对上，说明 <code>step-solve</code> 的两条路径等价。<code>det(X'X)</code> 是一个很大的正数（约 $10^{11}$ 量级），说明这份数据里 $\mathbf{X}^{\top}\mathbf{X}$ 远不奇异，OLS 可逆条件满足。</p>
+    <p><span class="ci-k">[2] 共线性与岭</span>设计矩阵取 $[1,\ x,\ 2x]$ 时第三列是第二列的 2 倍，<code>det(OLS)</code> 精确为 0，正规方程无唯一解（程序不强行求逆，只报行列式）；把第三列改成 $2x+10^{-3}(-1)^i$ 后行列式变成一个很小但非零的数，<code>beta</code> 立刻出现几百量级的系数并正负成对——这就是 VIF 与条件数报警时「系数乱跳」的真身。加上 $\lambda=1$ 的岭（只惩罚两个斜率、不罚截距）后，<code>det(ridge)</code> 变大、<code>beta_ridge</code> 回到温和量级且符号一致，直观验证了「垫高特征值 $\Rightarrow$ 逆存在、解稳定」。</p>
+    <p><span class="ci-k">[3] 零相关不独立</span>$X\sim U(-1,1)$、$Y=X^2$，<code>corr(X, X^2)</code> 接近 0（蒙特卡洛误差内），但 <code>corr(|X|, X^2)</code> 接近 $0.97$；<code>E[Y | |X| small]</code> 约 $0.03$ 而 <code>E[Y | |X| large]</code> 约 $0.73$，相差 20 倍以上。<strong>$Y$ 完全由 $X$ 决定，相关系数却测不出任何线性关联</strong>——深度专题二反例 A 的数值版。</p>
+    <p><span class="ci-k">[4] 伪回归</span>两条相互独立的随机游走，<code>levels</code> 回归的 $R^2$ 很高（共同趋势被当成解释力），而对一阶差分做回归后 <code>diffs</code> 的 $R^2$ 塌回接近 0。这正是「先判断平稳性、做差分看增量关系」能识别伪回归的实证，也说明高 $R^2$ 既不代表能预测、更不代表有因果。</p>
+    <p><span class="ci-k">何时会变</span>把 [1] 的 $x$ 换成一列常数，$S_{xx}=0$、行列式为 0，斜率无法估计（正文「$x$ 必须有变化」）；把 [2] 的 $\lambda$ 从 1 增到 100，系数继续被压向 0、偏差变大但更稳；把 [4] 的序列换成平稳白噪声，水平值 $R^2$ 也会接近 0，伪回归消失。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr>
+      <th>功能说明</th>
+      <td>解正规方程 $\mathbf{X}^{\top}\mathbf{X}\hat\beta=\mathbf{X}^{\top}\mathbf{y}$，得到线性模型的系数、拟合值与 $R^2$，并给出共线性 / 条件数 / 残差诊断的判据。<strong>做</strong>：样本内线性拟合、关联度量、系数区间与显著性所需的点估计。<strong>不做</strong>：不证明因果、不保证样本外预测准、不处理 $\mathbf{X}^{\top}\mathbf{X}$ 奇异（须交给岭 / Lasso）。</td>
+    </tr>
+    <tr>
+      <th>输入 / 输出</th>
+      <td>输入：设计矩阵 $\mathbf{X}\in\mathbb{R}^{n\times(p+1)}$（首列全 1）与响应 $\mathbf{y}\in\mathbb{R}^{n}$；$x,y$ 量纲各自保留（本例为「分钟」与「分」）。输出：系数向量 $\hat\beta$（量纲为「$y$ 单位 / $x$ 单位」，截距为 $y$ 单位）、拟合值、残差、无量纲的 $R^2$。</td>
+    </tr>
+    <tr>
+      <th>适用场景</th>
+      <td>连续响应变量的关联建模与基线预测：学习时长 → 测验分、广告投入 → 销量、特征 → 房价；也作为所有更复杂模型（正则化、广义线性模型、神经网络）的对照基准与教学起点。</td>
+    </tr>
+    <tr>
+      <th>关键参数</th>
+      <td><code>p</code>（自变量个数，影响复杂度与自由度）、<code>intercept</code>（是否含截距，默认含；去掉则拟合线被强行过原点）、<code>center/scale</code>（是否标准化，岭回归前必须做）、<code>rank_tol</code>（判定列满秩的阈值）。OLS 本身<strong>没有可调超参</strong>；共线时需引入岭的 <code>lambda</code>（由交叉验证选）。</td>
+    </tr>
+    <tr>
+      <th>边界条件</th>
+      <td>在 $\mathbf{X}^{\top}\mathbf{X}$ 奇异（完全共线性、$p\ge n$、虚拟变量陷阱）时不适用，应改用岭回归、Lasso、弹性网或主成分回归；在残差呈 U 形 / 喇叭口 / 自相关时系数区间与显著性不可信，应改用变量变换、加权最小二乘或稳健标准误；在需要因果结论时应改用随机实验、工具变量或双重差分；在样本 $x$ 范围之外应改用标注为不可靠的外推，或干脆不预测。</td>
+    </tr>
+    <tr>
+      <th>常见问题</th>
+      <td>① 把高 $R^2$ 当成「模型对 / 有因果」；② 见单个系数不显著就断言「该变量没用」（其实是共线性导致说不清）；③ 把相关系数为 0 当成「两者独立」；④ 忽略残差图直接汇报 $p$ 值。详见下方常见问题。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details>
+    <summary>$\mathbf{X}^{\top}\mathbf{X}$ 不可逆时，软件为什么还能给出一个解？</summary>
+    <div class="faq-a">多数库不会真的求逆，而是用伪逆（Moore–Penrose）或 QR 分解，在无穷多组解里挑「系数长度最小」的那一组。它数值上能算，但<strong>没有统计上的唯一可解释性</strong>：换一批样本、换一个特征编码，系数就全变。正确做法是先查 VIF 与条件数，删冗余列、合并特征，或改用岭回归 $(\mathbf{X}^{\top}\mathbf{X}+\lambda\mathbf{I})^{-1}$ 让矩阵必定可逆。</div>
+  </details>
+  <details>
+    <summary>共线性让某个系数不显著，能不能删掉这个变量？</summary>
+    <div class="faq-a">不能仅凭 $t$ 值下结论。共线性放大的是<strong>方差与标准误</strong>，系数的期望值仍无偏；「不显著」是「说不清」而不是「没有作用」（正文 VIF 例题里 $x_1$ 标准误从 $0.039$ 膨胀到 $0.156$ 就是这个现象）。先看整体 $F$ 检验是否显著、VIF 是否超 5 / 10，再决定删冗余、合并变量还是上岭回归，并报告删 / 不删两套结果做敏感性分析。</div>
+  </details>
+  <details>
+    <summary>$R^2=0.90$ 是不是就能放心拿去预测和解释？</summary>
+    <div class="faq-a">都不能只靠它。$R^2$ 是样本内拟合指标，往模型里塞任何变量都不会下降；伪回归（两条独立随机游走）、过拟合、共同趋势都能造出虚高的 $R^2$。预测要看验证集 / 交叉验证误差，解释要看残差图、系数区间、以及是否满足外生性；因果还需要随机化或识别策略。代码实验 [4] 里水平值 $R^2$ 很高、差分后塌回 0，就是最直接的警告。</div>
+  </details>
+  <details>
+    <summary>相关系数为 0，为什么说两者还可能强依赖？</summary>
+    <div class="faq-a">因为 $\rho$ 只检测<strong>线性</strong>成分。取 $X\sim U(-1,1)$、$Y=X^2$，由对称性 $\mathrm{Cov}(X,Y)=\mathbb{E}(X^3)=0$，故 $\rho=0$；但 $Y$ 完全由 $X$ 决定，且代码实验 [3] 显示 $\mathbb{E}(Y\mid |X|\lt0.3)\approx0.03$、$\mathbb{E}(Y\mid|X|\gt0.7)\approx0.73$、$\rho_{|X|,Y}\approx0.97$。对策：永远先画散点图；需要检测一般依赖时用互信息、距离相关或基于残差的非线性诊断。</div>
+  </details>
+  <details>
+    <summary>回归系数 $0.160833$ 能写成「多学 1 分钟，成绩提高 0.16 分」吗？</summary>
+    <div class="faq-a">要加限定词：「在数据与模型条件下，每周学习时长每多 1 分钟，测验均分<strong>平均</strong>高约 0.16 分」，且这是<strong>关联</strong>不是因果。观察数据里学习时长与测验分同受学习动机、基础水平驱动，$\mathbb{E}(\varepsilon\mid x)=0$ 未必成立；真正问「逼人多学 1 分钟能提几分」需要随机分配学时。措辞里出现「导致」「提升」「只要…就」都要先自检三连：有没有混杂？时间先后对吗？$x,y$ 对调还说得通吗？</div>
+  </details>
+  <details>
+    <summary>截距 $64.4306$ 有什么业务含义？</summary>
+    <div class="faq-a">数学上是 $x=0$ 时的拟合值，且保证直线穿过 $(\bar x,\bar y)$；业务上往往是<strong>外推产物</strong>。本例样本学习时长从接近 0 到 273 分钟，「完全不学」是否在样本范围内、线性关系在低端是否仍成立都存疑，因此不宜把 $64.43$ 解释成「零学习的基础分」。正文第 8 节把它列为三大陷阱之一：解释截距前先问「$x=0$ 有意义吗？数据覆盖它吗？」。</div>
+  </details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测 · 可逆性、$R^2$ 与依赖</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$\hat\beta=(\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}$ 要求 $\mathbf{X}^{\top}\mathbf{X}$ 可逆，等价于下列哪一条？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q1" value="A"> A. 样本量 $n$ 大于 30</label>
+      <label class="quiz-opt"><input type="radio" name="m06q1" value="B"> B. $\mathbf{X}$ 列满秩，即自变量之间无完全共线性</label>
+      <label class="quiz-opt"><input type="radio" name="m06q1" value="C"> C. 残差服从正态分布</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$(\mathbf{X}^{\top}\mathbf{X})^{-1}$ 存在 $\Leftrightarrow$ $\mathrm{rank}(\mathbf{X}^{\top}\mathbf{X})=p+1$ $\Leftrightarrow$ $\mathbf{X}$ 列满秩（无完全共线性，且 $n\ge p+1$）。残差正态性只影响小样本推断，不影响矩阵可逆；$n\ge30$ 是 CLT 的经验值，与此无关。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">设计矩阵含一列 $x$ 与一列 $2x$，会发生什么？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q2" value="A"> A. $R^2$ 一定变成 0</label>
+      <label class="quiz-opt"><input type="radio" name="m06q2" value="B"> B. OLS 仍能给出唯一且稳定的系数</label>
+      <label class="quiz-opt"><input type="radio" name="m06q2" value="C"> C. $\det(\mathbf{X}^{\top}\mathbf{X})=0$，有无穷多组等价解；应删冗余列或改用岭回归</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$2x$ 是 $x$ 的线性倍数，列线性相关，$\mathbf{X}^{\top}\mathbf{X}$ 有零特征值、行列式为 0。$\beta_1 x+\beta_2(2x)$ 可任意在两列之间挪动而拟合值不变，故解不唯一。代码实验 [2] 把这个行列式算成 0，再用 $\lambda=1$ 的岭把系数拉回稳定量级。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">岭回归 $(\mathbf{X}^{\top}\mathbf{X}+\lambda\mathbf{I})^{-1}\mathbf{X}^{\top}\mathbf{y}$ 为什么能让矩阵必定可逆？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q3" value="A"> A. 每个特征值都被加上 $\lambda\gt0$，最小特征值不再为 0，条件数下降</label>
+      <label class="quiz-opt"><input type="radio" name="m06q3" value="B"> B. 它把样本量 $n$ 变大了</label>
+      <label class="quiz-opt"><input type="radio" name="m06q3" value="C"> C. 它删除了所有相关的自变量</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mathbf{X}^{\top}\mathbf{X}$ 半正定，特征值 $\lambda_j\ge0$；加上 $\lambda\mathbf{I}$ 后变为 $\lambda_j+\lambda\ge\lambda\gt0$，全部严格为正，矩阵正定必可逆，且 $\kappa_{\text{ridge}}=(\lambda_{\max}+\lambda)/(\lambda_{\min}+\lambda)\lt\kappa$。代价是引入偏差、不再无偏。B、C 都不是岭的机制。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$X\sim U(-1,1)$、$Y=X^{2}$，则 $\mathrm{Corr}(X,Y)$ 与两者的依赖关系是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q4" value="A"> A. 相关系数为 1，完全线性相关</label>
+      <label class="quiz-opt"><input type="radio" name="m06q4" value="B"> B. 相关系数为 0，但 $Y$ 完全由 $X$ 决定（强依赖）</label>
+      <label class="quiz-opt"><input type="radio" name="m06q4" value="C"> C. 相关系数为 0，且 $X$ 与 $Y$ 相互独立</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：由对称性 $\mathrm{Cov}(X,Y)=\mathbb{E}(X^3)-\mathbb{E}(X)\mathbb{E}(X^2)=0$，故 $\rho=0$；但 $Y=X^2$ 是确定性函数关系，代码实验 [3] 中 $\mathbb{E}(Y\mid|X|\lt0.3)\approx0.03$ 与 $\mathbb{E}(Y\mid|X|\gt0.7)\approx0.73$ 相差 20 多倍，且 $\rho_{|X|,Y}\approx0.97$。零相关只排除线性关联，不等于独立。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">贯穿案例 OLS 给出 $\hat\beta_1=0.160833$、$R^2=0.2296$。下列哪句最克制、最正确？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q5" value="A"> A. 每周多学 1 分钟，成绩就会提高 0.16 分</label>
+      <label class="quiz-opt"><input type="radio" name="m06q5" value="B"> B. $R^2$ 只有 0.23，说明学习时长与成绩无关</label>
+      <label class="quiz-opt"><input type="radio" name="m06q5" value="C"> C. 学习时长与测验分呈中等正相关，解释了约 23% 的波动；系数是关联而非因果，且需查残差与样本外表现</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：A 把关联写成因果且丢了「平均」；B 把中等 $R^2$ 误读成「无关」（$r=0.4792$，相关性并不弱）。C 同时给了方向、大小、解释比例与边界：观察数据存在混杂、残差可能非线性、样本外未必稳定。这正是「拟合 / 预测 / 因果」三分法要求的克制表述。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>

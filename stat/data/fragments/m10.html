@@ -1,0 +1,603 @@
+<!-- 深度片段 · 10 AI 前沿：统计学与大模型 -->
+<!-- 已就近放置的图示 ID：data-figure="curve-scaling-law" data-figure="flow-conformal" data-figure="flow-learning-loop" data-classic="0"；其余图示由脚本补入汇总 -->
+
+<h2 id="d-deep-1">深度专题一 · 缩放定律：从 Kaplan 幂律到 Chinchilla 算力最优修正，以及 N、D 该按什么比例长大</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>固定算力下，「多堆参数」和「多喂数据」必须一起长大，最优比例恰好让两者按 $\sqrt C$ 同步放大</h3></div>
+  <p class="dt-lead">本章正文第 3 节（#s3）已经介绍过大模型的「规模带来能力」现象与几条经验幂律；这里不重复那份现象清单，而是回答两个可计算的问题：把「损失随参数量、数据量下降」写成一条具体的函数后，给定一笔算力预算，到底该买多少参数、买多少 token？以及 2020 年与 2022 年两篇代表作为什么会给出不同的分配答案？整节只用初中就学过的「幂」和「配平方／求最小」。</p>
+
+  <h4>背景：两篇论文，一个被修正的结论</h4>
+  <p>2020 年 Kaplan 等人在《Scaling Laws for Neural Language Models》里系统测量了语言模型损失 $L$ 与参数量 $N$、数据量 $D$、算力 $C$ 的关系，发现三者在双对数坐标下近似是直线，即幂律；并据此主张「在算力增长时，应主要把预算投向更大的模型，数据可以相对少」，给出的指数约为 $N\propto C^{0.73}$。这条结论一度主导了「越大越好」的军备竞赛。</p>
+  <p>2022 年 Hoffmann 等人（论文训练出的模型叫 Chinchilla）在《Training Compute-Optimal Large Language Models》里指出：Kaplan 的实验没有对<strong>每个算力预算都重新调好训练 token 数</strong>，导致大模型普遍「训练不足」。他们用 400 多个不同规模、不同数据量的对照实验重新拟合，结论是：在固定算力下，参数量与数据量应当<strong>大致等比例</strong>增长，经验规则是「每 1 个参数配约 20 个 token」；同样 70B 参数，把训练 token 从 0.3T 提到 1.4T，反而能以更小的模型打败大得多的旧模型。这不是否定幂律，而是把「给定预算下怎么分配」这件事算对了。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把训练想成「用一笔固定经费办补习班」，钱只能花在两处：请更厉害的老师（模型容量 $N$，参数越多越能记住复杂规律），或买更多习题（数据量 $D$，见过的题越多越不容易钻牛角尖）。两边各自都有「收益递减」：老师再厉害，只做三套卷子也考不好；题海再大，老师只会列竖式也讲不透压轴题。</p>
+  <p>关键的一句话：<strong>经费翻倍时，不能只把老师升级一倍、题目原封不动，而应让「老师水平」和「题目数量」各自涨约 $\sqrt 2$ 倍</strong>。因为花费是「老师水平 × 题目数量」的乘积（下面会看到 $C\approx 6ND$），要让乘积翻倍且两项都别偏废，最自然的分配就是各分一半。Kaplan 的做法相当于「经费翻倍、老师翻 1.7 倍、题目只涨一点」，于是模型空有一身容量没被喂饱；Chinchilla 把它掰回各涨一半。谁偏科，谁就在同一笔钱上买到更高的损失。</p>
+
+  <h4>形式化：把「偏科」写成一个约束最小化</h4>
+  <p>先把现象写成可算的函数。大量实验拟合出的损失形如「一个搬不走的地板 + 两块各自递减的项」：</p>
+
+  <div class="formula-box">
+    <div class="f-name">损失的幂律（可加形式）</div>
+    $$ L(N,D) = E \;+\; A\,N^{-\alpha} \;+\; B\,D^{-\beta} $$
+    <div class="f-note">白话：$E$ 是数据本身熵决定的不可约损失，任何模型都到不了它以下；$A N^{-\alpha}$ 是「参数不够、装不下规律」造成的误差，$N$ 越大这项越小；$B D^{-\beta}$ 是「数据不够、没学全」造成的误差，$D$ 越大这项越小。$\alpha,\beta$ 是两条双对数直线的斜率绝对值，恒为正。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">算力 ≈ 参数量 × token 数</div>
+    $$ C \;\approx\; 6\,N\,D $$
+    <div class="f-note">白话：训练一个稠密 Transformer，每个参数每处理 1 个 token，前向约 2 次乘加、反向约 4 次，合计约 6 FLOPs；所以总算力正比于 $N\times D$。于是「固定预算」就是约束 $6ND=C$，$N$ 与 $D$ 此消彼长。</div>
+  </div>
+
+  <p>现在问题变成一个纯数学题：在 $6ND=C$ 的约束下，让 $L$ 最小。用拉格朗日乘子 $\mu$ 把约束并进目标，</p>
+  <div class="formula-box">
+    <div class="f-name">一阶条件：两边「边际收益」必须相等</div>
+    $$ \mathcal L(N,D,\mu) = A N^{-\alpha} + B D^{-\beta} + \mu\,(6ND - C) $$
+    $$ \alpha A N^{-\alpha-1} = 6\mu D,\qquad \beta B D^{-\beta-1} = 6\mu N $$
+    <div class="f-note">白话：分别对 $N,D$ 求导并令其为零。两式相除消去 $\mu$，得到最优时「多花一点钱在参数上的边际下降」恰好等于「多花在 token 上的边际下降」——谁性价比高就往谁挪，直到相等为止。这就是「别偏科」的严格版本。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">一般最优分配的指数</div>
+    $$ \frac{\alpha A N^{-\alpha}}{\beta B D^{-\beta}} = \frac{D}{N},\qquad N_{\mathrm{opt}} \propto C^{\beta/(\alpha+\beta)},\qquad D_{\mathrm{opt}} \propto C^{\alpha/(\alpha+\beta)} $$
+    <div class="f-note">白话：解出 $N,D$ 随预算 $C$ 的幂次。参数量按 $C$ 的 $\beta/(\alpha+\beta)$ 次方长大，数据量按 $\alpha/(\alpha+\beta)$ 次方长大；两者指数相加恒为 1，因为乘积必须正比于 $C$。指数只由两条斜率 $\alpha,\beta$ 决定，与常数 $A,B,E$ 无关。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">史上有名的两个数字：0.73 对 0.5</div>
+    $$ \alpha\approx\beta\ \Longrightarrow\ N_{\mathrm{opt}}\propto C^{0.5},\qquad D_{\mathrm{opt}}\propto C^{0.5} $$
+    <div class="f-note">白话：当两个斜率差不多（Chinchilla 实测 $\alpha\approx0.34,\ \beta\approx0.28$，很接近）时，指数都约等于 $0.5$，即各按 $\sqrt C$ 增长、比例恒定——这就是「每参数约 20 token」的由来。Kaplan 当初主张的 $N\propto C^{0.73},\ D\propto C^{0.27}$ 相当于假设 $\beta$ 远大于 $\alpha$，把大头给了参数；修正的核心不是幂律错了，而是把指数从 0.73 拉回 0.5。</div>
+  </div>
+
+  <h4>数值对账：一笔 $6\times10^{23}$ FLOPs 的预算怎么花</h4>
+  <p>取 $\alpha=\beta=0.5$、$E=1.70$、并把常数调到使「每参数 20 token」成立，预算 $C_0=6\times10^{23}$ FLOPs。由 $6ND=C_0$ 与 $D=20N$ 联立得 $120N^2=C_0$，于是 $N_{\mathrm{opt}}=\sqrt{C_0/120}=7.0711\times10^{10}$（70.71 B 参数），$D_{\mathrm{opt}}=20N_{\mathrm{opt}}=1.4142\times10^{12}$（1.4142 T token）。下图和表格里每个数字都来自下方代码实验，可用笔复核：</p>
+  <div class="formula-box">
+    <div class="f-name">解析最优与对称的 U 形损失</div>
+    $$ N_{\mathrm{opt}} = \sqrt{C/120} = 7.0711\times 10^{10},\qquad D_{\mathrm{opt}} = 20\,N_{\mathrm{opt}} = 1.4142\times 10^{12} $$
+    $$ L - E = A\bigl(t^{-0.5} + t^{0.5}\bigr),\qquad t = N/N_{\mathrm{opt}} $$
+    <div class="f-note">白话：把 $N$ 写成「最优值的 $t$ 倍」，代入 $D=C/(6N)$ 后，参数项变成 $t^{-0.5}$、数据项变成 $t^{0.5}$；两项之和在 $t=1$ 取最小，且关于 $\log t$ 对称（$t$ 与 $1/t$ 损失相同）。这说明偏离最优点无论往哪边偏，代价都一样增长。</div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>同预算下的分配</th><th>$N$（B 参数）</th><th>$D$（T token）</th><th>$D/N$</th><th>损失 $L$</th></tr></thead>
+      <tbody>
+        <tr><td>数据优先 $N^*/4$</td><td>17.678</td><td>5.6569</td><td>320.0</td><td>1.997302</td></tr>
+        <tr><td>数据偏多 $N^*/2$</td><td>35.355</td><td>2.8284</td><td>80.0</td><td>1.952269</td></tr>
+        <tr><td>Chinchilla 最优 $N^*$</td><td>70.711</td><td>1.4142</td><td>20.0</td><td>1.937841</td></tr>
+        <tr><td>参数偏多 $2N^*$</td><td>141.421</td><td>0.7071</td><td>5.0</td><td>1.952269</td></tr>
+        <tr><td>参数优先 $4N^*$</td><td>282.843</td><td>0.3536</td><td>1.2</td><td>1.997302</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>读法：从最优往两头挪，损失从 $1.937841$ 升到 $1.952269$ 再到 $1.997302$，而且 $N^*/4$ 与 $4N^*$、$N^*/2$ 与 $2N^*$ 的损失<strong>逐位相等</strong>——正是上面 $t^{-0.5}+t^{0.5}$ 的对称性。把预算放大 4 倍、16 倍，代码实验测得 $N_{\mathrm{opt}}$ 分别变 2 倍、4 倍，$D_{\mathrm{opt}}$ 同理，双对数斜率 $d\log N/d\log C=0.5000$，与 $C^{0.5}$ 精确一致；换成 $\alpha=0.34,\beta=0.28$ 的实测指数，则得 $N\propto C^{0.4516},\ D\propto C^{0.5484}$，数值核验斜率也逐位吻合。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>在损失可加幂律 $L=E+AN^{-\alpha}+BD^{-\beta}$、算力 $C\approx6ND$、且数据质量不随重复退化这三条前提下，最优分配满足 $N_{\mathrm{opt}}\propto C^{\beta/(\alpha+\beta)},\ D_{\mathrm{opt}}\propto C^{\alpha/(\alpha+\beta)}$；当代实验里 $\alpha\approx\beta$，故<strong>参数与数据应各按 $\sqrt C$ 同步增长、比例恒定（约 20 token/参数）</strong>。Kaplan(2020) 的 $N\propto C^{0.73}$ 是「训练不足」的偏参数分配，Chinchilla(2022) 用等比例修正了它。同一预算下任何单侧偏科都会抬高损失，且偏离倍数 $t$ 与 $1/t$ 的代价对称。</div>
+
+  <p><strong>边界条件：</strong>在两条斜率明显不等（$\alpha\ne\beta$，损失曲线不再对称）、高质量数据已耗尽而必须重复训练（数据受限，重复 token 的边际收益递减，需引入「有效 token」衰减项）、约束来自推理延迟／显存而非训练算力（此时倾向把小模型 over-train 以省推理成本）、或下游任务需微调／检索增强而预训练损失不再是唯一目标的条件下，本结论不成立，应改用带重复惩罚的 data-constrained scaling law、推理感知（inference-aware）的算力分配，或明确区分「预训练最优」与「部署最优」后再定 $N:D$。</p>
+
+  <p>下图把损失随单一维度增长的幂律直线、以及固定预算下「参数—数据」此消彼长的 U 形曲线画在一起：前者是双对数坐标里的直线，后者是本节表格的图形化，最低点正落在 $D/N\approx20$。</p>
+  <figure data-figure="curve-scaling-law"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 分割共形预测：不假设分布，凭什么敢说「覆盖率至少 $1-\alpha$」</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>保证不来自「猜对了分布」，而来自「新样本与校准样本地位可交换」带来的排名均匀</h3></div>
+  <p class="dt-lead">本章正文第 5 节（#s5）已经给出「给大模型输出配一个置信区间」的动机与共形预测的直观用法；这里补上那份直觉背后唯一真正要紧的证明：为什么一条只用「排序取分位数」的规则，能在<strong>有限样本</strong>、<strong>不对数据分布作任何参数假设</strong>的前提下，给出 $\mathbb{P}(Y\in C(X))\ge 1-\alpha$？以及这个保证到底「保证了什么、没保证什么」。</p>
+
+  <h4>背景：从「假设正态」到「不假设任何分布」</h4>
+  <p>传统的预测区间（例如回归里的 $\hat f(x)\pm 1.96\hat\sigma$）依赖「残差近似正态且方差恒定」这类假设；一旦分布偏斜、厚尾、异方差，或模型是个黑箱大模型，$\hat\sigma$ 根本无从谈起，区间覆盖率就会悄悄失守。Vovk 等人在 1990 年代提出的共形预测（conformal prediction）、以及 Papadopoulos (2002) 与 Lei 等人 (2018) 的「分割／归纳」版本（split conformal），换了一条完全不同的路：不建模误差分布，只用「误差们之间的相对排名」。</p>
+  <p>它换来的保证非常硬：只要数据可交换（i.i.d. 是它的特例），覆盖率就是<strong>有限样本精确</strong>的，不需要「$n\to\infty$」、不需要正态、不需要模型一致。代价是它只保证「平均意义上的覆盖」（marginal coverage），这一点在专题末尾的边界条件里会正式点明。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>想象你要给「模型猜测验分」配一个「允许误差范围」。做法很朴素：先留出 99 条记录当<strong>校准题</strong>，把模型在每条上「猜偏了多少」记下来、从小到大排队；想做到「约 90% 的新题都落在范围内」，就取排在第 90 位的那个偏差当「容忍半径」 $\hat q$。以后来一条新样本，预测集就是「真值只要不超过 $\hat f(X)\pm\hat q$ 都算收进来」。</p>
+  <p>为什么这样就能拍胸脯保证 90%？关键不是「我们猜对了误差分布」，而是一句地位对称的话：<strong>新来的那条样本，和那 99 条校准样本，本质上是同一锅随机抽出来的，谁也不比谁特殊</strong>。于是「新样本的偏差」插进 99 个已排好序的偏差里，它落在第 1、第 2、……、第 100 个位置的<strong>机会完全均等</strong>。取第 90 位当阈值，等于宣布「只有当新样本排在后 10 个位置（偏差特别大）时才漏掉它」——而「排在后 10 位」的概率恰好是 $10/100=0.10$。所以漏掉概率不超过 0.10，覆盖概率不低于 0.90。整个推理只用到了「排名均匀」，没碰过分布长什么样。</p>
+
+  <h4>形式化：把「排名均匀」写成可核对的等式</h4>
+  <p>把数据切成两部分：训练集（用来拟合点预测 $\hat f$）与校准集 $\{(X_i,Y_i)\}_{i=1}^n$；再来一条独立的新样本 $(X_{n+1},Y_{n+1})$。定义不一致性分数（这里取绝对残差，也可用一般化的 score）：</p>
+  <div class="formula-box">
+    <div class="f-name">校准分数与分位数阈值</div>
+    $$ s_i = \bigl|y_i - \hat f(x_i)\bigr|,\quad i=1,\dots,n,\qquad k = \bigl\lceil (n+1)(1-\alpha)\bigr\rceil,\qquad \hat q = s_{(k)} $$
+    <div class="f-note">白话：$s_i$ 是第 $i$ 条校准样本「错得多离谱」；把它们从小到大排成 $s_{(1)}\le\dots\le s_{(n)}$，取第 $k$ 小当阈值。$k=\lceil(n+1)(1-\alpha)\rceil$ 这个向上取整，是为了让后面的覆盖率**至少** $1-\alpha$ 而不是略低于它；$s_{(k)}$ 是第 $k$ 个顺序统计量。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">预测集（回归时就是一个区间）</div>
+    $$ C(X) = \bigl\{\,y : s(X,y) \le \hat q\,\bigr\} = \bigl[\,\hat f(X)-\hat q,\ \ \hat f(X)+\hat q\,\bigr] $$
+    <div class="f-note">白话：凡是让「新误差不超过容忍半径」的候选 $y$，都收进预测集。绝对残差下，它退化成以点预测为中心、半径 $\hat q$ 的区间；分类时则是「分数够低的所有类别」组成的集合。</div>
+  </div>
+
+  <p>现在引入全节的枢纽量：把新样本也放进校准分数里，定义它的<strong>秩</strong>（排名）</p>
+  <div class="formula-box">
+    <div class="f-name">可交换性 ⇒ 秩均匀（全部保证的发动机）</div>
+    $$ R_{n+1} = \sum_{i=1}^{n+1} \mathbf 1\bigl\{s_i \le s_{n+1}\bigr\},\qquad \mathbb{P}\bigl(R_{n+1}=r\bigr) = \frac{1}{n+1},\ \ r=1,\dots,n+1 $$
+    <div class="f-note">白话：若 $n+1$ 个分数可交换（联合分布在任意置换下不变），那么「谁最小、谁第二小……」的每一种排列等可能，新样本的排名 $R_{n+1}$ 在 $1$ 到 $n+1$ 上均匀分布。这是唯一用到的概率假设——比 i.i.d. 还弱一点。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">覆盖事件 = 秩不超过 $k$</div>
+    $$ \bigl\{s_{n+1}\le \hat q\bigr\} = \bigl\{R_{n+1}\le k\bigr\},\qquad \mathbb{P}\bigl(Y_{n+1}\in C(X_{n+1})\bigr) = \mathbb{P}\bigl(R_{n+1}\le k\bigr) = \frac{k}{n+1} $$
+    <div class="f-note">白话：「新误差不超过第 $k$ 小的校准误差」与「新样本排名在前 $k$ 位」是同一件事；而排名均匀，落在前 $k$ 位的概率就是 $k/(n+1)$。这一步把「覆盖率」彻底化成了「数格子」，不再有任何未知分布参数。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">有限样本覆盖保证（无分布假设）</div>
+    $$ 1-\alpha \;\le\; \mathbb{P}\bigl(Y\in C(X)\bigr) \;=\; \frac{\lceil(n+1)(1-\alpha)\rceil}{n+1} \;\le\; 1-\alpha + \frac{1}{n+1} $$
+    <div class="f-note">白话：下界来自 $\lceil x\rceil\ge x$，故 $k/(n+1)\ge 1-\alpha$；上界来自 $\lceil x\rceil \lt x+1$，故最多只比 $1-\alpha$ 高出 $1/(n+1)$。若分数几乎必然无并列（连续分布），覆盖率就被夹在这个窄缝里；有并列时下界依然成立，只会更保守。注意这是<strong>有限 $n$</strong> 的精确陈述，不是大样本近似。</div>
+  </div>
+
+  <p>数值证据见代码实验 Part 2：$(n,\alpha)=(9,0.2)$ 时 $k=8$、覆盖率 $8/10=0.8000$；$(100,0.05)$ 时 $k=96$、$96/101=0.9505$，落在 $[0.95,\ 0.9599]$ 内；当 $\alpha=0.005,\ n=99$ 时 $k=100\gt n$，预测集退化为全集、覆盖率 $=1$（保证成立但信息量为零）。</p>
+
+  <h4>这份保证「没保证」什么</h4>
+  <p>把上式再读一遍：概率是对<strong>所有样本（含 $X$ 的随机性）一起取的边际平均</strong>。它<strong>不</strong>承诺「给定某个具体 $X=x$，覆盖率也 $\ge 1-\alpha$」。代码实验 Part 2 的蒙特卡洛把这一点摆得很清楚：边际覆盖 $0.9015\approx0.90$ 达标，但按噪声大小拆开，「容易子群」覆盖 $0.9834$（过高、区间浪费），「困难子群」只有 $0.6237$（严重不足）——一个全局阈值 $\hat q$ 无法同时适配异方差的两拨人，两者按占比加权平均才凑回 $0.90$。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>分割共形预测的有效性<strong>只依赖校准样本与新样本可交换</strong>：可交换性使新分数的秩在 $1,\dots,n+1$ 上均匀，取 $k=\lceil(n+1)(1-\alpha)\rceil$ 便把覆盖率精确锁定在 $[1-\alpha,\ 1-\alpha+1/(n+1)]$。它无需分布假设、无需大样本、对任意黑箱点预测都成立；但这是<strong>边际</strong>覆盖，不是逐点条件覆盖，且阈值由校准分布决定，一旦分布漂移、样本有依赖或分数并列被忽略，保证即失效。</div>
+
+  <p><strong>边界条件：</strong>在样本非可交换（时间序列自相关、同一用户重复观测、分布随时间漂移）、要求条件覆盖 $\mathbb{P}(Y\in C(X)\mid X=x)\ge1-\alpha$（异方差、子群公平性）、校准集过小导致预测集退化为全集、或数据不再与校准同分布（代码实验 Part 2(c) 把噪声放大 4 倍后覆盖率掉到 $0.4162$）的条件下，本结论不成立，应改用重校准／滚动共形、局部自适应或分组（Mondrian）共形、加权共形（处理已知漂移），或用 jackknife+ 等给出更强训练一致性的变体。</p>
+
+  <p>下图是分割共形预测的完整数据流：训练拟合 → 校准打分排序取 $\hat q$ → 新样本构造预测集 → 上线后监控覆盖率并在漂移时回到重校准。保证的「上游契约」是那批与新样本可交换的校准数据，任何把测试信息倒灌进校准、或让校准分布过期的做法，都会让整条链路失效。</p>
+  <figure data-figure="flow-conformal"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 分割共形预测（Split Conformal Prediction）</h2>
+<div class="algo-spec">
+  <p>上一专题回答的是「凭什么保证覆盖」（证明）；本节回答的是「具体怎么算、代价多大、跟谁比、以及在什么工程条件下选它」。本算法位于「点预测模型 → 不确定性量化 → 决策」链条的<strong>量化环节</strong>，上游契约是「一个已训练好的点预测 $\hat f$ 与一批独立、可交换的校准数据」，下游契约是「一个带有限样本覆盖保证的预测集合 $C(X)$ 及其平均宽度」。选它作经典算法，是因为它<strong>与底层模型完全解耦</strong>：无论 $\hat f$ 是线性回归还是千亿参数大模型，套上同一层校准就能拿到保证，是「统计保证 ↔ 任意黑箱模型」之间最短的一座桥。</p>
+
+  <h3 id="d-algo-principle">一、原理：用「校准误差的分位数」当容忍半径</h3>
+  <p>给定训练集 $\mathcal D_{\mathrm{tr}}$、校准集 $\mathcal D_{\mathrm{cal}}=\{(x_i,y_i)\}_{i=1}^n$、目标覆盖率 $1-\alpha$、以及任意不一致性分数 $s(x,y)$（如 $|y-\hat f(x)|$、分类的 $1-\hat\pi_y(x)$）。算法先只用训练集拟合 $\hat f$，再在<strong>未参与训练</strong>的校准集上算分数并取分位数：</p>
+  <div class="formula-box">
+    <div class="f-name">算法的三行核心</div>
+    $$ \hat f = \mathcal A(\mathcal D_{\mathrm{tr}}),\qquad s_i = s(x_i,y_i),\qquad \hat q = s_{(k)},\quad k = \bigl\lceil (n+1)(1-\alpha)\bigr\rceil $$
+    $$ C(X) = \bigl\{\,y : s(X,y)\le \hat q\,\bigr\},\qquad \mathbb{P}\bigl(Y\in C(X)\bigr)\ge 1-\alpha $$
+    <div class="f-note">白话：训练、打分、取阈值三步彼此干净隔离；$\hat q$ 只由校准分数决定，$\hat f$ 只由训练数据决定。正因为阈值与新样本独立、且分数可交换，上一专题的秩均匀论证才成立。</div>
+  </div>
+  <p>两个常被忽略的细节：其一，$\hat q$ 用的是 $\lceil(n+1)(1-\alpha)\rceil$ 而非 $\lceil n(1-\alpha)\rceil$，多出来的「$+1$」正是把新样本也数进排名，才拿到有限样本下界；其二，若 $k\gt n$（$\alpha$ 太小或 $n$ 太小），规定 $\hat q=+\infty$、$C(X)$ 为全集，覆盖率 $=1$ 但区间无意义——这是「保证」与「有用性」的分界。分数也可换成<strong>标准化</strong>的 $s(x,y)=|y-\hat f(x)|/\hat\sigma(x)$，让区间随 $x$ 自适应宽窄，缓解异方差（对应共形化分位数回归 CQR）。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>切分。</strong>把可用数据随机分成训练集与校准集（常见 70/30 或 80/20）；<strong>切分必须在拟合 $\hat f$ 之前</strong>，校准集全程不得参与训练、特征筛选、调参或早停（呼应 m09 的泄漏判据）。</li>
+    <li><strong>训练点预测。</strong>只用训练集拟合 $\hat f$；若还要给「误差尺度」建模（CQR / 标准化分数），同样只用训练集。</li>
+    <li><strong>校准打分。</strong>对每条校准样本算 $s_i=s(x_i,y_i)$，得到 $n$ 个非负分数；确认分数之间是否可能大量并列（离散标签、整数分数），并列会让保证更保守。</li>
+    <li><strong>排序取阈值。</strong>把 $s_i$ 升序排列，取 $k=\lceil(n+1)(1-\alpha)\rceil$；若 $k\gt n$ 则置 $\hat q=+\infty$ 并报警，否则 $\hat q=s_{(k)}$。</li>
+    <li><strong>构造预测集。</strong>对新 $X$，输出 $C(X)=\{y: s(X,y)\le\hat q\}$；回归时直接展开为 $[\hat f(X)-\hat q,\ \hat f(X)+\hat q]$，分类时枚举候选类别/标签打分后筛选。</li>
+    <li><strong>评估与记账。</strong>在独立测试集上报告实测边际覆盖率、平均集合大小／区间宽度，并按关键子群拆开看条件覆盖；与 $1-\alpha$ 及 $1-\alpha+1/(n+1)$ 对照。</li>
+    <li><strong>监控与重校准。</strong>上线后持续监测覆盖率与输入分布；一旦漂移（如代码实验 (c)），用新校准集重算 $\hat q$，或切换加权／滚动共形，切勿让旧阈值无限期服役。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>数据假设：</strong>校准样本与新样本可交换（i.i.d. 是最常见特例）；对分布族、残差形态、异方差<strong>无要求</strong>。</li>
+    <li><strong>模型假设：</strong>无。$\hat f$ 可以是任意黑箱、任意规模；只要能对新 $X$ 与候选 $y$ 计算 $s(X,y)$ 即可。</li>
+    <li><strong>规模要求：</strong>$n$ 越大，$\hat q$ 越稳、区间越紧；经验上 $n\ge 1000$ 才能让 $1/(n+1)$ 的上界项和分位数噪声都可忽略。$\alpha$ 不能小到让 $k\gt n$。</li>
+    <li><strong>分数选择：</strong>分数须在训练／校准切分之前定好，不能在看过校准结果后反复挑「覆盖最好」的分数；否则选择本身构成泄漏。</li>
+    <li><strong>目标类型：</strong>回归（区间）、分类（标签集合）、结构化输出皆可；集合形式的输出天然适配「宁可给几个候选、也不漏掉真值」的场景。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>一次性校准</b> 计算 $n$ 个分数 $O(n\cdot c_s)$（$c_s$ 为单次打分成本），排序 $O(n\log n)$，取第 $k$ 小可降到 $O(n)$（快速选择）。<b>推理</b> 回归仅 $O(1)$ 次加减得到区间端点；分类需对每个候选类别算一次分数，$O(|Y|\cdot c_s)$。<b>空间</b> 存校准分数 $O(n)$，可只保留前 $k$ 个用堆压到 $O(k)$；不需存储原始训练数据。<b>训练</b> 成本完全由底层 $\hat f$ 决定，共形层本身不增加训练量；这是它相对「重训 $K$ 次」方法（如 jackknife+ 需 $n$ 次留一重训）的最大工程优势。</div>
+  <p>白话：共形层几乎「白送」——不重训模型、只多存一串分数、排序一次；代价是牺牲了一部分统计效率（少用了校准集来训练 $\hat f$），换来的是一条不依赖分布、能写进合同的覆盖保证。$n$ 很大时排序 $O(n\log n)$ 也远小于一次大模型前向。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>分布无关、有限样本有效：$\ge 1-\alpha$ 的覆盖不靠渐近、不靠正态，可交换即成立。</li>
+        <li>与模型解耦：对任意黑箱点预测「即插即用」，不改动、不重训底层模型，工程成本极低。</li>
+        <li>校准只需排序取分位数，实现十余行、可审计；输出是集合／区间，比单个点更诚实。</li>
+        <li>可换分数做自适应（CQR、标准化残差），在不丢保证的前提下让区间随 $x$ 宽窄变化。</li>
+        <li>上界 $1-\alpha+1/(n+1)$ 明确，覆盖率「最多虚高多少」也能量化。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>只保证<strong>边际</strong>覆盖：异方差下子群覆盖可严重失衡（代码实验难子群仅 0.6237）。</li>
+        <li>强依赖可交换性：分布漂移、时间依赖、聚类样本下保证失效（漂移后掉到 0.4162）。</li>
+        <li>需要专门留一批校准数据，牺牲了训练样本量；$n$ 小或 $\alpha$ 极小时预测集退化为全集。</li>
+        <li>单一全局 $\hat q$ 对所有 $X$ 一样宽，平均宽度偏大；区间不附带「某个体」的条件置信。</li>
+        <li>集合可能不连通、可能出现并列保守；对「要一个最优点估计」的下游仍需额外决策规则。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>固定一组可笔算的校准数据。设已用训练集拟合好 $\hat f$，在 $n=9$ 条校准样本上得到绝对残差分数（已升序）：$s_{(1\dots9)} = (0.3,\ 0.5,\ 0.8,\ 1.1,\ 1.4,\ 2.0,\ 2.5,\ 3.1,\ 5.0)$。取 $\alpha=0.2$（目标覆盖 $\ge 0.8$）。以下每一步都能用笔复核，并与代码实验 Part 2(a) 第一行对上。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">算 $k$。</span>$k=\lceil(n+1)(1-\alpha)\rceil=\lceil 10\times0.8\rceil=\lceil 8\rceil=8$。注意用的是 $n+1=10$ 而非 $n=9$——把新样本一起数进去，才拿得到有限样本下界。</div>
+    <div class="solve-step"><span class="ss-k">取阈值。</span>$\hat q=s_{(8)}=3.1$（第 8 小）。故对任意新 $X$，$C(X)=[\hat f(X)-3.1,\ \hat f(X)+3.1]$。</div>
+    <div class="solve-step"><span class="ss-k">翻译覆盖事件。</span>新样本被覆盖 $\iff s_{n+1}\le 3.1 \iff$ 它在 10 个分数里排名 $R_{n+1}\le 8$。由可交换性，$R_{n+1}$ 在 $\{1,\dots,10\}$ 均匀，故 $\mathbb{P}(R\le 8)=8/10=0.8000$。</div>
+    <div class="solve-step"><span class="ss-k">核对上下界。</span>$1-\alpha=0.8$，上界 $1-\alpha+1/(n+1)=0.8+0.1=0.9$；实测 $0.8000$ 落在 $[0.8,\ 0.9]$ 内，与代码表第一行 exact=0.8000、upper=0.9000 逐位一致。</div>
+    <div class="solve-step"><span class="ss-k">换一组看退化。</span>$(n,\alpha)=(99,0.005)$：$k=\lceil100\times0.995\rceil=\lceil99.5\rceil=100\gt n=99$，故 $\hat q=+\infty$、$C(X)$ 为全集、覆盖率 $=1.0000$——保证成立但区间毫无信息，对应代码表末行 degenerate=YES。</div>
+    <div class="solve-step"><span class="ss-k">手算蒙特卡洛的子群加权。</span>代码实验 (b) 中容易子群占比 $0.772$、覆盖 $0.9834$，困难子群占比 $0.228$、覆盖 $0.6237$。边际覆盖 $=0.772\times0.9834+0.228\times0.6237=0.7592+0.1422=0.9014\approx0.9015$，与实测 marginal=0.9015 吻合。这一步说明「总体达标」完全可能由「一子群过高、一子群严重不足」平均而来。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>$\hat q$ 是<strong>一个</strong>全局数字，只能对齐「平均」误差水平；尾部噪声被放大 3 倍时，困难子群的真实误差远超 $\hat q$，覆盖自然掉到 0.6237。要让每个子群都达标，必须改成分组共形（各子群各算一个 $\hat q$）或标准化分数，而这已超出「单一全局阈值」的适用边界。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把分割共形与三种「给预测配不确定性」的同类方法放在一起对照。右侧的「朴素参数区间」是反例式的补充：它也输出区间，但覆盖率依赖分布假设，与共形「无分布保证」的定位形成对照。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>分割共形 Split Conformal</th><th>完全共形 Full Conformal</th><th>Jackknife+</th><th>朴素参数区间 $\hat f\pm1.96\hat\sigma$</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>可交换 + 有独立校准集；任意黑箱点预测；回归/分类皆可</td>
+        <td>可交换；需为新样本每个候选 $y$ 重训模型，模型须可反复拟合</td>
+        <td>可交换；愿做 $n$ 次留一重训，追求训练一致性</td>
+        <td>残差近似正态、方差恒定、$\hat\sigma$ 可估；仅回归</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td class="best">校准 $O(n\log n)$、空间 $O(n)$、推理 $O(1)$；不重训</td>
+        <td>极高：每候选 $y$ 重训一次，$O(n\cdot|Y|\cdot T_{\mathrm{train}})$</td>
+        <td>高：$n$ 次留一重训 $O(n\cdot T_{\mathrm{train}})$，空间 $O(n^2)$ 量级</td>
+        <td>训练 $O(n)$、推理 $O(1)$；最省</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>$\alpha$（目标 miscoverage）、$k=\lceil(n+1)(1-\alpha)\rceil$、分数 $s$、校准集大小 $n$</td>
+        <td>$\alpha$、分数 $s$、候选 $y$ 网格、重训预算</td>
+        <td>$\alpha$、留一折数、分数 $s$</td>
+        <td>置信水平、$\hat\sigma$ 估计方式、正态/$t$ 分位数</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">分布无关、有限样本有效、模型解耦、实现最简、可审计</td>
+        <td>统计效率最高（全数据既训练又校准）、无校准集浪费</td>
+        <td>点预测用上几乎全部数据，区间更紧、有近似的训练一致性保证</td>
+        <td>公式人人会算、区间平滑、计算最轻</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>只保边际覆盖、依赖可交换、需留校准集、$k\gt n$ 退化为全集</td>
+        <td>计算不可行（大模型场景直接排除）、实现复杂、难并行</td>
+        <td>重训代价大、保证是近似而非精确有限样本、实现复杂</td>
+        <td>分布假设一破即失守；厚尾/异方差下覆盖系统性偏低；黑箱大模型无法估 $\hat\sigma$</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>阈值=「第 $k$ 小校准误差」，一句话讲清；改造成本最低，十余行包装</td>
+        <td>「候选 $y$ 反事实重训」难解释；工程改造最大</td>
+        <td>「留一预测分布」较直观；需维护 $n$ 个模型，运维最重</td>
+        <td>系数即边际误差，最易讲；但「覆盖率」不可靠、误导风险最高</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>六维口径由下图统一约定，保证全站各章的「横向对比」在同一套标准下展开，不随章节改变。分割共形之所以成为大模型时代的主流选择，正是因为这一套里只有它同时满足「不碰模型内部」与「有可证明保证」。</p>
+  <figure data-figure="flow-learning-loop"></figure>
+</div>
+
+<h2 id="d-code">代码实验 · 缩放定律的算力最优分配、共形覆盖保证与漂移失效的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 10 AI 前沿：统计学与大模型
+# 纯 Python 标准库；固定种子 20261107；复用「知学云」案例数字
+# Part 1: 缩放定律 Kaplan(2020) 幂律 vs Chinchilla(2022) 算力最优分配
+# Part 2: 分割共形预测的有限样本覆盖保证、条件覆盖失效、分布漂移
+import math
+import random
+
+random.seed(20261107)
+
+# ============================================================
+print("=== Part 1: 缩放定律与算力最优分配 ===")
+# 示意性幂律损失（指数取 alpha=beta=0.5 便于手算核对；结论对一般指数同样成立）
+E = 1.70
+NRM = 1e9        # 参数量以「十亿」为单位
+DRM = 1e9        # token 数以「十亿」为单位
+G = 1.0
+H = math.sqrt(20.0)     # 使最优 D/N = 20（Chinchilla 经验规则）
+ALPHA = BETA = 0.5
+
+
+def loss(N, D):
+    return E + G * (N / NRM) ** (-ALPHA) + H * (D / DRM) ** (-BETA)
+
+
+def flops(N, D):
+    return 6.0 * N * D        # C ≈ 6 N D
+
+
+C0 = 6e23
+# alpha=beta=0.5 时，最优满足 D/N = (H/G)^(1/alpha) = 20，配合 6ND=C 解出
+N_STAR = math.sqrt(C0 / 120.0)
+D_STAR = 20.0 * N_STAR
+print("预算 C0 = %.2e FLOPs；C ≈ 6ND，20 tokens/param 规则" % C0)
+print("解析解 N_opt = sqrt(C/120) = %.4e (%.2f B 参数)" % (N_STAR, N_STAR / 1e9))
+print("        D_opt = 20*N_opt  = %.4e (%.4f T tokens)" % (D_STAR, D_STAR / 1e12))
+print("校验 6*N*D = %.4e  (= C0)" % flops(N_STAR, D_STAR))
+print()
+print("同一预算 C0 下，五种『参数/数据』分配的比较（损失越小越好）：")
+allocs = [
+    ("数据优先 N*/4", N_STAR / 4.0),
+    ("数据偏多 N*/2", N_STAR / 2.0),
+    ("Chinchilla 最优 N*", N_STAR),
+    ("参数偏多 2N*", 2.0 * N_STAR),
+    ("参数优先 4N*", 4.0 * N_STAR),
+]
+for name, N in allocs:
+    D = C0 / (6.0 * N)
+    print("  %-20s N=%9.3f B  D=%8.4f T  D/N=%6.1f  L=%.6f" %
+          (name, N / 1e9, D / 1e12, D / N, loss(N, D)))
+print("→ 两头都变差，最优在中间；『只堆参数』在同算力下损失更高。")
+print("  注：alpha=beta=0.5 时 L-E = A(t^-0.5 + t^0.5), t=N/N*，关于 log t 对称，")
+print("      故 N*/4 与 4N* 损失相同；一般 alpha≠beta 时曲线不再对称。")
+print()
+
+# 验证 N_opt ∝ C^0.5, D_opt ∝ C^0.5（理想 alpha=beta 情形）
+print("理想情形 alpha=beta=0.5：预算放大 4 倍 / 16 倍时的最优分配")
+base_N, base_D = N_STAR, D_STAR
+for mult in (1, 4, 16):
+    C = C0 * mult
+    N = math.sqrt(C / 120.0)
+    D = 20.0 * N
+    print("  C=%.0f*C0 : N=%10.4f B (x%.3f)  D=%10.4f T (x%.3f)" %
+          (mult, N / 1e9, N / base_N, D / 1e12, D / base_D))
+sN = math.log(math.sqrt(16.0)) / math.log(16.0)
+print("  log-log 斜率 dlogN/dlogC = %.4f , dlogD/dlogC = %.4f (应为 0.5)" % (sN, sN))
+print()
+
+# 一般情形：N ∝ C^(beta/(a+b)), D ∝ C^(alpha/(a+b))；用解析式核验指数
+print("一般情形：指数只由 a=alpha, b=beta 决定（N∝C^(b/(a+b)), D∝C^(a/(a+b))）")
+for a, b, tag in ((0.5, 0.5, "理想"), (0.34, 0.28, "Chinchilla 实测")):
+    eN, eD = b / (a + b), a / (a + b)
+    print("  a=%.2f b=%.2f (%-14s): N∝C^%.4f  D∝C^%.4f" % (a, b, tag, eN, eD))
+print("  历史主张对比：Kaplan(2020) 主张 N∝C^0.73 / D∝C^0.27（参数优先、训练不足）；")
+print("                Chinchilla(2022) 修正为 ≈C^0.5/C^0.5 与『每参数约 20 tokens』。")
+
+# 用一般损失 L=E+N^-a+D^-b 在两个预算上数值核验斜率（a!=b）
+def general_opt(C, a, b):
+    # a*N^-a = b*(C/(6N))^-b  =&gt;  N = (a/b)^(1/(a+b)) * (C/6)^(b/(a+b))
+    N = (a / b) ** (1.0 / (a + b)) * (C / 6.0) ** (b / (a + b))
+    return N, C / (6.0 * N)
+
+a, b = 0.34, 0.28
+N1, D1 = general_opt(C0, a, b)
+N2, D2 = general_opt(C0 * 16, a, b)
+print("  数值核验 a=0.34,b=0.28: slope_N=%.4f  slope_D=%.4f" %
+      (math.log(N2 / N1) / math.log(16), math.log(D2 / D1) / math.log(16)))
+print()
+
+# ============================================================
+print("=== Part 2: 分割共形预测 split conformal 的覆盖保证 ===")
+B0, B1 = 64.4306, 0.160833
+MU_X, SD_X = 95.2964, 43.4274
+SIGMA0 = 12.7939        # 案例残差标准差
+HARD = 1.2 * SD_X       # 「难」子群：偏离均值 1.2 个标准差之外
+
+
+def f(x):
+    return B0 + B1 * x
+
+
+def noise_sd(x):
+    return SIGMA0 * (3.0 if abs(x - MU_X) &gt; HARD else 1.0)   # 异方差：尾部噪声 3 倍
+
+
+def draw_point(scale=1.0):
+    x = MU_X + SD_X * random.gauss(0, 1)
+    y = f(x) + scale * noise_sd(x) * random.gauss(0, 1)
+    return x, y
+
+
+def conformal_q(n, alpha):
+    scores = []
+    for _ in range(n):
+        x, y = draw_point()
+        scores.append(abs(y - f(x)))        # 不一致性分数 = |y - fhat(x)|, 此处 fhat=f
+    scores.sort()
+    k = math.ceil((n + 1) * (1 - alpha))
+    if k &gt; n:
+        return float("inf"), k
+    return scores[k - 1], k                # 第 k 小
+
+
+def covered(x, y, q):
+    return abs(y - f(x)) &lt;= q
+
+
+# (a) 有限样本精确覆盖率表
+print("(a) 有限样本精确覆盖率 = ceil((n+1)(1-a))/(n+1)，上界 = 1-a+1/(n+1)")
+print("%4s %6s %4s %10s %10s %12s %8s" %
+      ("n", "alpha", "k", "exact", "1-alpha", "1-a+1/(n+1)", "degenerate"))
+for n, alpha in ((9, 0.2), (19, 0.1), (99, 0.1), (100, 0.05), (99, 0.005)):
+    k = math.ceil((n + 1) * (1 - alpha))
+    exact = 1.0 if k &gt; n else k / (n + 1)
+    upper = (1 - alpha) + 1.0 / (n + 1)
+    deg = "YES(q=inf)" if k &gt; n else "no"
+    print("%4d %6.3f %4d %10.4f %10.4f %12.4f %8s" %
+          (n, alpha, k, exact, 1 - alpha, upper, deg))
+print("    每一行的 exact 都落在 [1-a, 1-a+1/(n+1)] 内；k&gt;n 时预测集退化为全集，覆盖率=1。")
+print()
+
+# (b) 蒙特卡洛：边际覆盖成立、条件覆盖对子群失效
+N_CAL, ALPHA, REPS = 99, 0.10, 6000
+k = math.ceil((N_CAL + 1) * (1 - ALPHA))
+tot = hit = 0
+hard_tot = hard_hit = 0
+easy_tot = easy_hit = 0
+q_sum = 0.0
+for _ in range(REPS):
+    q, _ = conformal_q(N_CAL, ALPHA)
+    q_sum += q
+    xt, yt = draw_point()
+    ok = covered(xt, yt, q)
+    tot += 1
+    hit += 1 if ok else 0
+    if abs(xt - MU_X) &gt; HARD:
+        hard_tot += 1
+        hard_hit += 1 if ok else 0
+    else:
+        easy_tot += 1
+        easy_hit += 1 if ok else 0
+print("(b) 蒙特卡洛 n_cal=%d, alpha=%.2f, k=%d, R=%d（异方差：尾部噪声 3 倍）" %
+      (N_CAL, ALPHA, k, REPS))
+print("    marginal coverage = %.4f   (理论 k/(n+1) = %.4f)" % (hit / tot, k / (N_CAL + 1)))
+print("    easy  subgroup     = %.4f   (占比 %.3f, 噪声小 → 覆盖过高)" %
+      (easy_hit / easy_tot, easy_tot / tot))
+print("    hard  subgroup     = %.4f   (占比 %.3f, 噪声大 → 覆盖不足)" %
+      (hard_hit / hard_tot, hard_tot / tot))
+print("    mean q / sigma0    = %.4f   (单一全局阈值，无法适配两个子群)" % (q_sum / REPS / SIGMA0))
+print("    → 边际覆盖 ≈ 1-a 成立，但条件覆盖 P(Y∈C | X=子群) 对难子群显著低于 1-a。")
+print()
+
+# (c) 分布漂移：测试点噪声放大 4 倍，校准集不变 → 可交换性被破坏
+shift_hit, shift_tot = 0, 0
+for _ in range(REPS):
+    q, _ = conformal_q(N_CAL, ALPHA)
+    xt, yt = draw_point(scale=4.0)      # 测试分布漂移：噪声 4 倍
+    shift_tot += 1
+    shift_hit += 1 if covered(xt, yt, q) else 0
+print("(c) 分布漂移（新样本噪声放大 4 倍，校准集仍按原分布）：")
+print("    shifted coverage = %.4f   &lt;&lt; 目标 %.2f" % (shift_hit / shift_tot, 1 - ALPHA))
+print("    → 数据不再可交换，1-a 保证不成立，必须重校准或改用加权共形。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: 缩放定律与算力最优分配 ===
+预算 C0 = 6.00e+23 FLOPs；C ≈ 6ND，20 tokens/param 规则
+解析解 N_opt = sqrt(C/120) = 7.0711e+10 (70.71 B 参数)
+        D_opt = 20*N_opt  = 1.4142e+12 (1.4142 T tokens)
+校验 6*N*D = 6.0000e+23  (= C0)
+
+同一预算 C0 下，五种『参数/数据』分配的比较（损失越小越好）：
+  数据优先 N*/4            N=   17.678 B  D=  5.6569 T  D/N= 320.0  L=1.997302
+  数据偏多 N*/2            N=   35.355 B  D=  2.8284 T  D/N=  80.0  L=1.952269
+  Chinchilla 最优 N*     N=   70.711 B  D=  1.4142 T  D/N=  20.0  L=1.937841
+  参数偏多 2N*             N=  141.421 B  D=  0.7071 T  D/N=   5.0  L=1.952269
+  参数优先 4N*             N=  282.843 B  D=  0.3536 T  D/N=   1.2  L=1.997302
+→ 两头都变差，最优在中间；『只堆参数』在同算力下损失更高。
+  注：alpha=beta=0.5 时 L-E = A(t^-0.5 + t^0.5), t=N/N*，关于 log t 对称，
+      故 N*/4 与 4N* 损失相同；一般 alpha≠beta 时曲线不再对称。
+
+理想情形 alpha=beta=0.5：预算放大 4 倍 / 16 倍时的最优分配
+  C=1*C0 : N=   70.7107 B (x1.000)  D=    1.4142 T (x1.000)
+  C=4*C0 : N=  141.4214 B (x2.000)  D=    2.8284 T (x2.000)
+  C=16*C0 : N=  282.8427 B (x4.000)  D=    5.6569 T (x4.000)
+  log-log 斜率 dlogN/dlogC = 0.5000 , dlogD/dlogC = 0.5000 (应为 0.5)
+
+一般情形：指数只由 a=alpha, b=beta 决定（N∝C^(b/(a+b)), D∝C^(a/(a+b))）
+  a=0.50 b=0.50 (理想            ): N∝C^0.5000  D∝C^0.5000
+  a=0.34 b=0.28 (Chinchilla 实测 ): N∝C^0.4516  D∝C^0.5484
+  历史主张对比：Kaplan(2020) 主张 N∝C^0.73 / D∝C^0.27（参数优先、训练不足）；
+                Chinchilla(2022) 修正为 ≈C^0.5/C^0.5 与『每参数约 20 tokens』。
+  数值核验 a=0.34,b=0.28: slope_N=0.4516  slope_D=0.5484
+
+=== Part 2: 分割共形预测 split conformal 的覆盖保证 ===
+(a) 有限样本精确覆盖率 = ceil((n+1)(1-a))/(n+1)，上界 = 1-a+1/(n+1)
+   n  alpha    k      exact    1-alpha  1-a+1/(n+1) degenerate
+   9  0.200    8     0.8000     0.8000       0.9000       no
+  19  0.100   18     0.9000     0.9000       0.9500       no
+  99  0.100   90     0.9000     0.9000       0.9100       no
+ 100  0.050   96     0.9505     0.9500       0.9599       no
+  99  0.005  100     1.0000     0.9950       1.0050 YES(q=inf)
+    每一行的 exact 都落在 [1-a, 1-a+1/(n+1)] 内；k&gt;n 时预测集退化为全集，覆盖率=1。
+
+(b) 蒙特卡洛 n_cal=99, alpha=0.10, k=90, R=6000（异方差：尾部噪声 3 倍）
+    marginal coverage = 0.9015   (理论 k/(n+1) = 0.9000)
+    easy  subgroup     = 0.9834   (占比 0.772, 噪声小 → 覆盖过高)
+    hard  subgroup     = 0.6237   (占比 0.228, 噪声大 → 覆盖不足)
+    mean q / sigma0    = 2.6516   (单一全局阈值，无法适配两个子群)
+    → 边际覆盖 ≈ 1-a 成立，但条件覆盖 P(Y∈C | X=子群) 对难子群显著低于 1-a。
+
+(c) 分布漂移（新样本噪声放大 4 倍，校准集仍按原分布）：
+    shifted coverage = 0.4162   &lt;&lt; 目标 0.90
+    → 数据不再可交换，1-a 保证不成立，必须重校准或改用加权共形。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">N_opt = 7.0711e+10 (70.71 B)、D_opt = 1.4142e+12 (1.4142 T)</span>：由 $120N^2=C_0=6\times10^{23}$ 解出（$D=20N$ 代入 $6ND=C$）。<span class="ci-k">校验 6*N*D = 6.0000e+23</span> 逐位回到预算，说明解析解没有算错。常数 $H=\sqrt{20}$ 是为了让最优比 $D/N=(H/G)^{1/\alpha}=20$ 恰好等于 Chinchilla 的「每参数约 20 token」，改 $H$ 会整体挪动最优点，但「两头对称变差」的结构不变。</p>
+    <p><span class="ci-k">五种分配的 L：1.997302 / 1.952269 / 1.937841 / 1.952269 / 1.997302</span>：最低点落在 $N^*$（$D/N=20$），且 $N^*/4$ 与 $4N^*$、$N^*/2$ 与 $2N^*$ 的损失<strong>逐位相等</strong>，验证的是 $L-E=A(t^{-0.5}+t^{0.5})$ 关于 $\log t$ 的对称性。「只堆参数」（$4N^*$，282.843 B / 0.3536 T）在同算力下比最优损失更高，正是 Kaplan 式偏参数分配被修正的定量证据。把 <code>ALPHA/BETA</code> 改成不相等，这条对称会被打破，但最低点仍由 $\beta/(\alpha+\beta)$ 决定。</p>
+    <p><span class="ci-k">log-log 斜率 0.5000 / 0.5000</span>：预算放大 16 倍时 $N$、$D$ 各变 4 倍，$\log 4/\log 16=0.5$，与 $N_{\mathrm{opt}}\propto C^{0.5},D_{\mathrm{opt}}\propto C^{0.5}$ 精确一致。<span class="ci-k">a=0.34,b=0.28 → N∝C^0.4516, D∝C^0.5484</span>：代入一般式 $N\propto C^{\beta/(\alpha+\beta)}$、$D\propto C^{\alpha/(\alpha+\beta)}$ 得 $0.28/0.62=0.4516$、$0.34/0.62=0.5484$，末行数值核验 <code>slope_N=0.4516 / slope_D=0.5484</code> 与解析指数逐位吻合——注意这组实测指数已很接近 0.5，故历史对比写成「Kaplan 0.73/0.27 → Chinchilla ≈0.5/0.5」。</p>
+    <p><span class="ci-k">Part 2(a) 的 exact 列</span>：$k=\lceil(n+1)(1-\alpha)\rceil$，覆盖率 $k/(n+1)$。$(9,0.2)$ 得 $0.8000$、$(100,0.05)$ 得 $96/101=0.9505$，每行都夹在 $[1-\alpha,\ 1-\alpha+1/(n+1)]$ 内；末行 $(99,0.005)$ 因 $k=100\gt n$ 触发 <code>degenerate=YES</code>、覆盖率 $=1.0000$——保证成立但区间退化为全集。这几行是「有限样本、无分布假设」最硬的数值证据，不依赖任何蒙特卡洛。</p>
+    <p><span class="ci-k">marginal=0.9015 对理论 0.9000</span>：$n_{\mathrm{cal}}=99,\alpha=0.10$ 时 $k=90$、理论 $90/100=0.90$，6000 次重复实测 0.9015，差 0.0015 是蒙特卡洛抖动。<span class="ci-k">easy 0.9834 / hard 0.6237</span> 与占比 0.772/0.228 加权平均 $\approx0.9014$ 回到边际值，说明「总体达标」掩盖了子群失衡；<span class="ci-k">mean q/sigma0 = 2.6516</span> 是单一全局阈值，它对齐的是「平均」噪声，故对尾部 3 倍噪声的困难子群系统性偏窄。</p>
+    <p><span class="ci-k">shifted coverage = 0.4162</span>：把新样本噪声放大 4 倍、校准集仍按原分布，可交换性被破坏，覆盖率从 0.90 崩到 0.4162，远低于目标。这不是「$q$ 没调好」，而是上一专题证明的前提（秩均匀）不再成立——修复只能靠重校准或加权共形，加大校准集于事无补。案例数值 $\mu=95.2964,\sigma_x=43.4274,\sigma_0=12.7939$ 全部来自 <code>case.json</code>，与全站共用同一套真源。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组方法给出两件东西：在给定算力预算下，把损失幂律解成 $N_{\mathrm{opt}},D_{\mathrm{opt}}$ 的比例（缩放定律）；以及不假设分布、仅凭可交换性就给出 $\ge1-\alpha$ 有限样本覆盖的预测集合（分割共形）。<strong>不做</strong>因果识别、不提升点预测本身的精度，也不承诺逐点条件覆盖。</td></tr>
+    <tr><th>输入 / 输出</th><td>缩放定律输入：预算 $C$、拟合指数 $\alpha,\beta$ 与常数；输出：最优参数量 $N$（个）、token 数 $D$、预计损失 $L$。共形输入：校准分数 $\{s_i\}$、目标 $\alpha$、点预测 $\hat f$；输出：阈值 $\hat q$、预测集 $C(X)$（回归为区间，量纲与 $y$ 相同）、实测覆盖率与平均宽度。</td></tr>
+    <tr><th>适用场景</th><td>训练预算分配与「模型该做多大、喂多少数据」的规划；大模型／任意黑箱输出的不确定性量化、风险敏感决策（医疗、金融、审核）的兜底候选集；A/B 之外需要「可写进合同的覆盖率」的合规场景；监控分布漂移并触发重校准。</td></tr>
+    <tr><th>关键参数</th><td>$\alpha$（目标 miscoverage，越小区间越宽）；$k=\lceil(n+1)(1-\alpha)\rceil$；校准集大小 $n$（决定 $1/(n+1)$ 上界与阈值稳定性）；不一致性分数 $s$（绝对残差 / CQR / 标准化残差）；缩放侧 $\alpha,\beta,E,A,B$ 与 $C\approx6ND$ 的系数 6。</td></tr>
+    <tr><th>边界条件</th><td>在 $\alpha\ne\beta$、数据受限需重复、约束来自推理成本、或下游需微调的条件下，等比例缩放结论不成立，应改用 data-constrained / inference-aware scaling；在样本非可交换（漂移、时间序列、聚类）、要求条件覆盖、$\alpha$ 过小致 $k\gt n$、或分数大量并列的条件下，边际覆盖结论不足以支撑逐点结论，应改用重校准、分组／局部／加权共形或 jackknife+，并重新核对可交换性。</td></tr>
+    <tr><th>常见问题</th><td>① 把「边际覆盖达标」当成「每个子群都达标」；② 校准集参与训练或特征／超参选择造成泄漏；③ 分布已漂移仍沿用旧 $\hat q$；④ 以为覆盖率越接近 $1-\alpha+1/(n+1)$ 越好、忽视区间宽度；⑤ 把 Chinchilla 的 20 token/参数当成普适常数。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>算力翻倍，是不是把参数量翻倍、数据不变就行？</summary><div class="faq-a">不行。最优解是 $N\propto C^{0.5},D\propto C^{0.5}$：算力翻倍时两者各涨约 $\sqrt2$ 倍。代码实验里 $C$ 放大 16 倍，$N,D$ 各变 4 倍而不是一个变 16 倍、另一个不动。只堆参数会把数据项 $BD^{-\beta}$ 留在高位，同预算下损失更高（表格里 $4N^*$ 的 1.997302 对最优 1.937841）。</div></details>
+  <details><summary>Chinchilla 说「每参数 20 token」，这是放之四海皆准的常数吗？</summary><div class="faq-a">不是。$D/N=(H/G)^{1/\alpha}$、以及 20 这个具体数字，来自当前数据分布、模型族与拟合出的 $\alpha,\beta,A,B$；换语料、换架构、换 tokenizer 都会变。它是「这一代实验下的经验最优点」，不是理论常数。真正普适的是结构结论：$N,D$ 按 $C^{\beta/(\alpha+\beta)},C^{\alpha/(\alpha+\beta)}$ 同步增长、比例恒定。</div></details>
+  <details><summary>共形预测为什么不需要假设误差服从正态分布？</summary><div class="faq-a">因为保证来自「秩均匀」而非分布积分。可交换性使新样本误差在 $n+1$ 个分数里的排名均匀分布，覆盖事件等价于「排名 $\le k$」，概率就是 $k/(n+1)$——整个推导没出现过密度函数、均值或方差。代价是结论只对「所有样本平均」成立，且强依赖可交换性；一旦漂移，代码实验 (c) 的覆盖率会掉到 0.4162。</div></details>
+  <details><summary>实测边际覆盖率 0.90 达标，是不是可以放心上线了？</summary><div class="faq-a">还不行，要看子群。代码实验 (b) 里边际 0.9015 达标，但容易子群 0.9834（区间浪费）、困难子群仅 0.6237（大量漏报），二者按占比加权才凑回 0.90。若困难子群恰是高风险人群，这个「达标」会掩盖严重问题。应改成分组共形（各子群各算 $\hat q$）或标准化／CQR 分数，并分别报告各子群覆盖与宽度。</div></details>
+  <details><summary>上线一段时间后覆盖率掉了，是不是该把校准集加大？</summary><div class="faq-a">先查是不是分布漂移，而不是先加大 $n$。漂移破坏的是「可交换性」这个前提，加大同分布校准集救不回来；代码实验 (c) 把噪声放大 4 倍后覆盖率崩到 0.4162，正是此因。正确做法是用<strong>当前</strong>分布的新数据重算 $\hat q$（滚动／重校准），或改用加权共形给近样本更高权重，并持续监控输入分布。</div></details>
+  <details><summary>为何有时 $\alpha$ 设得很小，预测集就变成「什么都可能」？</summary><div class="faq-a">因为 $k=\lceil(n+1)(1-\alpha)\rceil$ 可能超过 $n$。例如 $n=99,\alpha=0.005$ 时 $k=100\gt99$，按约定 $\hat q=+\infty$、$C(X)$ 为全集，覆盖率 $=1$ 但毫无信息。这是有限样本下的硬限制：想要 99.5% 覆盖，校准集至少要能让 $k\le n$，即 $n$ 需远大于 $1/\alpha$。要么放宽 $\alpha$，要么收集更多校准数据。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">在 $C\approx6ND$ 与 $\alpha\approx\beta$ 的条件下，算力预算 $C$ 放大 16 倍时，Chinchilla 最优分配会怎样变？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. $N$ 变 16 倍、$D$ 不变</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. $N$、$D$ 各变 4 倍，比例 $D/N$ 保持不变</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. $D$ 变 16 倍、$N$ 不变</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. $N$ 变 8 倍、$D$ 变 2 倍</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$N_{\mathrm{opt}}\propto C^{\beta/(\alpha+\beta)},D_{\mathrm{opt}}\propto C^{\alpha/(\alpha+\beta)}$，$\alpha=\beta=0.5$ 时两指数都是 0.5，故 $16^{0.5}=4$，两者同步放大 4 倍、比例恒定（约 20 token/参数）。代码实验 log-log 斜率 0.5000/0.5000 正是它。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">Kaplan(2020) 与 Chinchilla(2022) 在算力分配上的核心分歧是什么？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 是否承认损失随规模服从幂律</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 是否使用 Transformer 架构</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. Kaplan 主张 $N\propto C^{0.73}$（偏参数、训练不足），Chinchilla 修正为参数与数据各按 $\approx C^{0.5}$ 同步增长</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. Chinchilla 认为数据越多损失必然单调下降、与参数无关</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：两篇都承认幂律，分歧在「给定预算怎么分」。Kaplan 的指数约 0.73/0.27 把大头给参数，导致大模型训练不足；Chinchilla 用 400 多个对照实验把指数拉回约 0.5/0.5，并给出每参数约 20 token 的经验规则。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">分割共形预测的有限样本覆盖保证，最根本依赖哪一条假设？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 残差服从正态分布且方差恒定</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 点预测模型 $\hat f$ 是真实函数的相合估计</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 校准样本与新样本可交换，使新分数的秩在 $1,\dots,n+1$ 上均匀</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 样本量 $n\to\infty$ 的大样本渐近性</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：保证来自可交换性 ⇒ 秩均匀 ⇒ $\mathbb{P}(R\le k)=k/(n+1)\ge1-\alpha$，全程不需要分布假设、模型相合性，也不是渐近结论。可交换一旦被漂移或时间依赖破坏，代码实验 (c) 的覆盖率就从 0.90 掉到 0.4162。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$n=9$、$\alpha=0.2$ 时，分割共形取 $k=\lceil(9+1)(1-0.2)\rceil=8$，得到的覆盖率是多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. $8/9\approx0.889$</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. $8/10=0.8000$，恰为下界 $1-\alpha$</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. $9/10=0.9000$，即上界</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. $7/10=0.7000$，因为要预留一位给新样本</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：用的是 $n+1=10$ 个分数（含新样本），覆盖率 $=k/(n+1)=8/10=0.8000=1-\alpha$，上界 $1-\alpha+1/(n+1)=0.9$；代码实验 (a) 第一行 exact=0.8000、upper=0.9000 逐位一致。注意不是 $8/9$。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">代码实验 (b) 中边际覆盖 0.9015 达标，但困难子群只有 0.6237。正确的解读是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 共形保证被推翻了，因为理论说覆盖应 $\ge0.90$</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 蒙特卡洛次数不够，多跑几次困难子群就会回到 0.90</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 应该把 $\alpha$ 调得更小来提高困难子群覆盖</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 保证是边际覆盖：容易子群 0.9834 与困难子群 0.6237 按占比加权凑回 0.90，需分组共形或标准化分数</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：有限样本保证的是对所有 $X$ 平均的边际覆盖，不是逐点条件覆盖。$0.772\times0.9834+0.228\times0.6237\approx0.9014$ 正是加权还原。要每个子群都达标，须改成分组（Mondrian）共形、局部自适应或标准化 CQR 分数，让 $\hat q$ 随 $x$ 变化。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure data-classic="0"></figure>

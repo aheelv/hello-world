@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>里程碑时间线 · 统计 · 智能学习体系</title>
+<meta name="description" content="1763–2025 统计学到生成式 AI 的里程碑时间线，含阶段归属、来源与核验状态。">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/learning.css">
+<link rel="stylesheet" href="assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="timeline" data-prefix="">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="roadmap.html">路线图</a>
+    <a class="icon-btn" href="resources.html">资源库</a>
+    <a class="icon-btn" href="timeline.html">时间线</a>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+      <article class="module">
+      <div class="inner">
+      <header class="module-header">
+        <div class="crumbs"><a href="index.html">首页</a> / 里程碑时间线</div>
+        <h1>里程碑时间线</h1>
+        <p class="lead">从 1763 年贝叶斯定理到 2025 年推理模型与新一代基准，共 39 个关键节点。按时间正序排列，可按阶段与核验状态筛选，并注明每个节点与统计主线的关联。</p>
+        <div class="module-meta">
+          <span class="badge brand">39 个节点</span> <span class="badge info">6 个阶段</span>
+          <span class="badge ok">1763 – 2025</span> <span class="badge ">更新 2026-11-07</span>
+        </div>
+      </header>
+
+      <h2 id="reading">1 · 怎么读这条时间线</h2>
+      <div class="callout note">
+        <div class="callout-title">不是编年史，是统计主线的展开</div>
+        <p>每个节点都写明「它与统计推断的哪一部分相关」。例如 1922 年最大似然直通今天所有训练目标，1952 年的 Bradley–Terry 模型在 70 年后成为 RLHF 奖励模型的根基，2005 年共形预测在 20 年后成为大模型不确定性量化的热点。顺着这条线读，前五个阶段不是历史背景，而是理解生成式 AI 的必要前提。</p>
+        <p>阶段分布：统计学 8 项 · 大数据 1 项 · 机器学习 1 项 · 深度学习 3 项 · 神经网络 4 项 · 生成式AI 22 项。2026 年条目已明确标注「待核验」，仅作为持续更新的提醒，不作为定论。</p>
+      </div>
+
+      <h2 id="filters">2 · 筛选时间线</h2>
+      <div id="timeline-app">
+        <div class="filter-bar">
+          <div class="filter-row"><span class="filter-label">关键词</span>
+            <input class="field grow" id="tl-q" type="search" placeholder="事件 / 机构 / 出处，例如：Transformer、Chinchilla、扩散">
+          </div>
+          <div class="filter-row">
+            <span class="filter-label">条件</span>
+            <select class="field" id="tl-stage"><option value="all">全部阶段</option><option value="s1">阶段 1 · 统计学</option><option value="s2">阶段 2 · 大数据分析</option><option value="s3">阶段 3 · 机器学习</option><option value="s4">阶段 4 · 深度学习</option><option value="s5">阶段 5 · 神经网络</option><option value="s6">阶段 6 · 生成式 AI</option></select>
+            <select class="field" id="tl-verify">
+              <option value="all">全部核验状态</option>
+              <option value="verified">仅已核验</option>
+              <option value="canonical">仅权威共识</option>
+              <option value="pending">仅待核验</option>
+            </select>
+            <button class="btn" id="tl-reset">重置筛选</button>
+          </div>
+        </div>
+        <div class="filter-summary" id="tl-count"></div>
+        <div id="tl-list"></div>
+      </div>
+      <noscript><div class="callout warn"><p>筛选功能需要 JavaScript，离线环境同样可用。</p></div></noscript>
+
+      <h2 id="by-stage">3 · 按阶段查看</h2>
+      <div class="card-grid three"><a class="card mod-card" href="timeline.html?stage=s1">
+          <div class="mod-num">STAGE 1</div><h3>统计学</h3>
+          <p>8 个里程碑节点 · 18 世纪至今 · 一切后续阶段的地基</p></a><a class="card mod-card" href="timeline.html?stage=s2">
+          <div class="mod-num">STAGE 2</div><h3>大数据分析</h3>
+          <p>1 个里程碑节点 · 2000 年代至今 · 分布式与流式范式</p></a><a class="card mod-card" href="timeline.html?stage=s3">
+          <div class="mod-num">STAGE 3</div><h3>机器学习</h3>
+          <p>1 个里程碑节点 · 1950 年代至今 · 统计学习范式</p></a><a class="card mod-card" href="timeline.html?stage=s4">
+          <div class="mod-num">STAGE 4</div><h3>深度学习</h3>
+          <p>3 个里程碑节点 · 2006 年至今 · 训练范式与规模化</p></a><a class="card mod-card" href="timeline.html?stage=s5">
+          <div class="mod-num">STAGE 5</div><h3>神经网络</h3>
+          <p>4 个里程碑节点 · 1943 年至今 · 架构谱系与归纳偏置</p></a><a class="card mod-card" href="timeline.html?stage=s6">
+          <div class="mod-num">STAGE 6</div><h3>生成式 AI</h3>
+          <p>22 个里程碑节点 · 2020 年至今 · 大模型与生成系统</p></a></div>
+      <div class="flex-between mt-6">
+        <div><a class="btn" href="index.html">← 返回首页</a> <a class="btn" href="roadmap.html">路线图</a> <a class="btn" href="resources.html">资源库</a></div>
+        <a class="btn primary" href="stages/statistics.html">从阶段 1 开始 →</a>
+      </div>
+      </div>
+      </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="resources.html">资源库</a> · <a href="timeline.html">时间线</a> · <a href="glossary.html">术语表</a> · <a href="roadmap.html">学习路线图</a> · <a href="DATA-GUIDE.md">数据维护说明</a> · <a href="TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索阶段、概念、资源、论文…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索全站内容。例如：置信区间、Transformer、共形预测、DeepSeek-R1。</div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendor/katex/dist/katex.min.js"></script>
+<script src="assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/site-data.js"></script>
+<script src="assets/js/search-index.js"></script>
+<script src="assets/js/learning-index.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/site-ui.js"></script>
+<script src="assets/js/learning.js"></script>
+</body>
+</html>

@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>06 · 回归分析 · 统计 · 智能学习体系</title>
+<meta name="description" content="回归分析：简单线性回归与最小二乘推导、高斯-马尔可夫定理、R² 与残差诊断、多元回归与多重共线性、逻辑回归与极大似然、岭回归与 Lasso 正则化、回归常见陷阱。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m06" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 1 · <a href="../stages/statistics.html">统计学</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l2">L2 基础</span> · 10 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 05 · 上一篇：<a href="m05-inference.html">05 · 统计推断：估计与检验</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m07-bayesian.html">07 · 贝叶斯统计与计算</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m04-distributions.html">04 随机变量与常见分布</a><span class="dep-arrow">→</span><a class="dep-node" href="m05-inference.html">05 统计推断：估计与检验</a><span class="dep-arrow">→</span><a class="dep-node current" href="m06-regression.html">06 回归分析</a><span class="dep-arrow">→</span><a class="dep-node" href="m07-bayesian.html">07 贝叶斯统计与计算</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：最小二乘, 回归系数, 残差, R², 异方差, 多重共线性, 影响点, 逻辑回归</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>最小二乘的解析解为什么要求 XᵀX 可逆？不可逆时怎么办？ <a class="q-anchor" href="#s2">→ 对应讲解</a></li><li>R² 高是否代表模型可用于预测或因果解释？ <a class="q-anchor" href="#s4">→ 对应讲解</a></li><li>异方差、非线性、强影响点分别会在残差图上留下什么痕迹？ <a class="q-anchor" href="#s6">→ 对应讲解</a></li><li>相关系数为 0 为什么仍可能存在强依赖关系？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+    <article class="module" data-module="m06">
+
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/statistics.html">阶段 1 · 统计学</a> / 06 · 回归分析</div>
+        <h1>06 · 回归分析</h1>
+        <p class="lead">
+          回归分析回答一类最实用的问题：<strong>当 $x$ 变化时，$y$ 平均会怎样变化？能否用 $x$ 预测 $y$？</strong>
+          它是统计学与机器学习之间最结实的桥梁——线性回归的最小二乘思想、逻辑回归的极大似然思想、
+          正则化的偏差-方差权衡，会一路延伸到深度学习。本章从「拟合一条直线」出发，把每个公式亲手推一遍。
+        </p>
+        <div class="module-meta">
+          <span class="badge ok">基础</span>
+          <span class="badge">10 学时</span>
+          <span class="badge">前置：模块 05</span>
+          <span class="badge brand">阶段二 · 核心推断</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>说清简单线性回归模型 $y=\beta_0+\beta_1 x+\varepsilon$ 中每一项的含义</li>
+          <li>亲手推导最小二乘估计 $\hat{\beta}_1=\dfrac{S_{xy}}{S_{xx}}$、$\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$，并能手算小数据集</li>
+          <li>逐条解释高斯-马尔可夫定理的假设，会用残差图诊断违背</li>
+          <li>正确解释回归系数，理解 $R^2$ 与调整 $R^2$，识别异常点与高杠杆点</li>
+          <li>掌握多元回归矩阵形式，会用 VIF 判断多重共线性</li>
+          <li>理解逻辑回归的 sigmoid / logit 结构、极大似然与交叉熵损失，会解释优势比</li>
+          <li>对比岭回归与 Lasso，从偏差-方差与贝叶斯先验两个角度理解正则化</li>
+          <li>识别外推、伪回归、因果过度解读三大陷阱</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 简单线性回归：从散点图到拟合直线</h2>
+
+      <h3 id="s1-1">1.1 模型设定</h3>
+      <p>假设我们观测到 $n$ 对数据 $(x_i,y_i)$，$i=1,2,\dots,n$。简单线性回归（Simple Linear Regression）假设 $y$ 与 $x$ 之间存在<strong>线性关系</strong>，并把「没被线性解释的部分」归入随机误差：</p>
+
+      <div class="formula-box">
+        <div class="f-name">简单线性回归模型</div>
+        $$ y_i = \beta_0 + \beta_1 x_i + \varepsilon_i, \qquad i=1,2,\dots,n $$
+        <div class="f-note">
+          $\beta_0$：截距（$x=0$ 时 $y$ 的平均值）；$\beta_1$：斜率（$x$ 每增加 1 单位，$y$ 的<em>平均</em>变化量）；
+          $\varepsilon_i$：随机误差，通常假设 $E(\varepsilon_i)=0$、$\mathrm{Var}(\varepsilon_i)=\sigma^2$ 且相互独立。
+          真实的直线叫<strong>总体回归直线</strong>，我们用样本估出来的叫<strong>拟合直线</strong> $\hat{y}=\hat{\beta}_0+\hat{\beta}_1 x$。
+        </div>
+      </div>
+
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          直觉：$\varepsilon$ 是「模型懒得解释的一切」
+        </div>
+        <p>误差项 $\varepsilon$ 里装着：没测量到的变量、个体差异、测量噪声、纯粹的随机波动。统计学不奢求「完全解释 $y$」，只要求<strong>剩下的部分是无规律的随机噪声</strong>——这是后面高斯-马尔可夫假设的核心思想。</p>
+      </div>
+
+      <h3 id="s1-2">1.2 散点图与拟合直线</h3>
+      <p>动手画图永远是回归的第一步。散点图能告诉我们三件事：</p>
+      <ul>
+        <li><strong>大体趋势</strong>：是直线、曲线，还是毫无关系？曲线趋势强行拟直线会得到误导性结论。</li>
+        <li><strong>趋势方向</strong>：正相关（斜向上）还是负相关（斜向下）？</li>
+        <li><strong>异常结构</strong>：有没有远离主体的点？有没有两团分离的点群（可能对应两个子群体）？</li>
+      </ul>
+      <p>拟合的目标很朴素：<strong>找一条直线，使它「尽量贴近」所有数据点</strong>。「贴近」需要被量化——这就是最小二乘法。</p>
+
+      <h3 id="s1-3">1.3 最小二乘法原理</h3>
+      <p>对每个观测点，实际值 $y_i$ 与拟合值 $\hat{y}_i=\hat{\beta}_0+\hat{\beta}_1 x_i$ 之差叫<strong>残差</strong>（residual）：</p>
+      $$ e_i = y_i - \hat{y}_i = y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i $$
+      <p>残差有正有负，直接相加会互相抵消（任何穿过数据中心的直线，残差和都是 0）。取绝对值在数学上不方便求导，因此取<strong>平方</strong>。最小二乘法（Ordinary Least Squares, OLS）就是：</p>
+
+      <div class="formula-box">
+        <div class="f-name">最小二乘准则</div>
+        $$ \min_{\beta_0,\ \beta_1} \; \mathrm{SSE} = \sum_{i=1}^{n} \left( y_i - \beta_0 - \beta_1 x_i \right)^2 $$
+        <div class="f-note">
+          SSE（Sum of Squared Errors，残差平方和）越小，直线越贴近数据。下面一节就来求这个最小值点——
+          方法是「求导 = 找极值」：导数为 0 的地方，函数达到最低点。
+        </div>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 最小二乘估计的推导（重点）</h2>
+
+      <h3 id="s2-1">2.1 从求导到正规方程</h3>
+      <p>把 SSE 看成 $\beta_0,\beta_1$ 的函数。要在某点取到最小值，该点处沿两个方向的<strong>斜率（偏导数）都必须为 0</strong>。先对 $\beta_0$ 求偏导（把 $\beta_1$ 当常数）：</p>
+      $$ \frac{\partial\, \mathrm{SSE}}{\partial \beta_0} = -2 \sum_{i=1}^{n} \left( y_i - \beta_0 - \beta_1 x_i \right) = 0 $$
+      <p>两边除以 $-2$ 并展开求和（注意 $\sum_{i=1}^{n}\beta_0 = n\beta_0$，因为 $\beta_0$ 与 $i$ 无关）：</p>
+      $$ \sum_{i=1}^{n} y_i = n\beta_0 + \beta_1 \sum_{i=1}^{n} x_i $$
+      <p>两边同除以 $n$，用 $\bar{x}=\frac{1}{n}\sum x_i$、$\bar{y}=\frac{1}{n}\sum y_i$，立刻得到一个漂亮的结论：</p>
+      $$ \beta_0 = \bar{y} - \beta_1 \bar{x} $$
+      <p>这说明：只要定了斜率 $\beta_1$，最佳截距必然让直线<strong>穿过样本中心点 $(\bar{x},\bar{y})$</strong>。</p>
+
+      <p>再对 $\beta_1$ 求偏导：</p>
+      $$ \frac{\partial\, \mathrm{SSE}}{\partial \beta_1} = -2 \sum_{i=1}^{n} x_i \left( y_i - \beta_0 - \beta_1 x_i \right) = 0 $$
+      <p>把 $\beta_0 = \bar{y} - \beta_1 \bar{x}$ 代入，整理（关键一步是把 $y_i-\bar{y}$ 与 $x_i-\bar{x}$ 凑成对）：</p>
+      $$ \sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y}) = \beta_1 \sum_{i=1}^{n} (x_i - \bar{x})^2 $$
+      <p>这两个方程合称<strong>正规方程</strong>（Normal Equations）。解出 $\beta_1$ 就完成了整个推导：</p>
+
+      <div class="formula-box">
+        <div class="f-name">最小二乘估计量（本章最重要的公式）</div>
+        $$ \hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2} = \frac{S_{xy}}{S_{xx}}, \qquad \hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x} $$
+        <div class="f-note">
+          其中 $S_{xy}=\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})$ 是 $x$ 与 $y$ 的离差乘积和（分子），
+          $S_{xx}=\sum_{i=1}^{n}(x_i-\bar{x})^2$ 是 $x$ 的离差平方和（分母）。
+          常用等价算式：$S_{xy}=\sum x_i y_i - n\bar{x}\bar{y}$，$S_{xx}=\sum x_i^2 - n\bar{x}^2$。
+          $\hat{\beta}_1$ 的符号永远与 $S_{xy}$ 相同——$x$、$y$ 同涨同跌则斜率为正。
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：「求导 = 找极值」要配合二阶条件
+        </div>
+        <p>偏导为 0 只是取极值的<strong>必要条件</strong>（山顶和山谷的斜率都是 0）。此处 SSE 是 $\beta_0,\beta_1$ 的<strong>二次函数且开口向上</strong>（平方和配方可验证），所以驻点一定是<strong>最小值</strong>点，不必担心解出「最大」。另外注意：$S_{xx}=0$ 时（所有 $x_i$ 完全相同）分母为 0，斜率无法估计——$x$ 必须有变化，才能谈「$x$ 对 $y$ 的影响」。</p>
+      </div>
+
+      <h3 id="s2-2">2.2 手算一遍：从数据到回归方程</h3>
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 2.1</span>
+          <span class="ex-title">五组数据，完整手算 $\hat{\beta}_1$ 与 $\hat{\beta}_0$</span>
+        </div>
+        <div class="example-body">
+          <p>某公司统计了广告投入 $x$（万元）与月销量 $y$（百件）的 5 组数据：</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>$i$</th><th>$x_i$</th><th>$y_i$</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>1</td><td>3</td></tr>
+                <tr><td>2</td><td>2</td><td>5</td></tr>
+                <tr><td>3</td><td>3</td><td>6</td></tr>
+                <tr><td>4</td><td>4</td><td>8</td></tr>
+                <tr><td>5</td><td>5</td><td>9</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>求拟合方程，并预测广告投入 6 万元时的销量。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步：算均值。</strong></p>
+              $$ \bar{x} = \frac{1+2+3+4+5}{5} = 3, \qquad \bar{y} = \frac{3+5+6+8+9}{5} = \frac{31}{5} = 6.2 $$
+              <p><strong>第 2 步：列离差表，算 $S_{xy}$ 与 $S_{xx}$。</strong></p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$x_i$</th><th>$y_i$</th><th>$x_i-\bar{x}$</th><th>$y_i-\bar{y}$</th><th>乘积</th><th>$(x_i-\bar{x})^2$</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>3</td><td>$-2$</td><td>$-3.2$</td><td>$6.4$</td><td>$4$</td></tr>
+                    <tr><td>2</td><td>5</td><td>$-1$</td><td>$-1.2$</td><td>$1.2$</td><td>$1$</td></tr>
+                    <tr><td>3</td><td>6</td><td>$0$</td><td>$-0.2$</td><td>$0$</td><td>$0$</td></tr>
+                    <tr><td>4</td><td>8</td><td>$1$</td><td>$1.8$</td><td>$1.8$</td><td>$1$</td></tr>
+                    <tr><td>5</td><td>9</td><td>$2$</td><td>$2.8$</td><td>$5.6$</td><td>$4$</td></tr>
+                    <tr><td>合计</td><td>—</td><td>$0$</td><td>$0$</td><td>$S_{xy}=15$</td><td>$S_{xx}=10$</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p><strong>第 3 步：代入公式。</strong></p>
+              $$ \hat{\beta}_1 = \frac{S_{xy}}{S_{xx}} = \frac{15}{10} = 1.5, \qquad \hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x} = 6.2 - 1.5 \times 3 = 1.7 $$
+              <p><strong>第 4 步：写出拟合方程并预测。</strong></p>
+              $$ \hat{y} = 1.7 + 1.5 x \quad \Rightarrow \quad x=6:\; \hat{y} = 1.7 + 1.5 \times 6 = 10.7 \text{（百件）} $$
+              <p><strong>检验一下：</strong>残差依次为 $-0.2,\ 0.3,\ -0.2,\ 0.3,\ -0.2$，$\mathrm{SSE}=0.3$，残差和为 0（符合正规方程的结论）。
+              $S_{yy}=22.8$，$R^2 = \dfrac{\hat{\beta}_1 S_{xy}}{S_{yy}} = \dfrac{22.5}{22.8} \approx 0.987$，拟合非常好。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 高斯-马尔可夫定理：OLS 为什么「最佳」</h2>
+
+      <h3 id="s3-1">3.1 经典线性回归的六条假设</h3>
+      <p>高斯-马尔可夫定理（Gauss-Markov Theorem）指出：在下面的假设下，OLS 估计是<strong>最佳线性无偏估计（BLUE）</strong>。逐条看懂假设，比背结论重要十倍：</p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>表 3.1 经典假设、含义与违背后果</caption>
+          <thead><tr><th>假设</th><th>通俗含义</th><th>违背后的典型症状</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>1. 线性于参数</strong></td>
+              <td>$y = \beta_0 + \beta_1 x + \varepsilon$，$y$ 对参数是线性的（$x$ 本身可以是平方项等变换）</td>
+              <td>残差图呈弯曲（U 形）趋势 → 需要加二次项或做变换</td>
+            </tr>
+            <tr>
+              <td><strong>2. 随机抽样</strong></td>
+              <td>观测相互独立地来自同一总体</td>
+              <td>样本有偏 → 系数有偏，样本量救不了</td>
+            </tr>
+            <tr>
+              <td><strong>3. 无完全共线性</strong></td>
+              <td>自变量不能互相线性决定（多元回归中尤其重要）</td>
+              <td>$X^\top X$ 不可逆，系数无法唯一求解</td>
+            </tr>
+            <tr>
+              <td><strong>4. 同方差</strong></td>
+              <td>误差的方差恒定：$\mathrm{Var}(\varepsilon_i)=\sigma^2$，不随 $x$ 变</td>
+              <td>残差图呈「喇叭口」→ 标准误失真，显著性检验不可信</td>
+            </tr>
+            <tr>
+              <td><strong>5. 无自相关</strong></td>
+              <td>误差之间互不相关：$\mathrm{Cov}(\varepsilon_i,\varepsilon_j)=0$</td>
+              <td>时间序列常见「连成串」的残差 → 标准误被低估，假显著</td>
+            </tr>
+            <tr>
+              <td><strong>6. 外生性</strong></td>
+              <td>$E(\varepsilon_i \mid x_i) = 0$：误差与自变量无关（无遗漏变量、无反向因果）</td>
+              <td><strong>系数有偏且不一致</strong>——最严重的问题，增加样本也没用</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s3-2">3.2 BLUE 的含义</h3>
+      <p>BLUE 是四个词的组合：</p>
+      <ul>
+        <li><strong>Best（最佳）</strong>：在所有<em>线性</em>无偏估计量中，OLS 的<strong>方差最小</strong>（最稳定）。</li>
+        <li><strong>Linear（线性）</strong>：估计量是 $y_i$ 的线性组合（$\hat{\beta}_1 = \sum w_i y_i$）。</li>
+        <li><strong>Unbiased（无偏）</strong>：$E(\hat{\beta}_1)=\beta_1$，平均而言不偏高也不偏低。</li>
+        <li><strong>Estimator（估计量）</strong>：注意是「估计量」好，不是说每次估计都准。</li>
+      </ul>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：BLUE ≠「最好的估计」
+        </div>
+        <p>「最佳」仅限于<strong>线性、无偏</strong>估计量这个小圈子。如果允许一点偏差换取大幅降方差（如岭回归、Lasso），或者放弃线性（如非参数方法），完全可能得到<em>预测更准</em>的估计——这正是第 7 节正则化的逻辑。另外，BLUE 的成立<strong>完全依赖假设</strong>；假设 4、5 被违背时 OLS 仍大致无偏但不再最有效，假设 6 被违背时连无偏都保不住。</p>
+      </div>
+
+      <h3 id="s3-3">3.3 残差图：假设的听诊器</h3>
+      <p>把残差 $e_i$ 对拟合值 $\hat{y}_i$（或对 $x_i$）画散点图，是诊断假设最快的方式：</p>
+      <ul>
+        <li><strong>理想形态</strong>：残差随机散布在 0 线上下，无任何形状。</li>
+        <li><strong>U 形 / 倒 U 形</strong>：关系非线性，违背假设 1 → 加入 $x^2$ 项或换模型。</li>
+        <li><strong>喇叭口（随 $\hat{y}$ 变宽）</strong>：异方差，违背假设 4 → 对 $y$ 取对数、加权最小二乘、或稳健标准误。</li>
+        <li><strong>连成波浪/长串</strong>：自相关，违背假设 5（时间序列里常见）→ 需要时间序列专用方法。</li>
+        <li><strong>少数点远离 0 线</strong>：异常点，见第 4.3 节。</li>
+      </ul>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 系数解释、拟合优度与残差诊断</h2>
+
+      <h3 id="s4-1">4.1 怎样正确解释 $\beta_1$</h3>
+      <p>斜率 $\beta_1$ 的<strong>统计学含义</strong>只有一句话：「$x$ 每增加 1 个单位，$y$ 的<em>条件平均值</em>变化 $\beta_1$ 个单位」。注意三个限定词——是<strong>平均</strong>（个体的 $y$ 还会受 $\varepsilon$ 影响而波动）、是<strong>条件于模型正确</strong>、而且它本身<strong>不携带因果意义</strong>。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.1</span>
+          <span class="ex-title">「广告费每增 1 万元，销量平均增 450 件」——哪种说法是对的？</span>
+        </div>
+        <div class="example-body">
+          <p>对某公司的观察数据（非随机实验）做回归得到 $\hat{y} = 200 + 450x$（$y$：件，$x$：万元）。下面四种表述，哪些站得住脚？</p>
+          <ol type="A">
+            <li>「广告费每增加 1 万元，销量平均增加 450 件。」</li>
+            <li>「给 A 产品多投 1 万元广告，它的销量就会涨 450 件。」</li>
+            <li>「广告费为 0 时，销量是 200 件。」</li>
+            <li>「广告费解释了销量的全部变化，因为 $R^2$ 很高。」</li>
+          </ol>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>A 正确</strong>——它说的是「平均」关系，且没有引入因果动词。这是回归系数的标准表述模板。</p>
+              <p><strong>B 是因果过度解读</strong>：数据是<em>观察</em>来的。旺季时公司既加广告又遇需求高峰（混杂），「多投广告」与「销量涨」可能同涨同跌却非因果。要支持因果，需要随机分配广告预算的对照实验（模块 08 的 A/B 测试 / RCT）。</p>
+              <p><strong>C 要谨慎</strong>：$\hat{\beta}_0=200$ 是数学上的截距。若样本中广告费从 2 万元起步，$x=0$ 就是<strong>外推</strong>，200 件这个数可能完全失真；而且「完全不投广告」往往不在业务可选范围内。</p>
+              <p><strong>D 错</strong>：$R^2$ 高只说明「拟合的这条线贴得紧」，不说明因果，更不说明「没有遗漏变量」，也不保证样本外预测依然准。</p>
+              <p><strong>结论：</strong>解释系数的黄金句式是「在其他条件不变（ceteris paribus）的前提下，$x$ 每增加 1 单位，$y$ 平均变化 $\hat{\beta}_1$ 单位」。多元回归中的系数就是在「控制其他变量」意义下说的；简单回归里则必须自己警惕遗漏变量。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s4-2">4.2 $R^2$ 与调整 $R^2$</h3>
+      <p>总平方和可以拆成两部分：$\mathrm{SST} = \mathrm{SSR} + \mathrm{SSE}$，即「总波动 = 模型解释的波动 + 剩下的波动」。$R^2$（决定系数）刻画解释比例：</p>
+
+      <div class="formula-box">
+        <div class="f-name">决定系数与调整决定系数</div>
+        $$ R^2 = \frac{\mathrm{SSR}}{\mathrm{SST}} = 1 - \frac{\mathrm{SSE}}{\mathrm{SST}}, \qquad \bar{R}^2 = 1 - \frac{\mathrm{SSE}/(n-p-1)}{\mathrm{SST}/(n-1)} = 1 - (1-R^2)\cdot\frac{n-1}{n-p-1} $$
+        <div class="f-note">
+          $p$ 是自变量个数。$R^2 \in [0,1]$，越大说明拟合的线解释的波动越多。
+          但<strong>往模型里塞任何变量，$R^2$ 都不会下降</strong>（哪怕塞的是无关变量）——这就是需要调整 $R^2$ 的原因：
+          调整 $R^2$ 对增加变量进行了「罚款」（$p$ 变大时被减去的项变大），无用变量会让它下降。
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：$R^2$ 高 ≠ 模型好
+        </div>
+        <p>三种常见翻车：① <strong>伪回归</strong>（两个独立上涨的时间序列，$R^2$ 可以 &gt; 0.9，见第 8 节）；② <strong>过拟合</strong>：训练集 $R^2$ 很高，新数据上一塌糊涂（要看样本外表现）；③ <strong>因果误读</strong>：$R^2$ 度量的是关联紧密度，与因果无关。评价回归永远要同时看：残差图、系数显著性、样本外误差、业务合理性。</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.2</span>
+          <span class="ex-title">$R^2$ 升了却该被淘汰：调整 $R^2$ 的「罚款」机制</span>
+        </div>
+        <div class="example-body">
+          <p>同一组数据（$n = 20$，$\mathrm{SST} = 500$），拟合了两个模型：模型 A 只含 1 个自变量，残差平方和 $\mathrm{SSE}_A = 50$；模型 B 含 3 个自变量，$\mathrm{SSE}_B = 47.5$。（a）分别计算 $R^2$ 与调整 $R^2$；（b）该选哪个模型？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）模型 A（$p = 1$）。</strong></p>
+              $$ R^2 = 1 - \frac{\mathrm{SSE}}{\mathrm{SST}} = 1 - \frac{50}{500} = 0.900 $$
+              $$ \bar{R}^2 = 1 - (1 - R^2)\frac{n-1}{n-p-1} = 1 - 0.100 \times \frac{19}{18} = 1 - 0.1056 = 0.8944 $$
+              <p><strong>模型 B（$p = 3$）。</strong></p>
+              $$ R^2 = 1 - \frac{47.5}{500} = 0.905 $$
+              $$ \bar{R}^2 = 1 - 0.095 \times \frac{19}{16} = 1 - 0.1128 = 0.8872 $$
+              <p><strong>（b）矛盾出现了：$R^2$ 上升（$0.900 \to 0.905$），调整 $R^2$ 却下降（$0.8944 \to 0.8872$）。</strong>原因很清楚：新增的两个变量只多解释了 $0.5\%$ 的总波动（$\mathrm{SSE}$ 从 $50$ 降到 $47.5$），却让模型多吃了两个自由度的「罚款」，得不偿失。调整 $R^2$ 正是为此而生——<strong>凡是让 $R^2$ 上升、却让调整 $R^2$ 下降的新变量，都应该被剔除</strong>。</p>
+              <p><strong>用 $F$ 检验做同样的判断（更正式）。</strong>两个模型是嵌套的，</p>
+              $$ F = \frac{(\mathrm{SSE}_A - \mathrm{SSE}_B)/(p_B - p_A)}{\mathrm{SSE}_B/(n - p_B - 1)} = \frac{(50 - 47.5)/2}{47.5/16} = \frac{1.25}{2.9688} \approx 0.42 $$
+              <p>而 $F_{0.05}(2,16) \approx 3.63$，$0.42 \ll 3.63$——<strong>新增变量不显著</strong>，保留模型 A。（注意：$F$ 检验在这里等价于「整体回归的 $F$ 统计量」与「系数显著性 $t$ 检验」的一致性。）</p>
+              <p><strong>易错提示：</strong>① 调整 $R^2$ 的分母是 $n-p-1$（$p$ 为自变量个数，不含截距），别写成 $n-p$ 或 $n-1$；② 不要用「$R^2$ 更大」来选模型——它必然只会变大；③ 调整 $R^2$ 只是启发式：变量很多时它仍可能虚高，此时应看<strong>样本外误差</strong>（交叉验证，模块 09）；④ $R^2$ 高不说明模型对，更不说明有因果（第 8 节）。</p>
+              <p><strong>应用/AI 关联：</strong>这正是机器学习里「训练误差下降 ≠ 模型更好」的同构问题：增加特征层数或参数个数，训练损失一定下降，但泛化性能可能变差。对应的现代做法是用<strong>验证集 / 交叉验证</strong>来选择复杂度，而不是看训练集上的拟合指标；调整 $R^2$ 可视为它最朴素的代理版本。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s4-3">4.3 异常点、高杠杆点与影响点</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>概念</th><th>特征</th><th>危害</th><th>处理建议</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>异常点</strong> Outlier</td>
+              <td>$y$ 远离拟合值（残差大）</td>
+              <td>拉大 SSE，降低 $R^2$，干扰 $\sigma$ 估计</td>
+              <td>核查数据录入；考虑稳健回归；报告有/无该点两种结果</td>
+            </tr>
+            <tr>
+              <td><strong>高杠杆点</strong> High leverage</td>
+              <td>$x$ 远离 $\bar{x}$（自变量取值极端）</td>
+              <td>对斜率有「杠杆」般的话语权</td>
+              <td>不轻易删除（可能是重要信息），但要检查是否主导结论</td>
+            </tr>
+            <tr>
+              <td><strong>影响点</strong> Influence</td>
+              <td>既是异常点又是高杠杆点</td>
+              <td>删掉它，系数大变（Cook 距离度量）</td>
+              <td>必须报告敏感性分析：删/不删各给出结论</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 多元线性回归</h2>
+
+      <h3 id="s5-1">5.1 矩阵形式与最小二乘解</h3>
+      <p>现实中 $y$ 由多个因素共同影响。引入 $p$ 个自变量，$y_i = \beta_0 + \beta_1 x_{i1} + \cdots + \beta_p x_{ip} + \varepsilon_i$。写成矩阵形式非常紧凑：</p>
+
+      <div class="formula-box">
+        <div class="f-name">多元线性回归的矩阵解</div>
+        $$ \mathbf{y} = \mathbf{X}\beta + \varepsilon, \qquad \hat{\beta} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{y} $$
+        <div class="f-note">
+          $\mathbf{y}$ 是 $n\times 1$ 的响应向量；$\mathbf{X}$ 是 $n\times(p+1)$ 的设计矩阵（第一列全 1 对应截距）；
+          $\beta$ 是 $(p+1)\times 1$ 的系数向量；$\top$ 表示转置，$-1$ 表示矩阵求逆。
+          这个公式就是「对向量 $\beta$ 求导、令导数为 0」的矩阵版正规方程 $\mathbf{X}^\top\mathbf{X}\hat{\beta}=\mathbf{X}^\top\mathbf{y}$ 的解。
+          前提：$\mathbf{X}^\top \mathbf{X}$ <strong>可逆</strong>——这等价于「无完全共线性」假设。
+        </div>
+      </div>
+
+      <h3 id="s5-2">5.2 多重共线性与 VIF</h3>
+      <p><strong>多重共线性（Multicollinearity）</strong>指自变量之间高度相关（如「广告电视投入」与「广告总预算」）。后果：</p>
+      <ul>
+        <li>系数<strong>方差膨胀</strong>：单个系数变得极不稳定，数据微小变化导致系数大跳。</li>
+        <li>系数<strong>符号可能翻转</strong>、变得不显著，但整体 $F$ 检验仍显著（「整体有用，单个说不清」）。</li>
+        <li>完全共线性时 $\mathbf{X}^\top\mathbf{X}$ 不可逆，系数根本无法唯一计算。</li>
+      </ul>
+      <p>诊断工具是<strong>方差膨胀因子</strong>（VIF）：把 $x_j$ 对其余自变量做回归得到 $R_j^2$，则</p>
+      $$ \mathrm{VIF}_j = \frac{1}{1 - R_j^2} $$
+      <p>直觉：$x_j$ 越能被其他变量「预测」（$R_j^2$ 越大），它自己的独立信息越少，VIF 越大。经验阈值：<strong>VIF &gt; 5 需警惕，&gt; 10 通常认为严重</strong>。处理手段：剔除冗余变量、合并变量、改用主成分回归或岭回归。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 5.1</span>
+          <span class="ex-title">VIF 手算：两个高度相关的广告变量放在一起会怎样</span>
+        </div>
+        <div class="example-body">
+          <p>某公司记录了 6 个月的数据：广告总投入 $x_1$（万元）、其中电视投入 $x_2$（万元）、销量 $y$（百件）：</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>月份</th><th>$x_1$ 广告总投入</th><th>$x_2$ 电视投入</th><th>$y$ 销量</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>10</td><td>11</td><td>22</td></tr>
+                <tr><td>2</td><td>12</td><td>14</td><td>25</td></tr>
+                <tr><td>3</td><td>14</td><td>15</td><td>29</td></tr>
+                <tr><td>4</td><td>16</td><td>17</td><td>32</td></tr>
+                <tr><td>5</td><td>18</td><td>20</td><td>35</td></tr>
+                <tr><td>6</td><td>20</td><td>19</td><td>38</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>（a）计算 $x_2$ 的方差膨胀因子；（b）分别用「$y \sim x_1$」与「$y \sim x_1 + x_2$」估计，比较系数、标准误与拟合优度；（c）如果再加入一个与销量毫无关系的变量 $x_3$，$R^2$ 与调整 $R^2$ 会怎么变？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）手算相关系数与 VIF。</strong>$\bar{x}_1 = 15$，$\bar{x}_2 = 16$，$\bar{y} = 30.5$。离差平方和与乘积和：</p>
+              $$ S_{11} = \sum(x_{1i}-\bar{x}_1)^2 = 25+9+1+1+9+25 = 70 $$
+              $$ S_{22} = \sum(x_{2i}-\bar{x}_2)^2 = 25+4+1+1+16+9 = 56 $$
+              $$ S_{12} = \sum(x_{1i}-\bar{x}_1)(x_{2i}-\bar{x}_2) = 25+6+1+1+12+15 = 60 $$
+              $$ r_{12} = \frac{S_{12}}{\sqrt{S_{11}S_{22}}} = \frac{60}{\sqrt{70\times 56}} = \frac{60}{62.61} \approx 0.9583 $$
+              <p>把 $x_2$ 对 $x_1$ 做简单回归，其 $R_2^2 = r_{12}^2 \approx 0.9184$，于是</p>
+              $$ \mathrm{VIF}_2 = \frac{1}{1 - R_2^2} = \frac{1}{1 - 0.9184} = \frac{1}{0.0816} \approx 12.25 $$
+              <p><strong>超过 10，属于严重共线性。</strong>直观解释：$x_2$ 有 $91.8\%$ 的波动能被 $x_1$ 解释，它自己携带的独立信息只剩下 $8.2\%$。</p>
+              <p><strong>（b）两个模型的对比。</strong></p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>模型</th><th>$\hat{\beta}_0$</th><th>$\hat{\beta}_1$</th><th>$\mathrm{SE}(\hat{\beta}_1)$</th><th>$R^2$</th><th>调整 $R^2$</th></tr></thead>
+                  <tbody>
+                    <tr><td>$y \sim x_1$</td><td>$5.952$</td><td>$1.614$</td><td>$0.039$</td><td>$0.9977$</td><td>$0.9971$</td></tr>
+                    <tr><td>$y \sim x_1 + x_2$</td><td>$5.854$</td><td>$1.588$</td><td>$0.156$</td><td>$0.9977$</td><td>$0.9962$</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>多元回归中 $x_2$ 的系数为 $0.031$，标准误 $0.174$，$t = 0.18$——<strong>完全不显著</strong>，意思是「电视投入对销量的独立贡献测不出来」。同时注意 $x_1$ 的标准误从 $0.039$ 膨胀到 $0.156$，<strong>放大了约 4 倍</strong>（与 $\sqrt{\mathrm{VIF}} \approx \sqrt{12.25} \approx 3.5$ 同量级，差异来自自由度由 4 减到 3）。</p>
+              <p>而 $R^2$ 几乎没变（$0.9977 \to 0.9977$），调整 $R^2$ 反而略降（$0.9971 \to 0.9962$）。三个信号一致：<strong>$x_2$ 没有带来任何新信息，只是把 $x_1$ 的估计搅浑了</strong>。</p>
+              <p><strong>（c）加入无用变量 $x_3$。</strong>$R^2$ 从 $0.9977$ 升到 $0.9980$（必然上升），调整 $R^2$ 却从 $0.9962$ 降到 $0.9951$（被罚款），而 $x_3$ 的系数是 $-0.032$、$t = -0.57$，纯属噪声。这再次印证第 4.2 节的结论。</p>
+              <p><strong>处理建议：</strong>① 若业务上只关心「广告总投入的作用」，直接用简单回归并说明电视投入是总投入的组成部分；② 若要同时保留两者，改用<strong>岭回归</strong>（对共线性稳健）或先做主成分分析；③ 绝不要因为「$t$ 值不显著」就断言「电视投入没用」——共线性会让系数变得无法辨识，这是<strong>「说不清」而不是「没有」</strong>。</p>
+              <p><strong>易错提示：</strong>① VIF 公式里的 $R_j^2$ 是「$x_j$ 对<strong>其余</strong>自变量回归」的 $R^2$，绝不是模型整体 $R^2$（这里的 $0.9977$ 拿来算 VIF 会得到荒谬的 $434$）；② VIF 是对称的：$x_1$ 的 VIF 与 $x_2$ 相同（都是 $12.25$）；③ 共线性影响的是<strong>方差与显著性</strong>，不改变系数的期望值（无偏性仍在）；④ 阈值 $5$ / $10$ 是经验规则，行业与样本量不同要调整。</p>
+              <p><strong>应用/AI 关联：</strong>特征工程里的重复特征（「用户年龄」与「用户年龄段」、「文本长度」与「字符数」、「总广告费」与「各渠道广告费」）是共线性的重灾区，会让模型系数在小数点后几位乱跳，线上解释与稳定性变差。常用对策：删除或合并冗余特征、<strong>岭回归 / 弹性网</strong>正则化、或先做主成分降维；深度学习里的<strong>权重衰减（weight decay）</strong>在某种意义上就是对共线性的正则化处理。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s5-3">5.3 变量选择：从「全塞进去」到「挑得准」</h3>
+      <p>变量不是越多越好——无用变量让模型变复杂、方差变大、过拟合风险上升。常见策略：</p>
+      <ul>
+        <li><strong>向前选择</strong>：从空模型开始，每次加入「最显著」的变量，直到没有变量值得加入。</li>
+        <li><strong>向后剔除</strong>：从全模型开始，每次剔除「最不显著」的变量。</li>
+        <li><strong>逐步回归</strong>：两者结合，边进边出。</li>
+        <li><strong>信息准则</strong>：用 AIC / BIC 在拟合好坏与复杂度之间做权衡（公式见模块 09 机器学习），数值越小越好；BIC 对复杂度的惩罚更重，倾向于选更简单的模型。</li>
+      </ul>
+      <p>注意：逐步回归基于 p 值反复搜索，会带来「选择后推断」的偏差（p 值失真）。现代实践更偏好<strong>正则化方法</strong>（第 7 节）或<strong>预注册模型</strong>。</p>
+
+      <!-- ===== 6 ===== -->
+      <h2 id="s6">6 · 逻辑回归：把线性回归接到概率上（重点）</h2>
+
+      <h3 id="s6-1">6.1 线性回归为什么不能直接预测概率</h3>
+      <p>当响应 $Y$ 是<strong>二分类</strong>（买/不买、流失/留存、有病/没病），记 $p = P(Y=1 \mid x)$。第一反应是「照搬线性回归 $p=\beta_0+\beta_1 x$」，但它有两个致命伤：</p>
+      <ul>
+        <li>$\beta_0+\beta_1 x$ 是任意实数，而<strong>概率必须落在 $[0,1]$</strong>——预测出「$-0.3$」或「$1.7$」毫无意义。</li>
+        <li>真实关系通常是<strong>S 形</strong>：$x$ 很小或很大时，概率变化平缓；中间段变化剧烈。直线拟不出来。</li>
+      </ul>
+      <p>解决思路：让线性预测值先输出一个「分数」$z=\beta_0+\beta_1 x$（取值任意），再用一个<strong>压缩函数</strong>把它映射进 $(0,1)$。这个压缩函数就是 sigmoid（logistic）函数。</p>
+
+      <div class="formula-box">
+        <div class="f-name">逻辑回归模型与 logit 变换</div>
+        $$ P(Y=1 \mid x) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 x)}} = \frac{1}{1 + e^{-z}}, \qquad z = \beta_0 + \beta_1 x $$
+        $$ \log\frac{p}{1-p} = \beta_0 + \beta_1 x \quad (\text{对数几率 } \text{logit}) $$
+        <div class="f-note">
+          sigmoid 把 $(-\infty,+\infty)$ 平滑压进 $(0,1)$：$z=0$ 时 $p=0.5$，$z\to+\infty$ 时 $p\to 1$，$z\to-\infty$ 时 $p\to 0$。
+          logit 变换 $\log\frac{p}{1-p}$ 把概率<strong>反向拉直</strong>成任意实数，于是右边又能写成线性形式——
+          逻辑回归本质上是「对<strong>对数几率</strong>做线性回归」。$p/(1-p)$ 叫<strong>几率</strong>（odds），是「发生 vs 不发生」之比。
+        </div>
+      </div>
+
+      <h3 id="s6-2">6.2 极大似然估计与交叉熵损失</h3>
+      <p>线性回归用最小二乘估计参数，逻辑回归用<strong>极大似然估计（MLE）</strong>：找一组 $\beta$，使「观测到当前这批标签」的概率最大。单个观测的似然贡献是：</p>
+      $$ P(y_i \mid x_i) = p_i^{y_i} (1 - p_i)^{1 - y_i}, \qquad p_i = \frac{1}{1 + e^{-(\beta_0 + \beta_1 x_i)}} $$
+      <p>整个样本的似然 $L = \prod_{i=1}^n p_i^{y_i}(1-p_i)^{1-y_i}$。取对数（把连乘变连加，方便求导），再取负号——就得到机器学习中大名鼎鼎的<strong>交叉熵损失</strong>：</p>
+      $$ \mathrm{Loss} = -\sum_{i=1}^{n} \left[ y_i \log p_i + (1 - y_i) \log(1 - p_i) \right] $$
+      <p>「极大化似然」与「极小化交叉熵损失」是<strong>同一件事的两种说法</strong>。与线性回归不同，这个损失<strong>没有闭式解</strong>（无法像 $\hat{\beta}_1=S_{xy}/S_{xx}$ 那样写成公式），需要用迭代优化算法求解（梯度下降、牛顿法/IRLS——AI 章节的核心内容）。</p>
+
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          通往 AI 的接口
+        </div>
+        <p>交叉熵损失是<strong>分类问题的标准损失</strong>：逻辑回归是单层的「神经网络」；softmax 回归是它的多分类版本；深度学习里的分类器最后一层往往就是「线性层 + sigmoid/softmax + 交叉熵」。把这一节学透，AI 章节会轻松很多。</p>
+      </div>
+
+      <h3 id="s6-3">6.3 系数解释：优势比</h3>
+      <p>在逻辑回归中，$\beta_1$ 不能像线性回归那样说「$x$ 每加 1，$p$ 加 $\beta_1$」——$p$ 的变化量随 $x$ 变化。正确的解释要用<strong>几率</strong>（odds $=p/(1-p)$）：</p>
+      $$ \text{odds}(x+1) = e^{\beta_1} \cdot \text{odds}(x) $$
+      <p>即 $x$ 每增加 1 单位，几率<strong>乘以</strong> $e^{\beta_1}$ 倍。$e^{\beta_1}$ 叫<strong>优势比 / 比值比</strong>（Odds Ratio, OR）：</p>
+      <ul>
+        <li>$\mathrm{OR} = e^{\beta_1} &gt; 1$：$x$ 增大，事件更可能发生；</li>
+        <li>$\mathrm{OR} = 1$：$x$ 与概率无关；</li>
+        <li>$\mathrm{OR} &lt; 1$：$x$ 增大，事件更不可能。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.1</span>
+          <span class="ex-title">给定系数算概率与优势比</span>
+        </div>
+        <div class="example-body">
+          <p>某逻辑回归模型：$P(Y=1 \mid x) = \dfrac{1}{1 + e^{-(-2.5 + 0.5x)}}$，其中 $x$ 是用户月访问次数。（a）求 $x=3$ 与 $x=5$ 时的购买概率；（b）解释系数 $0.5$（给出优势比）。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>(a) 计算概率。</strong>先算线性分数 $z$：</p>
+              <ul>
+                <li>$x=3$：$z = -2.5 + 0.5 \times 3 = -1$，于是
+                  $$ p = \frac{1}{1 + e^{1}} = \frac{1}{1 + 2.71828} \approx 0.2689 \approx 26.9\% $$</li>
+                <li>$x=5$：$z = -2.5 + 0.5 \times 5 = 0$，于是
+                  $$ p = \frac{1}{1 + e^{0}} = \frac{1}{2} = 0.5 = 50\% $$</li>
+              </ul>
+              <p><strong>(b) 优势比。</strong></p>
+              $$ \mathrm{OR} = e^{\beta_1} = e^{0.5} \approx 1.65 $$
+              <p>解读：月访问次数每增加 1 次，购买的<strong>几率</strong>变为原来的约 1.65 倍（不是「概率增加 65%」！）。
+              验证：$x=3$ 时 $\text{odds} = 0.2689/0.7311 \approx 0.368 = e^{-1}$；$x=4$ 时 $z=-0.5$，$p\approx 0.378$，$\text{odds}\approx 0.607 = e^{-0.5}$；
+              两者之比 $e^{-0.5}/e^{-1} = e^{0.5} \approx 1.65$，与公式一致。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.2</span>
+          <span class="ex-title">逻辑回归的 MLE 没有闭式解：手算牛顿迭代</span>
+        </div>
+        <div class="example-body">
+          <p>8 位用户的每周访问次数 $x$ 与是否购买 $y$ 如下：$x = (0,0,1,1,2,2,3,3)$，$y = (0,1,0,1,1,0,1,1)$。（a）写出对数似然，并说明它为什么没有闭式解；（b）用牛顿-拉夫森法从 $\beta = (0,0)$ 出发迭代，给出前 3 步的迭代结果；（c）用最终系数计算优势比，并用一个 $2\times 2$ 表独立核对。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）对数似然与「无闭式解」的原因。</strong></p>
+              $$ L(\beta) = \prod_{i=1}^{8} p_i^{y_i}(1-p_i)^{1-y_i}, \qquad p_i = \frac{1}{1+e^{-(\beta_0+\beta_1 x_i)}} $$
+              $$ \ell(\beta) = \sum_{i=1}^{8}\left[ y_i \ln p_i + (1-y_i)\ln(1-p_i) \right] $$
+              <p>线性回归能写出 $\hat{\beta}_1 = S_{xy}/S_{xx}$，是因为平方损失展开后 $\beta$ 是<strong>线性</strong>出现在目标函数里的；逻辑回归里 $p_i$ 是 $\beta$ 的<strong>非线性</strong>函数（经 sigmoid 压缩），方程 $\partial\ell/\partial\beta = 0$ 含有指数与对数，无法解析求解——必须<strong>迭代</strong>。</p>
+              <p><strong>牛顿迭代公式。</strong>记 $p_i = \sigma(\beta_0+\beta_1x_i)$、$w_i = p_i(1-p_i)$，则</p>
+              $$ g = \sum_i (y_i - p_i)\begin{pmatrix} 1 \\ x_i \end{pmatrix}, \qquad J = \sum_i w_i \begin{pmatrix} 1 \\ x_i \end{pmatrix}\begin{pmatrix} 1 & x_i \end{pmatrix}, \qquad \beta \leftarrow \beta + J^{-1}g $$
+              <p>其中 $J$ 是观测信息矩阵（即 $-\nabla^2\ell$）。</p>
+              <p><strong>（b）逐步迭代。</strong></p>
+              <p><strong>第 1 步（起点 $\beta = (0,0)$）：</strong>此时所有 $p_i = 0.5$，$w_i = 0.25$；又 $\sum x_i = 12$，$\sum x_i^2 = 28$。</p>
+              $$ g_0 = \sum (y_i - 0.5) = 5 - 4 = 1.0, \qquad g_1 = \sum (y_i - 0.5)x_i = 9 - 0.5\times 12 = 3.0 $$
+              $$ J_{00} = 8\times 0.25 = 2, \quad J_{01} = 0.25\times 12 = 3, \quad J_{11} = 0.25\times 28 = 7, \quad \det J = 2\times 7 - 3^2 = 5 $$
+              $$ J^{-1} = \frac{1}{5}\begin{pmatrix} 7 & -3 \\ -3 & 2 \end{pmatrix}, \qquad J^{-1}g = \frac{1}{5}\begin{pmatrix} 7-9 \\ -3+6 \end{pmatrix} = \begin{pmatrix} -0.4 \\ 0.6 \end{pmatrix} $$
+              <p>于是 $\beta^{(1)} = (-0.4,\ 0.6)$，对数似然 $\ell = -4.8053$。</p>
+              <p><strong>第 2 步：</strong>代入新系数重新计算，得 $\beta^{(2)} = (-0.4527,\ 0.6886)$，$\ell = -4.7935$。</p>
+              <p><strong>第 3 步：</strong>$\beta^{(3)} = (-0.4553,\ 0.6932)$，$\ell = -4.7934$（几乎不再变化，已收敛）。</p>
+              <p><strong>收敛解：</strong></p>
+              $$ \hat{\beta}_0 = -0.4553, \qquad \hat{\beta}_1 = 0.6932, \qquad \ell_{\max} \approx -4.7934 $$
+              <p>对数似然在迭代中<strong>单调上升</strong>（$-4.8053 \to -4.7935 \to -4.7934$），这是收敛的最好 sanity check。</p>
+              <p><strong>（c）优势比与独立核对。</strong></p>
+              $$ \mathrm{OR} = e^{\hat{\beta}_1} = e^{0.6932} \approx 2.00 $$
+              <p>解读：每周访问次数每多 1 次，购买的<strong>几率</strong>变为原来的约 2 倍。代入各 $x$ 得到拟合概率：</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$x$</th><th>$z = \hat{\beta}_0 + \hat{\beta}_1 x$</th><th>拟合概率 $p$</th><th>实际购买人数</th></tr></thead>
+                  <tbody>
+                    <tr><td>0</td><td>$-0.455$</td><td>$0.388$</td><td>$1 / 2$</td></tr>
+                    <tr><td>1</td><td>$0.238$</td><td>$0.559$</td><td>$1 / 2$</td></tr>
+                    <tr><td>2</td><td>$0.931$</td><td>$0.717$</td><td>$1 / 2$</td></tr>
+                    <tr><td>3</td><td>$1.624$</td><td>$0.835$</td><td>$2 / 2$</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p><strong>独立核对：</strong>把 $x$ 二分成「不访问 ($x=0$)」与「访问 ($x \ge 1$)」两组，得到 $2\times 2$ 表：</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th></th><th>购买</th><th>未购买</th></tr></thead>
+                  <tbody>
+                    <tr><td>不访问 ($x=0$)</td><td>1</td><td>1</td></tr>
+                    <tr><td>访问 ($x \ge 1$)</td><td>4</td><td>2</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>经典优势比（列联表法）：$\dfrac{1\times 4}{1\times 2} = 2$，与 $e^{\hat{\beta}_1} = 2.00$ <strong>完全一致</strong>——这说明逻辑回归并没有发明新东西，它只是把「优势比的线性化」做得更灵活（可同时容纳多个自变量、连续型 $x$）。</p>
+              <p><strong>易错提示：</strong>① 牛顿法的更新方向是 $+J^{-1}g$（$J$ 是信息矩阵），写成 $-H^{-1}g$ 时容易把符号搞反，导致似然下降甚至发散；② <strong>完全可分</strong>的数据（能被一条直线分开）会使 MLE 不存在，系数冲向无穷——这在 AI 里对应「训练损失趋近 0 而验证集变差」，做工程时要加正则化；③ OR 解释的是<strong>几率</strong>不是概率，不能说「概率翻倍」；④ 迭代必须检查对数似然是否单调上升。</p>
+              <p><strong>应用/AI 关联：</strong>逻辑回归的 MLE 就是「最小化交叉熵损失」（第 6.2 节），牛顿法即 IRLS，statsmodels 与 scikit-learn 默认都这么解；深度学习用梯度下降求解的是<strong>同一个目标函数</strong>，只是优化器不同。把这一例完整手算一遍，就是理解「梯度下降每一步在干什么」最好的练习：$g$ 是「预测与实际的偏差按 $x$ 加权求和」，$J$ 决定了每个方向该走多远。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 7 ===== -->
+      <h2 id="s7">7 · 正则化：当模型太「聪明」</h2>
+
+      <h3 id="s7-1">7.1 问题：过拟合与 $p \gg n$</h3>
+      <p>当自变量很多（甚至多于样本量，$p \gg n$，如文本/基因数据），两个问题同时出现：</p>
+      <ul>
+        <li><strong>过拟合</strong>：模型把训练数据里的噪声也学了进去，训练误差极低，新数据上误差很高。</li>
+        <li><strong>不可识别</strong>：$p \ge n$ 时 $\mathbf{X}^\top\mathbf{X}$ 不可逆，OLS 连唯一解都没有（有无穷多条直线都能完美穿过训练点）。</li>
+      </ul>
+      <p>正则化（Regularization）的思路：在损失函数上<strong>给系数大小加惩罚</strong>，逼模型「收敛」到更简单、更稳定的解。</p>
+
+      <div class="formula-box">
+        <div class="f-name">岭回归（L2）与 Lasso（L1）</div>
+        $$ \text{岭回归（Ridge）：} \min_{\beta} \; \| y - \mathbf{X}\beta \|_2^2 + \lambda \| \beta \|_2^2 = \min_{\beta} \; \| y - \mathbf{X}\beta \|_2^2 + \lambda \sum_{j} \beta_j^2 $$
+        $$ \text{Lasso：} \min_{\beta} \; \| y - \mathbf{X}\beta \|_2^2 + \lambda \| \beta \|_1 = \min_{\beta} \; \| y - \mathbf{X}\beta \|_2^2 + \lambda \sum_{j} |\beta_j| $$
+        <div class="f-note">
+          $\lambda \ge 0$ 是<strong>正则化强度</strong>：$\lambda=0$ 退化为普通最小二乘；$\lambda$ 越大，惩罚越重，系数整体越被压缩向 0。
+          $\|\cdot\|_2$ 是欧氏长度（平方再开方的 $\ell_2$ 范数），$\|\cdot\|_1$ 是绝对值之和（$\ell_1$ 范数）。
+          两者的<strong>关键差异</strong>：Lasso 的惩罚在 0 点有「尖角」，会产生<strong>恰好为 0 的系数</strong>（自动变量选择）；
+          岭回归只会让系数<strong>趋近</strong> 0 而不等于 0。
+        </div>
+      </div>
+
+      <h3 id="s7-2">7.2 两种解释：偏差-方差权衡 & 贝叶斯先验</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>视角</th><th>岭回归（L2）</th><th>Lasso（L1）</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>偏差-方差</strong></td>
+              <td>引入少量偏差，大幅降低系数方差，总误差常下降</td>
+              <td>同样降方差，且把无关变量系数压成 0，方差降得更彻底</td>
+            </tr>
+            <tr>
+              <td><strong>几何直觉</strong></td>
+              <td>约束区域是圆（$\sum \beta_j^2 \le t$），解多为「圆与椭圆相切的普通点」→ 系数很小但非 0</td>
+              <td>约束区域是菱形（$\sum |\beta_j| \le t$），切点常落在<strong>顶点</strong>上 → 某些系数恰好为 0</td>
+            </tr>
+            <tr>
+              <td><strong>贝叶斯先验</strong></td>
+              <td>等价于给系数加<strong>高斯先验</strong> $\beta_j \sim N(0, \sigma^2/\lambda)$（L2 惩罚 $=$ 负对数高斯先验）</td>
+              <td>等价于给系数加<strong>拉普拉斯先验</strong>（L1 惩罚 $=$ 负对数拉普拉斯先验，密度在 0 处有尖峰）</td>
+            </tr>
+            <tr>
+              <td><strong>适用场景</strong></td>
+              <td>自变量多且都可能有用、共线性严重时稳定首选</td>
+              <td>相信「只有少数变量真正重要」，需要可解释的稀疏模型</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>弹性网（Elastic Net）</strong>把两者混合：$\min \| y - \mathbf{X}\beta \|_2^2 + \lambda_1 \| \beta \|_1 + \lambda_2 \| \beta \|_2^2$。
+      它兼得 Lasso 的稀疏性与岭回归对共线性变量组的稳定性（Lasso 在高度相关的变量中往往只随机留下一个，弹性网倾向于「整组留下或整组丢弃」）。$\lambda_1,\lambda_2$ 的比例决定了偏向哪一侧。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.1</span>
+          <span class="ex-title">$p \gg n$ 时为何用 Lasso？岭与 Lasso 差在哪？</span>
+        </div>
+        <div class="example-body">
+          <p>某文本分类任务：$n = 80$ 篇文档，$p = 5000$ 个词特征。（a）为什么普通 OLS 在这里根本不可用？（b）业务上希望最后的模型只保留几十个关键词以便人工审核，应选岭回归还是 Lasso？（c）若 5000 个特征中有很多近义词（高度相关），你担心 Lasso 的什么问题？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>(a)</strong> $p = 5000 &gt; n = 80$，$\mathbf{X}^\top\mathbf{X}$ 是 $5001\times 5001$ 的矩阵，秩最多为 80，必然<strong>不可逆</strong>，OLS 无唯一解；
+              即使强行求解，模型也会完美拟合 80 个训练点（$\mathrm{SSE}=0$）并把噪声全学走——彻底过拟合，样本外表现崩溃。</p>
+              <p><strong>(b)</strong> 选 <strong>Lasso</strong>。岭回归把系数整体缩小，但 5000 个系数<strong>全都非零</strong>，无法得到「只保留几十个词」的稀疏解；
+              Lasso 的 $\ell_1$ 惩罚会把大部分系数<strong>恰好压成 0</strong>，天然完成变量选择，剩下的是可审核的关键词列表。</p>
+              <p><strong>(c)</strong> Lasso 在<strong>高度相关的特征组</strong>中表现任性：往往只留下其中一个近义词、丢掉其余，换一批样本可能留下另一个——选择结果不稳定。
+              对策：用<strong>弹性网</strong>（加入 $\ell_2$ 项，让相关变量「共进退」），或先做特征聚类/合并再做 Lasso，并用交叉验证检查选择的稳定性。</p>
+              <p><strong>关于 $\lambda$：</strong>太大则欠拟合（所有系数都被压到 0 附近），太小则过拟合。实践中用<strong>交叉验证</strong>（模块 09）选择 $\lambda$。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.2</span>
+          <span class="ex-title">同一个数据集：岭回归把系数压小，Lasso 把系数压成 0</span>
+        </div>
+        <div class="example-body">
+          <p>沿用第 2.2 节的广告数据：$x = (1,2,3,4,5)$，$y = (3,5,6,8,9)$，已知 $\bar{x} = 3$，$\bar{y} = 6.2$，$S_{xy} = 15$，$S_{xx} = 10$。（a）写出普通最小二乘的解与残差平方和；（b）求岭回归在 $\lambda = 5$ 与 $\lambda = 10$ 时的系数与 SSE；（c）求 Lasso 在 $\lambda = 10,\ 20,\ 30$ 时的系数与 SSE；（d）两者的关键差别是什么？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）普通最小二乘。</strong></p>
+              $$ \hat{\beta}_1 = \frac{S_{xy}}{S_{xx}} = \frac{15}{10} = 1.5, \qquad \hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x} = 6.2 - 1.5\times 3 = 1.7 $$
+              <p>残差依次为 $-0.2,\ 0.3,\ -0.2,\ 0.3,\ -0.2$，故 $\mathrm{SSE} = 0.3$（拟合非常好）。</p>
+              <p><strong>（b）岭回归（L2）。</strong>目标函数（与 §7.1 公式框一致，损失不做归一化）：</p>
+              $$ \min_{\beta_0,\ \beta_1}\ \sum_{i=1}^{5}\left(y_i - \beta_0 - \beta_1 x_i\right)^2 + \lambda\,\beta_1^2 $$
+              <p>先对 $\beta_0$ 求导（惩罚项不含 $\beta_0$，截距不受罚）：$\beta_0 = \bar{y} - \beta_1\bar{x}$；代回后再对 $\beta_1$ 求导：</p>
+              $$ -2\left(S_{xy} - \beta_1 S_{xx}\right) + 2\lambda \beta_1 = 0 \;\Longrightarrow\; \hat{\beta}_1^{\text{ridge}} = \frac{S_{xy}}{S_{xx} + \lambda/2} $$
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$\lambda$</th><th>$\hat{\beta}_1$</th><th>$\hat{\beta}_0 = 6.2 - 3\hat{\beta}_1$</th><th>拟合值</th><th>SSE</th></tr></thead>
+                  <tbody>
+                    <tr><td>$0$（OLS）</td><td>$1.50$</td><td>$1.70$</td><td>$3.2, 4.7, 6.2, 7.7, 9.2$</td><td>$0.30$</td></tr>
+                    <tr><td>$5$</td><td>$15/12.5 = 1.20$</td><td>$2.60$</td><td>$3.8, 5.0, 6.2, 7.4, 8.6$</td><td>$1.20$</td></tr>
+                    <tr><td>$10$</td><td>$15/15 = 1.00$</td><td>$3.20$</td><td>$4.2, 5.2, 6.2, 7.2, 8.2$</td><td>$2.80$</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p><strong>（c）Lasso（L1）。</strong>目标函数 $\sum (y_i-\beta_0-\beta_1x_i)^2 + \lambda|\beta_1|$。同样先消掉 $\beta_0$，再对 $\beta_1$ 求导，分 $\beta_1 &gt; 0$ 与 $\beta_1 &lt; 0$ 讨论，得到<strong>软阈值（soft-thresholding）</strong>解：</p>
+              $$ \hat{\beta}_1^{\text{lasso}} = \mathrm{sign}(S_{xy})\cdot \max\!\left( \frac{S_{xy}}{S_{xx}} - \frac{\lambda}{2S_{xx}},\ 0\right) $$
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$\lambda$</th><th>阈值 $\lambda/(2S_{xx})$</th><th>$\hat{\beta}_1$</th><th>$\hat{\beta}_0$</th><th>SSE</th></tr></thead>
+                  <tbody>
+                    <tr><td>$10$</td><td>$0.50$</td><td>$1.50 - 0.50 = 1.00$</td><td>$3.20$</td><td>$2.80$</td></tr>
+                    <tr><td>$20$</td><td>$1.00$</td><td>$1.50 - 1.00 = 0.50$</td><td>$4.70$</td><td>$10.30$</td></tr>
+                    <tr><td>$30$</td><td>$1.50$</td><td>$0$（被压成 0！）</td><td>$6.20$</td><td>$22.80$</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p><strong>（d）关键差别。</strong>同样的 $\lambda$ 下（这里 $\lambda = 10$），两者给出完全相同的 $\hat{\beta}_1 = 1.00$，但<strong>变化的机制不同</strong>：</p>
+              <ul>
+                <li><strong>岭回归是连续压缩</strong>：$\hat{\beta}_1$ 随 $\lambda$ 增大逐渐靠近 0，但只要 $\lambda$ 有限就<strong>不会等于 0</strong>（$\lambda = 10$ 时仍是 $1.0$）；系数之间的相对大小结构保留。</li>
+                <li><strong>Lasso 是稀疏收缩</strong>：当 $\lambda \ge 30$ 时 $\hat{\beta}_1$ 被<strong>恰好压成 0</strong>，模型退化为「只预测均值 $\bar{y} = 6.2$」的常数模型，SSE 从 $0.3$ 涨到 $22.8$——拟合明显变差，但换来一个<strong>极其简洁、可解释的模型</strong>。</li>
+              </ul>
+              <p>这就是「偏差—方差权衡」的具体样子：$\lambda$ 越大，系数越「短小稳定」（方差小）但离真值越远（偏差大）。岭适合「自变量多、都有用、彼此相关」，Lasso 适合「只有少数变量真正重要」；两者结合就是<strong>弹性网</strong>。</p>
+              <p><strong>易错提示：</strong>① 惩罚项只作用于斜率、<strong>不惩罚截距</strong>（否则连数据的中心都对不准）；② 推导时必须先把 $\beta_0$ 用 $\bar{y}-\beta_1\bar{x}$ 消掉，不能直接套 $S_{xy}/S_{xx}$；③ <strong>$\lambda$ 的数值依赖损失的归一化方式</strong>：本例用未归一化的 SSE，若把损失写成 $\frac1n\sum(\cdot)^2$，同一 $\lambda$ 对应的是不同的惩罚强度（软件里还要再乘 $n$），所以比较不同工具的 $\lambda$ 数值前先确认定义；④ $\lambda$ 应由交叉验证选择，不是手调。</p>
+              <p><strong>应用/AI 关联：</strong>L1 惩罚产生稀疏解，正是深度学习里用 L1 做特征选择的动机；但在高度相关的特征组中，Lasso 的选择不稳定（可能随机留下其中一个近义词），因此实践中常用<strong>弹性网</strong>或先做特征聚类/筛选。现代框架（PyTorch、TensorFlow）的 <code>L1Loss</code>、权重衰减项默认作用在全部参数上，若想得到「稀疏模型」，还需要配合结构性稀疏设计（如阈值门控）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <h2 id="s8">8 · 回归的三大常见陷阱</h2>
+
+      <h3 id="s8-1">8.1 外推（Extrapolation）</h3>
+      <p>回归方程只在<strong>样本的 $x$ 范围内</strong>有数据支撑。超出这个范围的预测是「信仰」而非「统计」：</p>
+      <ul>
+        <li>用 18–60 岁人群拟合「年龄 → 收入」，预测 15 岁和 90 岁的收入，荒谬且危险。</li>
+        <li>截距 $\hat{\beta}_0$ 往往是外推的产物（$x=0$ 常不在样本范围内），解释前先问「$x=0$ 有意义吗？数据覆盖它吗？」</li>
+      </ul>
+
+      <h3 id="s8-2">8.2 伪回归（Spurious Regression）</h3>
+      <p>两个毫无关系、但都随时间持续上涨的序列（如「某国冰淇淋销量」与「某小众乐器的注册量」），做回归会得到<strong>很高的 $R^2$ 和「显著」的斜率</strong>——因为它们共享「随时间增长」这个趋势，而非真实的因果联系。这在时间序列中极为常见，叫<strong>伪回归</strong>。</p>
+      <ul>
+        <li>诊断：看残差是否非平稳、是否有明显趋势；对序列做<strong>差分</strong>（看增量而非水平）再分析。</li>
+        <li>对策：使用时间序列专门方法（平稳化、协整检验），或在回归中加入时间趋势项。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 8.1</span>
+          <span class="ex-title">伪回归诊断：$R^2 = 0.985$ 却毫无关系的两条曲线</span>
+        </div>
+        <div class="example-body">
+          <p>某分析师拿到两条月度序列（$t = 1,\dots,20$）：</p>
+          <p>$x$ = 冰淇淋月销量（万份）：104.5, 111.0, 114.5, 119.4, 123.1, 129.6, 137.2, 140.8, 147.1, 150.5, 155.8, 160.4, 161.7, 171.7, 176.0, 181.0, 181.6, 186.5, 193.2, 199.1</p>
+          <p>$y$ = 某小众乐器月注册量（台）：52.6, 53.9, 57.0, 56.7, 60.6, 62.8, 62.7, 69.4, 69.1, 72.4, 70.8, 72.5, 75.3, 77.8, 81.3, 82.5, 83.1, 84.1, 87.0, 92.4</p>
+          <p>（a）对水平值做回归，报告 $R^2$、斜率与 $t$ 值；（b）对<strong>一阶差分</strong>做回归，再报告同样三个量；（c）据此说明什么是伪回归，以及该怎么诊断；（d）若用拟合出的直线做外推，会出什么问题？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）水平值回归。</strong>拟合结果（$n = 20$）：</p>
+              $$ \hat{y} = 10.2308 + 0.4005\,x, \qquad R^2 = 0.9850, \qquad r = 0.9925 $$
+              <p>斜率的 $t$ 值高达 $34.37$，$p$ 小到可以忽略。分析师会写下：「冰淇淋销量每增加 1 万份，乐器注册量增加 $0.40$ 台，$R^2$ 高达 $98.5\%$，关系极强！」</p>
+              <p><strong>（b）一阶差分回归。</strong>令 $\Delta x_t = x_t - x_{t-1}$、$\Delta y_t = y_t - y_{t-1}$（共 19 个点）：</p>
+              $$ \Delta \hat{y} = 2.8854 - 0.1585\,\Delta x, \qquad R^2 = 0.0271, \qquad t(\hat{\beta}_1) = -0.689 $$
+              <p>天差地别：$R^2$ 只有 $2.7\%$，斜率不仅接近 0，而且<strong>方向还是负的</strong>（不显著）。</p>
+              <p><strong>（c）这就是伪回归。</strong>两条序列的共同点是<strong>都随时间上升</strong>，而它们的变化其实彼此独立（冰激凌销量受天气与季节影响，乐器注册量受自己的营销活动影响，互不相干）。回归之所以「显著」，是因为 $x$ 的波动里混入了<strong>共同的时间趋势</strong>，而不是因为 $x$ 的变化带来了 $y$ 的变化。</p>
+              <p><strong>诊断流程（记住这三条）：</strong></p>
+              <ol>
+                <li><strong>先看图</strong>：两条线都在往上走，就要立刻警觉；</li>
+                <li><strong>做差分再回归</strong>：看「增量之间」还有没有关系（本例 $R^2$ 从 $98.5\%$ 塌到 $2.7\%$）；</li>
+                <li><strong>检查平稳性</strong>（ADF 检验等）并考虑加入时间趋势项、差分、或用协整分析处理长期均衡关系。</li>
+              </ol>
+              <p>值得强调：本例水平回归的<strong>残差与时间的相关系数只有 $0.01$</strong>——因为 $x$ 已经把共同趋势吸收掉了，残差图看起来「很正常」。这说明：<strong>光看残差图并不能识别伪回归</strong>，识别它的关键动作是「先判断序列是否平稳」与「做差分看增量关系」。</p>
+              <p><strong>（d）外推的风险。</strong>拟合直线在 $x = 0$ 处给出 $\hat{y} = 10.23$，但样本中 $x$ 的取值范围是 $104.5 \sim 199.1$——<strong>$x = 0$ 完全在样本之外</strong>，这个预测毫无数据支撑。若外推到 $x = 250$，模型给出 $y \approx 110.4$，而真实序列最高才 $92.4$。凡是预测的 $x$ 超出样本范围，都属于<strong>外推</strong>，必须标注为不可靠。</p>
+              <p><strong>易错提示：</strong>① 伪回归里 $R^2$ 越高越危险（$0.985$ 看起来「非常可信」），$R^2$ 完全无法识别伪回归；② 时间序列默认<strong>非平稳</strong>，回归前先看趋势、做差分；③ 判断外推的标准是「预测的 $x$ 是否落在样本范围内」，而不是「公式能不能算出来」；④ 截距 $\hat{\beta}_0$ 在时间序列回归中几乎总是外推的产物，不要赋予业务解释。</p>
+              <p><strong>应用/AI 关联：</strong>推荐与广告系统里，「曝光量」与「点击量」「活跃用户数」与「GMV」都是随时间上升的序列，直接回归必然得到高 $R^2$ 与「显著正斜率」；想做真正的因果分析，必须先做时间序列处理或改用<strong>双重差分、合成控制</strong>等因果识别策略（模块 08）。同理，用历史增长趋势做销量预测时，外推误差会随时间迅速放大，这也是要做「时间序列交叉验证」的原因。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s8-3">8.3 因果过度解读</h3>
+      <p>回归系数是<strong>关联</strong>的度量。从「关联」跳到「因果」，必须满足：无遗漏混杂（或已控制）、时间先后正确、无反向因果、有可信的识别策略（随机实验、自然实验、双重差分等——见模块 08）。写结论时自检三连：</p>
+      <ol>
+        <li>我有没有把「相关」误写成「导致」？</li>
+        <li>有没有第三个变量同时影响 $x$ 和 $y$？</li>
+        <li>若把 $x$ 与 $y$ 对调，这个模型是不是也能「解释得通」？（若是，多半只是相关）</li>
+      </ol>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点汇总：回归最常犯的三个错
+        </div>
+        <p>① <strong>把观察回归当实验结论</strong>（系数 ≠ 处置效应）；② <strong>在样本范围外做预测</strong>（外推）；
+        ③ <strong>只看 $R^2$ 不看残差图</strong>（异方差、非线性、异常点会静悄悄毁掉所有显著性检验）。
+        记住：回归的价值不在「跑出一个数」，而在「模型假设是否可信、诊断是否通过、结论是否克制」。</p>
+      </div>
+
+      <!-- ===== 9 ===== -->
+      <div id="examples"></div><!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 模块 06 回归分析 -->
+<!-- 本片段只补充「深度」：正文已有的例题、练习与小结不重复 -->
+
+<h2 id="d-deep-1">深度专题一 · 为什么 $\mathbf{X}^{\top}\mathbf{X}$ 必须可逆：共线性、条件数与岭回归这剂药</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：一个矩阵把「线性代数」和「统计」焊在了一起</h3>
+  <p>正文给出了多元回归的矩阵解 $\hat\beta=(\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}$，并把它和「无完全共线性」假设挂钩。本专题要拆开这个逆矩阵：它<strong>什么时候不存在、快不存在时有多危险、以及为什么加一个 $\lambda\mathbf{I}$ 就能救回来</strong>。</p>
+  <p>这条线索横跨两百年。1805 年 Legendre 与 Gauss 用最小二乘算天体轨道时，解的就是正规方程；20 世纪随着电子计算机出现，人们发现当自变量彼此高度相关时，$\mathbf{X}^{\top}\mathbf{X}$ 接近奇异，系数会剧烈跳动——这在数值分析里叫<strong>病态矩阵</strong>。1970 年 Hoerl 与 Kennard 提出岭回归，本质上是给矩阵对角线加一个正数，用一点偏差换大幅稳定；1996 年 Tibshirani 的 Lasso 又从另一角度给出稀疏解。今天这条线直接延伸到深度学习：权重衰减、共线性特征、双重下降现象，都是同一类问题。</p>
+  <p>对只有初中数学起点的读者，先把一句话记住：<strong>$\mathbf{X}^{\top}\mathbf{X}$ 的「可逆」翻译过来就是「每个自变量都提供了别人提供不了的新信息」</strong>。一旦某个自变量能被其他自变量线性拼出来，这条信息就是重复的，方程组就有无穷多组解，系数无法唯一确定。</p>
+
+  <h3>直觉：三个人抬一根柱子，各出了多大力？</h3>
+  <p>想象三个人一起抬一根柱子，你只知道「总共用了 300 牛」，却没有任何其他信息。问「甲出了多少力」——答不出来，因为甲、乙、丙的出力可以任意分配，只要加起来是 300。这就是<strong>完全共线性</strong>：自变量是「完全同进同退」的，数据里根本不含区分它们的信息。</p>
+  <p>再进一步：若三个人几乎总是同时使劲（相关系数 $0.99$），你虽能勉强分辨，但一点点测量误差就会被放大——今天算出「甲 200、乙 $-50$」，明天换个样本就变成「甲 $-30$、乙 $220$」。系数剧烈跳动、符号翻转、单个 $t$ 检验全不显著，可整体模型又显著。这不是「甲没用力」，而是<strong>「说不清」</strong>：数据的信息量不够把两人分开。</p>
+  <p>几何上更好懂：$\mathbf{X}^{\top}\mathbf{X}$ 刻画了设计矩阵列向量张成的「形状」。可逆意味着这个形状在各个方向都有厚度（像一颗饱满的橄榄球）；接近奇异意味着某个方向被压得极扁（像一张薄饼）。求逆相当于「在每个方向上除以厚度」，扁方向上一除，任何微小噪声都被放大成巨大的系数波动。岭回归做的事很朴素：<strong>给每个方向先垫一个最低厚度 $\lambda$</strong>，不让任何方向被除到爆炸。</p>
+
+  <h3>形式化：从秩、特征值到岭估计</h3>
+  <div class="formula-box">
+    <div class="f-name">正规方程与可解条件</div>
+    $$ \mathbf{X}^{\top}\mathbf{X}\,\hat\beta=\mathbf{X}^{\top}\mathbf{y}, \qquad \hat\beta=(\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y} $$
+    $$ (\mathbf{X}^{\top}\mathbf{X})^{-1}\ \text{存在}\ \Longleftrightarrow\ \mathrm{rank}(\mathbf{X}^{\top}\mathbf{X})=p+1\ \Longleftrightarrow\ \mathbf{X}\ \text{列满秩（无完全共线性）} $$
+    <div class="f-note">白话：$\mathbf{X}$ 是 $n\times(p+1)$ 设计矩阵（第一列全 1 对应截距）。$\mathbf{X}^{\top}\mathbf{X}$ 是 $(p+1)\times(p+1)$ 方阵。它能求逆，当且仅当 $\mathbf{X}$ 的列向量线性无关——即没有哪一列能被其他列线性表出。若 $p\ge n$（特征比样本还多），列数超过维数，必然线性相关，逆一定不存在。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">特征值与条件数：把「病态」量化</div>
+    $$ \mathbf{X}^{\top}\mathbf{X}=Q\,\mathrm{diag}(\lambda_1,\dots,\lambda_{p+1})\,Q^{\top}, \qquad \kappa=\frac{\lambda_{\max}}{\lambda_{\min}}, \qquad \mathrm{Var}(\hat\beta_j)=\frac{\sigma^{2}}{(n-1)s_j^{2}}\cdot\frac{1}{1-R_j^{2}} $$
+    <div class="f-note">白话：把 $\mathbf{X}^{\top}\mathbf{X}$ 做特征分解，$\lambda_j$ 是各方向的「厚度」。$\kappa$ 是最大与最小厚度之比，叫<strong>条件数</strong>：$\kappa$ 越大越病态，求逆时噪声被放大得越狠。第三式是系数方差的精确表达，其中 $\frac{1}{1-R_j^2}$ 正是正文的方差膨胀因子 VIF——$R_j^2$ 越接近 1，分母越小，系数方差越大。$\kappa$ 与 VIF 是同一件事的「整体版」与「逐列版」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">完全共线时发生了什么：无穷多解</div>
+    $$ \text{若 }\mathbf{x}_2 = c\,\mathbf{x}_1,\ \text{则对任意 } t:\quad \beta_1\mathbf{x}_1+\beta_2\mathbf{x}_2=\left(\beta_1 + t c\right)\mathbf{x}_1+\left(\beta_2 - t\right)\mathbf{x}_2 $$
+    <div class="f-note">白话：把一份贡献从 $\beta_2$ 挪到 $\beta_1$，拟合值 $\mathbf{X}\beta$ 分毫不变。于是 $\mathrm{SSE}$ 有无穷多个等价最小点，$\mathbf{X}^{\top}\mathbf{X}$ 有零特征值、行列式为 0，$\det(\mathbf{X}^{\top}\mathbf{X})=0$ 无法求逆。代码实验 [2] 会用一个 $[1,\ x,\ 2x]$ 的设计矩阵把行列式算成 0，再把它稍微扰动一下，看系数如何爆掉。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">岭回归：给对角线垫一层，逆就存在了</div>
+    $$ \hat\beta_{\text{ridge}}=\arg\min_{\beta}\ \| \mathbf{y}-\mathbf{X}\beta \|_2^{2}+\lambda\|\beta\|_2^{2}=\left(\mathbf{X}^{\top}\mathbf{X}+\lambda\mathbf{I}\right)^{-1}\mathbf{X}^{\top}\mathbf{y} $$
+    $$ \lambda_j\ \longrightarrow\ \lambda_j+\lambda, \qquad \kappa_{\text{ridge}}=\frac{\lambda_{\max}+\lambda}{\lambda_{\min}+\lambda}\ \lt\ \kappa $$
+    <div class="f-note">白话：$\lambda\gt0$ 时每个特征值都被加上同一个正数，最小的那个不再接近 0，条件数严格下降，矩阵必定可逆（$\mathbf{X}^{\top}\mathbf{X}$ 半正定 + $\lambda\mathbf{I}$ 正定）。代价是<strong>引入偏差</strong>：估计不再无偏，但方差大幅下降，总误差常更小。$\lambda=0$ 退回 OLS；$\lambda\to\infty$ 把所有系数压向 0。实践里不惩罚截距，且 $\lambda$ 由交叉验证选，不手调。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">贝叶斯视角：岭 = 给系数一个高斯先验</div>
+    $$ \beta_j\ \sim\ N\!\left(0,\ \sigma^{2}/\lambda\right)\ \Longrightarrow\ -\ln p(\beta)=\frac{\lambda}{2\sigma^{2}}\sum_j\beta_j^{2}+\text{常数} $$
+    <div class="f-note">白话：把岭的惩罚项看成「系数本来就不该太大」这一先验信念的负对数。于是「加 $\lambda\|\beta\|_2^2$」等价于「假设系数来自一个以 0 为中心的高斯分布」。这也解释了为什么岭能稳住共线性：当两个变量分不清谁贡献大时，先验会把它们的系数一起往 0 拉，而不是让一个冲到 $+\infty$、另一个冲到 $-\infty$。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    $\mathbf{X}^{\top}\mathbf{X}$ 可逆 $\Leftrightarrow$ 设计矩阵列满秩 $\Leftrightarrow$ 无完全共线性。接近奇异时条件数 $\kappa$ 与 VIF 一起飙升，系数方差被放大、符号可能翻转——这是<strong>「说不清」而不是「没有作用」</strong>。岭回归用 $(\mathbf{X}^{\top}\mathbf{X}+\lambda\mathbf{I})^{-1}$ 把所有特征值垫高 $\lambda$，以少量偏差换取矩阵必定可逆与系数稳定；工程上先查 VIF / 条件数，再决定删冗余特征、合并特征、还是上岭回归或弹性网。
+  </div>
+
+  <p><strong>边界：</strong>在设计矩阵列满秩、样本量充足、自变量之间相关性低且不存在 $p\ge n$ 的条件下，本结论不成立，应改用普通最小二乘（OLS），因为它此时是高斯—马尔可夫意义下的最佳线性无偏估计（BLUE），而岭回归引入的偏差纯属浪费；若目标是「从一堆高度相关特征里挑出少数几个」而非「稳定预测」，则岭也不合适，应改用 Lasso 或弹性网。</p>
+
+  <figure class="figure" id="fig-matrix-algo-compare">
+  <svg class="dia" viewBox="0 0 680 224" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="算法横向对比的六个固定维度"><text class="dg-th" x="340.0" y="24" text-anchor="middle">统一横向对比口径</text><rect class="dg-box muted" x="20.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="122.0" y="73.0" text-anchor="middle">适用条件</text><text class="dg-ts" x="122.0" y="90.0" text-anchor="middle">数据假设 / 规模</text><rect class="dg-box alt" x="238.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="340.0" y="73.0" text-anchor="middle">时间与空间复杂度</text><text class="dg-ts" x="340.0" y="90.0" text-anchor="middle">训练 / 推理</text><rect class="dg-box" x="456.0" y="42" width="204.0" height="68" rx="8"/><text class="dg-t" x="558.0" y="73.0" text-anchor="middle">关键超参数</text><text class="dg-ts" x="558.0" y="90.0" text-anchor="middle">敏感性与默认建议</text><rect class="dg-box ok" x="20.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="122.0" y="155.0" text-anchor="middle">优点</text><text class="dg-ts" x="122.0" y="172.0" text-anchor="middle">何时优先选</text><rect class="dg-box warn" x="238.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="340.0" y="155.0" text-anchor="middle">局限与失效边界</text><text class="dg-ts" x="340.0" y="172.0" text-anchor="middle">何时不该用</text><rect class="dg-box info" x="456.0" y="124" width="204.0" height="68" rx="8"/><text class="dg-t" x="558.0" y="155.0" text-anchor="middle">可解释性 / 工程成本</text><text class="dg-ts" x="558.0" y="172.0" text-anchor="middle">落地的隐性代价</text></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">算法横向对比的六个固定维度</span>
+    <span class="fig-note">所有章节的「横向对比」统一按这六栏展开，保证全站术语与评价口径一致。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="../CHAPTER-SPEC.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · $R^2$ 很高却没用：预测 ≠ 因果，零相关 ≠ 独立</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：一个数字骗了整整一代分析师</h3>
+  <p>正文反复警告「$R^2$ 高 ≠ 模型好」，举了伪回归、过拟合、因果误读三类翻车。本专题把这三件事拆成两个更根本的追问：<strong>① 关联紧密为什么既不保证能预测、也不保证能解释因果？② 相关系数为零为什么仍可能存在铁板钉钉的依赖关系？</strong></p>
+  <p>Anscombe 在 1973 年只用了四组散点图就说明：四组数据的均值、方差、相关系数、回归线、$R^2$ 几乎完全相同，但散点形态分别是正态、抛物线、带一个离群点、以及所有点几乎排成一列——本站的经典配图正是其中第 III / IV 组。同一年稍晚，Granger 与 Newbold 系统研究了「伪回归」：两条独立随机游走的 $R^2$ 可以高到 $0.9$ 以上，$t$ 值大得离谱，而二者毫无关系。</p>
+  <p>再往 AI 走一步：推荐系统里「曝光量」与「点击量」、LLM 评测里「模型规模」与「准确率」都是随时间一同上升的序列，直接回归必然得到漂亮的 $R^2$；但用它做外推或因果结论会翻车。这也是为什么正文把「外推、伪回归、因果过度解读」并列为三大陷阱。</p>
+
+  <h3>直觉：把「贴得紧」「猜得准」「因为所以」分开</h3>
+  <p>三个动词对应三件不同的事：</p>
+  <ul>
+    <li><strong>拟合（贴得紧）</strong>：这条线离已有数据点近不近。$R^2$ 只回答这个，而且它是<strong>样本内</strong>指标。</li>
+    <li><strong>预测（猜得准）</strong>：换一批没见过的数据，误差还小不小。要看样本外误差 / 交叉验证；$R^2$ 高但残差有结构、或自变量是共同趋势，样本外就会崩。</li>
+    <li><strong>因果（因为所以）</strong>：主动把 $x$ 改一单位，$y$ 会不会跟着变。这需要随机化或可信的识别策略，与拟合优度几乎无关。</li>
+  </ul>
+  <p>一个刺眼的例子：夏天冰淇淋销量与溺水人数高度相关、$R^2$ 很高，因为二者同受「气温」驱动。用冰淇淋销量<strong>预测</strong>溺水人数在历史数据里甚至挺准（共同趋势还在），但若据此<strong>禁止卖冰淇淋来减少溺水</strong>，就是因果误读。可见「能预测」与「能干预」之间还隔着一道坎。</p>
+  <p>再说零相关。相关系数只检测<strong>直线</strong>关系。若 $Y=X^2$ 且 $X$ 在 $[-1,1]$ 上对称分布，$X$ 变大时 $Y$ 先降后升，正的与负的线性倾向正好抵消，$\mathrm{Cov}(X,Y)=0$。可 $Y$ 完全由 $X$ 决定——知道了 $X$ 就知道了 $Y$，这是能再强一点的依赖吗？<strong>零相关只说明「没有线性成分」，不说明「没有关系」。</strong></p>
+
+  <h3>形式化：把两个反例算到底</h3>
+  <div class="formula-box">
+    <div class="f-name">反例 A：零相关但完全依赖（$X\sim U(-1,1)$，$Y=X^2$）</div>
+    $$ \mathrm{Cov}(X,Y)=\mathbb{E}(X^{3})-\mathbb{E}(X)\mathbb{E}(X^{2})=0-0\cdot\frac13=0 \;\Longrightarrow\; \rho_{X,Y}=0 $$
+    $$ \mathbb{E}(Y\mid |X|\lt 0.3)=0.03, \qquad \mathbb{E}(Y\mid |X|\gt 0.7)=0.73 $$
+    <div class="f-note">白话：第一式里 $\mathbb{E}(X^3)=0$（对称区间上奇函数积分为零）、$\mathbb{E}(X)=0$，所以协方差严格为 0、相关系数为 0。但第二式显示：知道 $|X|$ 小，$Y$ 平均只有 $0.03$；知道 $|X|$ 大，$Y$ 平均 $0.73$——相差 24 倍。$Y$ 由 $X$ 完全决定，依赖强得不能再强。同时 $\rho_{|X|,Y}\approx0.97$，说明「换个能看见的形状，相关立刻冒出来」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">反例 B：伪回归——两条独立随机游走</div>
+    $$ X_t=X_{t-1}+\varepsilon_t,\qquad Y_t=Y_{t-1}+\eta_t,\qquad \varepsilon_t,\eta_t\ \text{相互独立} $$
+    $$ \text{水平值回归：}\ R^{2}\ \text{常}\ \gt 0.5,\ \hat\beta\ \text{「极显著」};\qquad \text{一阶差分回归：}\ R^{2}\approx 0 $$
+    <div class="f-note">白话：两条序列毫无关系，只是都随时间累积漂移。水平值把「共同的时间趋势」当成了「$x$ 对 $y$ 的解释」，于是 $R^2$ 虚高、$t$ 值虚大。做一阶差分 $\Delta X_t,\Delta Y_t$ 后只剩独立噪声，$R^2$ 塌回 0。代码实验 [4] 会真实跑出这两个 $R^2$。<strong>识别伪回归的关键动作是「先判断平稳性、做差分看增量关系」，而不是盯着 $R^2$。</strong></div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">预测与因果的分界：系数到底是什么</div>
+    $$ \hat\beta_1=\frac{\mathrm{Cov}(X,Y)}{\mathrm{Var}(X)}, \qquad Y=\beta_0+\beta_1 X+\varepsilon,\qquad \mathbb{E}(\varepsilon\mid X)\ne 0\ \Rightarrow\ \hat\beta_1\ \text{有偏且不一致} $$
+    <div class="f-note">白话：$\hat\beta_1$ 只是「$X$ 与 $Y$ 的协方差 / $X$ 的方差」这个<strong>关联</strong>比值。要把它读成「$X$ 变动 1 单位导致 $Y$ 变动 $\beta_1$」，必须满足外生性 $\mathbb{E}(\varepsilon\mid X)=0$——即没有遗漏变量、没有反向因果、没有选择性偏差。观察数据里这几乎从不可能自动成立，需要随机实验（A/B / RCT）、工具变量、双重差分等识别策略。样本量再大也修不好系统性偏差。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">$R^2$ 与样本外误差的分家</div>
+    $$ R^{2}=1-\frac{\mathrm{SSE}_{\text{train}}}{\mathrm{SST}_{\text{train}}}, \qquad \mathrm{风险}=\mathbb{E}\left[(Y-\hat f(X))^{2}\ \middle|\ \text{新样本}\right] $$
+    <div class="f-note">白话：$R^2$ 分母分子都只用了训练集；风险用的是新样本。往模型里塞任何变量 $R^2$ 都不会下降（正文的调整 $R^2$ 才对变量数罚款），但新样本上的误差可能一路上升——这就是过拟合。评价预测能力必须用验证集 / 交叉验证，不能看训练 $R^2$。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    $R^2$ 只度量「样本内线性拟合的紧密程度」，它<strong>既不保证样本外预测准，也不蕴含因果</strong>：$\rho=0$ 只排除线性关联，$Y=X^2$ 这类确定性依赖照样存在；伪回归与过拟合则让高 $R^2$ 与真实关系彻底脱钩。正确顺序是——先看散点图与残差图、再做样本外验证、最后只有在随机化或可信识别策略下才谈因果；报告时给出系数区间、适用边界与残差诊断，而不是只报一个 $R^2$。
+  </div>
+
+  <p><strong>边界：</strong>在数据来自随机对照实验、$x$ 由实验者主动分配、模型经残差诊断通过且验证集误差稳定的条件下，本结论不成立，应改用回归系数直接解释为处置效应（ceteris paribus 的因果效应），此时高 $R^2$ 配合显著系数确实支持「$x$ 导致 $y$ 变化」；若目标纯粹是样本内插值预测、且已确认序列平稳无共同趋势，高 $R^2$ 也可作为有效的拟合优度报告，不必一律否定。</p>
+
+  <figure class="figure" id="fig-flow-regression-diagnose">
+  <svg class="dia" viewBox="0 0 680 464" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="回归建模与残差诊断闭环"><rect class="dg-box alt" x="190.0" y="34" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="57.0" text-anchor="middle">① 明确响应变量与解释变量</text><text class="dg-ts" x="340.0" y="74.0" text-anchor="middle">先画散点图</text><rect class="dg-box" x="190.0" y="120" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="143.0" text-anchor="middle">② 拟合最小二乘</text><text class="dg-ts" x="340.0" y="160.0" text-anchor="middle">得 β̂ 与 R²</text><line class="dg-edge" x1="340.0" y1="86" x2="340.0" y2="120"/><polygon class="dg-edge" points="340.0,120 336.7379163755234,112.69528847750153 343.2620836244766,112.69528847750153" fill="var(--line-strong)" stroke="none"/><rect class="dg-box warn" x="190.0" y="206" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="229.0" text-anchor="middle">③ 残差诊断</text><text class="dg-ts" x="340.0" y="246.0" text-anchor="middle">线性 / 等方差 / 正态 / 影响点</text><line class="dg-edge" x1="340.0" y1="172" x2="340.0" y2="206"/><polygon class="dg-edge" points="340.0,206 336.7379163755234,198.69528847750152 343.2620836244766,198.69528847750152" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="190.0" y="292" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="315.0" text-anchor="middle">④ 修正模型</text><text class="dg-ts" x="340.0" y="332.0" text-anchor="middle">变换 / 加权 / 稳健回归</text><line class="dg-edge" x1="340.0" y1="258" x2="340.0" y2="292"/><polygon class="dg-edge" points="340.0,292 336.7379163755234,284.69528847750155 343.2620836244766,284.69528847750155" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="190.0" y="378" width="300" height="52" rx="8"/><text class="dg-t" x="340.0" y="401.0" text-anchor="middle">⑤ 交叉验证与报告</text><text class="dg-ts" x="340.0" y="418.0" text-anchor="middle">系数区间 + 适用边界</text><line class="dg-edge" x1="340.0" y1="344" x2="340.0" y2="378"/><polygon class="dg-edge" points="340.0,378 336.7379163755234,370.69528847750155 343.2620836244766,370.69528847750155" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">回归建模与残差诊断闭环</span>
+    <span class="fig-note">拟合后必须回到残差检查；发现异方差 / 非线性 / 强影响点时，需变换或换模型再迭代。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../modules/m06-regression.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+  <figure class="figure-placeholder" id="fig-classic-m06-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 6-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">Anscombe 第 III / IV 组：离群点与高杠杆点如何翻转回归线</span>
+    <span class="fig-note">一组数据仅一个离群点即可把斜率拉成相反符号；另一组中所有 x 几乎相同，单个点决定整条回归线——残差诊断与影响点分析的经典图示。</span>
+    <span class="fig-src">来源：Anscombe (1973) 原图；回归诊断的标准讨论见本站资源库 b05 第 3 章 · 查看：<a href="https://www.statlearning.com/" target="_blank" rel="noopener">https://www.statlearning.com/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 普通最小二乘（正规方程）</h2>
+
+<div class="algo-spec">
+
+  <h3>原理：最小化残差平方和，把「拟合」变成一个可解的方程组</h3>
+  <p>给定 $n$ 对观测 $(x_i,y_i)$，简单线性回归设 $y_i=\beta_0+\beta_1 x_i+\varepsilon_i$。最小二乘选择 $(\beta_0,\beta_1)$ 使残差平方和最小：</p>
+  <div class="formula-box">
+    <div class="f-name">目标函数与正规方程（矩阵版）</div>
+    $$ \min_{\beta}\ \mathrm{SSE}(\beta)=\sum_{i=1}^{n}\left(y_i-\mathbf{x}_i^{\top}\beta\right)^{2}=\|\mathbf{y}-\mathbf{X}\beta\|_2^{2} $$
+    $$ \nabla_{\beta}\mathrm{SSE}=-2\mathbf{X}^{\top}(\mathbf{y}-\mathbf{X}\beta)=0 \;\Longrightarrow\; \mathbf{X}^{\top}\mathbf{X}\hat\beta=\mathbf{X}^{\top}\mathbf{y} $$
+    <div class="f-note">白话：把 $\mathrm{SSE}$ 对参数向量求导并令其为 0（$\mathrm{SSE}$ 是开口向上的二次函数，驻点即最小点），得到正规方程。$\mathbf{X}^{\top}\mathbf{X}$ 是 $(p+1)\times(p+1)$ 方阵，$\mathbf{X}^{\top}\mathbf{y}$ 是 $(p+1)$ 维向量，解一个线性方程组即可，无需迭代——这是 OLS 与逻辑回归最本质的差别。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">简单回归的闭式解（$p=1$ 时把 $2\times2$ 逆展开）</div>
+    $$ \hat\beta_1=\frac{S_{xy}}{S_{xx}}=\frac{\sum (x_i-\bar x)(y_i-\bar y)}{\sum (x_i-\bar x)^{2}}, \qquad \hat\beta_0=\bar y-\hat\beta_1\bar x, \qquad R^{2}=\frac{S_{xy}^{2}}{S_{xx}S_{yy}} $$
+    <div class="f-note">白话：分子 $S_{xy}$ 是 $x,y$ 的「同涨同跌」程度，分母 $S_{xx}$ 是 $x$ 自己的波动；两者相除就是「$x$ 每动 1 单位，$y$ 平均动多少」。$R^2$ 等于相关系数 $r$ 的平方，故也可用 $\hat\beta_1=r\,s_y/s_x$ 与 $R^2=r^2$ 从汇总统计量直接算出——下面手算就走这条路。</div>
+  </div>
+  <p>几何解释：$\mathbf{X}\hat\beta$ 是 $\mathbf{y}$ 在 $\mathbf{X}$ 列空间上的<strong>正交投影</strong>，残差向量 $\mathbf{e}=\mathbf{y}-\mathbf{X}\hat\beta$ 与每一列都垂直（这正是 $\mathbf{X}^{\top}\mathbf{e}=0$，即正规方程）。$R^2$ 就是「投影长度平方 / 原向量长度平方」。</p>
+
+  <h3>编号步骤：照着做一遍就会</h3>
+  <ol>
+    <li><strong>整理数据。</strong>写出 $n$ 对 $(x_i,y_i)$，画散点图确认大体线性；确定响应变量 $y$ 与解释变量 $x$。</li>
+    <li><strong>构造设计矩阵。</strong>$\mathbf{X}$ 第一列全为 1（截距），第二列为 $x$；多元时每自变量一列。检查是否列满秩（见深度专题一）。</li>
+    <li><strong>算五个汇总量。</strong>$\bar x,\ \bar y,\ S_{xx},\ S_{xy},\ S_{yy}$（或等价地 $\sum x,\sum y,\sum x^2,\sum xy$）。</li>
+    <li><strong>解正规方程。</strong>$p=1$ 时代入 $\hat\beta_1=S_{xy}/S_{xx}$、$\hat\beta_0=\bar y-\hat\beta_1\bar x$；多元时解 $(\mathbf{X}^{\top}\mathbf{X})\hat\beta=\mathbf{X}^{\top}\mathbf{y}$（高斯消元或 Cholesky，不显式求逆更稳）。</li>
+    <li><strong>算拟合优度。</strong>$\mathrm{SSE}=\sum(y_i-\hat y_i)^2$、$\mathrm{SST}=S_{yy}$、$R^2=1-\mathrm{SSE}/\mathrm{SST}$，并算调整 $R^2$。</li>
+    <li><strong>残差诊断。</strong>画 $e_i$ 对 $\hat y_i$ 的图：查 U 形（非线性）、喇叭口（异方差）、孤立点（影响点）。诊断不过就回到第 1 步换模型。</li>
+    <li><strong>报告与边界。</strong>给出系数、标准误、区间、$R^2$ 与适用 $x$ 范围；明确「关联 ≠ 因果」、禁止样本范围外外推。</li>
+  </ol>
+
+  <h3>适用条件</h3>
+  <ul>
+    <li>数据：$n$ 对独立观测，$y$ 为连续量；$x$ 可为连续或 0/1 编码。</li>
+    <li>假设：线性于参数、随机抽样、无完全共线性、同方差、无自相关、外生性 $\mathbb{E}(\varepsilon\mid x)=0$（高斯—马尔可夫六条）。</li>
+    <li>规模：$n \gt p+1$ 且 $\mathbf{X}^{\top}\mathbf{X}$ 条件数不过大；$p\ge n$ 时必须改用正则化。</li>
+    <li>特征类型：数值型；类别变量需先做哑变量编码（注意别落下「虚拟变量陷阱」造成完全共线性）。</li>
+    <li>工程位置：位于「特征工程 → 建模拟合 → 残差诊断 → 上线预测」链条的建模环节；上游是数据清洗与特征构造，下游是系数解释、样本外评估与监控漂移。</li>
+  </ul>
+
+  <div class="complexity">
+    <span><b>训练（拟合）</b>：时间 $O(np^{2}+p^{3})$，空间 $O(np+p^{2})$</span>
+    <span><b>推理（单个预测）</b>：时间 $O(p)$，空间 $O(p)$</span>
+    <span><b>$p=1$ 特例</b>：训练 $O(n)$、空间 $O(1)$、推理 $O(1)$</span>
+  </div>
+  <p>说明：构造 $\mathbf{X}^{\top}\mathbf{X}$ 需 $O(np^2)$，解 $p+1$ 阶线性方程组需 $O(p^3)$；存 $\mathbf{X}$ 需 $O(np)$、存方阵需 $O(p^2)$。简单回归 $p=1$ 时只剩一次遍历累加（$O(n)$ 时间、$O(1)$ 空间），这正是它能手算、能嵌进边缘设备的原因。工程上通常<strong>不显式求逆</strong>而用 QR / Cholesky 分解，数值更稳（与深度专题一的条件数呼应）。梯度下降等迭代法在 $p$ 极大时更划算，但那是 AI 章节的内容。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>有闭式解，无需迭代、无需调学习率，结果确定可复现。</li>
+        <li>在六条假设下是 BLUE（最佳线性无偏估计），统计性质完备。</li>
+        <li>系数、$R^2$、区间都有清晰解释，可直接做推断与报告。</li>
+        <li>计算极轻，纯标准库几行即可实现，是所有回归方法的基准。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>缺点</h4>
+      <ul>
+        <li>外生性一旦违背（遗漏变量、反向因果），系数有偏且样本量救不回来。</li>
+        <li>对异常点、异方差、非线性敏感；平方损失放大离群点的话语权。</li>
+        <li>$\mathbf{X}^{\top}\mathbf{X}$ 接近奇异时系数爆炸、符号翻转；$p\ge n$ 时无唯一解。</li>
+        <li>只拟合线性（于参数）关系，且只在样本 $x$ 范围内可靠，外推危险。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>示例推演：用贯穿案例的汇总统计量手算到底（学习时长 → 测验均分）</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span> 知学云案例 $n=12000$，$x=$ 每周学习分钟数、$y=$ 测验均分。共享汇总量（与 <code>case-outputs.txt</code> 一致）：$\bar x=95.2964$、$s_x=43.4274$、$\bar y=79.7574$、$s_y=14.5763$、$r=0.4792$；共享 OLS 结果为 $\hat\beta_0=64.4306$、$\hat\beta_1=0.160833$、$R^2=0.2296$。</div>
+    <div class="solve-step"><span class="ss-k">选公式。</span> $p=1$，直接走闭式解；由 $\hat\beta_1=r\,\dfrac{s_y}{s_x}$ 可从汇总量一步得到斜率，避免展开 12000 行（正规方程与它完全等价）。</div>
+    <div class="solve-step"><span class="ss-k">算斜率。</span> $\dfrac{s_y}{s_x}=\dfrac{14.5763}{43.4274}=0.33565$；$\hat\beta_1=0.4792\times0.33565=0.16083\overline{3}$。即每周多学 1 分钟，测验分平均高约 $0.161$ 分；多学 100 分钟约高 $16.1$ 分。</div>
+    <div class="solve-step"><span class="ss-k">算截距。</span> $\hat\beta_0=\bar y-\hat\beta_1\bar x=79.7574-0.160833\times95.2964=79.7574-15.3268=64.4306$。拟合线必过 $(\bar x,\bar y)$，这正是第一步正规方程 $\sum y_i=n\beta_0+\beta_1\sum x_i$ 的结论。</div>
+    <div class="solve-step"><span class="ss-k">算 $R^2$。</span> $R^2=r^2=0.4792^2=0.22963\approx0.2296$。即学习时长解释了测验分约 $23\%$ 的波动，剩下 $77\%$ 来自其他因素与噪声——<strong>这不低，但也远不等于「学习时长决定成绩」</strong>。</div>
+    <div class="solve-step"><span class="ss-k">用矩阵式独立核对。</span> 记 $S_{11}=n$、$S_{1x}=\sum x_i=n\bar x=1\,143\,556.8$、$S_{xx}=\sum x_i^2-n\bar x^2$、$S_{1y}=\sum y_i=n\bar y=957\,088.8$、$S_{xy}=\sum x_iy_i-n\bar x\bar y$，则 $\det=S_{11}S_{xx}-S_{1x}^2$，$\hat\beta_1=\dfrac{S_{11}S_{xy}-S_{1x}S_{1y}}{\det}$、$\hat\beta_0=\dfrac{S_{xx}S_{1y}-S_{1x}S_{xy}}{\det}$。代码实验 [1] 会按这个 $2\times2$ 逆真算一遍并打印 $\mathbf{X}^{\top}\mathbf{X}$ 与 $\det$，结果与上面完全一致。</div>
+    <div class="solve-step"><span class="ss-k">做一次预测并解释边界。</span> $x=150$ 分钟时 $\hat y=64.4306+0.160833\times150=88.56$ 分。$x=0$ 时截距给 $64.43$ 分，但样本里学习时长最小接近 0、且「完全不学」是否线性成立存疑，截距属于<strong>外推产物</strong>，不宜赋予业务解释。</div>
+    <div class="solve-step"><span class="ss-k">诊断与克制。</span> $R^2=0.2296$ 属中等偏低，需查残差图是否 U 形（学时与分数可能非线性）、是否喇叭口（高分端方差更小）。更要把住因果关：这是<strong>观察数据</strong>，学习时长与测验分同受「学习动机、基础水平」驱动，$\hat\beta_1$ 是关联不是「多学 1 分钟就能提分」的处置效应——要因果结论需随机分配学时的实验。</div>
+  </div>
+
+  <h3>横向对比：拟合一条线的四类方法</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>维度</th><th class="best">OLS 正规方程（本算法）</th><th>岭回归（Ridge）</th><th>梯度下降求解</th><th>稳健回归（Huber / 中位数）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td class="best">列满秩、$n \gt p$、六条经典假设成立</td>
+        <td>共线性严重或 $p\ge n$、需稳定系数</td>
+        <td>$p$ 极大、数据无法一次装入内存</td>
+        <td>含异常点、误差重尾、平方损失被少数点绑架</td>
+      </tr>
+      <tr>
+        <th>时间与空间复杂度</th>
+        <td class="best">训练 $O(np^2+p^3)$、推理 $O(p)$；$p=1$ 时 $O(n)$ / $O(1)$</td>
+        <td>与 OLS 同阶，多一个 $\lambda$ 的一维搜索（交叉验证）</td>
+        <td>每轮 $O(np)$，轮数不定；空间 $O(p)$ 起，可小批量</td>
+        <td>迭代重加权，每轮 $O(np)$，轮数多于 OLS</td>
+      </tr>
+      <tr>
+        <th>关键超参数</th>
+        <td class="best">无（闭式解），不需调参</td>
+        <td>$\lambda\ge0$（由交叉验证选）、是否标准化特征</td>
+        <td>学习率、迭代轮数、批量大小、初始化</td>
+        <td>稳健损失的分界常数（Huber $\delta$）</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">一次算完、确定可复现、假设下为 BLUE、解释最完整</td>
+        <td>矩阵必定可逆、系数稳定、对共线性免疫</td>
+        <td>可扩展到海量特征与在线学习，是深度学习的基础</td>
+        <td>极端值不主导结果，重尾数据下更可信</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td class="best">$\mathbf{X}^{\top}\mathbf{X}$ 奇异 / 近奇异、外生性违背、异方差、异常点时失效，应改用岭、稳健回归或因果识别策略</td>
+        <td>引入偏差、系数不再无偏；$\lambda$ 选错会欠拟合或仍不稳定</td>
+        <td>需调参、可能不收敛、结果依赖初始化与随机种子</td>
+        <td>损失非凸时求解更难；效率略低于正态误差下的 OLS</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td class="best">系数 / 区间 / $R^2$ 一套现成语言，纯标准库即可落地</td>
+        <td>需解释「偏差换稳定」，多一步 $\lambda$ 选择</td>
+        <td>黑箱程度高，工程链路（优化器、调度）最重</td>
+        <td>需向业务解释「为什么不用平方损失」，诊断成本略高</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>选择规则：先跑 OLS 作基准并做残差诊断；VIF / 条件数报警则上岭回归；异常点多则换稳健损失；$p$ 大到装不进内存才用梯度下降。<strong>无论选哪个，散点图、残差图与样本外验证都不能省</strong>——这是深度专题二的结论在算法层的落地。</p>
+</div>
+
+<h2 id="d-code">代码实验 · 手算正规方程、看 $\mathbf{X}^{\top}\mathbf{X}$ 奇异、证零相关不独立</h2>
+
+<div class="code-lab">
+  <div class="cl-head">
+    <span class="cl-lang">Python 3 · 纯标准库</span>
+    <span>实验：OLS 正规方程 / 共线性与岭 / 零相关不独立 / 伪回归</span>
+    <span class="cl-grow"></span>
+    <span>固定种子 20261107 · 可复现</span>
+  </div>
+  <pre>__PY_CODE__</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout，逐字粘贴自 Bash 执行结果）</div>
+    <pre>__PY_OUTPUT__</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">[1] 真实数据 OLS</span>程序用与 <code>case-data.py</code> 完全相同的固定种子与生成顺序重建 12000 行数据，再用 $2\times2$ 的 $\mathbf{X}^{\top}\mathbf{X}$ 求逆解正规方程。<code>intercept</code> $=64.4306$、<code>slope</code> $=0.160833$、<code>R2</code> $=0.2296$ 与 <code>case-outputs.txt</code> 的共享数字逐位吻合；<code>shortcut</code> 一行用 $\hat\beta_1=r\,s_y/s_x$、$R^2=r^2$ 独立核对，同样对上，说明 <code>step-solve</code> 的两条路径等价。<code>det(X'X)</code> 是一个很大的正数（约 $10^{11}$ 量级），说明这份数据里 $\mathbf{X}^{\top}\mathbf{X}$ 远不奇异，OLS 可逆条件满足。</p>
+    <p><span class="ci-k">[2] 共线性与岭</span>设计矩阵取 $[1,\ x,\ 2x]$ 时第三列是第二列的 2 倍，<code>det(OLS)</code> 精确为 0，正规方程无唯一解（程序不强行求逆，只报行列式）；把第三列改成 $2x+10^{-3}(-1)^i$ 后行列式变成一个很小但非零的数，<code>beta</code> 立刻出现几百量级的系数并正负成对——这就是 VIF 与条件数报警时「系数乱跳」的真身。加上 $\lambda=1$ 的岭（只惩罚两个斜率、不罚截距）后，<code>det(ridge)</code> 变大、<code>beta_ridge</code> 回到温和量级且符号一致，直观验证了「垫高特征值 $\Rightarrow$ 逆存在、解稳定」。</p>
+    <p><span class="ci-k">[3] 零相关不独立</span>$X\sim U(-1,1)$、$Y=X^2$，<code>corr(X, X^2)</code> 接近 0（蒙特卡洛误差内），但 <code>corr(|X|, X^2)</code> 接近 $0.97$；<code>E[Y | |X| small]</code> 约 $0.03$ 而 <code>E[Y | |X| large]</code> 约 $0.73$，相差 20 倍以上。<strong>$Y$ 完全由 $X$ 决定，相关系数却测不出任何线性关联</strong>——深度专题二反例 A 的数值版。</p>
+    <p><span class="ci-k">[4] 伪回归</span>两条相互独立的随机游走，<code>levels</code> 回归的 $R^2$ 很高（共同趋势被当成解释力），而对一阶差分做回归后 <code>diffs</code> 的 $R^2$ 塌回接近 0。这正是「先判断平稳性、做差分看增量关系」能识别伪回归的实证，也说明高 $R^2$ 既不代表能预测、更不代表有因果。</p>
+    <p><span class="ci-k">何时会变</span>把 [1] 的 $x$ 换成一列常数，$S_{xx}=0$、行列式为 0，斜率无法估计（正文「$x$ 必须有变化」）；把 [2] 的 $\lambda$ 从 1 增到 100，系数继续被压向 0、偏差变大但更稳；把 [4] 的序列换成平稳白噪声，水平值 $R^2$ 也会接近 0，伪回归消失。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr>
+      <th>功能说明</th>
+      <td>解正规方程 $\mathbf{X}^{\top}\mathbf{X}\hat\beta=\mathbf{X}^{\top}\mathbf{y}$，得到线性模型的系数、拟合值与 $R^2$，并给出共线性 / 条件数 / 残差诊断的判据。<strong>做</strong>：样本内线性拟合、关联度量、系数区间与显著性所需的点估计。<strong>不做</strong>：不证明因果、不保证样本外预测准、不处理 $\mathbf{X}^{\top}\mathbf{X}$ 奇异（须交给岭 / Lasso）。</td>
+    </tr>
+    <tr>
+      <th>输入 / 输出</th>
+      <td>输入：设计矩阵 $\mathbf{X}\in\mathbb{R}^{n\times(p+1)}$（首列全 1）与响应 $\mathbf{y}\in\mathbb{R}^{n}$；$x,y$ 量纲各自保留（本例为「分钟」与「分」）。输出：系数向量 $\hat\beta$（量纲为「$y$ 单位 / $x$ 单位」，截距为 $y$ 单位）、拟合值、残差、无量纲的 $R^2$。</td>
+    </tr>
+    <tr>
+      <th>适用场景</th>
+      <td>连续响应变量的关联建模与基线预测：学习时长 → 测验分、广告投入 → 销量、特征 → 房价；也作为所有更复杂模型（正则化、广义线性模型、神经网络）的对照基准与教学起点。</td>
+    </tr>
+    <tr>
+      <th>关键参数</th>
+      <td><code>p</code>（自变量个数，影响复杂度与自由度）、<code>intercept</code>（是否含截距，默认含；去掉则拟合线被强行过原点）、<code>center/scale</code>（是否标准化，岭回归前必须做）、<code>rank_tol</code>（判定列满秩的阈值）。OLS 本身<strong>没有可调超参</strong>；共线时需引入岭的 <code>lambda</code>（由交叉验证选）。</td>
+    </tr>
+    <tr>
+      <th>边界条件</th>
+      <td>在 $\mathbf{X}^{\top}\mathbf{X}$ 奇异（完全共线性、$p\ge n$、虚拟变量陷阱）时不适用，应改用岭回归、Lasso、弹性网或主成分回归；在残差呈 U 形 / 喇叭口 / 自相关时系数区间与显著性不可信，应改用变量变换、加权最小二乘或稳健标准误；在需要因果结论时应改用随机实验、工具变量或双重差分；在样本 $x$ 范围之外应改用标注为不可靠的外推，或干脆不预测。</td>
+    </tr>
+    <tr>
+      <th>常见问题</th>
+      <td>① 把高 $R^2$ 当成「模型对 / 有因果」；② 见单个系数不显著就断言「该变量没用」（其实是共线性导致说不清）；③ 把相关系数为 0 当成「两者独立」；④ 忽略残差图直接汇报 $p$ 值。详见下方常见问题。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details>
+    <summary>$\mathbf{X}^{\top}\mathbf{X}$ 不可逆时，软件为什么还能给出一个解？</summary>
+    <div class="faq-a">多数库不会真的求逆，而是用伪逆（Moore–Penrose）或 QR 分解，在无穷多组解里挑「系数长度最小」的那一组。它数值上能算，但<strong>没有统计上的唯一可解释性</strong>：换一批样本、换一个特征编码，系数就全变。正确做法是先查 VIF 与条件数，删冗余列、合并特征，或改用岭回归 $(\mathbf{X}^{\top}\mathbf{X}+\lambda\mathbf{I})^{-1}$ 让矩阵必定可逆。</div>
+  </details>
+  <details>
+    <summary>共线性让某个系数不显著，能不能删掉这个变量？</summary>
+    <div class="faq-a">不能仅凭 $t$ 值下结论。共线性放大的是<strong>方差与标准误</strong>，系数的期望值仍无偏；「不显著」是「说不清」而不是「没有作用」（正文 VIF 例题里 $x_1$ 标准误从 $0.039$ 膨胀到 $0.156$ 就是这个现象）。先看整体 $F$ 检验是否显著、VIF 是否超 5 / 10，再决定删冗余、合并变量还是上岭回归，并报告删 / 不删两套结果做敏感性分析。</div>
+  </details>
+  <details>
+    <summary>$R^2=0.90$ 是不是就能放心拿去预测和解释？</summary>
+    <div class="faq-a">都不能只靠它。$R^2$ 是样本内拟合指标，往模型里塞任何变量都不会下降；伪回归（两条独立随机游走）、过拟合、共同趋势都能造出虚高的 $R^2$。预测要看验证集 / 交叉验证误差，解释要看残差图、系数区间、以及是否满足外生性；因果还需要随机化或识别策略。代码实验 [4] 里水平值 $R^2$ 很高、差分后塌回 0，就是最直接的警告。</div>
+  </details>
+  <details>
+    <summary>相关系数为 0，为什么说两者还可能强依赖？</summary>
+    <div class="faq-a">因为 $\rho$ 只检测<strong>线性</strong>成分。取 $X\sim U(-1,1)$、$Y=X^2$，由对称性 $\mathrm{Cov}(X,Y)=\mathbb{E}(X^3)=0$，故 $\rho=0$；但 $Y$ 完全由 $X$ 决定，且代码实验 [3] 显示 $\mathbb{E}(Y\mid |X|\lt0.3)\approx0.03$、$\mathbb{E}(Y\mid|X|\gt0.7)\approx0.73$、$\rho_{|X|,Y}\approx0.97$。对策：永远先画散点图；需要检测一般依赖时用互信息、距离相关或基于残差的非线性诊断。</div>
+  </details>
+  <details>
+    <summary>回归系数 $0.160833$ 能写成「多学 1 分钟，成绩提高 0.16 分」吗？</summary>
+    <div class="faq-a">要加限定词：「在数据与模型条件下，每周学习时长每多 1 分钟，测验均分<strong>平均</strong>高约 0.16 分」，且这是<strong>关联</strong>不是因果。观察数据里学习时长与测验分同受学习动机、基础水平驱动，$\mathbb{E}(\varepsilon\mid x)=0$ 未必成立；真正问「逼人多学 1 分钟能提几分」需要随机分配学时。措辞里出现「导致」「提升」「只要…就」都要先自检三连：有没有混杂？时间先后对吗？$x,y$ 对调还说得通吗？</div>
+  </details>
+  <details>
+    <summary>截距 $64.4306$ 有什么业务含义？</summary>
+    <div class="faq-a">数学上是 $x=0$ 时的拟合值，且保证直线穿过 $(\bar x,\bar y)$；业务上往往是<strong>外推产物</strong>。本例样本学习时长从接近 0 到 273 分钟，「完全不学」是否在样本范围内、线性关系在低端是否仍成立都存疑，因此不宜把 $64.43$ 解释成「零学习的基础分」。正文第 8 节把它列为三大陷阱之一：解释截距前先问「$x=0$ 有意义吗？数据覆盖它吗？」。</div>
+  </details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测 · 可逆性、$R^2$ 与依赖</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$\hat\beta=(\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}$ 要求 $\mathbf{X}^{\top}\mathbf{X}$ 可逆，等价于下列哪一条？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q1" value="A"> A. 样本量 $n$ 大于 30</label>
+      <label class="quiz-opt"><input type="radio" name="m06q1" value="B"> B. $\mathbf{X}$ 列满秩，即自变量之间无完全共线性</label>
+      <label class="quiz-opt"><input type="radio" name="m06q1" value="C"> C. 残差服从正态分布</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$(\mathbf{X}^{\top}\mathbf{X})^{-1}$ 存在 $\Leftrightarrow$ $\mathrm{rank}(\mathbf{X}^{\top}\mathbf{X})=p+1$ $\Leftrightarrow$ $\mathbf{X}$ 列满秩（无完全共线性，且 $n\ge p+1$）。残差正态性只影响小样本推断，不影响矩阵可逆；$n\ge30$ 是 CLT 的经验值，与此无关。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">设计矩阵含一列 $x$ 与一列 $2x$，会发生什么？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q2" value="A"> A. $R^2$ 一定变成 0</label>
+      <label class="quiz-opt"><input type="radio" name="m06q2" value="B"> B. OLS 仍能给出唯一且稳定的系数</label>
+      <label class="quiz-opt"><input type="radio" name="m06q2" value="C"> C. $\det(\mathbf{X}^{\top}\mathbf{X})=0$，有无穷多组等价解；应删冗余列或改用岭回归</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$2x$ 是 $x$ 的线性倍数，列线性相关，$\mathbf{X}^{\top}\mathbf{X}$ 有零特征值、行列式为 0。$\beta_1 x+\beta_2(2x)$ 可任意在两列之间挪动而拟合值不变，故解不唯一。代码实验 [2] 把这个行列式算成 0，再用 $\lambda=1$ 的岭把系数拉回稳定量级。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">岭回归 $(\mathbf{X}^{\top}\mathbf{X}+\lambda\mathbf{I})^{-1}\mathbf{X}^{\top}\mathbf{y}$ 为什么能让矩阵必定可逆？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q3" value="A"> A. 每个特征值都被加上 $\lambda\gt0$，最小特征值不再为 0，条件数下降</label>
+      <label class="quiz-opt"><input type="radio" name="m06q3" value="B"> B. 它把样本量 $n$ 变大了</label>
+      <label class="quiz-opt"><input type="radio" name="m06q3" value="C"> C. 它删除了所有相关的自变量</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mathbf{X}^{\top}\mathbf{X}$ 半正定，特征值 $\lambda_j\ge0$；加上 $\lambda\mathbf{I}$ 后变为 $\lambda_j+\lambda\ge\lambda\gt0$，全部严格为正，矩阵正定必可逆，且 $\kappa_{\text{ridge}}=(\lambda_{\max}+\lambda)/(\lambda_{\min}+\lambda)\lt\kappa$。代价是引入偏差、不再无偏。B、C 都不是岭的机制。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$X\sim U(-1,1)$、$Y=X^{2}$，则 $\mathrm{Corr}(X,Y)$ 与两者的依赖关系是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q4" value="A"> A. 相关系数为 1，完全线性相关</label>
+      <label class="quiz-opt"><input type="radio" name="m06q4" value="B"> B. 相关系数为 0，但 $Y$ 完全由 $X$ 决定（强依赖）</label>
+      <label class="quiz-opt"><input type="radio" name="m06q4" value="C"> C. 相关系数为 0，且 $X$ 与 $Y$ 相互独立</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：由对称性 $\mathrm{Cov}(X,Y)=\mathbb{E}(X^3)-\mathbb{E}(X)\mathbb{E}(X^2)=0$，故 $\rho=0$；但 $Y=X^2$ 是确定性函数关系，代码实验 [3] 中 $\mathbb{E}(Y\mid|X|\lt0.3)\approx0.03$ 与 $\mathbb{E}(Y\mid|X|\gt0.7)\approx0.73$ 相差 20 多倍，且 $\rho_{|X|,Y}\approx0.97$。零相关只排除线性关联，不等于独立。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">贯穿案例 OLS 给出 $\hat\beta_1=0.160833$、$R^2=0.2296$。下列哪句最克制、最正确？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m06q5" value="A"> A. 每周多学 1 分钟，成绩就会提高 0.16 分</label>
+      <label class="quiz-opt"><input type="radio" name="m06q5" value="B"> B. $R^2$ 只有 0.23，说明学习时长与成绩无关</label>
+      <label class="quiz-opt"><input type="radio" name="m06q5" value="C"> C. 学习时长与测验分呈中等正相关，解释了约 23% 的波动；系数是关联而非因果，且需查残差与样本外表现</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：A 把关联写成因果且丢了「平均」；B 把中等 $R^2$ 误读成「无关」（$r=0.4792$，相关性并不弱）。C 同时给了方向、大小、解释比例与边界：观察数据存在混杂、残差可能非线性、样本外未必稳定。这正是「拟合 / 预测 / 因果」三分法要求的克制表述。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+<h2 id="d-figures">本章图示汇总</h2>
+<figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s9">9 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>用以下 4 组数据手算 $\hat{\beta}_1$、$\hat{\beta}_0$，写出拟合方程，并预测 $x=4$ 时的 $\hat{y}$：<br>
+            $(x,y)$：$(1,2)$，$(2,3)$，$(3,5)$，$(4,6)$。</li>
+          <li>某模型 $R^2 = 0.92$。请给出三种「$R^2$ 很高但结论仍不可信」的情形，并各用一句话说明原因。</li>
+          <li>残差图显示：残差随 $\hat{y}$ 增大呈喇叭口状扩散。诊断违背了哪条假设？有什么危害？给出两种处理办法。</li>
+          <li>多元回归中，自变量 $x_j$ 对其余自变量回归的 $R_j^2 = 0.8$。计算 $\mathrm{VIF}_j$，并说明它意味着什么、按经验阈值该如何处理。</li>
+          <li>逻辑回归输出 $P(Y=1 \mid x) = \dfrac{1}{1 + e^{-(\beta_0 + \beta_1 x)}}$，其中 $\beta_0 = -1$，$\beta_1 = 0.2$。（a）求 $x = 5$ 时的概率；（b）求优势比并解释；（c）为什么不能说「$x$ 每加 1，购买概率增加 $0.2$」？</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> $\bar{x}=2.5$，$\bar{y}=4$。$S_{xy} = (-1.5)(-2) + (-0.5)(-1) + (0.5)(1) + (1.5)(2) = 3+0.5+0.5+3 = 7$；
+            $S_{xx} = 2.25+0.25+0.25+2.25 = 5$。$\hat{\beta}_1 = 7/5 = 1.4$，$\hat{\beta}_0 = 4 - 1.4 \times 2.5 = 0.5$。
+            拟合方程 $\hat{y} = 0.5 + 1.4x$；$x=4$ 时 $\hat{y} = 0.5 + 5.6 = 6.1$。</p>
+            <p><strong>2.</strong> 示例：① <strong>伪回归</strong>——两条独立上涨的时间序列共享趋势，$R^2$ 虚高；
+            ② <strong>过拟合</strong>——自变量过多，训练集 $R^2$ 高但样本外崩溃；
+            ③ <strong>因果误读</strong>——$R^2$ 只说明关联紧密，无法排除混杂（广告与销量同受旺季驱动）。
+            另外 $R^2$ 高也可能掩盖异方差/异常点，仍需看残差图。</p>
+            <p><strong>3.</strong> 违背<strong>同方差假设（假设 4）</strong>。危害：系数仍近似无偏，但标准误估计失真 → t 检验、置信区间不可信（可能把不显著的判成显著）。
+            处理：① 对 $y$ 做对数变换压缩方差；② 使用加权最小二乘或<strong>稳健标准误</strong>（异方差一致标准误）。</p>
+            <p><strong>4.</strong> $\mathrm{VIF}_j = \dfrac{1}{1 - 0.8} = 5$。意味着 $x_j$ 有 80% 的波动可被其他自变量解释，系数方差被放大到 5 倍（标准误放大到 $\sqrt{5}\approx 2.24$ 倍）。
+            按经验阈值属于「需警惕」（&gt; 5）：应检查是否与其他变量冗余，考虑剔除/合并变量，或改用岭回归。</p>
+            <p><strong>5.</strong> （a）$z = -1 + 0.2 \times 5 = 0$，$p = \dfrac{1}{1 + e^{0}} = 0.5$。
+            （b）$\mathrm{OR} = e^{0.2} \approx 1.22$：$x$ 每增加 1 单位，购买<strong>几率</strong>约变为 1.22 倍。
+            （c）逻辑回归中概率与 $x$ 是非线性（S 形）关系，$p$ 的变化量随 $x$ 水平不同而不同；$\beta_1$ 作用在<strong>对数几率</strong>上，不是概率的加法。$0.2$ 是「对数几率的增量」，不是概率增量。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 10 ===== -->
+      <h2 id="s10">10 · 本章小结</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>主题</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>简单线性回归</td><td>$y=\beta_0+\beta_1 x+\varepsilon$；拟合直线过 $(\bar{x},\bar{y})$</td></tr>
+            <tr><td>最小二乘</td><td>最小化 SSE；求导得正规方程 $\hat{\beta}_1=S_{xy}/S_{xx}$，$\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$</td></tr>
+            <tr><td>高斯-马尔可夫</td><td>六条假设下 OLS 是 BLUE；假设 4/5 违背伤标准误，假设 6 违背伤无偏性</td></tr>
+            <tr><td>解释与诊断</td><td>$\beta_1$ 是「平均变化」而非因果；$R^2$ 会骗人，调整 $R^2$ 对变量数罚款；残差图是听诊器</td></tr>
+            <tr><td>多元回归</td><td>$\hat{\beta}=(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$；VIF 诊断多重共线性；AIC/BIC 与逐步回归选变量</td></tr>
+            <tr><td>逻辑回归</td><td>sigmoid 压缩进 $(0,1)$；logit 线性；MLE = 最小化交叉熵（无闭式解）；OR $=e^{\beta_1}$</td></tr>
+            <tr><td>正则化</td><td>岭（L2）缩系数，Lasso（L1）产稀疏；L2=高斯先验、L1=拉普拉斯先验；弹性网兼顾</td></tr>
+            <tr><td>三大陷阱</td><td>外推、伪回归、因果过度解读</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：回归建模。</strong>用学习时长回归测验分；讨论线性概率模型的越界问题与逻辑回归的引入。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="current" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning（第 1 版）</a> <span class="muted small">（2013 · 已核验）</span><span class="fr-why">为什么读：ISLR 第 3 章线性回归：系数解释、共线性与交互项。</span></span></div><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://hastie.su.domains/ElemStatLearn/" target="_blank" rel="noopener">The Elements of Statistical Learning（第 2 版）</a> <span class="muted small">（2009 · 权威共识）</span><span class="fr-why">为什么读：ESL 第 3 章给出岭回归 / Lasso 与最小二乘的统一视角。</span></span></div><div class="fr-item"><span class="fr-tag">理论</span><span class="fr-body"><a href="../resources.html#r-t02">最小二乘法</a> <span class="muted small">（1805 · 权威共识）</span><span class="fr-why">为什么读：最小二乘法里程碑条目，说明其历史与高斯–马尔可夫条件。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div class="muted small">继续学习下一章，或标记本章完成以记录进度。</div>
+        <button class="btn primary" data-complete-btn="m06">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m05-inference.html"><span class="dir">← 上一篇</span><span class="ttl">05 · 统计推断：估计与检验</span></a>
+        <a class="next" href="m07-bayesian.html"><span class="dir">下一篇 →</span><span class="ttl">07 · 贝叶斯统计与计算</span></a>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索概念、公式、例题…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索章节、概念、公式或例题。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

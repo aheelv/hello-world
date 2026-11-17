@@ -1,0 +1,129 @@
+/* ==========================================================================
+   tokens.css — 设计令牌（Design Tokens）
+   通用学习网站模板的唯一视觉真源。更换主题时只需修改本文件。
+   适用于：统计分析 / 大数据 / 人工智能 等任意方向的学习网站。
+   ========================================================================== */
+
+:root {
+  /* ---------- 品牌色（Brand） ---------- */
+  --brand-h: 222;                 /* 色相 */
+  --brand-s: 73%;
+  --brand-l: 42%;
+  --brand:        hsl(var(--brand-h) var(--brand-s) var(--brand-l));
+  --brand-strong: hsl(var(--brand-h) var(--brand-s) 34%);
+  --brand-soft:   hsl(var(--brand-h) 70% 96%);
+  --brand-line:   hsl(var(--brand-h) 60% 88%);
+  --brand-on:     #ffffff;
+
+  /* ---------- 强调色 ---------- */
+  --accent:       #0f766e;        /* 青绿：章节 / 进阶 */
+  --accent-soft:  #e6f4f2;
+  --warn:         #b45309;        /* 橙：注意 / 易错 */
+  --warn-soft:    #fef4e6;
+  --danger:       #b91c1c;        /* 红：警告 */
+  --danger-soft:  #fdecec;
+  --ok:           #15803d;        /* 绿：重点 / 正确 */
+  --ok-soft:      #e8f6ec;
+  --info:         #1d4ed8;        /* 蓝：例题 / 提示 */
+  --info-soft:    #e8eefc;
+
+  /* ---------- 中性色（浅色主题） ---------- */
+  --bg:           #f7f8fa;
+  --bg-panel:     #ffffff;
+  --bg-inset:     #f2f4f8;
+  --bg-code:      #f4f2f8;
+  --text:         #1c2330;
+  --text-2:       #48536b;
+  --text-3:       #78839b;
+  --line:         #e3e7ef;
+  --line-strong:  #c9d0de;
+
+  /* ---------- 排版 ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+               "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC",
+               "Source Han Sans SC", sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", "SF Mono", Consolas,
+               "Liberation Mono", "Courier New", monospace;
+  --font-serif: "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+
+  --fs-xs:   0.78rem;
+  --fs-sm:   0.875rem;
+  --fs-base: 1rem;
+  --fs-md:   1.125rem;
+  --fs-lg:   1.35rem;
+  --fs-xl:   1.7rem;
+  --fs-2xl:  2.15rem;
+  --fs-3xl:  2.6rem;
+
+  --lh-tight: 1.3;
+  --lh-base:  1.75;
+
+  /* ---------- 间距 / 圆角 / 阴影 ---------- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4rem;
+
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(18, 26, 48, 0.06);
+  --shadow:    0 4px 16px rgba(18, 26, 48, 0.08);
+  --shadow-lg: 0 12px 40px rgba(18, 26, 48, 0.14);
+
+  /* ---------- 布局尺寸 ---------- */
+  --sidebar-w: 288px;
+  --toc-w: 232px;
+  --header-h: 58px;
+  --content-max: 900px;
+
+  /* ---------- 动效 ---------- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur: 250ms;
+
+  /* ---------- 层级 ---------- */
+  --z-header: 100;
+  --z-sidebar: 90;
+  --z-overlay: 80;
+  --z-search: 200;
+}
+
+/* ---------- 暗色主题（通过 body[data-theme="dark"] 启用） ---------- */
+body[data-theme="dark"] {
+  --brand:        hsl(var(--brand-h) 68% 62%);
+  --brand-strong: hsl(var(--brand-h) 72% 70%);
+  --brand-soft:   hsl(var(--brand-h) 40% 16%);
+  --brand-line:   hsl(var(--brand-h) 36% 26%);
+  --brand-on:     #0b1020;
+
+  --accent:       #5eead4;
+  --accent-soft:  #11292a;
+  --warn:         #fbbf24;
+  --warn-soft:    #2e2412;
+  --danger:       #fca5a5;
+  --danger-soft:  #2e1616;
+  --ok:           #86efac;
+  --ok-soft:      #12281a;
+  --info:         #93c5fd;
+  --info-soft:    #14213f;
+
+  --bg:           #0e1420;
+  --bg-panel:     #151c2c;
+  --bg-inset:     #1a2334;
+  --bg-code:      #1a2030;
+  --text:         #e8ecf5;
+  --text-2:       #b3bdd0;
+  --text-3:       #7e8aa3;
+  --line:         #263148;
+  --line-strong:  #35435f;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow:    0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.55);
+}

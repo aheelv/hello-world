@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02 · 描述统计与可视化 · 统计 · 智能学习体系</title>
+<meta name="description" content="描述统计：集中趋势（均值/中位数/众数）、离散程度（方差/标准差/IQR/变异系数/切比雪夫）、分布形状（箱线图/偏度峰度/异常值检测）、相关性（协方差/皮尔逊/斯皮尔曼）与可视化选择指南。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m02" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 1 · <a href="../stages/statistics.html">统计学</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l1">L1 入门</span> · 6 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 01 · 上一篇：<a href="m01-data.html">01 · 数据与统计思维</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m03-probability.html">03 · 概率论基础</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m01-data.html">01 数据与统计思维</a><span class="dep-arrow">→</span><a class="dep-node current" href="m02-descriptive.html">02 描述统计与可视化</a><span class="dep-arrow">→</span><a class="dep-node" href="m03-probability.html">03 概率论基础</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：均值, 中位数, 标准差, 分位数, 四分位距, 箱线图, 异常值, 偏度, 直方图</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>均值被一个极端值拉偏时，应该改用哪些稳健统计量，代价是什么？ <a class="q-anchor" href="#s2">→ 对应讲解</a></li><li>箱线图的 1.5×IQR 规则从哪来，它把多少比例的正常点误判为异常？ <a class="q-anchor" href="#s3">→ 对应讲解</a></li><li>直方图 bin 宽度如何改变你对「分布形状」的判断？ <a class="q-anchor" href="#s4">→ 对应讲解</a></li><li>为什么均值与标准差不足以描述一个双峰分布？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+    <article class="module" data-module="m02">
+
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/statistics.html">阶段 1 · 统计学</a> / 02 · 描述统计与可视化</div>
+        <h1>02 · 描述统计与可视化</h1>
+        <p class="lead">
+          拿到一堆数据，怎么把它「说清楚」？描述统计用几个数字和几张图，把成千上万个观测值
+          浓缩成人脑能处理的信息：中心在哪、有多分散、什么形状、和别的变量有没有关系。
+          这些指标是后面一切推断方法的原材料——公式算错一个符号，结论就会整个翻车。
+        </p>
+        <div class="module-meta">
+          <span class="badge ok">入门</span>
+          <span class="badge">6 学时</span>
+          <span class="badge">前置：模块 01</span>
+          <span class="badge brand">阶段一 · 入门筑基</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>熟练计算均值（算术/加权/几何）、中位数、众数，并知道何时该用中位数</li>
+          <li>区分总体方差 $\sigma^2$ 与样本方差 $s^2$，讲清分母 $n$ 与 $n-1$ 的差别</li>
+          <li>会算极差、四分位距、变异系数，并用切比雪夫不等式与经验法则解读数据</li>
+          <li>用五数概括画箱线图，按 $1.5\times IQR$ 规则识别异常值</li>
+          <li>手算协方差与皮尔逊相关系数 $r$，区分皮尔逊与斯皮尔曼秩相关</li>
+          <li>根据数据类型与分析目的选择正确图形，识别常见图表误导手法</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 集中趋势：数据的「中心」在哪</h2>
+
+      <p>描述一组数据，第一个问题永远是：<strong>典型值大概是多少？</strong>这就是集中趋势（central tendency）。三个常用答案是均值、中位数、众数，它们回答的是略有不同的问题。</p>
+
+      <h3 id="s1-1">1.1 均值</h3>
+      <p>把所有数加起来除以个数——就像把一摞书的重量平摊到每只手上。<strong>算术均值</strong>是对称数据的默认选择：</p>
+
+      <div class="formula-box">
+        <div class="f-name">算术均值</div>
+        $$ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i = \frac{x_1 + x_2 + \cdots + x_n}{n} $$
+        <div class="f-note">$x_i$ 为第 $i$ 个观测值，$n$ 为样本量，$\bar{x}$ 为样本均值。总体均值记作 $\mu = \frac{1}{N}\sum_{i=1}^{N} x_i$。</div>
+      </div>
+
+      <p>当每个数据的「权重」不同时，要用<strong>加权均值</strong>。比如课程总评不能把平时和期末直接平均，而要按占比加权：</p>
+
+      <div class="formula-box">
+        <div class="f-name">加权均值</div>
+        $$ \bar{x}_w = \frac{\sum_{i=1}^{n} w_i x_i}{\sum_{i=1}^{n} w_i} $$
+        <div class="f-note">$w_i$ 是第 $i$ 项的权重（如占比、频数）。当所有 $w_i$ 相等时，加权均值退化为算术均值。</div>
+      </div>
+
+      <p>涉及<strong>增长率、倍率、比率的平均</strong>时要用<strong>几何均值</strong>。它的本质是「按复利折算的平均速度」：</p>
+
+      <div class="formula-box">
+        <div class="f-name">几何均值</div>
+        $$ G = \sqrt[n]{x_1 \cdot x_2 \cdots x_n} = \left(\prod_{i=1}^{n} x_i\right)^{\frac{1}{n}} $$
+        <div class="f-note">用于正数。若各期增长率为 $g_1,\dots,g_n$，则平均增长率 $G = \sqrt[n]{(1+g_1)(1+g_2)\cdots(1+g_n)} - 1$。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 1.1</span>
+          <span class="ex-title">加权均值与几何均值：成绩与增长率</span>
+        </div>
+        <div class="example-body">
+          <p>（a）某课总评规则：平时占 20%、期中占 30%、期末占 50%。小明三项成绩为 85、78、92，求总评。<br>
+          （b）某产品三年销量增长率分别为 10%、20%、30%，求年均增长率。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>（a）<strong>加权均值：</strong></p>
+              $$ \bar{x}_w = 0.2\times 85 + 0.3\times 78 + 0.5\times 92 = 17 + 23.4 + 46 = 86.4 $$
+              <p>（错误做法是 $(85+78+92)/3 = 85$——它默认三项同等重要。）</p>
+              <p>（b）<strong>几何均值：</strong>三年总倍率为 $1.1\times 1.2\times 1.3 = 1.716$，故年均增长率</p>
+              $$ G = \sqrt[3]{1.716} - 1 \approx 1.197 - 1 = 19.7\% $$
+              <p>注意算术平均 $(10\%+20\%+30\%)/3 = 20\%$ 略高于几何平均——对增长率求算术平均会<strong>系统性高估</strong>，因为它忽略了复利的乘法结构。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s1-2">1.2 中位数与众数</h3>
+      <ul>
+        <li><strong>中位数（Median）</strong>：把数据从小到大排序后，处在正中间的那个数（$n$ 为偶数时取中间两数的平均）。它回答「排在一半位置的人是多少」。</li>
+        <li><strong>众数（Mode）</strong>：出现次数最多的取值，可以没有或不止一个。它是唯一适用于<strong>名义尺度</strong>的集中指标（如「最畅销的颜色是白色」）。</li>
+      </ul>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>指标</th><th>回答的问题</th><th>优点</th><th>缺点</th></tr></thead>
+          <tbody>
+            <tr><td><strong>均值</strong></td><td>「平均」水平是多少</td><td>用到全部数据，性质最好（后续推断的基础）</td><td>对异常值极端敏感</td></tr>
+            <tr><td><strong>中位数</strong></td><td>「中间」的人是多少</td><td>稳健，不受极端值影响</td><td>没用到数据的具体大小信息</td></tr>
+            <tr><td><strong>众数</strong></td><td>「最常见」的是多少</td><td>适用于任意尺度</td><td>可能不唯一、不稳定</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s1-3">1.3 什么时候必须用中位数</h3>
+      <p>当数据<strong>右偏</strong>（有少数极大的值，如收入、房价、停留时长）或<strong>存在异常值</strong>时，均值会被极端值拽走，中位数才代表「普通人」。典型例子：一个国家的平均收入往往远高于收入中位数——因为少数富豪把均值拉上去了。</p>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：报告均值却不报告分布
+        </div>
+        <p>「平均用户时长 45 分钟」可能意味着大家都用了 45 分钟，也可能是 90% 的人用了 10 分钟、10% 的人用了 360 分钟。<strong>均值只是分布的一个侧面</strong>，必须搭配离散程度（下一节）一起报告。对偏态数据，优先报告<strong>中位数 + 四分位数</strong>。</p>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 离散程度：数据有多「散」</h2>
+
+      <p>两组数据均值相同，不代表它们一样。集中趋势管「中心」，离散程度（dispersion）管「波动」。在 AI 与工程场景里，波动往往比均值更重要：延迟的 P99、模型预测的方差、实验指标的抖动，都是风险本身。</p>
+
+      <h3 id="s2-1">2.1 极差、四分位数与 IQR</h3>
+      <ul>
+        <li><strong>极差（Range）</strong>：$R = x_{\max} - x_{\min}$。简单粗暴，只用了两个数，极易受异常值影响。</li>
+        <li><strong>四分位数</strong>：把排序数据四等分的三个切点 $Q_1$（25% 位置）、$Q_2$（中位数）、$Q_3$（75% 位置）。</li>
+        <li><strong>四分位距（IQR）</strong>：中间 50% 数据的跨度，稳健的离散度量。</li>
+      </ul>
+
+      <div class="formula-box">
+        <div class="f-name">四分位距</div>
+        $$ IQR = Q_3 - Q_1 $$
+        <div class="f-note">$Q_1$ 为下四分位数（约 25% 的数据小于它），$Q_3$ 为上四分位数（约 75% 的数据小于它）。IQR 不受两端 25% 极端值影响。</div>
+      </div>
+
+      <h3 id="s2-2">2.2 方差与标准差</h3>
+      <p>离散程度最核心的两个量。思路：每个数据偏离均值多少 → 平均这些偏离 → 为避免正负抵消，先平方：</p>
+
+      <div class="formula-box">
+        <div class="f-name">总体方差与总体标准差</div>
+        $$ \sigma^2 = \frac{1}{N}\sum_{i=1}^{N} (x_i - \mu)^2, \qquad \sigma = \sqrt{\sigma^2} $$
+        <div class="f-note">$N$ 为总体容量，$\mu$ 为总体均值。$\sigma$ 与原始数据同单位（米、元、秒），故实际报告多用标准差。</div>
+      </div>
+
+      <div class="formula-box">
+        <div class="f-name">样本方差与样本标准差</div>
+        $$ s^2 = \frac{1}{n-1}\sum_{i=1}^{n} (x_i - \bar{x})^2, \qquad s = \sqrt{s^2} $$
+        <div class="f-note">$n$ 为样本量，$\bar{x}$ 为样本均值。<strong>分母是 $n-1$ 而不是 $n$</strong>，理由见下方易错点。样本方差 $s^2$ 是总体方差 $\sigma^2$ 的无偏估计。</div>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          最高频易错点：分母到底是 $n$ 还是 $n-1$？
+        </div>
+        <p><strong>直觉解释：</strong>样本均值 $\bar{x}$ 是从这批数据里算出来的，它天然比总体均值 $\mu$「更靠近」这批数据——用 $\bar{x}$ 当中心算出的偏离偏小，方差被<em>系统性低估</em>。把分母从 $n$ 改为 $n-1$（除以「自由度」）正好补偿这个偏差，使 $s^2$ 的期望恰好等于 $\sigma^2$，这叫<strong>无偏性</strong>。</p>
+        <p>实用口诀：<strong>描述样本自身波动用 $s^2$（除以 $n-1$）；数据就是全部总体、只做描述不外推时用 $\sigma^2$（除以 $n$）</strong>。统计软件（Excel 的 <code>VAR.S</code> vs <code>VAR.P</code>、Python pandas 默认）都遵循这一约定。</p>
+      </div>
+
+      <h3 id="s2-3">2.3 变异系数 CV</h3>
+      <p>标准差受单位影响（身高的 $s$ 是 8cm，收入的 $s$ 是 5000 元，谁更分散？）。当需要<strong>跨单位、跨量级</strong>比较相对波动时，用<strong>变异系数</strong>：</p>
+
+      <div class="formula-box">
+        <div class="f-name">变异系数</div>
+        $$ CV = \frac{s}{\bar{x}} \times 100\% $$
+        <div class="f-note">无量纲的相对离散度。$CV$ 越大，相对波动越大。要求 $\bar{x} \neq 0$，且只对比率尺度数据有意义（均值为 0 或区间尺度数据不能用）。</div>
+      </div>
+
+      <p>例：投资 A 平均收益 10%、标准差 2%，$CV_A = 20\%$；投资 B 平均收益 20%、标准差 8%，$CV_B = 40\%$。B 收益高但相对波动是 A 的两倍——风险厌恶者会选 A。</p>
+
+      <h3 id="s2-4">2.4 切比雪夫不等式与经验法则</h3>
+      <p>「大部分数据离均值多远？」有两条通用工具：</p>
+
+      <div class="formula-box">
+        <div class="f-name">切比雪夫不等式（适用于任何分布）</div>
+        $$ P(|X - \mu| \geq k\sigma) \leq \frac{1}{k^2} $$
+        <div class="f-note">含义：无论分布形状如何，落在均值 $k$ 个标准差之外的数据比例不超过 $1/k^2$。等价地，至少 $1 - 1/k^2$ 的数据落在 $\mu \pm k\sigma$ 内：$k=2$ 至少 75%，$k=3$ 至少 88.9%。</div>
+      </div>
+
+      <div class="formula-box">
+        <div class="f-name">经验法则（仅适用于近似对称的钟形分布）</div>
+        $$ \mu \pm 1\sigma \approx 68\%, \qquad \mu \pm 2\sigma \approx 95\%, \qquad \mu \pm 3\sigma \approx 99.7\% $$
+        <div class="f-note">正态分布下的精确比例（模块 04 详解）。若分布明显偏态，切比雪夫给出的保证更保守也更可靠。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 2.1</span>
+          <span class="ex-title">跨指标比较波动：变异系数 + 切比雪夫</span>
+        </div>
+        <div class="example-body">
+          <p>某制造与运营团队同时监控三项指标：</p>
+          <ul>
+            <li>关键零件直径：均值 $\mu_1 = 20.0$ mm，标准差 $\sigma_1 = 1.2$ mm；</li>
+            <li>单笔订单金额：均值 $\mu_2 = 250$ 元，标准差 $\sigma_2 = 75$ 元；</li>
+            <li>App 首屏加载时间：均值 $\mu_3 = 2.0$ s，标准差 $\sigma_3 = 0.9$ s。</li>
+          </ul>
+          <p>（a）三项指标中，哪一项的<strong>相对波动</strong>最大？（b）对每项指标，用切比雪夫不等式给出「至少 75% 的观测值」所在的区间；（c）如果加载时间近似钟形分布，实际情况会比切比雪夫的保证好多少？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 用变异系数做无量纲比较：</strong></p>
+              $$ CV_1 = \frac{1.2}{20.0} = 6.0\%, \qquad CV_2 = \frac{75}{250} = 30.0\%, \qquad CV_3 = \frac{0.9}{2.0} = 45.0\% $$
+              <p><strong>结论：</strong>相对波动排序为 <strong>加载时间（45%）&gt; 订单金额（30%）&gt; 零件直径（6%）</strong>。</p>
+              <p>注意绝对波动的排序完全不同：$\sigma_2 = 75$ 最大，$\sigma_3 = 0.9$ 最小——但「75 元」和「0.9 秒」根本不能直接比大小，这正是必须用 $CV$ 的原因。$CV_1 = 6\%$ 说明零件尺寸非常稳定，$CV_3 = 45\%$ 说明加载体验很不稳定（这通常意味着存在长尾的慢请求）。</p>
+              <p><strong>第 2 步 切比雪夫不等式（$k = 2$，至少 $1 - 1/4 = 75\%$）：</strong></p>
+              <ul>
+                <li>零件直径：至少 75% 落在 $20.0 \pm 2 \times 1.2 = [17.6,\ 22.4]$ mm 内。</li>
+                <li>订单金额：至少 75% 落在 $250 \pm 2 \times 75 = [100,\ 400]$ 元内。</li>
+                <li>加载时间：至少 75% 落在 $2.0 \pm 2 \times 0.9 = [0.2,\ 3.8]$ s 内。</li>
+              </ul>
+              <p>若取 $k = 3$（至少 $1 - 1/9 \approx 88.9\%$）：零件直径 $[16.4,\ 23.6]$ mm；订单金额 $[25,\ 475]$ 元；加载时间 $2.0 \pm 2.7 = [-0.7,\ 4.7]$ s——下界为负，而加载时间不可能为负，说明<strong>这个分布明显右偏，不是钟形</strong>（$CV = 45\%$ 也印证了这一点）。此时切比雪夫的保证虽然仍然成立，却已相当保守。</p>
+              <p><strong>第 3 步 若分布近似钟形，经验法则给出更好的数字：</strong>加载时间约 95% 落在 $[0.2,\ 3.8]$ s 内，约 99.7% 落在 $\mu \pm 3\sigma$ 内。<strong>切比雪夫是「无论分布如何都成立的保底承诺」，经验法则只有在分布近似钟形时才适用</strong>——这也是为什么右偏数据要优先报中位数与四分位数（切比雪夫对偏态数据尤其有用，因为它不依赖形状假设）。</p>
+              <p><strong>易错提示：</strong>① 用 $CV$ 比较有序尺度数据（如满意度 1–5 分）：$CV$ 严格来说只对比率尺度有意义，均值接近 0 时 $CV$ 会爆炸；② 看到 $CV$ 大就断定「质量差」——要先确认数据不是右偏长尾（例如加载时间的 $CV$ 大常由少量超时请求造成，应看中位数与 P95/P99）；③ 用切比雪夫的「至少」当作「实际就是」，它只是保底；④ 忘记切比雪夫给的是 $\mu \pm k\sigma$ 内的<strong>比例下界</strong>，不是置信区间。</p>
+              <p><strong>应用/AI 关联：</strong>在 A/B 测试与模型监控中，$CV$ 是判断「指标抖动」的标准工具：模型推理时延的 $CV$ 决定了你需要多大的缓冲区（$CV$ 越大，容量规划越难）；同样一批用户下模型的错误率 $CV$ 过大，说明模型对不同子集表现不稳定，应该做分层分析（模块 06）。注意 AI 系统的时延分布几乎总是右偏的（少数请求触发重试或长上下文），因此实践中的标准做法是同时报告 P50/P95/P99，而不是只报均值与 $CV$。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 分布形状与异常值</h2>
+
+      <p>均值和标准差相同的数据，形状可能完全不同（一个对称、一个双峰）。看形状要靠图形，做精修要靠形状指标。</p>
+
+      <h3 id="s3-1">3.1 直方图与茎叶图</h3>
+      <ul>
+        <li><strong>直方图（Histogram）</strong>：把数值轴切成等宽区间（组距），统计每组频数。<strong>与条形图不同：直方图相邻柱相接、表达连续分布，柱的宽度有意义。</strong>组距选择会改变视觉印象，需谨慎。</li>
+        <li><strong>茎叶图（Stem-and-leaf）</strong>：把数字拆成「茎」（高位）与「叶」（低位），保留原始数值信息的小样本作图法。如数据 12, 15, 18, 20 画成 <code>1 | 2 5 8</code>、<code>2 | 0</code>。</li>
+      </ul>
+
+      <h3 id="s3-2">3.2 箱线图与五数概括</h3>
+      <p>箱线图（boxplot）用五个数概括一批数据，是展示分布与比较多组数据的利器：</p>
+
+      <div class="formula-box">
+        <div class="f-name">五数概括</div>
+        $$ \text{最小值},\quad Q_1,\quad \text{中位数},\quad Q_3,\quad \text{最大值} $$
+        <div class="f-note">箱体从 $Q_1$ 到 $Q_3$（覆盖中间 50%），箱内横线是中位数，须线延伸到非异常值的极值，异常值单独画点。</div>
+      </div>
+
+      <h3 id="s3-3">3.3 偏度与峰度</h3>
+      <ul>
+        <li><strong>偏度（Skewness）</strong>：刻画左右不对称。$\gamma_1 &gt; 0$ 右偏（长尾在右，均值 &gt; 中位数）；$\gamma_1 &lt; 0$ 左偏；$\gamma_1 \approx 0$ 近似对称。</li>
+        <li><strong>峰度（Kurtosis）</strong>：刻画尾部厚薄与峰的尖峭程度。正态分布超额峰度为 0；越大表示尾部越厚、极端值越多。</li>
+      </ul>
+
+      <div class="formula-box">
+        <div class="f-name">偏度与超额峰度（样本形式）</div>
+        $$ \gamma_1 = \frac{1}{n}\sum_{i=1}^{n}\left(\frac{x_i - \bar{x}}{s}\right)^{3}, \qquad \gamma_2 = \frac{1}{n}\sum_{i=1}^{n}\left(\frac{x_i - \bar{x}}{s}\right)^{4} - 3 $$
+        <div class="f-note">三次方保留正负号（衡量方向），四次方抹去符号（衡量尾重）并减 3 使正态分布对应 0。</div>
+      </div>
+
+      <h3 id="s3-4">3.4 异常值检测：$1.5\times IQR$ 规则</h3>
+
+      <div class="formula-box">
+        <div class="f-name">箱线图异常值规则</div>
+        $$ \text{下界} = Q_1 - 1.5\times IQR, \qquad \text{上界} = Q_3 + 1.5\times IQR $$
+        <div class="f-note">落在上下界之外的点视为<strong>疑似异常值</strong>（温和异常值；$3\times IQR$ 外为极端异常值）。异常值不等于错误数据——应先查录入，再决定删除、保留还是稳健处理。</div>
+      </div>
+
+      <div class="callout note">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          异常值处理三问
+        </div>
+        <p>① 是录入/测量错误吗？（是则修正或删除）② 是真实但罕见的极端情况吗？（如大促当天的订单量，保留并单独说明）③ 处理方式会改变结论吗？（同时报告「含/不含异常值」两套结果是最稳妥的做法）</p>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.1</span>
+          <span class="ex-title">五数概括、箱线图与异常值判定</span>
+        </div>
+        <div class="example-body">
+          <p>某小组 9 名成员的月消费（百元）：12, 15, 18, 20, 20, 25, 30, 35, 80。求五数概括，并判断是否有异常值。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 排序：</strong>12, 15, 18, 20, 20, 25, 30, 35, 80（$n=9$）。</p>
+              <p><strong>第 2 步 中位数：</strong>第 5 个数 $= 20$。</p>
+              <p><strong>第 3 步 四分位数：</strong>下半段 $\{12,15,18,20\}$，$Q_1 = (15+18)/2 = 16.5$；上半段 $\{25,30,35,80\}$，$Q_3 = (30+35)/2 = 32.5$。</p>
+              <p><strong>第 4 步 IQR 与界限：</strong>$IQR = 32.5 - 16.5 = 16$，$1.5\times IQR = 24$，故下界 $= 16.5 - 24 = -7.5$，上界 $= 32.5 + 24 = 56.5$。</p>
+              <p><strong>结论：</strong>五数概括为 $12,\ 16.5,\ 20,\ 32.5,\ 80$。由于 $80 &gt; 56.5$，80 是<strong>疑似异常值</strong>（某成员可能有大额一次性支出，应核实）。箱线图中 80 将作为离群点单独画出。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.2</span>
+          <span class="ex-title">偏度与峰度：算出来，也要能读懂</span>
+        </div>
+        <div class="example-body">
+          <p>某快递公司统计了 8 个偏远地区订单的配送天数：2, 3, 4, 5, 6, 7, 8, 25（天）。</p>
+          <p>（a）计算这组数据的偏度 $\gamma_1$ 与超额峰度 $\gamma_2$，并说明它们分别告诉你什么；（b）画出（或口述）箱线图，指出哪个方向的尾巴更长；（c）如果你的同事只看了均值就说「平均要 7.5 天」，你会怎么补充？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 均值与标准差：</strong></p>
+              $$ \bar{x} = \frac{2+3+4+5+6+7+8+25}{8} = \frac{60}{8} = 7.5 $$
+              $$ \sum (x_i - \bar{x})^2 = 30.25+20.25+12.25+6.25+2.25+0.25+0.25+306.25 = 378 $$
+              $$ s^2 = \frac{378}{8-1} = 54, \qquad s = \sqrt{54} \approx 7.35 $$
+              <p><strong>第 2 步 标准化：</strong>令 $z_i = (x_i - \bar{x})/s$，则 $\gamma_1 = \frac{1}{n}\sum z_i^3$，$\gamma_2 = \frac{1}{n}\sum z_i^4 - 3$。</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$x_i$</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>25</th></tr></thead>
+                  <tbody>
+                    <tr><td>$x_i - \bar{x}$</td><td>-5.5</td><td>-4.5</td><td>-3.5</td><td>-2.5</td><td>-1.5</td><td>-0.5</td><td>0.5</td><td>17.5</td></tr>
+                    <tr><td>$z_i$</td><td>-0.748</td><td>-0.612</td><td>-0.476</td><td>-0.340</td><td>-0.204</td><td>-0.068</td><td>0.068</td><td>2.381</td></tr>
+                    <tr><td>$z_i^3$</td><td>-0.419</td><td>-0.230</td><td>-0.108</td><td>-0.039</td><td>-0.009</td><td>0.000</td><td>0.000</td><td>13.506</td></tr>
+                    <tr><td>$z_i^4$</td><td>0.314</td><td>0.141</td><td>0.052</td><td>0.013</td><td>0.002</td><td>0.000</td><td>0.000</td><td>32.164</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p><strong>第 3 步 偏度：</strong></p>
+              $$ \gamma_1 = \frac{1}{8}\sum z_i^3 = \frac{12.71}{8} \approx 1.59 $$
+              <p>$\gamma_1 > 0$ 表示<strong>右偏</strong>（长尾拖在右边）：大多数订单 2–8 天，极少数要 25 天。用经验法则交叉验证：中位数 $= (5+6)/2 = 5.5$，而 $\bar{x} = 7.5 > 5.5$——<strong>均值被右尾的 25 拽高了</strong>，两者互相印证。</p>
+              <p><strong>第 4 步 峰度：</strong></p>
+              $$ \gamma_2 = \frac{1}{8}\sum z_i^4 - 3 = \frac{32.70}{8} - 3 \approx 4.09 - 3 = 1.09 $$
+              <p>正态分布的超额峰度为 0；$\gamma_2 = 1.09 > 0$ 说明这份数据的<strong>峰更尖、尾部更厚</strong>——极端值（那个 25 天）比正态分布下应有的更极端。峰度由四次方驱动，所以<strong>单个异常值就能把 $\gamma_2$ 显著抬高</strong>。</p>
+              <p><strong>第 5 步 回到箱线图：</strong></p>
+              <ul>
+                <li>中位数 $= 5.5$，$Q_1 = (3+4)/2 = 3.5$，$Q_3 = (7+8)/2 = 7.5$，$IQR = 4$；</li>
+                <li>上界 $= 7.5 + 1.5\times 4 = 13.5$，下界 $= 3.5 - 6 = -2.5$，所以 25 <strong>是异常值</strong>；</li>
+                <li>箱体为 $[3.5,\ 7.5]$，中位数线 $5.5$ 偏<strong>左</strong>（因为右半段被拉长），上须线长（伸到 8），25 单独画点。<strong>右边长尾 = 右偏</strong>，与 $\gamma_1 > 0$ 的结论一致。</li>
+              </ul>
+              <p><strong>第 6 步 怎么补充同事的说法：</strong>「平均 7.5 天」对用户毫无意义——<strong>典型订单是 5–6 天</strong>，而 7.5 天是被那个 25 天的订单拉上去的。应报告「中位数 5.5 天，$Q_1 = 3.5$，$Q_3 = 7.5$，另有 1 单超过 13.5 天（疑似偏远地区异常）」。同时提醒：<strong>8 个样本的偏度、峰度估计非常不稳定</strong>，小样本下这两个指标只能当作定性线索，务必配合直方图与箱线图一起看。</p>
+              <p><strong>易错提示：</strong>① 把 $\gamma_1$ 的正负号与「尾巴在哪边」搞反——三次方保留符号，正号就是右偏；② 忘记 $\gamma_2$ 已经减过 3，$1.09$ 是<strong>超额</strong>峰度，原始四阶矩是 4.09；③ 用小样本（$n < 20$）的 $\gamma_1,\gamma_2$ 下强结论；④ 认为偏度峰度能替代图形——它们只给出方向，形状仍要看直方图和箱线图；⑤ 公式中的 $s$ 是<strong>样本</strong>标准差（分母 $n-1$），别和总体标准差混用。</p>
+              <p><strong>应用/AI 关联：</strong>模型的<strong>预测残差分布</strong>就该接近正态（偏度接近 0、峰度接近 0）——如果残差明显右偏，往往意味着模型系统性漏掉了某类样本（如极端异常输入），需要专门建一个「难例集」去补训练数据。另一处高频用到偏度的是<strong>收益与损失分布</strong>：金融与风控模型里右偏的损失分布意味着「多数时候小亏、偶尔巨亏」，必须用分位数（VaR）或 CVaR 而不是均值来度量风险。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 相关性：两个变量一起动吗</h2>
+
+      <p>前面都只看一个变量。现实问题常是两个变量的关系：广告投入与销量、学习时长与成绩、模型置信度与准确率。</p>
+
+      <h3 id="s4-1">4.1 协方差</h3>
+      <p>协方差（covariance）衡量两个变量<strong>同向 / 反向变动</strong>的趋势：$x$ 大于均值时 $y$ 也倾向于大于均值，乘积为正。</p>
+
+      <div class="formula-box">
+        <div class="f-name">样本协方差</div>
+        $$ s_{xy} = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y}) $$
+        <div class="f-note">$s_{xy} &gt; 0$ 表示正向变动，$s_{xy} &lt; 0$ 表示反向变动。缺点：数值大小随 $x, y$ 的单位变化（换成万元、厘米就变了），不好直接解读。</div>
+      </div>
+
+      <h3 id="s4-2">4.2 皮尔逊相关系数</h3>
+      <p>把协方差按两个变量的标准差<strong>标准化</strong>，就得到无量纲、可跨数据比较的<strong>皮尔逊相关系数</strong>——本质上是「标准化后的协方差」：</p>
+
+      <div class="formula-box">
+        <div class="f-name">皮尔逊相关系数</div>
+        $$ r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \cdot \sum_{i=1}^{n}(y_i - \bar{y})^2}} = \frac{s_{xy}}{s_x \, s_y} $$
+        <div class="f-note">$r$ 无量纲且 $-1 \leq r \leq 1$。$r = 1$ 完全正线性关系，$r = -1$ 完全负线性关系，$r = 0$ 无线性关系。$r = \pm 1$ 当且仅当所有点严格落在一条直线上。</div>
+      </div>
+
+      <h3 id="s4-3">4.3 怎么解读 $r$ 的大小</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>$|r|$ 范围</th><th>线性强度（经验值，需结合领域）</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>0.8 ~ 1.0</td><td>强</td><td>点云贴近一条直线</td></tr>
+            <tr><td>0.5 ~ 0.8</td><td>中等</td><td>趋势清楚但散点可观</td></tr>
+            <tr><td>0.3 ~ 0.5</td><td>弱</td><td>有趋势，预测价值有限</td></tr>
+            <tr><td>0 ~ 0.3</td><td>极弱或无</td><td>不宜据此做结论</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s4-4">4.4 散点图：看关系的第一步</h3>
+      <p>算 $r$ 之前先画<strong>散点图（scatter plot）</strong>。散点图能立刻暴露 $r$ 看不出的问题：非线性曲线、异常值杠杆、数据分群、方差不齐（喇叭形）。<strong>先画图、再算数</strong>是铁律。</p>
+
+      <h3 id="s4-5">4.5 皮尔逊 vs 斯皮尔曼秩相关</h3>
+      <p>皮尔逊只捕捉<strong>线性</strong>关系且受异常值影响大。当关系单调但非线性、数据是有序尺度、或存在异常值时，用<strong>斯皮尔曼秩相关系数</strong>：先把 $x, y$ 各自换成排名（秩），再对排名算皮尔逊：</p>
+
+      <div class="formula-box">
+        <div class="f-name">斯皮尔曼秩相关（无并列秩时）</div>
+        $$ r_s = 1 - \frac{6\sum_{i=1}^{n} d_i^2}{n(n^2 - 1)} $$
+        <div class="f-note">$d_i = \text{rank}(x_i) - \text{rank}(y_i)$ 为两组排名之差。$r_s$ 衡量<strong>单调</strong>关系而非线性关系；出现并列秩时改用对秩算皮尔逊的通用公式。</div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>对比项</th><th>皮尔逊 $r$</th><th>斯皮尔曼 $r_s$</th></tr></thead>
+          <tbody>
+            <tr><td>度量对象</td><td>线性关系</td><td>单调关系（含非线性）</td></tr>
+            <tr><td>对异常值</td><td>敏感</td><td>稳健</td></tr>
+            <tr><td>数据要求</td><td>区间/比率尺度</td><td>有序尺度及以上</td></tr>
+            <tr><td>典型用途</td><td>身高与体重、量化的物理关系</td><td>满意度与评分、排名数据</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.1</span>
+          <span class="ex-title">手算斯皮尔曼秩相关：$r_s$ 与 $r$ 的差异</span>
+        </div>
+        <div class="example-body">
+          <p>某在线课程平台抽取 8 名学员，记录他们的<strong>每周学习时长 $x$（分钟）</strong>与<strong>结课满意度评分 $y$（1–5 分，有并列）</strong>：</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>学员</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr></thead>
+              <tbody>
+                <tr><td>$x$（分钟）</td><td>10</td><td>20</td><td>30</td><td>40</td><td>50</td><td>60</td><td>70</td><td>80</td></tr>
+                <tr><td>$y$（评分）</td><td>2</td><td>3</td><td>3</td><td>4</td><td>4</td><td>3</td><td>5</td><td>4</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>（a）求皮尔逊相关系数 $r$；（b）求斯皮尔曼秩相关系数 $r_s$（注意 $y$ 存在并列值，该用哪个公式？）；（c）若把 $y$ 换成「学习时长越长、满意度越低直到反弹」的倒 U 型关系，还用 $r$ 吗？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 皮尔逊 $r$：先算离差表。</strong>$\bar{x} = (10+20+\cdots+80)/8 = 45$，$\bar{y} = (2+3+3+4+4+3+5+4)/8 = 3.5$。</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$i$</th><th>$x_i$</th><th>$y_i$</th><th>$x_i-\bar{x}$</th><th>$y_i-\bar{y}$</th><th>乘积</th><th>$(x_i-\bar{x})^2$</th><th>$(y_i-\bar{y})^2$</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>10</td><td>2</td><td>-35</td><td>-1.5</td><td>52.5</td><td>1225</td><td>2.25</td></tr>
+                    <tr><td>2</td><td>20</td><td>3</td><td>-25</td><td>-0.5</td><td>12.5</td><td>625</td><td>0.25</td></tr>
+                    <tr><td>3</td><td>30</td><td>3</td><td>-15</td><td>-0.5</td><td>7.5</td><td>225</td><td>0.25</td></tr>
+                    <tr><td>4</td><td>40</td><td>4</td><td>-5</td><td>0.5</td><td>-2.5</td><td>25</td><td>0.25</td></tr>
+                    <tr><td>5</td><td>50</td><td>4</td><td>5</td><td>0.5</td><td>2.5</td><td>25</td><td>0.25</td></tr>
+                    <tr><td>6</td><td>60</td><td>3</td><td>15</td><td>-0.5</td><td>-7.5</td><td>225</td><td>0.25</td></tr>
+                    <tr><td>7</td><td>70</td><td>5</td><td>25</td><td>1.5</td><td>37.5</td><td>625</td><td>2.25</td></tr>
+                    <tr><td>8</td><td>80</td><td>4</td><td>35</td><td>0.5</td><td>17.5</td><td>1225</td><td>0.25</td></tr>
+                    <tr><td><strong>合计</strong></td><td>—</td><td>—</td><td>0</td><td>0</td><td><strong>120</strong></td><td><strong>4200</strong></td><td><strong>6</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>代入公式：</p>
+              $$ r = \frac{120}{\sqrt{4200 \times 6}} = \frac{120}{\sqrt{25200}} = \frac{120}{158.75} \approx 0.756 $$
+              <p><strong>第 2 步 斯皮尔曼 $r_s$：把两组数据各自换成秩。</strong>$x$ 无并列，秩为 1–8；$y$ 有并列——<strong>并列时取平均秩</strong>：2 出现 1 次，秩 $= 1$；3 出现 3 次（占第 2、3、4 位），秩 $= 3$；4 出现 3 次（占第 5、6、7 位），秩 $= 6$；5 出现 1 次，秩 $= 8$。</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>学员</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>合计</th></tr></thead>
+                  <tbody>
+                    <tr><td>$x$ 的秩</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>—</td></tr>
+                    <tr><td>$y$ 的秩</td><td>1</td><td>3</td><td>3</td><td>6</td><td>6</td><td>3</td><td>8</td><td>6</td><td>—</td></tr>
+                    <tr><td>$d_i$（秩差）</td><td>0</td><td>-1</td><td>0</td><td>-2</td><td>-1</td><td>3</td><td>-1</td><td>2</td><td>—</td></tr>
+                    <tr><td>$d_i^2$</td><td>0</td><td>1</td><td>0</td><td>4</td><td>1</td><td>9</td><td>1</td><td>4</td><td><strong>20</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>注意：<strong>因为存在并列秩，4.5 节的简化公式 $1-\frac{6\sum d_i^2}{n(n^2-1)}$ 不能再直接用</strong>（它只在无并列秩时严格成立；本例硬套会得到 $1-\frac{6\times 20}{8\times 63} \approx 0.762$，与正确值不符）。正确做法是回到本质——<strong>对秩再算一次皮尔逊相关系数</strong>。两组秩的均值均为 4.5，离差表为：</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$i$</th><th>秩 $x$</th><th>秩 $y$</th><th>离差积</th><th>离差平方和（$x$ 秩）</th><th>离差平方和（$y$ 秩）</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>1</td><td>1</td><td>12.25</td><td>12.25</td><td>12.25</td></tr>
+                    <tr><td>2</td><td>2</td><td>3</td><td>3.75</td><td>6.25</td><td>2.25</td></tr>
+                    <tr><td>3</td><td>3</td><td>3</td><td>2.25</td><td>2.25</td><td>2.25</td></tr>
+                    <tr><td>4</td><td>4</td><td>6</td><td>-0.75</td><td>0.25</td><td>2.25</td></tr>
+                    <tr><td>5</td><td>5</td><td>6</td><td>0.75</td><td>0.25</td><td>2.25</td></tr>
+                    <tr><td>6</td><td>6</td><td>3</td><td>-2.25</td><td>2.25</td><td>2.25</td></tr>
+                    <tr><td>7</td><td>7</td><td>8</td><td>8.75</td><td>6.25</td><td>12.25</td></tr>
+                    <tr><td>8</td><td>8</td><td>6</td><td>5.25</td><td>12.25</td><td>2.25</td></tr>
+                    <tr><td><strong>合计</strong></td><td>—</td><td>—</td><td><strong>30</strong></td><td><strong>42</strong></td><td><strong>38</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>代入：</p>
+              $$ r_s = \frac{30}{\sqrt{42 \times 38}} = \frac{30}{\sqrt{1596}} = \frac{30}{39.95} \approx 0.751 $$
+              <p><strong>第 3 步 结论与对比。</strong>本例 $r \approx 0.756$、$r_s \approx 0.751$，两者几乎相同——因为这组数据近似线性、且 $y$ 的并列值不多，秩变换几乎不改变形状。这说明<strong>当数据干净且关系接近线性时，两个指标给出一致的答案</strong>；若两者明显不同，才说明「非线性」或「异常值」在起作用。</p>
+              <p><strong>第 4 步 什么时候 $r_s$ 会给出不同答案？</strong>举两个极端情形：</p>
+              <ul>
+                <li><strong>单调但强烈非线性：</strong>若 $x$ 取 1, 2, 4, 8, 16, 32, 64, 128（翻倍递增），$y$ 取 1 到 8（线性递增），则 $r \approx 0.850$ 而 $r_s = 1.000$（秩完全一致，$d_i$ 全为 0）。$r$ 因为只捕捉<em>线性</em>而低估了这种「$y$ 随 $x$ 单调上升」的关系。</li>
+                <li><strong>倒 U 型：</strong>若关系是「学习时长越长、满意度越低，直到某个点后反弹」（$y$ = 60, 72, 85, 92, 92, 85, 72, 60），则 $r = 0$（左右两半的贡献正好抵消），$r_s$ 也接近 0——因为它同样只识别<em>单调</em>关系，识别不了 U 型。<strong>此时任何相关系数都会骗你，唯一可靠的做法是画散点图</strong>（4.6 节第一条陷阱）。</li>
+              </ul>
+              <p><strong>易错提示：</strong>① 存在并列秩时硬套简化公式 $1-\frac{6\sum d_i^2}{n(n^2-1)}$——该式只在无并列秩时严格成立，有并列时应改用「对秩算皮尔逊」的通用公式（多数软件如 SPSS、R 的 <code>cor.test(method="spearman")</code> 会自动处理）；② 并列秩取「任意一个」的秩而不是<strong>平均秩</strong>；③ 以为 $r_s$ 能捕捉一切非线性——它只对<strong>单调</strong>关系有效，U 型关系下 $r_s$ 同样接近 0；④ 看到 $r_s$ 很高就断言「有因果关系」，$r_s$ 与 $r$ 一样只描述关联；⑤ 用 $n$ 很小（$n<10$）的 $r_s$ 下强结论。</p>
+              <p><strong>应用/AI 关联：</strong>① <strong>用户满意度、NPS、问卷 Likert 量表</strong>都是有序数据，天生该用 $r_s$——同一条 $r$ 与 $r_s$ 的差距，往往就来自「把 1–5 分当成了连续数值」这个隐含假设；② <strong>模型评估中的「标注一致性」</strong>（如两个标注员对同一批图片的评分）天然有大量并列秩，用皮尔逊会低估一致性，此时 Cohen's kappa 才是标准工具（它基于秩的列联表）；③ <strong>推荐系统的排序指标</strong>（NDCG、MRR）与斯皮尔曼思想同源——都只关心「顺序对不对」，不关心数值差距大小，这正是「$x$ 翻倍而 $y$ 只涨 1 分」这类场景下秩相关更有意义的原因。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s4-6">4.6 相关系数的四大陷阱</h3>
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          看到 $r$ 高，先检查这四种情况
+        </div>
+        <ul>
+          <li><strong>非线性</strong>：$y = x^2$ 在 $[-1,1]$ 上 $r \approx 0$，但关系是确定的。<em>$r=0$ 只说明没有线性关系，不等于没有关系。</em></li>
+          <li><strong>异常值</strong>：一个离群点可以凭空造出高相关，或掩盖真实相关。先看散点图。</li>
+          <li><strong>范围限制</strong>：只看大学生群体，「高考成绩与大学成绩」的相关会被压缩——样本范围变窄，$r$ 往往变小。</li>
+          <li><strong>生态谬误（Ecological fallacy）</strong>：群体层面的相关不能下推到个体。某市「人均书店多、人均犯罪率高」不能推出「读书导致犯罪」（可能是城市规模造成的第三变量）。</li>
+        </ul>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 可视化选择指南</h2>
+
+      <h3 id="s5-1">5.1 按问题选图形</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>分析目的</th><th>推荐图形</th><th>注意事项</th></tr></thead>
+          <tbody>
+            <tr><td>比较类别间大小</td><td>条形图</td><td>排序后更易读；条形从 0 起画</td></tr>
+            <tr><td>展示占比</td><td>饼图 / 环形图 / 堆叠条形</td><td>类别 ≤ 5 且差异明显才用饼图</td></tr>
+            <tr><td>看数值分布</td><td>直方图、核密度图、箱线图</td><td>组距要说明；比较多组时箱线图更好</td></tr>
+            <tr><td>看两数值关系</td><td>散点图（可加回归线）</td><td>先看图再算 $r$</td></tr>
+            <tr><td>看随时间变化</td><td>折线图</td><td>时间轴等距；纵轴尽量从 0 起</td></tr>
+            <tr><td>展示不确定性</td><td>带误差棒的点图、箱线图</td><td>标明是标准差、标准误还是置信区间</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s5-2">5.2 饼图什么时候不该用</h3>
+      <ul>
+        <li>类别超过 5 个，或各类别占比接近——肉眼分不清角度。</li>
+        <li>需要跨多组比较占比——多饼并排不如堆叠条形图。</li>
+        <li>占比之和不是 100%（允许多选的问卷）——饼图在逻辑上就不成立。</li>
+      </ul>
+
+      <h3 id="s5-3">5.3 图表设计原则与常见误导</h3>
+      <ul>
+        <li><strong>提高数据墨水比（Tufte）</strong>：图上每一滴「墨水」都应为传递信息服务。去掉 3D 效果、阴影、多余网格与装饰。</li>
+        <li><strong>标注来源与口径</strong>：样本量、时间范围、统计定义（是「人」还是「人次」）。</li>
+        <li><strong>避免截断纵轴</strong>：条形图纵轴不从 0 开始会把微小差异视觉放大。</li>
+        <li><strong>避免双轴把戏</strong>：左右两个刻度可以任意制造「同步 / 背离」的假象。</li>
+        <li><strong>谨慎用平滑曲线</strong>：对离散时间点做过度平滑会暗示数据中不存在的趋势。</li>
+      </ul>
+
+      <!-- ===== 6 ===== -->
+      <div id="examples"></div><h2 id="s6">6 · 本章例题精讲</h2>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.1</span>
+          <span class="ex-title">集中与离散指标的完整计算</span>
+        </div>
+        <div class="example-body">
+          <p>8 名同学某次测验成绩：12, 15, 18, 20, 20, 25, 30, 35。求均值、中位数、众数、样本方差与样本标准差。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 均值：</strong>$\sum x_i = 12+15+18+20+20+25+30+35 = 175$，$n = 8$，</p>
+              $$ \bar{x} = \frac{175}{8} = 21.875 $$
+              <p><strong>第 2 步 中位数：</strong>数据已排序，$n$ 为偶数，取第 4、5 个数的平均：$(20+20)/2 = 20$。</p>
+              <p><strong>第 3 步 众数：</strong>20 出现两次，其余各一次，众数 $= 20$。</p>
+              <p><strong>第 4 步 离差平方：</strong></p>
+              $$ \sum (x_i - \bar{x})^2 = (12-21.875)^2 + \cdots + (35-21.875)^2 = 414.875 $$
+              <p>（也可用计算式 $\sum x_i^2 - n\bar{x}^2 = 4243 - 8\times 21.875^2 = 414.875$ 验算。）</p>
+              <p><strong>第 5 步 样本方差与标准差：</strong></p>
+              $$ s^2 = \frac{414.875}{8-1} \approx 59.27, \qquad s = \sqrt{59.27} \approx 7.70 $$
+              <p><strong>解读：</strong>平均 21.9 分、典型值 20 分，标准差约 7.7 分。均值略高于中位数，说明分布有轻微右偏。若这 8 人就是全班，则用总体方差 $\sigma^2 = 414.875/8 \approx 51.86$、$\sigma \approx 7.20$。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.2</span>
+          <span class="ex-title">异常值让均值失真：该报中位数</span>
+        </div>
+        <div class="example-body">
+          <p>某部门 9 人年薪（万元）：8, 9, 10, 10, 11, 11, 12, 13, 60（最后一人为公司老板）。用均值还是中位数描述「普通员工收入」？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>含异常值：</strong>均值 $= 144/9 = 16$ 万元；中位数 $= 11$ 万元。</p>
+              <p><strong>去掉老板后：</strong>8 人均值 $= 84/8 = 10.5$ 万元，中位数 $= 10.5$ 万元——此时均值与中位数重合（近似对称）。</p>
+              <p><strong>对比：</strong>老板一人的 60 万把均值从 10.5 拉到 16（高估约 52%），而中位数仅从 10.5 变到 11。</p>
+              <p><strong>结论：</strong>描述「普通员工收入」应报<strong>中位数 11 万元</strong>，并注明「含老板在内的均值为 16 万元」。收入、房价、时长类右偏数据，中位数是更诚实的中心指标；也可报告<strong>截尾均值</strong>（去掉最高最低 5% 后的均值）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.3</span>
+          <span class="ex-title">手算皮尔逊相关系数（四对数据）</span>
+        </div>
+        <div class="example-body">
+          <p>某店广告投入 $x$（万元）与销售额 $y$（万元）：$(2,3),\ (4,5),\ (6,4),\ (8,6)$。求皮尔逊相关系数 $r$。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 求均值：</strong>$\bar{x} = (2+4+6+8)/4 = 5$，$\bar{y} = (3+5+4+6)/4 = 4.5$。</p>
+              <p><strong>第 2 步 算离差、乘积与平方：</strong></p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$i$</th><th>$x_i$</th><th>$y_i$</th><th>$x_i-\bar{x}$</th><th>$y_i-\bar{y}$</th><th>乘积</th><th>$(x_i-\bar{x})^2$</th><th>$(y_i-\bar{y})^2$</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>2</td><td>3</td><td>-3</td><td>-1.5</td><td>4.5</td><td>9</td><td>2.25</td></tr>
+                    <tr><td>2</td><td>4</td><td>5</td><td>-1</td><td>0.5</td><td>-0.5</td><td>1</td><td>0.25</td></tr>
+                    <tr><td>3</td><td>6</td><td>4</td><td>1</td><td>-0.5</td><td>-0.5</td><td>1</td><td>0.25</td></tr>
+                    <tr><td>4</td><td>8</td><td>6</td><td>3</td><td>1.5</td><td>4.5</td><td>9</td><td>2.25</td></tr>
+                    <tr><td><strong>合计</strong></td><td>—</td><td>—</td><td>0</td><td>0</td><td><strong>8</strong></td><td><strong>20</strong></td><td><strong>5</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p><strong>第 3 步 代入公式：</strong></p>
+              $$ r = \frac{8}{\sqrt{20 \times 5}} = \frac{8}{\sqrt{100}} = \frac{8}{10} = 0.8 $$
+              <p><strong>解读：</strong>$r = 0.8$，广告投入与销售额呈较强正线性关系。注意 $n = 4$ 太小，这个 $r$ 的抽样波动很大（模块 05 会给出检验方法），只能当作「有正向趋势」的初步证据。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.4</span>
+          <span class="ex-title">相关不等于因果：冰淇淋与溺水</span>
+        </div>
+        <div class="example-body">
+          <p>某城市数据显示「冰淇淋销量」与「溺水事故数」的相关系数高达 $r \approx 0.8$。能否为了减少溺水而禁止卖冰淇淋？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>不能。</strong>这里有三种典型的「相关 ≠ 因果」解释：</p>
+              <ul>
+                <li><strong>混杂变量：</strong>气温高（第三变量）同时推高冰淇淋销量和游泳/戏水人数，从而推高溺水事故。冰淇淋只是无辜的旁观者。</li>
+                <li><strong>反向因果：</strong>本例不适用，但很多场景方向是反的（如「医院床位多的城市死亡率高」——是病人多导致床位多，而非相反）。</li>
+                <li><strong>纯巧合：</strong>小样本或多重比较下，高 $r$ 可能只是碰巧（模块 01 的 p-hacking）。</li>
+              </ul>
+              <p><strong>正确做法：</strong>① 在散点图上按气温分层重画；② 用多元回归控制气温（模块 06）；③ 要下因果结论，需要随机化实验或专门的因果推断设计（模块 08）。</p>
+              <p><strong>一句话总结：</strong>相关系数量化的是「一起动」，不是「谁导致谁」。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 6.5</span>
+          <span class="ex-title">挑战题：辛普森悖论的相关系数版本</span>
+        </div>
+        <div class="example-body">
+          <p>某在线教育平台想回答「<strong>每周学习时长 $x$（小时）</strong>与<strong>课程完课率 $y$（%）</strong>有没有关系？」。他们抽取了 8 名学员，数据如下——注意这 8 人来自两类完全不同的学员群体：</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>群体</th><th>学员</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+              <tbody>
+                <tr><td rowspan="2"><strong>A 组</strong>：基础扎实、目标明确</td><td>学习时长 $x$</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
+                <tr><td>完课率 $y$</td><td>80</td><td>85</td><td>90</td><td>95</td></tr>
+                <tr><td rowspan="2"><strong>B 组</strong>：基础薄弱、动机不足</td><td>学习时长 $x$</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+                <tr><td>完课率 $y$</td><td>40</td><td>45</td><td>50</td><td>55</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>请回答：（1）分别计算 A 组、B 组内部的相关系数；（2）把 8 人合并成一个样本，计算合并后的 $r$；（3）合并结果与组内结果矛盾吗？你会向业务方推荐哪个结论？为什么？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第 1 步 组内相关系数：两个组都是完美的正相关。</strong></p>
+              <p>A 组：$x$ 与 $y$ 同步等距上升（每多学 1 小时，完课率涨 5 个百分点），$r_A = 1.000$；B 组同样如此，$r_B = 1.000$。组内结论一致：<strong>学习越久，完课率越高</strong>。</p>
+              <p><strong>第 2 步 合并后计算。</strong>$\bar{x} = (3+4+\cdots+10)/8 = 6.5$，$\bar{y} = (80+85+90+95+40+45+50+55)/8 = 67.5$。</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>$i$</th><th>$x_i$</th><th>$y_i$</th><th>$x_i-\bar{x}$</th><th>$y_i-\bar{y}$</th><th>乘积</th><th>$(x_i-\bar{x})^2$</th><th>$(y_i-\bar{y})^2$</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>3</td><td>80</td><td>-3.5</td><td>12.5</td><td>-43.75</td><td>12.25</td><td>156.25</td></tr>
+                    <tr><td>2</td><td>4</td><td>85</td><td>-2.5</td><td>17.5</td><td>-43.75</td><td>6.25</td><td>306.25</td></tr>
+                    <tr><td>3</td><td>5</td><td>90</td><td>-1.5</td><td>22.5</td><td>-33.75</td><td>2.25</td><td>506.25</td></tr>
+                    <tr><td>4</td><td>6</td><td>95</td><td>-0.5</td><td>27.5</td><td>-13.75</td><td>0.25</td><td>756.25</td></tr>
+                    <tr><td>5</td><td>7</td><td>40</td><td>0.5</td><td>-27.5</td><td>-13.75</td><td>0.25</td><td>756.25</td></tr>
+                    <tr><td>6</td><td>8</td><td>45</td><td>1.5</td><td>-22.5</td><td>-33.75</td><td>2.25</td><td>506.25</td></tr>
+                    <tr><td>7</td><td>9</td><td>50</td><td>2.5</td><td>-17.5</td><td>-43.75</td><td>6.25</td><td>306.25</td></tr>
+                    <tr><td>8</td><td>10</td><td>55</td><td>3.5</td><td>-12.5</td><td>-43.75</td><td>12.25</td><td>156.25</td></tr>
+                    <tr><td><strong>合计</strong></td><td>—</td><td>—</td><td>0</td><td>0</td><td><strong>-270</strong></td><td><strong>42</strong></td><td><strong>3450</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              $$ r = \frac{-270}{\sqrt{42 \times 3450}} = \frac{-270}{\sqrt{144900}} = \frac{-270}{380.66} \approx -0.709 $$
+              <p><strong>第 3 步 矛盾出现了。</strong>合并后 $r \approx -0.709$，是一个<strong>中等强度的负相关</strong>——如果只看这张合并表，结论会变成「<strong>学得越久，完课率越低</strong>」，与两组内部完全相反。这就是模块 01 例 6.3 讲过的<strong>辛普森悖论在相关系数上的版本</strong>。</p>
+              <p><strong>为什么会这样？</strong>因为 $x$ 和 $y$ 的<strong>组间差异</strong>压倒了组内差异。合并后：学习时长最高的两组数据（$x = 7\sim10$）来自 B 组，完课率恰好最低（40–55%）；学习时长最低的（$x = 3\sim6$）来自 A 组，完课率最高（80–95%）。两组在 $x$ 轴和 $y$ 轴上<strong>朝着相反方向分布</strong>，于是合并的离差乘积几乎全为负。混杂因素就是「<strong>学员群体（A/B 组）</strong>」——它同时影响学习时长和完课率。</p>
+              <p><strong>第 4 步 该推荐哪个结论？</strong>推荐<strong>组内结论（学习越久，完课率越高）</strong>，并说明理由：</p>
+              <ul>
+                <li><strong>合并的 $r = -0.709$ 描述的是「这 8 个人」</strong>——一个由平台自己挑出来的、构成极端不平衡的样本。它回答不了「多学一小时会让我的完课率提高多少」这个业务问题。</li>
+                <li><strong>组内斜率高度一致</strong>（两组都是 $+5$ 个百分点/小时），说明「学习时长 → 完课率」的机制在两个群体中都成立且同向。把它们合并，等于人为制造了一个不存在的反常现象。</li>
+                <li><strong>「A 组学得少却完课率高」不是「学习无用」的证据</strong>，而是<strong>自选择</strong>：基础扎实的人本来就更容易坚持完课（反之亦然）。A 组的优势来自起点，不是来自时长。</li>
+              </ul>
+              <p><strong>正确的做法：</strong>① <strong>分层报告</strong>——按群体分别给 $r$ 与回归线；② 或做<strong>多元回归</strong>，把「群体」作为哑变量放进模型（模块 06），看控制群体后 $x$ 的系数；③ 若要下因果结论，做<strong>随机分配学习时长</strong>的实验（模块 08），而不是用观察数据的相关。</p>
+              <p><strong>易错提示：</strong>① 看到合并 $r = -0.709$ 就写进报告并建议「减少学习时长」——这是把辛普森悖论当成结论；② 只报一个总体 $r$ 而不报分层结果；③ 混淆「组间差异」与「组内效应」——前者是混杂，后者才是我们关心的机制；④ 认为 $r = 1.000$（组内完美相关）就等于因果——$n=4$ 的完美相关完全可能来自共同趋势，且不排除混杂；⑤ 以为「控制住群体就一定能得因果」——回归能控制<em>已观测的</em>混杂，未观测的混杂仍会残留。</p>
+              <p><strong>应用/AI 关联：</strong>这是模型评估与业务分析中最常见的翻车点。① <strong>推荐系统</strong>：「曝光越多、转化率越低」的合并相关性，往往是因为高活跃用户被推了更多曝光，而低活跃用户被反复推送导致疲劳——按用户活跃度分层后，结论会反转（对应模块 01 例 6.3 的 CTR 版本）；② <strong>模型离线评测</strong>：一个模型在整体数据集上指标下降，但按数据源分层后每层都提升，原因是测试集构成变了（类似 m01 的「口径变更」陷阱）；③ <strong>医疗 AI</strong>：若只用「轻症」病历训练与评测，会高估在重症上的效果（分层差异被当成总体水平）；④ <strong>AB 实验</strong>：如果分组不是随机的而是按「用户活跃度」分层指派，组间基线差异会污染结论——这正是实验设计必须随机化的原因（模块 08）。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 7 ===== -->
+      <!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 02 描述统计与可视化 -->
+
+
+<h2 id="d-deep-1">深度专题一 · 稳健统计：崩溃点、中位数与截尾均值</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>「不怕异常值」到底能扛到什么程度？把它量化成一个数</h3></div>
+  <p class="dt-lead">对应本章第 2 节（#s2）的提问「均值被一个极端值拉偏时，应该改用哪些稳健统计量，代价是什么」。正文 1.3 节与例 6.2 已经用「老板年薪把均值拉高 52%」演示了现象；这里把「稳健」变成一个可计算、可比较的指标：崩溃点。</p>
+
+  <h4>背景：最优不等于抗造</h4>
+  <p>算术均值在<strong>正态分布假设</strong>下是极大似然估计，方差最小、性质最好，所以整座经典统计推断的大厦（置信区间、t 检验、回归最小二乘）都建在它上面。但 20 世纪 60 年代 Tukey、Huber、Hampel 等人指出：这套最优性对「数据完全符合假设」极其敏感，一个录入错误（把 96 打成 960）就能让均值、标准差、乃至基于它们的全部结论整体翻车。稳健统计（robust statistics）由此诞生，目标不是「更好」，而是「在假设被轻微违背时仍然不崩」。</p>
+  <p>正文已经给了三个候选：中位数、众数、截尾均值（例 6.2 末尾提到「去掉最高最低 5% 后的均值」）。本专题回答一个正文留白的问题：<strong>它们各自最多能容忍多少污染？代价又是什么？</strong></p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>想象桌上排着 20 个数，有人悄悄把其中 1 个改成 100 万。会发生什么：</p>
+  <ul>
+    <li><strong>均值</strong>：它把 20 个数一视同仁地加起来，所以那一个 100 万被平摊进每个人的份额里，均值立刻飞到五万上下。它「全盘接收」每一个观测，一个坏点就能毁掉它。</li>
+    <li><strong>中位数</strong>：它只看排序后正中间的位置。改掉最右端 1 个数，中间那两位纹丝不动。你得把一半以上的数都改成 100 万，才可能把中间位置推走。</li>
+    <li><strong>截尾均值</strong>：先砍掉两端各若干个、再对中间求平均。只要被污染的点都落在被砍掉的那一段里，它就毫发无伤；污染多到「漏进」保留段，才会崩。</li>
+  </ul>
+  <p>于是可以问一个很自然的问题：<strong>至少要污染多少个点，才能让这个统计量彻底失控？</strong>答案就是「崩溃点」（breakdown point）。它把一个模糊的「稳健」变成一个 0 到 50% 之间的百分比：均值约 0%，中位数 50%，20% 截尾均值约 20%。</p>
+  <p>但天下没有免费午餐：数据干净且近似正态时，中位数比均值「浪费」信息——它的波动更大。稳健性是用<strong>效率</strong>换来的，选择哪个统计量，本质是选「愿意用多少效率换多少抗污染能力」。</p>
+
+  <h4>形式化</h4>
+  <div class="formula-box">
+    <div class="f-name">崩溃点的定义（有限样本）</div>
+    $$ \varepsilon^*(T,\mathbf{x}) = \frac{1}{n}\,\min\Big\{\, m : \sup_{\mathbf{x}'}\ \big|T(\mathbf{x}') - T(\mathbf{x})\big| = \infty \,\Big\} $$
+    <div class="f-note">白话：允许把至多 $m$ 个观测替换成任意值；能让统计量 $T$ 跑到无穷大的最小 $m$ 除以 $n$，就是崩溃点。它度量「坏数据最多能占多大比例还不至于毁掉结论」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">均值：一个坏点就崩</div>
+    $$ \bar{x}' = \bar{x} + \frac{M - x_j}{n} \xrightarrow[M\to\infty]{} \infty, \qquad \varepsilon^*(\bar{x}) = \frac{1}{n} \to 0 $$
+    <div class="f-note">白话：把第 $j$ 个数改成任意大的 $M$，均值增加 $(M-x_j)/n$；$M$ 无上界，所以只要污染 1 个点就能把均值推到任意远，崩溃点为 $1/n$，样本量越大越接近 0。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">中位数：最多容忍一半污染</div>
+    $$ \varepsilon^*(\mathrm{med}) = \frac{\lfloor (n+1)/2 \rfloor}{n} \;\to\; \frac{1}{2} $$
+    <div class="f-note">白话：中位数只由排序中间的一个（或两个）位置决定；要把它推走，至少得污染一半的观测，故崩溃点约 50%，这是任何位置统计量能做到的上限。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">$\alpha$ 截尾均值：可调节的折中</div>
+    $$ \bar{x}_{\alpha} = \frac{1}{\,n - 2k\,}\sum_{i=k+1}^{n-k} x_{(i)}, \qquad k = \lfloor \alpha n \rfloor, \qquad \varepsilon^*(\bar{x}_{\alpha}) = \frac{k+1}{n} \approx \alpha $$
+    <div class="f-note">白话：$x_{(i)}$ 是排序后第 $i$ 个数，砍掉两端各 $k$ 个再平均；污染点只要都落在砍掉的段里就不起作用。有限样本下精确崩溃点是 $(k+1)/n$，大样本下趋于 $\alpha$；$\alpha=0$ 退化为均值，$\alpha\to 0.5$ 退化为中位数。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">代价：效率的损失</div>
+    $$ \mathrm{Var}(\bar{x}) = \frac{\sigma^2}{n}, \qquad \mathrm{Var}(\mathrm{med}) \approx \frac{\pi}{2}\cdot\frac{\sigma^2}{n} \approx 1.571\,\frac{\sigma^2}{n} $$
+    <div class="f-note">白话：在干净的正态数据上，中位数的方差约为均值的 1.571 倍，相当于「浪费」了约 57% 的信息；20% 截尾均值只损失几个百分点效率，却把崩溃点从 0 提到 20%，通常是很划算的折中。</div>
+  </div>
+
+  <p>数值演示见代码实验 Part 1：干净样本 $n=20$、均值 79.800；只污染 1 个点，均值立刻变成 50075.00，而中位数仍为 79.50；10% 截尾均值在 $k=3$ 崩溃（62574.19），20% 截尾均值在 $k=5$ 崩溃（83405.83），中位数直到 $k=10$ 才跳到 500039.50。三个崩溃点分别是 $1/20$、$3/20$、$5/20$、$10/20$，与公式 $(\lfloor\alpha n\rfloor+1)/n$、$\lfloor(n+1)/2\rfloor/n$ 逐位吻合。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>崩溃点把「稳健」量化了：均值 $\varepsilon^*=1/n\to 0$、$\alpha$ 截尾均值 $\varepsilon^*\approx\alpha$、中位数 $\varepsilon^*\to 1/2$。选择不是「哪个统计量更好」，而是「愿意用多少效率换多少抗污染能力」：污染风险低且要推断总体时保留均值，右偏／含异常值且要描述典型水平时改用中位数或 20% 截尾均值，并同时报告两套结果。</div>
+
+  <p><strong>边界条件：</strong>在污染比例低于所选估计量的崩溃点、且极端值来自少数录入／测量错误（而非真实业务信号）的条件下，本结论成立；在污染比例超过崩溃点、或极端值本身是真实且重要的信号（大促订单、重症患者、欺诈交易、P99 延迟）的条件下，本结论不成立，应改用显式建模（重尾 t 分布、混合模型、分位数回归）或分层单独报告这些点，而不是简单截掉或一律删除。</p>
+
+  <p>下图是模块 09 的偏差—方差权衡曲线。稳健统计面对的是同一类两难结构：均值把所有观测都用上，方差最小但一旦被污染就产生巨大偏差；截尾均值主动舍弃一部分信息（牺牲一点效率）换取对污染的免疫。横轴含义不同，但「两项之和取最小」的取舍逻辑完全一致。</p>
+  <figure class="figure" id="fig-curve-bias-variance">
+  <svg class="dia" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="偏差—方差权衡与模型复杂度"><line class="dg-grid" x1="62" y1="26.0" x2="654" y2="26.0"/><line class="dg-grid" x1="62" y1="83.0" x2="654" y2="83.0"/><line class="dg-grid" x1="62" y1="140.0" x2="654" y2="140.0"/><line class="dg-grid" x1="62" y1="197.0" x2="654" y2="197.0"/><line class="dg-grid" x1="62" y1="254.0" x2="654" y2="254.0"/><line class="dg-axis" x1="62" y1="26" x2="62" y2="254"/><line class="dg-axis" x1="62" y1="254" x2="654" y2="254"/><path class="dg-curve alt" d="M 62.0 142.2 L 121.2 153.1 L 180.4 163.3 L 239.6 172.7 L 298.8 181.4 L 358.0 189.3 L 417.2 196.5 L 476.4 202.9 L 535.6 208.5 L 594.8 213.4 L 654.0 217.6"/><text class="dg-elabel" x="364.0" y="180.30578512396693" text-anchor="start">偏差²</text><path class="dg-curve " d="M 62.0 254.0 L 121.2 243.8 L 180.4 232.1 L 239.6 219.0 L 298.8 204.3 L 358.0 188.0 L 417.2 170.3 L 476.4 151.1 L 535.6 130.4 L 594.8 108.2 L 654.0 84.4"/><text class="dg-elabel" x="364.0" y="179.0495867768595" text-anchor="start">方差</text><path class="dg-curve ok" d="M 62.0 120.2 L 121.2 121.0 L 180.4 119.5 L 239.6 115.7 L 298.8 109.7 L 358.0 101.4 L 417.2 90.8 L 476.4 78.0 L 535.6 62.9 L 594.8 45.6 L 654.0 26.0"/><text class="dg-elabel" x="364.0" y="92.37190082644628" text-anchor="start">测试误差 = 偏差²+方差+噪声</text><text class="dg-ts" x="358.0" y="290" text-anchor="middle">模型复杂度 →</text><text class="dg-ts" x="14" y="140.0" text-anchor="start">误差</text><circle class="dg-dot" cx="298.8" cy="108.9" r="4"/><text class="dg-elabel" x="305.8" y="102.9090909090909" text-anchor="start">最优点</text></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">偏差—方差权衡与模型复杂度</span>
+    <span class="fig-note">训练误差随复杂度单调下降，测试误差呈 U 形；最优点在偏差平方与方差之和最小处。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="../modules/m09-ml-stats.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 为什么相同的汇总统计会隐藏截然不同的分布</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>两个数字不可能决定一条密度曲线：从矩问题到双峰</h3></div>
+  <p class="dt-lead">对应本章核心提问「为什么均值与标准差不足以描述一个双峰分布」，并回答第 4 节（#s4）「直方图 bin 宽度如何改变你对分布形状的判断」。正文已用经典配图（Anscombe 四重奏与 Datasaurus Dozen）给出「必须可视化」的证据；这里不重复那张图，而是讲清「凭什么不够」。</p>
+
+  <h4>背景：从一张图到一条定理</h4>
+  <p>1973 年 Anscombe 构造了四组散点，均值、方差、相关系数、回归线几乎完全相同，散点形态却是线性、曲线、离群点、垂直堆叠；2017 年 Matejka 与 Fitzmaurice 把这件事推到极致，做出十三个共享同样统计量、却分别呈恐龙、星形、圆环的数据集。这些例子常被当作「画图很重要」的劝告，其实背后是一条硬定理：<strong>有限个低阶矩不能唯一决定一个分布</strong>，这是概率论里「矩问题」（moment problem）的直接推论。均值与标准差只是前两阶矩，信息量根本不够。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>告诉你「某班平均身高 170 cm、标准差 8 cm」，你能画出身高直方图吗？不能。可能是众人集中在 170 上下的单峰钟形；也可能是「一批 158 cm 与一批 182 cm」两个明显分开的峰，平均起来恰好也是 170。均值只告诉你<strong>重心在哪</strong>，标准差只告诉你<strong>平均离重心多远</strong>，至于「数据堆成几堆、每堆多少人、堆与堆之间有没有空档」，这两个数字一个字都没记录。</p>
+  <p>类比：只知道一个物体的总重量和重心位置，猜不出它是实心球还是哑铃。更反直觉的是，把偏度、峰度也加上（四个数字）仍然不够——你需要的不是几个摘要，而是<strong>整条分布函数</strong>，或者至少一张图。这也是为什么本章正文反复强调「先画散点图／直方图，再算统计量」不是建议而是必需。</p>
+  <p>还要注意一个容易混淆的点：中心极限定理说「样本均值的分布趋近正态」，那是<strong>统计量</strong>的分布，不是<strong>原始数据</strong>的分布。原始数据可以双峰、重尾、完全不对称，而它的均值抽样分布照样是漂亮钟形。把这两件事分开，才不会误以为「CLT 保证了我的数据近似正态」。</p>
+
+  <h4>形式化</h4>
+  <div class="formula-box">
+    <div class="f-name">均值与方差只是前两阶矩</div>
+    $$ \mu = E[X], \qquad \sigma^2 = E\big[(X-\mu)^2\big], \qquad m_r = E[X^r] $$
+    <div class="f-note">白话：均值是一阶矩（重心），方差来自二阶矩（平均平方距离）；$m_r$ 是 $r$ 阶矩，把 $X$ 的 $r$ 次方求平均。我们平时报的「均值 + 标准差」只用到了 $m_1,m_2$。</div>
+  </div>
+
+  <p>下面给出一个<strong>显式构造</strong>，用初中代数就能验证：固定 $\sigma \gt 0$，对任意 $a \ge \sigma$ 定义对称三点分布</p>
+  <div class="formula-box">
+    <div class="f-name">无穷多个分布共享同一个均值与方差</div>
+    $$ P(X_a=-a) = P(X_a=a) = p, \quad P(X_a=0) = 1-2p, \quad p = \frac{\sigma^2}{2a^2} $$
+    $$ E[X_a] = -ap + ap = 0, \qquad \mathrm{Var}(X_a) = 2a^2 p = \sigma^2 $$
+    <div class="f-note">白话：无论 $a$ 取多大，均值恒为 0、方差恒为 $\sigma^2$；但 $a=\sigma$ 时是「只在 $\pm\sigma$ 两点」的分布，$a=\sqrt{2}\,\sigma$ 时一半质量堆在 0，$a$ 很大时几乎全部堆在 0、极小概率甩到 $\pm a$。均值、方差相同，形状天差地别。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">偏度与峰度仍只是两个数字</div>
+    $$ \gamma_1 = \frac{E[(X-\mu)^3]}{\sigma^3}, \qquad \gamma_2 = \frac{E[(X-\mu)^4]}{\sigma^4} - 3 $$
+    <div class="f-note">白话：偏度用三次方保留「尾巴朝哪」，峰度用四次方衡量「尾有多厚」；对上面的三点族，$\gamma_1$ 恒为 0（对称）、$\gamma_2 = a^2/\sigma^2 - 3$ 随 $a$ 变，所以峰度确实能区分它们，但它仍只是一个数，画不出「几堆、各堆多少」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">矩问题的结论（有限矩不唯一，全部矩才可能唯一）</div>
+    $$ \text{给定有限个 } m_1,\dots,m_r \ \Longrightarrow\ \text{存在无穷多个不同的分布与之相符} $$
+    $$ \text{在有界支撑上，全部矩序列 } \{m_k\}_{k\ge 1} \ \Longrightarrow\ \text{唯一确定分布（Hausdorff）} $$
+    <div class="f-note">白话：只给你前几个矩，分布有无穷多种可能；只有把无穷多个矩全拿到手（且取值有界）才能锁定分布。我们实际算的四个数字离「全部」差得远，所以必须靠图形、经验分布函数或分位数向量来描述形状。</div>
+  </div>
+
+  <p>数值演示见代码实验 Part 3：构造 A（单峰）与 B（双峰）各 40 个数，都用线性重标定对齐案例字段 <code>quiz_avg</code> 的 $\mu=79.7574$、$\sigma=14.5763$。两者均值、标准差、偏度（都精确为 0，由对称构造保证）完全一致，但超额峰度分别为 $+0.6023$ 与 $-1.6036$，五数概括里 IQR 已出现分歧（17.86 对 25.94），而共同分组的 ASCII 直方图最直观：A 只有一个峰，B 有两个峰、中间有一道明显谷底。顺带也回答了 #s4：Sturges 对两者一律给 $k=7$ 组，FD 组距却分别是 10.447 与 15.169——组距规则本身也依赖分布形状。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>均值与标准差（连同偏度、峰度）只是分布的低阶矩摘要，<strong>有限个数字不能决定分布形状</strong>；要描述形状必须给出直方图／核密度／经验分布函数或分位数向量。「均值 + 标准差」只有在已预先假定分布族（如正态，此时二者是充分统计量）时才够用；分布族未知、尤其可能多峰或重尾时，必须先看图。</div>
+
+  <p><strong>边界条件：</strong>在分布族已被先验限定（例如确知数据来自正态分布，$\bar{x}$ 与 $s$ 构成充分统计量）的条件下，本结论不成立，应改用该分布族的充分统计量做参数推断；在分布族未知、可能多峰或重尾时，本结论成立，应改用直方图／核密度／经验分布函数或分布无关的方法（分位数、秩统计、箱线图），并至少用两三种组距交叉核对形状。</p>
+
+  <p>下图是中心极限定理：随着 $n$ 增大，<strong>样本均值</strong>的分布按 $\sigma^2/n$ 收缩并趋于正态。请把它与本专题的结论放在一起读——钟形的是统计量的抽样分布，原始数据仍可以是任意形状；CLT 恰恰说明「汇总统计会抹平形状」这件事有多彻底。</p>
+  <figure class="figure" id="fig-curve-clt">
+  <svg class="dia" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="中心极限定理：样本均值的分布随 n 收敛"><line class="dg-grid" x1="62" y1="26.0" x2="654" y2="26.0"/><line class="dg-grid" x1="62" y1="83.0" x2="654" y2="83.0"/><line class="dg-grid" x1="62" y1="140.0" x2="654" y2="140.0"/><line class="dg-grid" x1="62" y1="197.0" x2="654" y2="197.0"/><line class="dg-grid" x1="62" y1="254.0" x2="654" y2="254.0"/><line class="dg-axis" x1="62" y1="26" x2="62" y2="254"/><line class="dg-axis" x1="62" y1="254" x2="654" y2="254"/><path class="dg-curve alt" d="M 62.0 218.0 L 121.2 212.6 L 180.4 203.9 L 239.6 190.0 L 298.8 171.7 L 358.0 161.4 L 417.2 171.7 L 476.4 190.0 L 535.6 203.9 L 594.8 212.6 L 654.0 218.0"/><text class="dg-elabel" x="364.0" y="152.39148114285712" text-anchor="start">n = 1（近似总体形状）</text><path class="dg-curve " d="M 62.0 235.6 L 121.2 229.8 L 180.4 219.0 L 239.6 196.5 L 298.8 149.7 L 358.0 106.4 L 417.2 149.7 L 476.4 196.5 L 535.6 219.0 L 594.8 229.8 L 654.0 235.6"/><text class="dg-elabel" x="364.0" y="97.43058285714287" text-anchor="start">n = 5</text><path class="dg-curve ok" d="M 62.0 254.0 L 121.2 250.5 L 180.4 243.2 L 239.6 224.7 L 298.8 162.2 L 358.0 26.0 L 417.2 162.2 L 476.4 224.7 L 535.6 243.2 L 594.8 250.5 L 654.0 254.0"/><text class="dg-elabel" x="364.0" y="17.0" text-anchor="start">n = 30</text><text class="dg-ts" x="358.0" y="290" text-anchor="middle">样本均值 x̄</text><text class="dg-ts" x="14" y="140.0" text-anchor="start">密度</text></svg>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">中心极限定理：样本均值的分布随 n 收敛</span>
+    <span class="fig-note">三条曲线示意不同样本量下均值的抽样分布；n 增大时方差按 σ²/n 收缩并趋于正态，与总体分布形态无关。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="../modules/m05-inference.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 箱线图 1.5×IQR 规则与直方图组距选择（Sturges / Freedman–Diaconis）</h2>
+<div class="algo-spec">
+  <p>这两个工具位于「数据采集 → 存储计算 → 建模 → 评估」链条的<strong>探索性分析入口</strong>：拿到一批数，先用五数概括 + 1.5×IQR 快速筛出疑似异常，再用直方图看形状。上游契约是「一列比率／区间尺度的数值」，下游契约是「异常标记、五数概括、组距与分箱结果」，供模块 04 分布拟合与模块 06 回归诊断使用。</p>
+
+  <h3 id="d-algo-principle">一、原理：用分位数代替均值，用组距控制分辨率</h3>
+  <p>箱线图的全部力量来自<strong>分位数</strong>：它不关心两端多极端，只关心排序位置，因此不会被异常值自己撑大（呼应深度专题一的崩溃点）。直方图则把连续取值切成等宽桶，组距 $h$ 是唯一的分辨率旋钮：$h$ 太大把双峰抹成一个包，$h$ 太小把随机空隙放大成假峰。</p>
+  <div class="formula-box">
+    <div class="f-name">五数概括与 1.5×IQR 栅栏</div>
+    $$ \mathrm{IQR} = Q_3 - Q_1, \qquad \text{下界} = Q_1 - 1.5\,\mathrm{IQR}, \qquad \text{上界} = Q_3 + 1.5\,\mathrm{IQR} $$
+    <div class="f-note">白话：盒子覆盖中间 50% 的数据，把盒子向两端各延长 1.5 个盒长，落在栅栏外的点标为疑似异常；用 $Q_1,Q_3$ 而非 $\bar{x},s$，所以异常值不会反过来抬高栅栏。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">系数 1.5 从哪来：正态下的误判率</div>
+    $$ Q_1 \approx \mu - 0.6745\sigma,\quad Q_3 \approx \mu + 0.6745\sigma,\quad \mathrm{IQR}\approx 1.349\sigma $$
+    $$ \text{上界} \approx \mu + 2.698\sigma \ \Longrightarrow\ P(|Z| \gt 2.698) \approx 2\big(1-\Phi(2.698)\big) \approx 0.007 $$
+    <div class="f-note">白话：1.5 是一个经验折中——在正态数据上，栅栏外只有约 0.7% 的正常点被误标为异常。这正是本章第 2 节提问「它把多少比例的正常点误判为异常」的答案；代码实验 Part 2 用 20 万个模拟点实测 0.0072。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">Sturges 组距（只依赖样本量）</div>
+    $$ k = \lceil \log_2 n \rceil + 1, \qquad h = \frac{x_{\max}-x_{\min}}{k} $$
+    <div class="f-note">白话：假设数据近似单峰、近似正态，用 $n$ 决定分几组；$n$ 翻倍才多一组，对偏态与多峰不敏感。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">Freedman–Diaconis 组距（用 IQR 抗异常值）</div>
+    $$ h = 2\,\mathrm{IQR}\,n^{-1/3}, \qquad k = \left\lceil \frac{x_{\max}-x_{\min}}{h} \right\rceil $$
+    <div class="f-note">白话：用四分位距而不是极差来定组宽，异常值拉不动它；数据越分散组越宽，样本越多组越细（按 $n^{-1/3}$ 收缩）。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">Scott 组距（对照）</div>
+    $$ h = 3.5\,s\,n^{-1/3} $$
+    <div class="f-note">白话：与 FD 同结构但用样本标准差 $s$；一旦有异常值，$s$ 被撑大、组距随之变宽，主体结构容易被抹平——这就是它不如 FD 稳健的原因。</div>
+  </div>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>排序并算五数概括。</strong>把 $n$ 个数升序排列，取最小值、$Q_1$、中位数、$Q_3$、最大值；偶数 $n$ 时 $Q_1,Q_3$ 取对应半段的中位数。</li>
+    <li><strong>算 IQR 与栅栏。</strong>$\mathrm{IQR}=Q_3-Q_1$，下界 $=Q_1-1.5\,\mathrm{IQR}$，上界 $=Q_3+1.5\,\mathrm{IQR}$；把界外点标为疑似异常，另用 $3\times\mathrm{IQR}$ 标极端异常。</li>
+    <li><strong>核查异常点。</strong>逐问：是录入错误吗？是真实但罕见的事件吗？含／不含它结论会变吗？保留两套结果，不急着删。</li>
+    <li><strong>选组距。</strong>先用 Sturges 得 $k_{\text{St}}$、用 FD 得 $h_{\text{FD}}$ 与 $k_{\text{FD}}$；二者差别大时<strong>至少画两张图</strong>交叉核对。</li>
+    <li><strong>分箱计数。</strong>确定起点（通常取 $x_{\min}$），把每个 $x$ 归入 $\lfloor (x-x_{\min})/h \rfloor$ 号桶，统计频数；注意声明纵轴是频数还是密度。</li>
+    <li><strong>读形状。</strong>看峰数、对称性、尾部、空隙；若 Sturges 与 FD 给出不同峰数，以「多组距一致出现」的结构为准，不轻易下结论。</li>
+    <li><strong>报告口径。</strong>同时给出 $n$、组距 $h$、组数 $k$、五数概括、异常点个数与处理决定，保证别人能复现同一张图。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>数据：</strong>单列定量数据，至少区间尺度；样本量建议 $n \ge 20$（小样本的分位数与组距都极不稳定）。</li>
+    <li><strong>1.5×IQR：</strong>分布近似对称时误判率约 0.7%；明显右偏时误判率显著上升（代码实测指数分布 4.84%），应改用按分布校准的栅栏或先做变换。</li>
+    <li><strong>Sturges：</strong>数据近似单峰、近似正态、无明显异常值；$n$ 不大（$n \lt 200$）时最常用。</li>
+    <li><strong>FD / Scott：</strong>数据有异常值、偏态或重尾时优先 FD；注意<strong>双峰数据 IQR 偏大反而使 FD 组数变少</strong>（代码 Part 3 中 $k_{\text{FD}}=4$ 对 $k_{\text{St}}=7$），此时 Sturges 或更窄的组距更能显出两个峰。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>构建（训练）</b> 排序 $O(n\log n)$；已排序后五数概括 $O(1)$，分箱计数 $O(n+k)$；<b>单次查询（推理）</b> 判定一个点是否异常 $O(1)$，归入某个桶 $O(1)$；<b>空间</b> 保留排序副本 $O(n)$，仅存桶计数 $O(k)$，流式分箱可压到 $O(k)$。</div>
+  <p>白话：最贵的一步是把数据排一遍序；排好之后，分位数、栅栏、分箱都是线性扫描，几乎不占内存。这正是它在大规模日志探查中仍然实用的原因。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>基于分位数，崩溃点约 50%，异常值不会自我掩盖（对比 3σ 规则）。</li>
+        <li>五数概括只需 5 个数就能刻画中心、离散与尾部，适合多组并排比较。</li>
+        <li>FD 组距对异常值稳健，且随 $n$ 自适应变细。</li>
+        <li>全部可手算、可复现，不依赖任何第三方库或分布假设。</li>
+        <li>图形直观，能立刻暴露双峰、偏态与空隙（深度专题二的核心诉求）。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>1.5×IQR 在偏态分布下误判率可达 4%~5%，把正常长尾当成异常。</li>
+        <li>Sturges 只看 $n$，对多峰、重尾、小样本都很迟钝。</li>
+        <li>FD 依赖 IQR；双峰数据的 IQR 偏大时组数反而变少，可能抹平双峰。</li>
+        <li>组距、起点、边界归属的微小差别就能改变视觉结论，必须报告口径。</li>
+        <li>箱线图不显示模态个数（单峰与双峰可以画出几乎相同的盒子）。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>某小组 12 名学员的每周学习分钟数（已排序）：</p>
+  <p>$$ 18,\ 22,\ 25,\ 29,\ 31,\ 33,\ 36,\ 38,\ 41,\ 45,\ 52,\ 96 $$</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>$n=12$，$x_{\min}=18$，$x_{\max}=96$，极差 $= 78$；末位 96 明显偏大，先不删，交给规则判断。</div>
+    <div class="solve-step"><span class="ss-k">中位数与四分位数。</span>$n$ 为偶数，中位数 $= (33+36)/2 = 34.5$；下半段 $\{18,22,25,29,31,33\}$ 给 $Q_1=(25+29)/2 = 27$；上半段 $\{36,38,41,45,52,96\}$ 给 $Q_3=(41+45)/2 = 43$。</div>
+    <div class="solve-step"><span class="ss-k">IQR 与栅栏。</span>$\mathrm{IQR}=43-27=16$，$1.5\times\mathrm{IQR}=24$；下界 $=27-24=3$，上界 $=43+24=67$。因 $96 \gt 67$，<strong>96 是疑似异常值</strong>。</div>
+    <div class="solve-step"><span class="ss-k">五数概括。</span>$18,\ 27,\ 34.5,\ 43,\ 96$；箱体 $[27,43]$，中位线 34.5 偏左，上须最长只到 52，96 单独画点——右偏形态与规则结论互相印证。</div>
+    <div class="solve-step"><span class="ss-k">Sturges 组距。</span>$\log_2 12 = 3.585$，$\lceil 3.585\rceil + 1 = 5$ 组；$h_{\text{St}} = 78/5 = 15.60$。五组为 $[18,33.6),[33.6,49.2),[49.2,64.8),[64.8,80.4),[80.4,96]$。</div>
+    <div class="solve-step"><span class="ss-k">FD 组距。</span>$12^{1/3} \approx 2.2894$，$h_{\text{FD}} = 2\times 16 / 2.2894 = 13.9773$；$k_{\text{FD}} = \lceil 78/13.9773\rceil = 6$ 组。FD 比 Sturges 多一组，主体部分被切得更细。</div>
+    <div class="solve-step"><span class="ss-k">对照 3σ 规则（重要反例）。</span>$\bar{x}=466/12=38.8333$，$\sigma=\sqrt{382.8056}=19.5654$，上界 $=38.8333+3\times19.5654 = 97.5296$。因 $96 \lt 97.5296$，<strong>3σ 规则没能抓到 96</strong>——因为 96 自己把 $\sigma$ 撑大了，这叫掩蔽效应（masking）。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>同一组数据，1.5×IQR 判 96 为异常、3σ 判为正常。原因是 IQR 的崩溃点约 50%，而 $\bar{x}$ 与 $s$ 的崩溃点为 0：异常值参与了自己是否被判异常的投票。这正是深度专题一「崩溃点」的直接后果。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>1.5×IQR 异常值规则</th><th>Sturges 组距</th><th>Freedman–Diaconis 组距</th><th>3σ 规则（对照）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>单列数值、$n\ge 20$、近似对称时最准</td>
+        <td>近似单峰、近似正态、无强异常值、$n$ 不大</td>
+        <td>含异常值、偏态、重尾；分布族未知</td>
+        <td>严格正态假设、无异常值污染</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>排序 $O(n\log n)$，判定 $O(1)$，空间 $O(n)$</td>
+        <td>分箱 $O(n+k)$，空间 $O(k)$</td>
+        <td>需先算 IQR，再 $O(n+k)$，空间 $O(k)$</td>
+        <td>需算 $\bar{x},s$，$O(n)$，空间 $O(1)$</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>倍数 1.5（温和）/ 3（极端）、四分位数口径</td>
+        <td>无（只由 $n$ 决定），隐含正态假设</td>
+        <td>系数 2、指数 $-1/3$、IQR 口径</td>
+        <td>倍数 3，隐含「均值与标准差可靠」</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">崩溃点约 50%，抗污染、可手算</td>
+        <td>最简单，$n$ 给定时无需看数据</td>
+        <td class="best">抗异常值，随 $n$ 自适应变细</td>
+        <td>正态下理论误判率约 0.27%，有明确概率解释</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>偏态分布误判率升到约 4.84%（指数），把正常长尾当异常</td>
+        <td>双峰／重尾下组数固定为 7 左右，容易抹平结构</td>
+        <td>双峰 IQR 偏大反而组数变少（实测 $k=4$），可能隐藏双峰</td>
+        <td>崩溃点 0，异常值撑大 $\sigma$ 造成掩蔽（本例 96 漏判）</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>五数概括仅 5 个数，审计最易；需统一分位数口径</td>
+        <td>口径最轻，但必须说明「假设近似正态」</td>
+        <td>需报告 IQR 与 $h$，审计成本中等</td>
+        <td>口径最少，但结论在污染下不可信，工程风险最高</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="d-code">代码实验 · 崩溃点、误判率与同矩异形的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例 quiz_avg</span></div>
+  <pre>
+# 深度实验：稳健统计 / 1.5×IQR 误判率 / 相同汇总统计下的分布差异
+import random, math
+
+def mean(xs): return sum(xs)/len(xs)
+def sd(xs):
+    m=mean(xs); return math.sqrt(sum((x-m)**2 for x in xs)/len(xs))
+def moment4(xs):
+    m=mean(xs); s=sd(xs); z=[(x-m)/s for x in xs]
+    return sum(t**3 for t in z)/len(z), sum(t**4 for t in z)/len(z)-3
+def quantile(xs,p):
+    s=sorted(xs); t=(len(s)-1)*p; lo=int(t); hi=min(lo+1,len(s)-1); f=t-lo
+    return s[lo]*(1-f)+s[hi]*f
+def trimmed(xs,a):
+    s=sorted(xs); k=int(len(s)*a)
+    return mean(s[k:len(s)-k]) if k&gt;0 else mean(s)
+
+print("=== Part 1: 崩溃点（把最大的 k 个数换成 1000000） ===")
+clean=[62,65,68,70,71,73,75,76,78,79,80,82,84,85,87,89,90,92,94,96]
+print(" clean n=%d mean=%.3f median=%.3f trim10=%.3f trim20=%.3f" % (len(clean),mean(clean),quantile(clean,0.5),trimmed(clean,0.1),trimmed(clean,0.2)))
+print("   k       mean        median      trim10      trim20")
+for k in [0,1,2,3,4,5,9,10,11]:
+    bad=clean[:-k]+[1000000]*k if k&gt;0 else list(clean)
+    print("%4d  %11.2f  %11.2f  %11.2f  %11.2f" % (k, mean(bad), quantile(bad,0.5), trimmed(bad,0.1), trimmed(bad,0.2)))
+
+print()
+print("=== Part 2: 1.5×IQR 规则把多少正常点误判为异常 ===")
+def fp_rate(gen, M=200000):
+    xs=[gen() for _ in range(M)]
+    q1=quantile(xs,0.25); q3=quantile(xs,0.75); iqr=q3-q1
+    lo=q1-1.5*iqr; hi=q3+1.5*iqr
+    out=sum(1 for x in xs if x&lt;lo or x&gt;hi)
+    return q1,q3,lo,hi,out/M
+random.seed(20261107)
+for name,gen in [("normal N(0,1)", lambda: random.gauss(0,1)),
+                 ("exponential Exp(1)", lambda: -math.log(1-random.random()))]:
+    q1,q3,lo,hi,r=fp_rate(gen)
+    print(" %-20s Q1=%.4f Q3=%.4f fence=[%.4f, %.4f]  flagged=%.4f" % (name,q1,q3,lo,hi,r))
+
+print()
+print("=== Part 3: 相同的均值/标准差/偏度，完全不同的形状 ===")
+def rescale(xs,mu,s):
+    m=mean(xs); d=sd(xs); return [mu+(x-m)*s/d for x in xs]
+random.seed(20261107)
+MUQ, SDQ = 79.7574, 14.5763
+g=[random.gauss(0,1) for _ in range(20)]
+A=g+[-x for x in g]
+r=[random.gauss(1.6,0.45) for _ in range(20)]
+B=r+[-x for x in r]
+A=rescale(A,MUQ,SDQ); B=rescale(B,MUQ,SDQ)
+for name,xs in [("A 单峰",A),("B 双峰",B)]:
+    g3,g4=moment4(xs)
+    print(" %s: n=%d mean=%.4f sd=%.4f skew=%+.4f exkurt=%+.4f" % (name,len(xs),mean(xs),sd(xs),g3,g4))
+    print("        min=%.2f Q1=%.2f med=%.2f Q3=%.2f max=%.2f IQR=%.2f" % (min(xs),quantile(xs,0.25),quantile(xs,0.5),quantile(xs,0.75),max(xs),quantile(xs,0.75)-quantile(xs,0.25)))
+    k_st=math.ceil(math.log2(len(xs)))+1
+    h_fd=2*(quantile(xs,0.75)-quantile(xs,0.25))/(len(xs)**(1/3))
+    print("        Sturges k=%d (width=%.3f)   FD width=%.3f -&gt; k=%d" % (k_st,(max(xs)-min(xs))/k_st,h_fd,math.ceil((max(xs)-min(xs))/h_fd)))
+h=2*(quantile(A,0.75)-quantile(A,0.25))/(len(A)**(1/3))
+lo=min(min(A),min(B)); hi=max(max(A),max(B))
+nb=math.ceil((hi-lo)/h)
+def bars(xs):
+    c=[0]*nb
+    for x in xs:
+        i=min(nb-1,int((x-lo)/h)); c[i]+=1
+    return c
+ca,cb=bars(A),bars(B)
+print(" common-bin histogram (width=%.2f, %d bins):" % (h,nb))
+print("  bin              A        B")
+for i in range(nb):
+    print("  [%6.1f,%6.1f)  %-8s %-8s" % (lo+i*h, lo+(i+1)*h, "#"*ca[i], "#"*cb[i]))
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: 崩溃点（把最大的 k 个数换成 1000000） ===
+ clean n=20 mean=79.800 median=79.500 trim10=79.938 trim20=79.917
+   k       mean        median      trim10      trim20
+    0        79.80        79.50        79.94        79.92
+    1     50075.00        79.50        79.94        79.92
+    2    100070.30        79.50        79.94        79.92
+    3    150065.70        79.50     62574.19        79.92
+    4    200061.20        79.50    125068.56        79.92
+    5    250056.75        79.50    187563.00     83405.83
+    9    450039.85        79.50    437541.88    416711.00
+   10    500035.85    500039.50    500036.88    500037.67
+   11    550031.90   1000000.00    562531.94    583364.42
+
+=== Part 2: 1.5×IQR 规则把多少正常点误判为异常 ===
+ normal N(0,1)        Q1=-0.6811 Q3=0.6690 fence=[-2.7061, 2.6941]  flagged=0.0072
+ exponential Exp(1)   Q1=0.2874 Q3=1.3817 fence=[-1.3539, 3.0230]  flagged=0.0484
+
+=== Part 3: 相同的均值/标准差/偏度，完全不同的形状 ===
+ A 单峰: n=40 mean=79.7574 sd=14.5763 skew=+0.0000 exkurt=+0.6023
+        min=41.31 Q1=70.82 med=79.76 Q3=88.69 max=118.21 IQR=17.86
+        Sturges k=7 (width=10.986)   FD width=10.447 -&gt; k=8
+ B 双峰: n=40 mean=79.7574 sd=14.5763 skew=-0.0000 exkurt=-1.6036
+        min=55.95 Q1=66.79 med=79.76 Q3=91.24 max=103.57 IQR=25.94
+        Sturges k=7 (width=6.803)   FD width=15.169 -&gt; k=4
+ common-bin histogram (width=10.45, 8 bins):
+  bin              A        B
+  [  41.3,  51.8)  ##               
+  [  51.8,  62.2)  #        #####   
+  [  62.2,  72.6)  ############ ##############
+  [  72.6,  83.1)  ######### #       
+  [  83.1,  93.5)  ########## ###########
+  [  93.5, 104.0)  ####     #########
+  [ 104.0, 114.4)  #                
+  [ 114.4, 124.9)  #                </pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">Part 1 干净行</span>：$n=20$、均值 79.800、中位数 79.500、10% 截尾 79.938、20% 截尾 79.917，四者一致，说明数据干净时它们几乎等价——这正是「效率损失」还没显现的状态。</p>
+    <p><span class="ci-k">k=1 时 mean=50075.00</span>：一个坏点就把均值抬高约 5 万，对应崩溃点 $1/n=1/20=5\%$（公式给出 $\varepsilon^*(\bar{x})=1/n\to0$）；同一行 median=79.50、trim10=79.94、trim20=79.92 全部不动。</p>
+    <p><span class="ci-k">trim10 在 k=3 崩溃（62574.19）、trim20 在 k=5 崩溃（83405.83）</span>：$\lfloor 0.1\times20\rfloor+1=3$、$\lfloor 0.2\times20\rfloor+1=5$，即有限样本崩溃点 $3/20=15\%$、$5/20=25\%$，与理论 $(\lfloor\alpha n\rfloor+1)/n$ 精确一致。<span class="ci-k">median 直到 k=10 才跳到 500039.50</span>，对应 $\lfloor(20+1)/2\rfloor/20 = 10/20 = 50\%$。四行串起来就是「崩溃点从 0 到 50% 可调」的完整证据。</p>
+    <p><span class="ci-k">Part 2 的 0.0072</span>：正态数据下约 0.72% 的正常点被 1.5×IQR 误标，与理论 $2(1-\Phi(2.698))\approx0.007$ 吻合；实测栅栏 $[-2.7061,\,2.6941]$ 也与 $\pm2.698\sigma$ 一致。<span class="ci-k">0.0484</span>：换成右偏的指数分布后误判率升到 4.84%，约 6.7 倍——因为上栅栏 $3.0230$ 落在指数分布的右尾里。这回答了本章第 2 节的提问，也给出边界：分布明显偏态时，1.5×IQR 的「0.7%」不再成立。</p>
+    <p><span class="ci-k">Part 3 的 mean=79.7574 / sd=14.5763</span>：来自案例字段 <code>quiz_avg</code> 的 mean=79.76、sd=14.58；A 与 B 都被线性重标定到这两个值，所以前两阶矩<strong>完全相同</strong>。<span class="ci-k">skew=±0.0000</span>：两个数据集都由「一组数 + 它的相反数」构造，严格对称，连三阶矩都相同。<span class="ci-k">exkurt +0.6023 对 −1.6036</span>：四阶矩终于出现分歧（双峰分布的超额峰度为负），是一个线索，但单个数字仍画不出形状。</p>
+    <p><span class="ci-k">五数概括</span>：A 的 IQR=17.86、B 的 IQR=25.94，分位数已经比「均值+标准差」更早察觉差异——这也是箱线图比只报两个数字更诚实的原因。<span class="ci-k">Sturges k=7 对两者一律相同</span>（它只依赖 $n=40$）；<span class="ci-k">FD width 10.447（k=8）对 15.169（k=4）</span>：FD 依赖 IQR，而 B 的 IQR 更大，反而给出更少的组，可能把双峰抹平；本例 Sturges 的 width=6.803 更细，反而更能显出两个峰。这正是「必须多组距交叉核对」的数值理由。</p>
+    <p><span class="ci-k">共同分组直方图（width=10.45，8 组）</span>：A 在 $[62.2,72.6)$ 有 12 个、单峰；B 在 $[62.2,72.6)$ 有 14 个、在 $[83.1,104.0)$ 有 11+9 个，中间 $[72.6,83.1)$ 只剩 1 个，形成明显谷底。前两阶矩、甚至偏度都相同，形状却一个是单峰、一个是双峰——深度专题二的结论在这里可以直接数出来。改动 <code>random.gauss(1.6,0.45)</code> 里的 1.6（峰间距）会改变谷底深度；把它调到 0.8 以下，两个峰会合并，直方图就又看不出差别了。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>用五数概括 + 1.5×IQR 栅栏筛查疑似异常，并用 Sturges / Freedman–Diaconis 组距画直方图揭示分布形状；<strong>不做</strong>异常值归因、不做缺失填补、不做分布拟合，也不自动删除任何观测。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：一列区间／比率尺度的数值、样本量 $n$、可选的分位数口径与组距规则；输出：五数概括（与原量纲一致）、IQR、上下栅栏、疑似异常点清单、组距 $h$ 与组数 $k$、各桶频数。频数量纲为「个数」，密度量纲为「1/原单位」。</td></tr>
+    <tr><th>适用场景</th><td>探索性数据分析（EDA）、多组分布并排比较、模型残差诊断、时延／收入等右偏指标的异常筛查、训练前的特征体检、以及任何「必须先看清形状再选模型」的环节。</td></tr>
+    <tr><th>关键参数</th><td>栅栏倍数（默认 1.5，极端用 3，调大则误判更少但漏检更多）；截尾比例 $\alpha$（默认 0.1~0.2，越大越稳健、效率越低）；组距规则（Sturges / FD / Scott）；分位数插值口径（不同软件对 $Q_1,Q_3$ 定义略有差异，须固定并写明）；直方图起点与边界归属。</td></tr>
+    <tr><th>边界条件</th><td>在分布明显偏态、或样本量 $n \lt 20$ 的条件下，1.5×IQR 的「约 0.7% 误判率」与分位数估计都不适用，应改用按分布校准的栅栏、先做对数变换，或直接用分位数回归／重尾模型；在分布族已确知（如正态）时应改用该族的充分统计量 $\bar{x},s$ 做参数推断，而非反复调组距。</td></tr>
+    <tr><th>常见问题</th><td>① 以为 1.5×IQR 的误判率恒为 0.7%；② 把异常值一律删除而不报告两套结果；③ 只用一种组距就下「单峰／双峰」结论；④ 用 3σ 规则筛异常却被异常值自身掩蔽。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>1.5×IQR 规则到底会把多少正常点误判为异常？</summary><div class="faq-a">在近似正态的数据上约 0.7%（代码实测 0.0072），因为上栅栏落在 $\mu+2.698\sigma$ 附近。但这个数<strong>依赖分布</strong>：右偏的指数分布实测 0.0484，约 4.84%，高近 7 倍；重尾或明显偏态时还会更高。所以「0.7%」不是规则的属性，而是「规则 + 正态假设」共同的属性。</div></details>
+  <details><summary>箱线图没显示出双峰，是不是说明数据就是单峰？</summary><div class="faq-a">不是。箱线图只画五数概括，单峰与双峰完全可以共享同样的最小值、$Q_1$、中位数、$Q_3$、最大值（代码 Part 3 里 A 与 B 的均值、标准差、偏度都相同，IQR 已开始分歧但盒子形状仍相近）。判断峰数必须看直方图或核密度，而且要用两三种组距交叉核对——这正是深度专题二与算法第七步强调的。</div></details>
+  <details><summary>Sturges 和 Freedman–Diaconis 该用哪个？为什么 FD 有时反而组数更少？</summary><div class="faq-a">近似单峰、近似正态、无明显异常值且 $n$ 不大时，Sturges 简单够用；有异常值、偏态、重尾时优先 FD（用 IQR 而非极差定组宽，抗污染）。但 FD 的 $h=2\,\mathrm{IQR}\,n^{-1/3}$ 会随 IQR 增大而变宽：<strong>双峰数据 IQR 偏大，FD 反而给出更少的组</strong>（实测 B 的 $k_{\text{FD}}=4$ 而 $k_{\text{St}}=7$），可能抹平双峰。稳妥做法是两者都画，必要时再补一张更窄组距的图，只把「多种组距都出现」的结构当结论。</div></details>
+  <details><summary>为什么 3σ 规则没把 96 判成异常？</summary><div class="faq-a">因为 96 参与了自己是否被判异常的投票：它把 $\bar{x}$ 拉到 38.8333、把 $\sigma$ 撑到 19.5654，上界随之变成 97.5296，于是 96 反而落在界内。这叫掩蔽效应（masking），根源是 $\bar{x}$ 与 $s$ 的崩溃点为 0（深度专题一）。1.5×IQR 用崩溃点约 50% 的分位数，不受此影响，本例正确判出 96（上界 67）。</div></details>
+  <details><summary>截尾均值砍掉多少比例合适？删掉的点要报告吗？</summary><div class="faq-a">常用 10%~20%：崩溃点从 0 提到 10%~20%，而正态效率只损失几个百分点，性价比最高（对比中位数虽崩溃点 50%，但效率损失约 57%）。任何删除都必须报告：给「含异常值」与「不含异常值」两套结果，说明判定依据与比例；若极端值是真实业务信号（P99 延迟、大额欺诈），应单独建模或分层报告，而不是截掉。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">把 20 个数中最大的 1 个改成 100 万后，下列哪个统计量几乎不变？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 算术均值</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 标准差</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 中位数</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. 极差</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：中位数的崩溃点约 50%，只由排序中间位置决定，改 1 个端点不影响它。均值崩溃点 $1/n$，一个坏点即可推到无穷；标准差、极差同样依赖端点。代码 Part 1 中 $k=1$ 时 mean=50075.00 而 median 仍为 79.50。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$n=20$ 时，20% 截尾均值（每端砍 $\lfloor 0.2\times20\rfloor=4$ 个）的有限样本崩溃点约为？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 1/20</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 5/20</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 10/20</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 20/20</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\varepsilon^*=(\lfloor\alpha n\rfloor+1)/n=(4+1)/20=5/20=25\%$。代码 Part 1 中 trim20 在 $k=4$ 仍为 79.92、到 $k=5$ 才跳到 83405.83，正好验证。10/20 是中位数的崩溃点。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">在近似正态的数据上，1.5×IQR 规则把多少比例的正常点误判为异常？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 约 0.7%</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 约 5%</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 约 32%</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 恰好 0</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：上栅栏约 $\mu+2.698\sigma$，双侧误判率 $2(1-\Phi(2.698))\approx0.007$，代码实测 0.0072。注意这只在近似正态时成立；右偏指数分布实测 0.0484。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">关于「均值与标准差足以描述一个分布」的说法，下列哪项正确？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 总是正确，因为二者是充分统计量</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 加上偏度与峰度后就一定唯一确定分布</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 只要样本量足够大就成立</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 仅在预先假定分布族（如正态）时成立</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：有限个低阶矩不能唯一决定分布（矩问题）；代码 Part 3 构造了均值、标准差、偏度都相同但一个单峰、一个双峰的两组数据。只有先假定分布族（如正态，$\bar{x},s$ 为充分统计量）时，两个数字才够用；样本量再大也改变不了「有限矩不唯一」这一事实。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">某数据 $n=12$、$Q_1=27$、$Q_3=43$，用 Sturges 得到的组数与用 FD 得到的组数分别是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 5 与 5</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 5 与 6</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 6 与 5</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 7 与 4</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mathrm{IQR}=16$，$\lceil\log_2 12\rceil+1 = 4+1 = 5$ 组（$h=15.60$）；$h_{\text{FD}}=2\times16/12^{1/3}=13.9773$，$\lceil78/13.9773\rceil=6$ 组。算法第六步有完整手算；两者不同时应至少画两张图交叉核对。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure class="figure-placeholder" id="fig-classic-m02-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 2-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">Anscombe 四重奏与 Datasaurus Dozen：统计量相同、图形迥异</span>
+    <span class="fig-note">十三个数据集共享近乎相同的均值、标准差与相关系数，散点却呈现恐龙、星形、圆环等形状，是「必须可视化」的经典证据。</span>
+    <span class="fig-src">来源：Matejka &amp; Fitzmaurice (2017), Same Stats, Different Graphs, CHI 2017；概念核对见本站资源库 s10 · 查看：<a href="https://www.statlearning.com/" target="_blank" rel="noopener">https://www.statlearning.com/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+<h2 id="d-figures">本章图示汇总</h2>
+<figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 4</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s7">7 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>求数据 5, 7, 7, 8, 10, 10, 10, 12 的均值、中位数、众数。</li>
+          <li>用自己的话解释：为什么样本方差 $s^2$ 的分母是 $n-1$？如果固执地除以 $n$，会带来什么系统性后果？</li>
+          <li>数据：3, 5, 6, 7, 8, 9, 10, 12, 40。求五数概括，并用 $1.5\times IQR$ 规则判断异常值。</li>
+          <li>有人说「$r = 0$ 说明两变量没有关系」，对吗？举出反例。另说明 $r = 0.85$ 与 $r = -0.85$ 在强度上有何异同。</li>
+          <li>为下列分析选择最合适的图形，并说明理由：① 各产品线营收占比；② 三城市成年男性身高分布对比；③ 广告费用与销售额的关系；④ 月活跃用户数一年来的变化。</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> 均值 $= 69/8 = 8.625$；中位数 $= (8+10)/2 = 9$；众数 $= 10$（出现 3 次）。</p>
+            <p><strong>2.</strong> 用样本均值 $\bar{x}$ 代替 $\mu$ 时，离差平方和被系统性压小（$\bar{x}$ 是这批数据的「重心」），除以 $n$ 会<strong>低估</strong>总体方差。除以 $n-1$（自由度）恰好补偿偏差，使 $s^2$ 满足 $E(s^2) = \sigma^2$（无偏）。</p>
+            <p><strong>3.</strong> 排序后 $n=9$：中位数 $= 8$；$Q_1 = (5+6)/2 = 5.5$；$Q_3 = (10+12)/2 = 11$；$IQR = 5.5$。上界 $= 11 + 1.5\times 5.5 = 19.25$，下界 $= 5.5 - 8.25 = -2.75$。故 40 是异常值；五数概括为 $3,\ 5.5,\ 8,\ 11,\ 40$。</p>
+            <p><strong>4.</strong> 不对。$r$ 只度量<strong>线性</strong>关系，反例如 $y = x^2$（对称区间上 $r \approx 0$ 但关系确定）。$|r|$ 相同则线性强度相同：0.85 强正相关，$-0.85$ 强负相关，只是方向相反。</p>
+            <p><strong>5.</strong> ① 占比少、类别分明 → 饼图（或堆叠条形）；② 比较多组分布 → 箱线图（或并排直方图）；③ 两数值关系 → 散点图；④ 随时间变化 → 折线图。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <h2 id="s8">8 · 本章小结</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>主题</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>集中趋势</td><td>均值（对称、无极端值）、中位数（偏态/异常值）、众数（名义尺度）；增长率用几何均值</td></tr>
+            <tr><td>离散程度</td><td>极差、IQR、方差与标准差、变异系数 CV；样本方差分母 $n-1$（无偏性）</td></tr>
+            <tr><td>分布形状</td><td>直方图/茎叶图/箱线图；偏度（对称性）、峰度（尾厚）；$1.5\times IQR$ 检测异常值</td></tr>
+            <tr><td>切比雪夫 vs 经验法则</td><td>任意分布：至少 $1-1/k^2$ 落在 $k\sigma$ 内；正态近似：68-95-99.7</td></tr>
+            <tr><td>相关性</td><td>协方差 → 标准化得皮尔逊 $r$；单调非线性/有序数据用斯皮尔曼 $r_s$</td></tr>
+            <tr><td>相关四陷阱</td><td>非线性、异常值、范围限制、生态谬误；先画散点图，永记相关 ≠ 因果</td></tr>
+            <tr><td>可视化</td><td>按目的选图；提高数据墨水比；警惕截断纵轴、双轴、饼图滥用</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：描述统计与可视化。</strong>给出学习时长、测验分的五数概括与箱线图；处理极端值与缺失。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="current" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning with Python</a> <span class="muted small">（2023 · 已核验）</span><span class="fr-why">为什么读：ISLP 第 2 章「统计学习概览」配大量真实数据的图形诊断。</span></span></div><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning（第 1 版）</a> <span class="muted small">（2013 · 已核验）</span><span class="fr-why">为什么读：ISLR 第 2 章以可视化引入建模前的探索性分析。</span></span></div><div class="fr-item"><span class="fr-tag">工具</span><span class="fr-body"><a href="https://pandas.pydata.org/" target="_blank" rel="noopener">pandas</a> <span class="muted small">（2008 · 权威共识）</span><span class="fr-why">为什么读：pandas 官方文档：describe / quantile / boxplot 的口径与边界行为。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div class="muted small">继续学习下一章，或标记本章完成以记录进度。</div>
+        <button class="btn primary" data-complete-btn="m02">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m01-data.html"><span class="dir">← 上一篇</span><span class="ttl">01 · 数据与统计思维</span></a>
+        <a class="next" href="m03-probability.html"><span class="dir">下一篇 →</span><span class="ttl">03 · 概率论基础</span></a>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索概念、公式、例题…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索章节、概念、公式或例题。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

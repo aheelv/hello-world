@@ -1,0 +1,849 @@
+<!-- 深度片段 · 15 生成式 AI 系统与方法 -->
+<!-- 已就近放置 3 张自绘图示（生成式系统分层 / RAG 链路 / 学习闭环）与 1 处经典配图标记；其余图示由脚本补入汇总 -->
+
+<h2 id="d-deep-1">深度专题一 · ELBO 的完整推导与生成路径的几何：从 Jensen / KL 分解、重参数化，到 DDPM 概率流 ODE 对整流流直线路径</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把第 3 节「写出来的恒等式」逐行推出来，再用一个解析可解的共轭高斯模型核对变分间隙；随后解释为何弯曲噪声调度必须多步采样</h3></div>
+  <p class="dt-lead">本章第 3.2 节直接写出了 $\log p_\theta(x)=\mathrm{ELBO}(q)+\mathrm{KL}(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x))$ 与 $z=\mu_\phi+\sigma_\phi\odot\varepsilon$，例 15.2 用重要性采样估出 $\log p_\theta(x)\approx-1.05$ 再算 ELBO 与间隙；第 5 节写出条件流匹配目标并断言「DDPM 路径是弯的、流匹配路径是直的」，例 15.4 用直线路径演示了一步欧拉精确到达。这些结论都成立，但有三处没有被展开：那个「恒等式」究竟怎么从 $\log p(x)$ 推出来、重参数化为什么<strong>非用不可</strong>（而不是「方差小一点」这种含糊说法）、以及概率流 ODE 写成长什么样、<strong>到底需要多少步</strong>。本专题把三条补齐：两条独立推导（Jensen 与 KL 代数）、一个能算出<strong>精确后验</strong>的共轭模型（因而间隙是解析值而非估计值）、以及一份弯曲调度对直线路径的欧拉步数—误差对照表。为免与例 15.2 / 15.3 / 15.4 重复，这里的数值例子全部换了新的。</p>
+
+  <h4>背景：两条线索在「把难算的积分换成可算的下界」上会合</h4>
+  <p>变分推断不是为神经网络发明的。Hinton &amp; Van Camp 1993 年把「用可分解分布近似不可解后验、最小化自由能」引入神经网络；Jordan、Ghahramani、Jaakkola 与 Saul 1999 年把它整理成平均场变分推断的标准推导。Kingma &amp; Welling 2013 年与 Rezende、Mohamed、Wierstra 2014 年分别给出 VAE 与随机梯度变分贝叶斯，关键贡献正是<strong>重参数化技巧</strong>，让 $\mathrm{E}_q[\cdot]$ 的梯度可以走普通反向传播。几年后生成模型走了另一条路：Sohl-Dickstein 等 2015、Ho 等 2020 用 DDPM 把生成变成「预测被加进去的噪声」的回归问题；Song 等 2021 用随机微分方程统一了分数匹配与扩散，并给出<strong>概率流 ODE</strong>——一条与随机反向链具有相同边缘分布、但完全确定性的轨迹。Lipman 等 2022、Liu 等 2022（Rectified Flow）、Albergo &amp; Vanden-Eijnden 2022 则从最优传输角度提出流匹配：干脆把路径定义为直线，再回归它的速度场；Esser 等 2024 的 SD3 / MMDiT 把这条路推向高分辨率图像生成。</p>
+  <p>两条线索其实回答同一个问题：<strong>怎样把一个「算不出来的积分 / 走不通的生成过程」换成一份可以逐格核算的账</strong>。VAE 换的是似然，流匹配换的是采样轨迹。下面把它们写成公式。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p><strong>ELBO 的直觉：算不出真账，就记一笔只低不高的账，并且知道差了多少。</strong>要最大化 $\log p(x)$，得对所有可能的隐变量 $z$ 积分，而后验 $p(z\mid x)$ 解不出来。变分推断的办法是引入一个我们自己选的、好算的 $q(z\mid x)$，改去算「$\log p(x)$ 的一个下界」。这个下界有两个好处：抬高它一定不亏（因为真值永远在它上面），而且<strong>下界与真值之间的差恰好等于「$q$ 离真后验有多远」</strong>——所以优化下界同时在做两件事：逼近似然、把 $q$ 拉向真后验。</p>
+  <p><strong>重参数化的直觉：把抽奖的随机性从「轮盘」挪到「一张与参数无关的纸条」。</strong>如果采样节点的分布参数（均值、方差）是网络输出的，那么「抽出来的那个数」在计算图里相当于一个与参数无关的常数，梯度根本穿不过去。要么用 score-function 估计器（合法但方差极大，等于把整个函数值当奖励乘以分数），要么把随机性改写成 $z=\mu+\sigma\varepsilon$：$\varepsilon$ 从标准正态抽、与参数无关，$\mu,\sigma$ 只做确定性的缩放平移，于是梯度可以顺着这条路回传。</p>
+  <p><strong>弯曲对直线的直觉：盘山公路与直线隧道。</strong>DDPM 的噪声调度（余弦 / 线性 $\beta$）让「从噪声走到数据」的速度大小和方向随时间变化：前面慢、中间快、末尾又慢，还常常要微微转向。用等步长的欧拉法去走这条路，步长一大就切弯切过头，必须把路细分很多段。整流流把两点用直线连起来，速度是常数，一步走到底也不会偏——离散误差直接为零。少步采样不是「模型更聪明」，而是「路本来就是直的」。</p>
+
+  <h4>形式化一：ELBO 的两条推导与恒等式</h4>
+  <div class="formula-box">
+    <div class="f-name">路线 A · Jensen 不等式：把 log 与期望交换方向</div>
+    $$ \log p_\theta(x)=\log\int p_\theta(x,z)\,dz=\log\int q_\phi(z\mid x)\,\frac{p_\theta(x,z)}{q_\phi(z\mid x)}\,dz=\log\,\mathrm{E}_{q}\Bigl[\frac{p_\theta(x,z)}{q_\phi(z\mid x)}\Bigr] $$
+    $$ \ge\ \mathrm{E}_{q}\Bigl[\log\frac{p_\theta(x,z)}{q_\phi(z\mid x)}\Bigr]\ \triangleq\ \mathrm{ELBO}(q) $$
+    <div class="f-note">白话：把「对所有 $z$ 积分」改写成「在 $q$ 下取期望」，并补一个分子分母相同的 $q$。$\log$ 是凹函数，Jensen 不等式给出 $\log\mathrm{E}[u]\ge\mathrm{E}[\log u]$，于是得到只低不高的下界。这里没有任何近似 assumption——下界是严格的，紧不紧取决于 $q$ 选得好不好。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">拆成「重构项 − 先验匹配项」</div>
+    $$ \mathrm{ELBO}(q)=\mathrm{E}_{q}\bigl[\log p_\theta(x\mid z)\bigr]+\mathrm{E}_{q}\bigl[\log p(z)-\log q_\phi(z\mid x)\bigr] $$
+    $$ =\underbrace{\mathrm{E}_{q}\bigl[\log p_\theta(x\mid z)\bigr]}_{\text{重构项：从 } z \text{ 还原 } x \text{ 有多像}}-\underbrace{D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\,\|\,p(z)\bigr)}_{\text{先验匹配：别把每个样本塞进孤立小格}} $$
+    <div class="f-note">白话：把 $\log p(x,z)=\log p(x\mid z)+\log p(z)$ 拆开即可。第一项是解码器的负重构误差，要求还原得准；第二项要求编码器输出的 $q$ 别离标准正态先验太远，否则每个样本各占一块互不重叠的区域，采样时从先验抽到的 $z$ 就落在「没训练过」的空隙里。对角高斯时它有解析式 $D_{\mathrm{KL}}=\frac12(\mu^2+s^2-1-\log s^2)$，注意最后是<strong>方差</strong>的对数。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">路线 B · KL 代数：得到精确恒等式而非不等式</div>
+    $$ D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\bigr)=\mathrm{E}_{q}\Bigl[\log q_\phi-\log\frac{p_\theta(x,z)}{p_\theta(x)}\Bigr] $$
+    $$ =\ \log p_\theta(x)-\mathrm{E}_{q}\Bigl[\log\frac{p_\theta(x,z)}{q_\phi}\Bigr]=\log p_\theta(x)-\mathrm{ELBO}(q) $$
+    $$ \Longrightarrow\quad \log p_\theta(x)=\mathrm{ELBO}(q)+D_{\mathrm{KL}}\bigl(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\bigr)\ \ge\ \mathrm{ELBO}(q) $$
+    <div class="f-note">白话：用贝叶斯 $p(z\mid x)=p(x,z)/p(x)$ 把 $\log p(x)$ 从积分里提出来，就发现「下界与真值之差」恰好是 $q$ 与真后验的 KL。因为 $D_{\mathrm{KL}}\ge0$，所以 ELBO 确实是下界；当且仅当 $q=p_\theta(z\mid x)$ 时取等。这也解释了例 15.2 里那个 $0.1931$ nats 的「变分间隙」是什么：$q$ 族表达能力不足时它搬不走，单看 ELBO 会系统性低估似然，不同模型的 ELBO 不能直接排序。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">重参数化：为什么必须把随机性移出参数</div>
+    $$ \nabla_\phi\,\mathrm{E}_{q_\phi}\bigl[f(z)\bigr]=\mathrm{E}_{q_\phi}\bigl[f(z)\,\nabla_\phi\log q_\phi(z)\bigr]\qquad\text{(score-function / REINFORCE)} $$
+    $$ z=g_\phi(\varepsilon)=\mu_\phi(x)+\sigma_\phi(x)\odot\varepsilon,\quad \varepsilon\sim\mathcal N(0,I)\ \Longrightarrow\ \nabla_\phi\,\mathrm{E}_{\varepsilon}\bigl[f(g_\phi(\varepsilon))\bigr]=\mathrm{E}_{\varepsilon}\bigl[\nabla_z f(z)\cdot\nabla_\phi g_\phi(\varepsilon)\bigr] $$
+    <div class="f-note">白话：直接从 $q$ 采样时，抽出来的 $z$ 相对 $\phi$ 是个常数，梯度无法穿过采样节点；score-function 估计器虽合法，却把整个 $f(z)$ 当「奖励」乘上 score，方差随 $f$ 的量级放大。重参数化把随机性放到与参数无关的 $\varepsilon$ 上，$z$ 对 $\mu,\sigma$ 变成确定性可导函数，梯度沿 $f$ 的导数回传，只含一阶噪声。代价：要求 $z$ 可重参数化且 $f$ 可导——离散隐变量与不可导目标不在此列。</div>
+  </div>
+
+  <h4>数值对账一：一个能算出精确后验的共轭模型</h4>
+  <p>例 15.2 用重要性采样<strong>估计</strong> $\log p_\theta(x)\approx-1.05$，间隙因此也是估计值。这里换一个解析可解的模型，让真值、真后验、ELBO 与间隙全部可以逐位核对：取先验 $p(z)=\mathcal N(0,1)$、似然 $p(x\mid z)=\mathcal N(z,\sigma^2)$、$\sigma^2=1$、观测 $x=1.0$。由高斯共轭性，边缘与后验都是解析的：</p>
+  <div class="formula-box">
+    <div class="f-name">共轭高斯的解析真值</div>
+    $$ p(x)=\mathcal N\bigl(x;\,0,\ 1+\sigma^{2}\bigr)\ \Longrightarrow\ \log p(x)=-\tfrac12\log\bigl(2\pi(1+\sigma^{2})\bigr)-\frac{x^{2}}{2(1+\sigma^{2})}=-1.515512\ \text{nats} $$
+    $$ p(z\mid x)=\mathcal N\Bigl(\frac{x}{1+\sigma^{2}},\ \frac{\sigma^{2}}{1+\sigma^{2}}\Bigr)=\mathcal N(0.5,\ 0.5) $$
+    <div class="f-note">白话：先验精度 1、似然精度 $1/\sigma^2=1$，后验精度相加得 2，故方差 $0.5$；后验均值是两者按精度加权，得 $0.5$。这个模型让「$q$ 取到真后验时 ELBO 取等」变成可以逐格验算的等式，而不是一句口号。</div>
+  </div>
+  <p>令 $q=\mathcal N(\mu,s^2)$，把重构项 $-\frac12\log(2\pi)-\frac12\bigl[(x-\mu)^2+s^2\bigr]$ 减去先验 KL，再加上「$q$ 与真后验的 KL」。代码实验 Part 1 对 20 组 $(\mu,s^2)$ 逐格打印这四项，关键结果：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$\mu$</th><th>$s^2$</th><th>$\mathrm{ELBO}$</th><th>$D_{\mathrm{KL}}(q\|p(z\mid x))$</th><th>$\mathrm{ELBO}+\text{间隙}$</th><th>$\log p(x)$</th><th>误差</th></tr></thead>
+      <tbody>
+        <tr><td>0.00</td><td>0.50</td><td>-1.765512</td><td>0.250000</td><td>-1.515512</td><td>-1.515512</td><td>0.00e+00</td></tr>
+        <tr><td>0.25</td><td>0.50</td><td>-1.578012</td><td>0.062500</td><td>-1.515512</td><td>-1.515512</td><td>0.00e+00</td></tr>
+        <tr><td>0.50</td><td>0.25</td><td>-1.612086</td><td>0.096574</td><td>-1.515512</td><td>-1.515512</td><td>0.00e+00</td></tr>
+        <tr><td>0.50</td><td>0.50</td><td>$\mathbf{-1.515512}$</td><td>$\mathbf{0.000000}$</td><td>-1.515512</td><td>-1.515512</td><td>0.00e+00</td></tr>
+        <tr><td>1.00</td><td>2.00</td><td>-2.572365</td><td>1.056853</td><td>-1.515512</td><td>-1.515512</td><td>0.00e+00</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>读法：无论 $q$ 取哪组值，$\mathrm{ELBO}+D_{\mathrm{KL}}(q\|p(z\mid x))$ 一列<strong>恒等于</strong> $-1.515512$，误差全为 $0.00\times10^{0}$——恒等式在所有 $q$ 上成立，而不只在最优点。$101\times40$ 的网格搜索给出 $\max\mathrm{ELBO}=-1.515512$，恰好在 $(\mu,s^2)=(0.5000,0.5000)$ 即真后验处取得，间隙为 0。这就把「最大化 ELBO 等价于最大化 $\log p(x)$ 并把 $q$ 拉向真后验」变成一组可复核的数：Jensen 下界在 $q=p(z\mid x)$ 时精确取等。</p>
+  <p>梯度方差也能量化。代码实验 Part 2 取 $f(z)=z^2$、$\mu=0.5,\sigma=0.5$（真梯度 $\nabla_\mu\mathrm{E}[z^2]=2\mu=1.0$），20000 个样本下：score-function 估计器均值 $0.9822$、方差 $\mathbf{7.4528}$；重参数化估计器均值 $0.9946$、方差 $\mathbf{1.0025}$，方差比 $\mathbf{7.43}$ 倍、标准误 $0.0193$ 对 $0.0071$。两者都无偏（均值与 1.0 的偏差是有限样本噪声），但同样的样本预算下，重参数化把标准误压到约 $1/2.73$。这就是「非用不可」的定量版本。</p>
+
+  <h4>形式化二：概率流 ODE 与整流流的直线路径</h4>
+  <div class="formula-box">
+    <div class="f-name">DDPM / VP-SDE 及其概率流 ODE（Song 等 2021）</div>
+    $$ \text{前向 VP-SDE:}\quad dx=-\tfrac12\beta(t)\,x\,dt+\sqrt{\beta(t)}\,dW,\qquad \bar\alpha_t=e^{-\int_0^t\beta(s)ds} $$
+    $$ \frac{dx}{dt}=\underbrace{f(x,t)-\tfrac12 g(t)^{2}\nabla_x\log p_t(x)}_{\text{概率流 ODE：与 SDE 同边缘、但确定性}},\qquad f=-\tfrac12\beta x,\quad g^{2}=\beta $$
+    $$ x_t=\alpha_t x_1+\sigma_t\epsilon,\quad \alpha_t=\sqrt{\bar\alpha_t},\ \sigma_t=\sqrt{1-\bar\alpha_t},\quad \nabla_x\log p_t=-\frac{x_t-\alpha_t x_1}{\sigma_t^{2}}=-\frac{\epsilon}{\sigma_t} $$
+    <div class="f-note">白话：第一行是逐步加噪的连续时间版本；第二行是「概率流 ODE」——把随机噪声项换成半个分数项，得到一条确定性的、却与随机链有相同边缘分布的轨迹；第三行说明任意时刻的带噪样本都能用「信号 $x_1$ + 噪声 $\epsilon$」两个量写出来，因此分数与 $\epsilon$ 只差一个尺度因子。把 $f,g$ 与分数代回第二行，可验证它等价于 $\frac{dx_t}{dt}=\dot\alpha_t x_1+\dot\sigma_t\epsilon$。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">余弦调度下的速度、以及为什么它是「弯」的</div>
+    $$ \alpha_t=\sin\bigl(\tfrac{\pi}{2}t\bigr),\quad \sigma_t=\cos\bigl(\tfrac{\pi}{2}t\bigr),\quad t=0\ \text{为噪声},\ t=1\ \text{为数据} $$
+    $$ \frac{dx_t}{dt}=\dot\alpha_t x_1+\dot\sigma_t\epsilon=\frac{\pi}{2}\Bigl[\cos\bigl(\tfrac{\pi}{2}t\bigr)x_1-\sin\bigl(\tfrac{\pi}{2}t\bigr)\epsilon\Bigr] $$
+    $$ \frac{d^{2}x_t}{dt^{2}}=-\frac{\pi^{2}}{4}\bigl(\alpha_t x_1+\sigma_t\epsilon\bigr)\ \ne\ 0,\qquad \frac{\dot\alpha_t}{\dot\sigma_t}=-\cot\bigl(\tfrac{\pi}{2}t\bigr)\ \text{随}\ t\ \text{变化} $$
+    <div class="f-note">白话：单个配对 $(x_1,\epsilon)$ 的轨迹在状态空间里是连接噪声与数据的线段，但沿线段前进的<strong>速度大小与方向都随 $t$ 变</strong>（等价于把直线做了非线性时间重参数化）；当数据分布有多个点、$\hat x_0,\hat\epsilon$ 需按分数求后验平均时，轨迹在状态空间里还会真正转向。二阶导不为零，意味着等步长欧拉必然有离散误差。本章约定 $t=0$ 噪声、$t=1$ 数据，读论文时须先核对方向。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">条件流匹配：为什么用「条件速度」训练却能得到「边缘速度」</div>
+    $$ x_t=(1-t)x_0+t\,x_1,\qquad u_t(x\mid x_0,x_1)=x_1-x_0=\text{常数} $$
+    $$ \mathcal L_{\text{CFM}}=\mathrm{E}_{t,x_0,x_1}\bigl\|v_\theta(x_t,t)-(x_1-x_0)\bigr\|^{2},\qquad u_t(x)=\mathrm{E}\bigl[u_t(x\mid x_0,x_1)\mid x_t=x\bigr] $$
+    $$ \Longrightarrow\quad \nabla_\theta \mathcal L_{\text{CFM}}=\nabla_\theta \mathcal L_{\text{FM}},\qquad \mathcal L_{\text{FM}}=\mathrm{E}_{t,p_t(x)}\|v_\theta(x,t)-u_t(x)\|^{2} $$
+    $$ \varepsilon_{\text{Euler}}\ \le\ \frac{h}{2}\max_t\Bigl\|\frac{d^{2}x_t}{dt^{2}}\Bigr\|\xrightarrow{\ \ddot x_t\equiv0\ }0 $$
+    <div class="f-note">白话：第一行的直线路径让条件速度是常数，故训练目标没有「同一个 $x_t$ 可能来自多个配对」带来的额外方差。第二、三行是流匹配成立的关键定理：边缘速度场是所有配对的条件速度在 $x_t=x$ 下的后验平均，两个目标的梯度完全相同，所以用简单的条件目标训练得到的 $v_\theta$ 正是采样时要用的边缘场。第四行是欧拉法的截断误差界：直线路径二阶导恒为零，任意步长都<strong>没有离散误差</strong>，剩下的误差只来自网络对速度场的拟合。</div>
+  </div>
+
+  <h4>数值对账二：到底需要多少步</h4>
+  <p>取二维数据 $x_1=(1.0,2.0)$、噪声 $\epsilon=(-0.5,0.3)$，并假设<strong>速度场 / 噪声预测完全精确</strong>（理想模型），于是误差只剩欧拉离散化这一项——这正好把「路径几何」的差别干净地隔离出来。代码实验 Part 3 的结果：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>步数 $M$</th><th>$h=1/M$</th><th>余弦概率流 ODE 终点误差</th><th>整流流直线路径终点误差</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>1.0000</td><td>$\mathbf{1.443330}$</td><td>0.00e+00</td></tr>
+        <tr><td>4</td><td>0.2500</td><td>0.436875</td><td>0.00e+00</td></tr>
+        <tr><td>16</td><td>0.0625</td><td>0.113951</td><td>6.66e-16</td></tr>
+        <tr><td>64</td><td>0.0156</td><td>0.028785</td><td>2.22e-15</td></tr>
+        <tr><td>256</td><td>0.0039</td><td>$\mathbf{0.007215}$</td><td>9.55e-15</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>直线路径一列始终是 $10^{-15}$ 量级的浮点零：<strong>$M=1$ 就精确到达 $x_1$</strong>。余弦调度一列按 $O(h)$ 线性下降，$M=1$ 时误差 $1.443330$、$M=256$ 时才降到 $0.007215$。代码进一步求出达到各容差所需的最少步数：误差小于 $0.05$ 需 $M=37$、小于 $0.01$ 需 $M=\mathbf{185}$、小于 $0.001$ 需 $M=\mathbf{1849}$，而直线路径始终 $M=1$。这与真实系统的量级一致：DDPM 原始随机反向链 1000 步、DDIM 确定性采样 20–50 步，整流流配合 reflow 与一致性蒸馏可压到 1–4 步。</p>
+  <p>误差来源可以手算核对。余弦调度下欧拉是「左黎曼和」，其误差约 $\frac{\pi h}{4}\lvert x_1+\epsilon\rvert$；本例 $\lvert(0.5,2.3)\rvert=2.3537$，$M=64$ 时 $\frac{\pi}{4\times64}\times2.3537\approx0.0289$，与实测 $0.028785$ 吻合。CFM 目标也顺手核对：$u_t=x_1-\epsilon=(1.5,1.7)$，若网络预测 $v_\theta=(1.4,1.8)$，则 $\mathcal L_{\text{CFM}}=(0.1)^2+(-0.1)^2=\mathbf{0.0200}$——这一项与步数无关，是「把速度场学准」要付的代价；直线路径消掉的是另一项（离散误差）。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>由 Jensen 不等式 $\log p_\theta(x)=\log\mathrm{E}_q[p_\theta(x,z)/q_\phi]\ge\mathrm{E}_q[\log p_\theta(x,z)/q_\phi]$ 得 ELBO；由 KL 代数得精确恒等式 $\log p_\theta(x)=\mathrm{ELBO}(q)+D_{\mathrm{KL}}(q_\phi(z\mid x)\|p_\theta(z\mid x))$，故间隙非负、且在 $q$ 取到真后验时为零。共轭高斯模型（$x=1,\sigma^2=1$）给出 $\log p(x)=-1.515512$、$p(z\mid x)=\mathcal N(0.5,0.5)$，20 组 $q$ 上 $\mathrm{ELBO}+\text{间隙}$ 恒等于 $-1.515512$（误差 $0.00\times10^0$），网格最大 ELBO 恰在真后验处取等。重参数化 $z=\mu_\phi+\sigma_\phi\odot\varepsilon$ 把采样随机性移出参数，使梯度走 $\nabla_z f\cdot\nabla_\phi g$ 而非 $f\cdot\nabla_\phi\log q$，实测方差由 $7.4528$ 降到 $1.0025$（$\mathbf{7.43}$ 倍）。生成侧：VP-SDE 的概率流 ODE 为 $\frac{dx}{dt}=-\frac12\beta x-\frac12\beta\nabla_x\log p_t$，余弦调度下 $\frac{dx_t}{dt}=\frac\pi2[\cos(\frac\pi2 t)x_1-\sin(\frac\pi2 t)\epsilon]$、二阶导非零，欧拉误差 $O(h)$，达到 0.01 容差需 $\mathbf{185}$ 步；整流流 $x_t=(1-t)x_0+t x_1$ 的速度为常数、$\ddot x\equiv0$，欧拉任意步长精确，$M=\mathbf{1}$ 即可，其条件目标 $\mathcal L_{\text{CFM}}$ 与边缘目标梯度相同。</div>
+
+  <p><strong>边界条件：</strong>在 $q$ 族不含真实后验（真后验多峰而 $q$ 被限制为单峰对角高斯）、且任务需要精确似然值而非下界的条件下，「最大化 ELBO 等价于最大化 $\log p(x)$」不成立（变分间隙搬不走），应改用重要性加权自编码 IWAE、归一化流或 MCMC / 精确推断把间隙压下去；在隐变量离散（token、类别）或 $f$ 不连续不可导的条件下，重参数化不成立，应改用 score-function 估计器配 baseline、或 Gumbel-Softmax 一类连续松弛；在初次训练尚未做整流 / 蒸馏、目标分布高度多峰导致配对直线大量交叉，或 CFM 的网络拟合误差 $\mathcal L_{\text{CFM}}$ 仍很大的条件下，「直线路径只需 1–4 步」不成立，应改用多步欧拉 / 高阶 RK 积分、reflow 迭代拉直，或保留 DDPM 式随机采样；在生成质量由「速度场学得准不准」而非「积分步数」主导的条件下，继续压缩步数不会带来收益，应改用容量更大的骨干与更干净的训练配对。</p>
+
+  <p>下图是生成式 AI 应用的分层系统工程视图。VAE 的编码器—解码器、DDPM / 流匹配的采样器都位于「基础层 · 预训练模型」与「推理服务」之间：它们改变的是 $p(x)$ 的参数化与从分布里抽样的效率，不改变对齐层的偏好目标，也不改变评测闭环的统计口径。把 ELBO 的下界、概率流 ODE 的轨迹、解码步数与这条链路对上，才知道一次「生成更快了」究竟动的是哪一环。</p>
+  <figure data-figure="stack-genai-system"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 检索到不等于有据可依：RAG 忠实度的形式化失败分解，与测试时计算的成本—准确率账</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>把「答得好」拆成三个条件概率的乘积，再回答：多采样几次到底买到了什么、代价按什么规律增长</h3></div>
+  <p class="dt-lead">本章第 7.2 节给出 $p(y\mid q)=\sum_z p(z\mid q)p_\theta(y\mid q,z)$ 与一张「召回率 / 上下文精度 / 忠实度 / 答案相关性 / 弃权率」指标表，第 7.2 节的提示框写下「检索到了不等于用上了」，第 8 节给出并行采样 $\hat y=\arg\max_{k}r_{\text{ver}}(x,y^{(k)})$ 与 $\mathrm{E}[\max_k r_k]\ge\max_k\mathrm{E}[r_k]$。这些都对，但散在两节、且缺一个把「失败」<strong>定量拆开</strong>的公式，以及一份「算力换来多少准确率」的账。本专题补上：把 grounded 事件沿检索链路写成三个条件概率的乘积、把失败分成互斥的三段并逐段给数；再把自洽性多数投票、验证器引导的 best-of-N 与线性成本放到同一张表上，说明为什么「每正确答案成本」在 $K=1$ 处最小、以及测试时计算真正的用途是「用预算换达标」。</p>
+
+  <h4>背景：两条各自独立、却在推理环节相遇的线索</h4>
+  <p>RAG 由 Lewis 等 2020 年提出：把参数化记忆（模型权重）与非参数化记忆（可检索文档）结合，用 $\sum_z p(z\mid q)p_\theta(y\mid q,z)$ 做边缘化。随后工程界发现「把相关文档放进上下文」远不等于「答案有据可依」：Liu 等 2023 的 lost-in-the-middle 显示长上下文中间位置的信息会被稀释，RAGAs、TruthfulQA、HaluEval 等基准把「忠实度 / 幻觉」与「检索质量」拆成独立指标。另一条线索来自推理：Wang 等 2022 的自洽性（self-consistency）用多数投票替代贪心解码；Lightman 等 2023 的过程奖励模型、Snell 等 2024 的「最优分配测试时计算」把「推理时多花算力」确立为继参数、数据之后的第三条扩展轴；DeepSeek-R1 与 s1（2025）把它工程化。两条线索在「推理服务」这一环相遇：检索决定<strong>条件信息</strong>，测试时计算决定<strong>从这个条件分布里抽多少次、怎么挑</strong>。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把 RAG 想成「开卷考试」。把参考书递到考生手里（检索命中），书可能被堆在桌子最底下没翻开（上下文截断 / 中间遗忘），翻开了也可能被考生随口编成别的结论（幻觉式综合）。这三件事是<strong>串联</strong>的：任何一环断掉，答案就不有据可依。所以「检索做得更准」只是把第一环变好，后两环不动，整体提升会被乘法压得很小——这就是「检索到不等于用上了」的算术版本。</p>
+  <p>测试时计算则是另一个直觉：多让模型答几次、再挑最好的，确实能把准确率往上抬，但每一次回答都要付一份 token、延迟与 KV Cache。而且同一个模型在同一提示下反复采样，答案<strong>高度相关</strong>——不是 $K$ 个独立证人，更像同一个人换着措辞说同一句话，边际收益迅速饱和。于是问题不是「$K$ 越大越好吗」，而是「给定必须达到的准确率门槛，最少要付多少算力」。</p>
+
+  <h4>形式化一：忠实度漏斗与失败分解</h4>
+  <p>记 $e$ 为能支撑答案的关键证据；定义三个串联事件：$M$ =「前 $k$ 个检索片段里至少含 $e$」（即 Recall@k 命中）、$C$ =「$e$ 在拼接上下文、截断预算与位置稀释之后确实被有效使用」、$F$ =「生成答案中每个可核查断言都能被 $e$ 支撑」（faithfulness）。答案有据可依的事件 $G=M\cap C\cap F$，由链式法则：</p>
+  <div class="formula-box">
+    <div class="f-name">忠实度漏斗：grounded 概率是三个条件概率的乘积</div>
+    $$ P(G)=P(M)\cdot P(C\mid M)\cdot P(F\mid C,M) $$
+    $$ =0.90\times0.85\times0.80=\mathbf{0.6120} $$
+    <div class="f-note">白话：三段串联，任何一段掉链子答案就无据。代入一组典型值（召回 0.90、进上下文 0.85、忠实综合 0.80），最终只有 $61.2\%$ 的答案真正有据可依——虽然单看每个指标都「八成以上」。这解释了一个常见困惑：检索指标很漂亮，用户却仍觉得模型在编。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">失败分解：三段互斥，恰好取等</div>
+    $$ 1-P(G)=\underbrace{\bigl(1-P(M)\bigr)}_{\text{检索未命中 miss}}+\underbrace{P(M)\bigl(1-P(C\mid M)\bigr)}_{\text{上下文截断 trunc}}+\underbrace{P(M)P(C\mid M)\bigl(1-P(F\mid C,M)\bigr)}_{\text{幻觉式综合 halluc}} $$
+    $$ =0.10+0.14+0.15=\mathbf{0.39}=1-0.6120 $$
+    <div class="f-note">白话：三段失败对应「第一段就没发生」「第一段发生但第二段没发生」「前两段都发生但第三段没发生」，彼此互斥，所以并集上界在这里<strong>恰好取等</strong>。它给出一个可操作的诊断顺序：先量三段的各自大小，再决定优化哪一段——而不是一上来就把召回率再刷两个点。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">为什么优化检索的边际收益被锁死</div>
+    $$ P(G)\ \le\ 1\cdot P(C\mid M)\cdot P(F\mid C,M)=0.85\times0.80=\mathbf{0.6800}\quad(\text{即使检索完美}) $$
+    $$ P(G)\big|_{\text{recall }0.90\to1.00}-P(G)=0.85\times0.80-0.6120=\mathbf{+0.0680} $$
+    <div class="f-note">白话：把召回从 0.90 提到完美的 1.00，整体只从 0.6120 涨到 0.6800，净增 0.0680；而把「进上下文」或「忠实综合」各提 0.1，收益分别是 0.072 与 0.0765，反而更大。$P(G)$ 是乘积，最短的那块板决定上限——这正是第 7.2 节「指标必须分层」的定量依据。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">上下文截断在概率式里长什么样</div>
+    $$ p(y\mid q)=\sum_z p_\eta(z\mid q)\,p_\theta(y\mid q,z)\ \xrightarrow{\ \text{Top-}k+\text{预算 }B\ }\ \sum_{z\in C_B}p_\eta(z\mid q)\,p_\theta(y\mid q,C_B),\qquad \sum_{z\in C_B}|z|\le B $$
+    <div class="f-note">白话：原式是对所有文档 $z$ 做边缘化；工程上只取前 $k$ 个、再受上下文预算 $B$ 截断，把求和范围换成 $C_B$，并把「逐文档条件生成」改成「一次看完整个拼接上下文再生成」。$C_B$ 之外的证据被硬性丢弃（截断失效），$C_B$ 之内靠中间位置的信息还会被注意力稀释（lost-in-the-middle）。二者都落在 $P(C\mid M)$ 这一项里，与检索命中率无关。</div>
+  </div>
+
+  <h4>形式化二：测试时计算的成本—准确率</h4>
+  <div class="formula-box">
+    <div class="f-name">自洽性多数投票：独立假设与相关性的饱和</div>
+    $$ P_{\text{maj}}(K)=\sum_{m=\lfloor K/2\rfloor+1}^{K}\binom{K}{m}p^{m}(1-p)^{K-m},\qquad p=\text{单次正确率} $$
+    $$ K_{\text{eff}}=\frac{K}{1+(K-1)\rho}\ \xrightarrow{\ K\to\infty\ }\ \frac{1}{\rho} $$
+    <div class="f-note">白话：第一式是 $K$ 次独立采样中「正确占多数」的二项概率。第二式来自相关样本的平均方差（与 <a href="m12-ml-algorithms.html">模块 12</a> 的 $\rho\sigma^2+(1-\rho)\sigma^2/B$ 同源）：候选两两相关系数 $\rho$ 越大，有效独立样本数越被压到 $1/\rho$。$\rho=0.6$ 时上限只有 $1.67$，所以无论加多少次采样，多数投票的收益都饱和。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">验证器引导搜索与线性成本</div>
+    $$ \hat y=\arg\max_{k=1,\dots,K}r_{\text{ver}}\bigl(x,y^{(k)}\bigr),\qquad y^{(k)}\sim\pi_\theta(\cdot\mid x),\qquad c(K)=c_0K $$
+    $$ \text{每正确答案成本}=\frac{c(K)}{A(K)},\qquad 1-(1-p)^{K}\le Kp\ \Longrightarrow\ \frac{K}{A(K)}\ \ge\ \frac{1}{p} $$
+    <div class="f-note">白话：第一式是 best-of-N——采 $K$ 个候选，用验证器打分挑最好；第二式给成本。若成本随 $K$ 线性、且「至少一个正确」的概率满足并集上界 $1-(1-p)^K\le Kp$，则每正确答案成本恒不小于 $1/p$，在 $K=1$ 处取最小：<strong>并行采样买的是准确率上限，不是单位效率</strong>。测试时计算的价值在于「给定不可降级的准确率门槛 $A^{*}$，求最小可行 $K$」，而不是让单位成本下降。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">串行修正与并行采样的分界</div>
+    $$ y_{t+1}=y_t\oplus\Delta_t,\qquad \sum_t|\Delta_t|\le B\ \text{（思考预算）},\qquad \mathrm{E}\bigl[\max_k r_k\bigr]\ \ge\ \max_k\mathrm{E}[r_k] $$
+    <div class="f-note">白话：并行采样（多数投票、best-of-N）用独立样本换覆盖率，$\mathrm{E}[\max_k r_k]$ 随 $K$ 上升但候选相关时迅速饱和；串行修正（长思维链、自我检查、验证器引导改写）沿一条轨迹反复追加 $\Delta_t$，用上下文换深度、能用上中间反馈，却会累积早期错误且无法事后剔除坏轨迹。$B$ 是预算旋钮，成本与延迟按它线性上升。两者常混用：先并行采若干条，再对最有希望的少数做串行自检。</div>
+  </div>
+
+  <h4>数值对账：漏斗、投票与 best-of-N</h4>
+  <p>代码实验 Part 4 给出三组可复核的数。第一组即上面的漏斗：$0.90\times0.85\times0.80=0.6120$，完美检索上界 $0.6800$，单提召回净增 $+0.0680$，失败分解 $0.10+0.14+0.15=0.39$。第二组是 $p=0.6$ 的自洽性多数投票：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$K$</th><th>独立假设 $P_{\text{maj}}$</th><th>相关 $\rho=0.6$ 修正</th><th>相对成本</th><th>每正确成本 $K/A$</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>0.6000</td><td>0.6000</td><td>1</td><td>1.667</td></tr>
+        <tr><td>3</td><td>0.6480</td><td>0.6000</td><td>3</td><td>4.630</td></tr>
+        <tr><td>9</td><td>0.7334</td><td>0.6480</td><td>9</td><td>12.271</td></tr>
+        <tr><td>17</td><td>0.8011</td><td>0.6480</td><td>17</td><td>21.222</td></tr>
+        <tr><td>33</td><td>$\mathbf{0.8789}$</td><td>$\mathbf{0.6480}$</td><td>33</td><td>37.547</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>独立假设下准确率从 0.6000 升到 0.8789；但 $\rho=0.6$ 时用有效样本数 $K/(1+(K-1)\rho)$ 修正后，从 $K=9$ 起就钉在 0.6480 附近——与第 8.3 节「候选高度相关，有效独立样本数远小于 $K$」一致。每正确成本一列从 1.667 单调升到 37.547，从未下降。第三组是验证器引导 best-of-N 的蒙特卡洛（单次正确率 $p=0.35$，验证器对正确 / 错误答案的分数分别服从 $\mathcal N(1,1)$ 与 $\mathcal N(0,1)$）：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$K$</th><th>最佳候选正确率 $A(K)$</th><th>相对成本</th><th>每正确答案成本</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>0.3530</td><td>1</td><td>$\mathbf{2.833}$</td></tr>
+        <tr><td>4</td><td>0.5823</td><td>4</td><td>6.869</td></tr>
+        <tr><td>8</td><td>0.6735</td><td>8</td><td>11.878</td></tr>
+        <tr><td>16</td><td>0.7593</td><td>16</td><td>21.072</td></tr>
+        <tr><td>32</td><td>$\mathbf{0.8131}$</td><td>32</td><td>39.356</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>准确率从 0.3530 升到 0.8131，但每正确答案成本在 $K=1$ 处最小（2.833）且单调不降——这正是并集上界 $1-(1-p)^K\le Kp\Rightarrow K/A\ge1/p$ 的数值版。换个问法才有意义：给定门槛，代码求出的最小可行 $K$ 是 0.50→4、0.60→8、0.70→16、0.80→32，对应成本 4 / 8 / 16 / 32。这就是 Snell 等 2024「计算最优」的核心：<strong>简单题少采样、难题才追加测试时计算</strong>，把预算按题目难度分配，而不是对所有题一律采 $K$ 次。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>RAG 的忠实度不是单个指标，而是串联漏斗 $P(G)=P(M)\,P(C\mid M)\,P(F\mid C,M)$；三段失败互斥且 $1-P(G)=(1-P(M))+P(M)(1-P(C\mid M))+P(M)P(C\mid M)(1-P(F\mid C,M))$。典型值下 $P(G)=0.90\times0.85\times0.80=0.6120$，即便检索完美上界也只有 $0.6800$，单提召回净增仅 $+0.0680$——检索到绝不保证有据可依，短板在上下文截断与幻觉式综合。测试时计算方面，$P_{\text{maj}}(K)=\sum_{m\gt K/2}\binom{K}{m}p^m(1-p)^{K-m}$ 在候选相关 $\rho=0.6$ 时因 $K_{\text{eff}}=K/(1+(K-1)\rho)\to1/\rho\approx1.67$ 而饱和；验证器 best-of-N 把准确率从 $0.3530$ 抬到 $0.8131$，但由 $1-(1-p)^K\le Kp$ 得每正确答案成本 $K/A(K)\ge1/p$ 且在 $K=1$ 处最小（$2.833$）并单调不降。因此并行采样买的是<strong>准确率上限</strong>而非单位效率，测试时计算的正确用法是「给定不可降级的门槛，用最小 $K$ 达标」（0.50→4、0.60→8、0.70→16、0.80→32），并按难度分配预算。</div>
+
+  <p><strong>边界条件：</strong>在候选答案高度相关（同一模型、低温度、同一提示使 $\rho\to1$）而任务又无客观可验证判据的条件下，「自洽性 / 多数投票随 $K$ 单调提升准确率」不成立，应改用提高采样温度、多样化提示、引入外部验证器或人类抽检；在没有可靠验证器（开放域写作、主观偏好、奖励模型本身带偏）的条件下，「verifier-guided best-of-N 用算力换准确率」不成立，应改用偏好奖励加人工复核、限制 $K$，或把预算转投检索与提示工程；在检索库覆盖完备、切分合理、上下文预算充足且生成器被约束为<strong>抽取式作答</strong>（不允许自由生成）的条件下，漏斗后两项接近 1、$P(G)\approx P(M)$，本结论给出的量化幅度不成立，此时应把优化重点转向检索排序、去重与延迟而非忠实度；在单次正确率 $p$ 已接近 1 的简单题上，追加测试时计算只增成本不增准确率，应改用零样本贪心解码。</p>
+
+  <p>下图是 RAG 的推理链路：查询改写 → 向量检索 → 重排序 → 拼接上下文 → 带引用生成。把上面的漏斗对到图上，$P(M)$ 落在「向量检索 / 重排序」，$P(C\mid M)$ 落在「拼接上下文」（截断与位置稀释），$P(F\mid C,M)$ 落在「LLM 生成」。评测时必须分别量这三段，否则「检索更准了」与「答案更可信了」会互相掩盖。</p>
+  <figure data-figure="flow-rag"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 温度缩放与 top-p（核）解码：6 类词表上的一次完整手算</h2>
+<div class="algo-spec">
+  <p>本算法位于「数据采集 → 存储计算 → 建模 → 评估 → 部署运维」链条的<strong>推理服务环节</strong>，它不改变任何权重，只改变「从 $p_\theta(x_t\mid x_{&lt;t})$ 里怎么抽下一个 token」这一步。第 7.1 节把温度与 top-p 列为采样旋钮、第 8.3 节说它们用来调节并行采样的多样性，但都没有把它当成一个可逐格手算的算法展开。选它作经典算法，是因为它<strong>只需要指数、除法、排序与累加</strong>，一次完整变换可以完全用初中算术算到底；而且它是把「同一个条件分布改写成另一个分布」的纯统计操作，正好与深度专题二的测试时计算、以及第 2 节的条件分布口径接上。正文例 15.1 讲的是 tokenizer 与困惑度换算，本例不重复，改用 6 类小词表把温度、softmax、熵、top-p 核与重归一化全走一遍。</p>
+
+  <h3 id="d-algo-principle">一、原理：对条件分布做「退火」与「条件化」</h3>
+  <p>语言模型每一步输出的是词表上 $V$ 个 logits $z_1,\dots,z_V$。原始采样分布是 softmax：$p_i=\frac{e^{z_i}}{\sum_j e^{z_j}}$。温度与 top-p 是两种<strong>不同的</strong>分布变换：</p>
+  <div class="formula-box">
+    <div class="f-name">温度缩放与核采样</div>
+    $$ p_i^{(T)}=\frac{\exp(z_i/T)}{\sum_{j=1}^{V}\exp(z_j/T)}=\frac{p_i^{\,1/T}}{\sum_j p_j^{\,1/T}},\qquad H\bigl(p^{(T)}\bigr)=-\sum_i p_i^{(T)}\log p_i^{(T)} $$
+    $$ S_p=\text{使}\sum_{i\in S_p}p_i^{(T)}\ \ge\ p\ \text{的最小概率最大的前若干个类别},\qquad p_i'=\frac{p_i^{(T)}\,\mathbb{I}[i\in S_p]}{\sum_{j\in S_p}p_j^{(T)}} $$
+    <div class="f-note">白话：温度 $T$ 把 logits 整体除以 $T$ 再 softmax，等价于把原始概率取 $1/T$ 次幂后重新归一化——统计里叫「退火 / tempered distribution」。$T\to0$ 时最大 logit 的概率趋于 1（贪心 / MAP），$T=1$ 是原分布，$T\to\infty$ 时趋于均匀分布（熵最大）；熵 $H$ 随 $T$ 单调上升。top-p 则先按概率降序排序，取累积质量刚超过 $p$ 的最小集合 $S_p$（核），把核外概率置零再重归一化——这在概率上等价于<strong>条件化</strong>于「抽样结果落在核内」这一事件。</div>
+  </div>
+  <p><strong>几何与统计解释：</strong>把 $V$ 类分布看成单纯形上的一个点。温度缩放让这个点沿一条指数族曲线移动：$T$ 变小把它拉向某个顶点（尖锐），$T$ 变大拉向中心（平坦）。top-p 则是把点投影到单纯形的一个「面」上——核外坐标被硬性置零。二者顺序很重要：工程上<strong>先做温度，再做 top-p</strong>（反过来会用错尺度的概率算累积质量）。温度是连续旋钮、控制整体锐度；top-p 是自适应截断、按当前分布自动决定保留多少候选（分布尖锐时核小、平坦时核大），比固定 top-k 更稳。二者共同决定深度专题二里并行采样 $K$ 条候选的多样性：$\rho$ 太高时提高 $T$ / 放宽 top-p 才能压低相关性。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>取 logits 并定参数。</strong>从模型当前步拿到 $z\in\mathbb R^V$，设定 $T\gt0$ 与 $p\in(0,1]$；纯贪心可令 $T\to0$ 或跳过第 5–6 步直接取 $\arg\max$。</li>
+    <li><strong>温度缩放。</strong>计算 $\tilde z_i=z_i/T$。$T$ 越小 $\tilde z$ 之间差距越大。</li>
+    <li><strong>数值稳定的 softmax。</strong>令 $m=\max_i\tilde z_i$，取 $e_i=\exp(\tilde z_i-m)$（减最大值不改变结果、防止溢出），再 $p_i^{(T)}=e_i/\sum_j e_j$。检查 $\sum_i p_i^{(T)}=1$。</li>
+    <li><strong>按概率降序排序。</strong>得到排列 $\pi(1),\pi(2),\dots$，使 $p_{\pi(1)}^{(T)}\ge p_{\pi(2)}^{(T)}\ge\cdots$。</li>
+    <li><strong>找核 $S_p$。</strong>累加 $\sum_{r=1}^{R}p_{\pi(r)}^{(T)}$，取使累积首次 $\ge p$ 的最小 $R$；$S_p=\{\pi(1),\dots,\pi(R)\}$。注意「首次达到」而非「最接近」，否则会多留一个尾部类别。</li>
+    <li><strong>截断并重归一化。</strong>核外置零，$p_i'=p_i^{(T)}/\sum_{j\in S_p}p_j^{(T)}$（$i\in S_p$）。这一步保证输出仍是合法概率分布；漏掉重归一化会让总质量小于 1，采样器报错或偷偷偏斜。</li>
+    <li><strong>按 $p'$ 抽样并记录。</strong>用轮盘赌 / 逆变换采样（生成一个均匀随机数，落入哪个累积区间就取哪类），把选中 token 追加到序列，重复直至 EOS 或达到长度上限；同时记录温度、$p$、随机种子，保证评测可复现（深度专题二的并行采样还要把 $K$ 条候选的温度一并留痕）。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>任务类型：</strong>开放式创作、对话、需要多样性的候选生成用 $T\approx0.7$–$1.0$、top-p $\approx0.9$–$0.95$；事实抽取、代码、数学答案用 $T\approx0$（贪心）或很小的 $T$ 配 top-p 收紧；做自洽性 / best-of-N 采样时必须 $T\gt0$ 且放宽 top-p，否则 $K$ 条候选几乎相同、$\rho\to1$（深度专题二）。</li>
+    <li><strong>模型与分布：</strong>要求 logits 尺度可比、且 softmax 后的分布有意义；经过不良校准或强 RLHF 的模型可能出现「过度尖锐」分布，此时调 $T$ 的收益有限，应回到校准 / 对齐环节。</li>
+    <li><strong>规模：</strong>每步需对 $V$ 个 logits 排序，词表 $V$ 可到数万至十几万；大词表下用部分排序或分桶把 $O(V\log V)$ 压到近似 $O(V)$。</li>
+    <li><strong>设置一致性：</strong>评测必须与线上服务使用完全相同的 $T$、$p$、top-k 顺序与 EOS 处理，否则「同一个模型」的两次结果不可交换（第 1 节与第 9 节的可交换性口径）。</li>
+    <li><strong>失效边界：</strong>需要严格可复现的确定性输出时随机采样不适用，应改用贪心或束搜索；需要覆盖保证而非点估计时应配合共形预测 / 弃权阈值，而不是靠调温度。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>单步训练</b> 无（纯推理操作，不参与反向传播）。<b>单步推理</b> 温度缩放与 softmax 各 $O(V)$；top-p 需排序 $O(V\log V)$，用堆 / 部分排序或累积质量分桶可降到 $O(V+R\log R)$ 甚至近似 $O(V)$；抽样 $O(R)$（$R=|S_p|\ll V$）。<b>空间</b> $O(V)$ 存 logits 与归一化概率（可原地复用），排序索引另 $O(V)$。<b>整段生成</b> 长度 $T_{\text{seq}}$ 时总计 $O(T_{\text{seq}}\,V\log V)$，且与 KV Cache 的 $O(L\,T_{\text{seq}}\,d)$ 显存叠加。<b>并行采样 $K$ 条</b> 成本乘 $K$（这正是深度专题二 $c(K)=c_0K$ 的来源）；<b>beam search</b> 另乘 beam 宽 $B$ 且需维护 $B$ 份缓存。<b>注意</b> 温度与 top-p 本身不增加 KV Cache，只增加采样侧的算术与排序开销。</div>
+  <p>白话：贵在「每步要把几万个候选按概率排一次序」，不在模型前向。这也是为什么投机解码、批量采样与「简单题直接贪心」能省下可观的端到端延迟——它们减少的是需要跑这套采样逻辑的步数或次数。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>零训练成本：只改推理时的一步分布变换，可即时热切换，不动权重。</li>
+        <li>两个旋钮语义清晰：$T$ 管整体锐度与熵，top-p 管尾部截断，可分别解释与调参。</li>
+        <li>top-p 自适应：分布尖锐时自动留少量候选、平坦时自动放宽，比固定 top-k 更稳。</li>
+        <li>是测试时计算的基础：调 $T$ / top-p 才能生成多样候选，供自洽性多数投票与 best-of-N 使用。</li>
+        <li>可复现：固定 $T$、$p$、随机种子与预处理后，同一提示的采样序列可逐位复算。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>只改采样分布、不改模型知识：事实错误、幻觉不会因为 $T$ 调低就消失，反而可能被低温「自信地固化」。</li>
+        <li>$T$ 与 top-p 耦合且对 logits 尺度敏感，跨模型 / 跨 checkpoint 不能照搬数值。</li>
+        <li>随机性带来评测方差：不固定种子与设置时，两次「同一模型」的分数不可比，需配对检验与区间（第 9 节）。</li>
+        <li>温度过高或 top-p 过大会引入低质长尾 token，过低则模板化、重复、多样性塌缩。</li>
+        <li>每步排序 $O(V\log V)$ 在超大词表与高并发下是实打实的延迟成本；且采样不提供任何覆盖或正确性保证。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>取 6 类词表，logits $z=(2.0,\ 1.0,\ 0.0,\ -1.0,\ -2.0,\ -3.0)$。为手算方便，记住 $e^{2}\approx7.3891$、$e^{1}\approx2.7183$、$e^{0}=1$、$e^{-1}\approx0.3679$、$e^{-2}\approx0.1353$、$e^{-3}\approx0.0498$。所有数值与代码实验 Part 5 逐位一致。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>$V=6$，$z=(2,1,0,-1,-2,-3)$。目标：分别求 $T=0.5,1,2$ 的采样分布与熵，再在 $T=1$ 上做 top-p $=0.9$，最后看 $T\to0$ 的极限。</div>
+    <div class="solve-step"><span class="ss-k">第 3 步：$T=1$ 的 softmax。</span>$e^{z}$ 依次为 $(7.3891,\ 2.7183,\ 1,\ 0.3679,\ 0.1353,\ 0.0498)$，行和 $=11.6603$。逐项除以行和得
+      $$ p^{(1)}=(\mathbf{0.6337,\ 0.2331,\ 0.0858,\ 0.0315,\ 0.0116,\ 0.0043}) $$
+      熵 $H=-\sum p_i\log p_i=\mathbf{1.0233}$ nats（代码原样输出）。最大项仍是第 1 类，$p_1\approx0.63$——分布已有偏好但不算尖锐。</div>
+    <div class="solve-step"><span class="ss-k">$T=0.5$：更尖锐。</span>$z/T=(4,2,0,-2,-4,-6)$，$e^{z/T}=(54.598,\ 7.389,\ 1,\ 0.1353,\ 0.0183,\ 0.0025)$，行和 $\approx63.143$，得
+      $$ p^{(0.5)}=(\mathbf{0.8647,\ 0.1170,\ 0.0158,\ 0.0021,\ 0.0003,\ 0.0000}),\qquad H=\mathbf{0.4584}\ \text{nats} $$
+      首类概率从 0.6337 抬到 0.8647，熵从 1.0233 降到 0.4584：$T$ 变小 = 分布变尖、不确定性下降。</div>
+    <div class="solve-step"><span class="ss-k">$T=2$：更平坦。</span>$z/T=(1,0.5,0,-0.5,-1,-1.5)$，$e^{z/T}=(2.7183,\ 1.6487,\ 1,\ 0.6065,\ 0.3679,\ 0.2231)$，行和 $\approx6.5645$，得
+      $$ p^{(2)}=(\mathbf{0.4141,\ 0.2512,\ 0.1523,\ 0.0924,\ 0.0560,\ 0.0340}),\qquad H=\mathbf{1.4952}\ \text{nats} $$
+      熵升到 1.4952（6 类均匀分布的上界是 $\log6\approx1.7918$），长尾类别被明显抬起来。三行对照说明 $H$ 随 $T$ 单调上升：$0.4584\to1.0233\to1.4952$。</div>
+    <div class="solve-step"><span class="ss-k">$T\to0$ 的极限。</span>$T=0.1$ 时 $z/T=(20,10,0,-10,-20,-30)$，softmax 后代码给出 $(\mathbf{1.0,\ 0,\ 0,\ 0,\ 0,\ 0})$：退化为 $\arg\max$，即贪心 / MAP 解码。这从数值上验证了「温度低到极限就是贪心」。</div>
+    <div class="solve-step"><span class="ss-k">第 4–6 步：在 $T=1$ 上做 top-p $=0.9$。</span>概率已降序排列，累积质量：第 1 类后 $0.6337$（未达 0.9）、第 2 类后 $0.6337+0.2331=0.8668$（仍未达）、第 3 类后 $0.8668+0.0858=\mathbf{0.9526}\ge0.9$（首次达到，停止）。故核 $S_{0.9}=\{1,2,3\}$，核内总质量 $0.9526$。重归一化 $p_i'=p_i/0.9526$：
+      $$ p'=(\mathbf{0.6652,\ 0.2447,\ 0.0900,\ 0,\ 0,\ 0}),\qquad \sum p'=\mathbf{1.0000},\qquad H=\mathbf{0.8324}\ \text{nats} $$
+      第 4–6 类被置零；熵从 1.0233 降到 0.8324，说明截断确实降低了不确定性。注意第 3 类原本概率 0.0858 被抬到 0.0900，这是重归一化的结果，不是算错。</div>
+    <div class="solve-step"><span class="ss-k">解释与对账。</span>温度是「整体锐度」旋钮、top-p 是「尾部截断」旋钮，二者作用在不同的分布变换上，因此顺序固定为「先温度后核采样」。若把 top-p 放在温度之前，累积质量会按未缩放的概率算，得到的核与上面不同。代码实验 Part 5 把三个温度、四个熵值、核 $S=[1,2,3]$、累积 $0.9526$、重归一化概率与 $H=0.8324$ 全部原样复现。把 $z_1$ 从 2.0 改成 3.0，首类概率会进一步上升、核可能缩到 $\{1,2\}$——这说明 top-p 是自适应的：分布越尖，核越小。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把「温度 + top-p」与三类直接同类 / 近亲的解码策略放在一起：贪心 / 束搜索代表「确定性」，top-k 代表「固定截断」，纯 softmax 祖先采样代表「不做任何变换」。读表时先锁定「任务是否需要多样性、是否有客观可验证答案」，再看成本与可复现性。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>温度 + top-p（核采样）</th><th>贪心 / 束搜索</th><th>top-k 采样</th><th>纯 softmax 祖先采样</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>开放式生成、对话、需要多样候选供自洽性 / best-of-N；评测须固定 $T,p,$ 种子</td>
+        <td>有唯一标准答案的事实抽取、代码、数学；要求逐位可复现的确定性输出</td>
+        <td>分布形状较稳定、希望固定候选数的场景；常与温度联用</td>
+        <td>需要严格按模型原始分布抽样、做似然评估或理论分析</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>每步 $O(V\log V)$ 排序，近似可到 $O(V)$；空间 $O(V)$；乘 $K$ 条候选线性放大</td>
+        <td>贪心 $O(V)$；束搜索 $O(BV\log(BV))$ 且需维护 $B$ 份 KV Cache，成本最高</td>
+        <td>$O(V\log k)$ 或 $O(V)$ 取前 $k$ 大；空间 $O(V)$</td>
+        <td>$O(V)$ softmax + 一次抽样；空间 $O(V)$</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>$T$（锐度 / 熵）、$p$（核质量，常 0.9–0.95）、二者的先后顺序、随机种子、EOS / 最大长度</td>
+        <td>束宽 $B$、长度惩罚、是否禁止重复 n-gram</td>
+        <td>$k$（固定候选数，常 40–50）、温度、是否先温度再截断</td>
+        <td>无（仅随机种子）；依赖模型自身 logits 校准</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">零训练成本、旋钮语义清晰、top-p 自适应候选数；是测试时计算生成多样候选的前提</td>
+        <td class="best">完全确定性、可逐位复现、无需排序、事实类任务最稳、延迟最低</td>
+        <td>实现简单、候选数固定可控、计算比全排序略省</td>
+        <td>不改变模型分布，理论分析与似然评估的基准口径</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>不改模型知识，低温会把幻觉「自信固化」；随机性带来评测方差；$T,p$ 跨模型不可照搬</td>
+        <td>输出模板化、重复、多样性为零；束搜索还可能偏好短句与高频套话</td>
+        <td>分布尖锐时固定 $k$ 会放进大量低质长尾，平坦时又可能砍掉合理候选</td>
+        <td>长尾低质 token 常被抽到；分布过尖时几乎不产生多样候选，$\rho\to1$</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>中强：$T$ 与熵、$p$ 与核大小都可直接读数；需维护采样器、种子与设置留痕，成本中等</td>
+        <td>最强：输出即 $\arg\max$，无随机性；实现最简、工程成本最低</td>
+        <td>强：$k$ 含义直观；实现简单，但需额外的 top-k 选择与温度联调</td>
+        <td>强：无变换可解释；但需处理数值稳定与抽样器，评测方差最大</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>把这张表与深度专题二的账对起来：并行采样 $K$ 条候选时，只有「温度 + top-p」「top-k」「纯 softmax」三类能提供多样性，但候选相关性 $\rho$ 随 $T$ 降低而升高——$\rho\to1$ 时 $K_{\text{eff}}=K/(1+(K-1)\rho)$ 饱和，多数投票与 best-of-N 的收益随之消失。所以采样参数不是「风格偏好」，而是测试时计算能否起效的前置条件。</p>
+  <p>下图对应 RAG 原论文的架构配图（离线站点不内嵌外图，按独立标记由脚本生成带准确出处与核验链接的说明）。把它与本节放在一起看：解码策略决定「从 $p_\theta(y\mid q,C_B)$ 里怎么抽」，而检索与重排序决定「$C_B$ 里有什么」——前者属于采样分布，后者属于条件信息，二者改变的是系统的不同环节。</p>
+  <figure data-classic="0"></figure>
+</div>
+
+<h2 id="d-code">代码实验 · ELBO 恒等式、重参数化方差、概率流 ODE 步数、RAG 漏斗与解码变换的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 15 生成式 AI 系统与方法
+# 纯 Python 标准库；固定种子 20261107；复用「知学云 · 在线课程完课率」案例数字
+# Part 0: 案例口径
+# Part 1: 共轭高斯模型里 ELBO 恒等式逐项核对（含精确后验与变分间隙）
+# Part 2: 重参数化 vs score-function 梯度估计的方差
+# Part 3: DDPM 余弦概率流 ODE vs 整流流直线路径的欧拉步数-误差对照
+# Part 4: RAG 忠实度漏斗 + 自洽性 / 验证器 best-of-N 的成本-准确率
+# Part 5: 温度 / top-p 解码数值核对（d-algo 手算用）
+import math
+import random
+
+random.seed(20261107)
+
+
+def fmt(row, nd=4):
+    return [round(v, nd) for v in row]
+
+
+# ============================================================
+print("=== Part 0: 案例口径（知学云 · 在线课程完课率，N=12000, seed=20261107）===")
+N, COMPLETED = 12000, 5967
+STUDY_MEAN, STUDY_SD = 95.30, 43.43
+QUIZ_MEAN, QUIZ_SD = 79.76, 14.58
+CORR = 0.4792
+B0, B1, R2 = 64.4306, 0.160833, 0.2296
+OR_ = 3.7158
+print(f"overall completed : {COMPLETED:,} / {N:,} = {COMPLETED/N:.4f}")
+print(f"study_minutes/week: mean={STUDY_MEAN:.2f}  sd={STUDY_SD:.2f}")
+print(f"quiz_avg          : mean={QUIZ_MEAN:.2f}  sd={QUIZ_SD:.2f}")
+print(f"corr(study, quiz) : {CORR:.4f}   OLS slope={B1:.6f} R2={R2:.4f}   2x2 OR={OR_:.4f}")
+print("下列实验用解析可解的小模型核对公式；案例数字用于固定全站口径。")
+print()
+
+# ============================================================
+print("=== Part 1: 共轭高斯模型里把 ELBO 恒等式逐项核对 ===")
+SIG2 = 1.0
+X = 1.0
+LOG2PI = math.log(2 * math.pi)
+log_px = -0.5 * math.log(2 * math.pi * (1 + SIG2)) - X * X / (2 * (1 + SIG2))
+v = SIG2 / (1 + SIG2)
+m = X / (1 + SIG2)
+print(f"模型: p(z)=N(0,1), p(x|z)=N(z,{SIG2:.1f}), 观测 x={X:.1f}")
+print(f"log p(x) = {log_px:.6f} nats   (解析值)")
+print(f"精确后验 p(z|x) = N(mu={m:.4f}, var={v:.4f})")
+
+
+def kl_gauss(mu, s2, mu0, v0):
+    return 0.5 * ((mu - mu0) ** 2 / v0 + s2 / v0 - 1 - math.log(s2 / v0))
+
+
+def elbo(mu, s2):
+    recon = -0.5 * LOG2PI - 0.5 * ((X - mu) ** 2 + s2) / SIG2
+    kl_prior = 0.5 * (mu ** 2 + s2 - 1 - math.log(s2))
+    return recon - kl_prior, recon, kl_prior
+
+
+print()
+print(f"{'mu':&gt;7}{'s2':&gt;7}{'ELBO':&gt;13}{'KL(q||post)':&gt;14}{'ELBO+gap':&gt;13}{'log p(x)':&gt;12}{'误差':&gt;12}")
+for mu in [0.0, 0.25, 0.5, 0.75, 1.0]:
+    for s2 in [0.25, 0.5, 1.0, 2.0]:
+        E, _, _ = elbo(mu, s2)
+        gap = kl_gauss(mu, s2, m, v)
+        err = (E + gap) - log_px
+        print(f"{mu:&gt;7.2f}{s2:&gt;7.2f}{E:&gt;13.6f}{gap:&gt;14.6f}{E+gap:&gt;13.6f}{log_px:&gt;12.6f}{err:&gt;12.2e}")
+print()
+best = (-1e9, None)
+for i in range(0, 101):
+    mu = -1.0 + 0.02 * i
+    for j in range(1, 41):
+        s2 = 0.05 * j
+        E, _, _ = elbo(mu, s2)
+        if E &gt; best[0]:
+            best = (E, (mu, s2))
+print(f"网格搜索 max ELBO = {best[0]:.6f}，在 (mu, s2)=({best[1][0]:.4f}, {best[1][1]:.4f})")
+print(f"解析 log p(x)     = {log_px:.6f}，差 = {best[0]-log_px:.2e}")
+print(f"精确后验处 (mu,s2)=({m:.4f},{v:.4f}) 的 ELBO = {elbo(m,v)[0]:.6f}，间隙 = {kl_gauss(m,v,m,v):.2e}")
+print("结论：ELBO 是 log p(x) 的下界，间隙恰为 KL(q||p(z|x))；q 取到精确后验时下界取等。")
+print()
+
+# ============================================================
+print("=== Part 2: 重参数化 vs score-function 梯度估计的方差（f(z)=z^2）===")
+MU, SIG = 0.5, 0.5
+M = 20000
+sf_vals, rp_vals = [], []
+for _ in range(M):
+    eps = random.gauss(0.0, 1.0)
+    z = MU + SIG * eps
+    fz = z * z
+    sf = fz * (z - MU) / (SIG * SIG)
+    rp = 2 * z
+    sf_vals.append(sf)
+    rp_vals.append(rp)
+
+
+def mean_var(a):
+    n = len(a)
+    mu = sum(a) / n
+    var = sum((x - mu) ** 2 for x in a) / n
+    return mu, var
+
+
+ms, vs = mean_var(sf_vals)
+mr, vr = mean_var(rp_vals)
+print(f"真值 d/dmu E_q[z^2] = 2*mu = {2*MU:.4f}")
+print(f"score-function: 均值={ms:.4f}  方差={vs:.4f}  标准误={math.sqrt(vs/M):.4f}")
+print(f"重参数化      : 均值={mr:.4f}  方差={vr:.4f}  标准误={math.sqrt(vr/M):.4f}")
+print(f"方差比 = {vs/vr:.2f} 倍；同样 {M} 个样本，重参数化标准误小约 {math.sqrt(vs/vr):.2f} 倍。")
+print("原因：score-function 把 f 当「奖励」乘上 score，方差随 f 量级放大；")
+print("重参数化把随机性移到与参数无关的 eps 上，梯度走 f 的导数（2z），只含一阶噪声。")
+print("边界：z 离散或 f 不可导时重参数化不可用，只能退回 score-function 或 Gumbel-Softmax。")
+print()
+
+# ============================================================
+print("=== Part 3: DDPM 余弦概率流 ODE vs 整流流直线路径：欧拉步数-误差对照 ===")
+X1 = (1.0, 2.0)
+EPS = (-0.5, 0.3)
+PI = math.pi
+
+
+def norm(a, b):
+    return math.sqrt(sum((u - v) ** 2 for u, v in zip(a, b)))
+
+
+def endpoint(schedule, M):
+    h = 1.0 / M
+    x = [EPS[0], EPS[1]]
+    for k in range(M):
+        t = k * h
+        if schedule == "cos":
+            da = 0.5 * PI * math.cos(0.5 * PI * t)
+            ds = -0.5 * PI * math.sin(0.5 * PI * t)
+        else:
+            da, ds = 1.0, -1.0
+        x[0] += h * (da * X1[0] + ds * EPS[0])
+        x[1] += h * (da * X1[1] + ds * EPS[1])
+    return x
+
+
+print(f"数据 x1={X1}  噪声 eps={EPS}；t=0 为噪声、t=1 为数据")
+print("DDPM/VP 概率流 ODE: dx/dt = (pi/2)cos(pi t/2) x1 - (pi/2)sin(pi t/2) eps  [余弦调度，速度随 t 变]")
+print("整流流直线路径  : dx/dt = x1 - eps  [常数速度]")
+print("取「理想模型」(速度场精确)，故误差只来自欧拉离散化。")
+print(f"{'步数 M':&gt;8}{'h=1/M':&gt;10}{'余弦ODE终点误差':&gt;18}{'直线路径终点误差':&gt;18}")
+for M in [1, 2, 4, 8, 16, 32, 64, 128, 256]:
+    e_cos = norm(endpoint("cos", M), X1)
+    e_lin = norm(endpoint("straight", M), X1)
+    print(f"{M:&gt;8d}{1.0/M:&gt;10.4f}{e_cos:&gt;18.6f}{e_lin:&gt;18.2e}")
+print()
+for tol in [0.05, 0.01, 0.001]:
+    Mc = next(M for M in range(1, 5001) if norm(endpoint("cos", M), X1) &lt; tol)
+    print(f"终点误差 &lt; {tol}: 余弦ODE 至少需要 M={Mc} 步；直线路径 M=1 步即满足。")
+print("直线路径速度场为常数，欧拉对任意 M 都精确（误差约 1e-15，浮点零）；")
+print("余弦调度速度随 t 变化，左黎曼和误差约 (pi*h/4)|x1+eps|，按 O(h) 衰减，故需成百上千步。")
+u = (X1[0] - EPS[0], X1[1] - EPS[1])
+vth = (1.4, 1.8)
+cfm = sum((u[i] - vth[i]) ** 2 for i in range(2))
+print(f"条件流匹配核对：u_t=x1-eps={u}，若 v_theta={vth}，则 L_CFM={cfm:.4f}")
+print("真实 DDPM 随机反向链需 1000 步、DDIM 20-50 步；整流流+蒸馏可压到 1-4 步，与本表量级一致。")
+print()
+
+# ============================================================
+print("=== Part 4: RAG 忠实度漏斗 + 测试时计算的成本-准确率 ===")
+recall, place, faith = 0.90, 0.85, 0.80
+g = recall * place * faith
+print("4.1 检索到 != 有据可依：把 grounded 事件沿链路拆成三个条件概率")
+print(f"   P(检索命中 e)           = {recall:.2f}  (recall@k)")
+print(f"   P(e 进上下文 | 命中)    = {place:.2f}  (截断预算 / lost-in-the-middle)")
+print(f"   P(忠实综合 | e 进上下文) = {faith:.2f}  (faithfulness)")
+print(f"   P(grounded) = {recall:.2f} * {place:.2f} * {faith:.2f} = {g:.4f}")
+print(f"   即便把检索做到完美(1.00)，上界也只有 1.00*{place:.2f}*{faith:.2f} = {place*faith:.4f}")
+print(f"   单独把 recall 从 0.90 提到 1.00，grounded 仅 +{place*faith-g:.4f}；边际收益被后两项锁死。")
+print("   失败分解(三段互斥，恰好取等): miss + trunc + halluc = %.2f + %.2f + %.2f = 1-P(grounded)=%.2f"
+      % (1 - recall, recall * (1 - place), recall * place * (1 - faith), 1 - g))
+print()
+
+print("4.2 自洽性(self-consistency) 多数投票：二项精确概率 + 候选相关性的饱和")
+from math import comb
+
+
+def majority(p, K):
+    return sum(comb(K, m) * p ** m * (1 - p) ** (K - m) for m in range(K // 2 + 1, K + 1))
+
+
+print(f"{'K':&gt;5}{'独立 p=0.6':&gt;14}{'相关 rho=0.6':&gt;16}{'成本(相对)':&gt;12}{'每正确成本':&gt;12}")
+for K in [1, 3, 5, 9, 17, 33]:
+    acc = majority(0.6, K)
+    rho = 0.6
+    Keff = K / (1 + (K - 1) * rho)
+    Ke = int(round(Keff)) | 1
+    acc_c = majority(0.6, Ke)
+    print(f"{K:&gt;5d}{acc:&gt;14.4f}{acc_c:&gt;16.4f}{K:&gt;12d}{K/acc:&gt;12.3f}")
+print("   独立假设下多数准确率随 K 升到 1；但 rho=0.6 时有效样本数 K/(1+(K-1)rho) 饱和在约 1.67，几乎不涨。")
+print("   每正确成本 K/acc 单调不降：并行采样买的是「准确率上限」，不是「单位效率」。")
+print()
+
+print("4.3 验证器引导的 best-of-N：Monte Carlo（验证器分数 correct~N(1,1), wrong~N(0,1)）")
+
+
+def best_of_n(p, K, trials=10000):
+    win = 0
+    for _ in range(trials):
+        best_score, best_ok = -1e18, False
+        for _k in range(K):
+            ok = random.random() &lt; p
+            sc = random.gauss(1.0 if ok else 0.0, 1.0)
+            if sc &gt; best_score:
+                best_score, best_ok = sc, ok
+        win += 1 if best_ok else 0
+    return win / trials
+
+
+print(f"{'K':&gt;5}{'最佳候选正确率(p=0.35)':&gt;24}{'成本(相对 K)':&gt;14}{'每正确答案成本':&gt;16}")
+res = []
+for K in [1, 2, 4, 8, 16, 32]:
+    acc = best_of_n(0.35, K)
+    cpc = K / acc
+    res.append((K, acc, cpc))
+    print(f"{K:&gt;5d}{acc:&gt;24.4f}{K:&gt;14d}{cpc:&gt;16.3f}")
+bestK = min(res, key=lambda t: t[2])
+print(f"   每正确答案成本在 K=1 处最小（{bestK[2]:.3f}），且随 K 单调不降：由并集上界 1-(1-p)^K &lt;= Kp 可证 K/acc &gt;= 1/p。")
+print("   给定不可降级的准确率门槛时才有意义：")
+for target in [0.50, 0.60, 0.70, 0.80]:
+    hit = next((r for r in res if r[1] &gt;= target), None)
+    if hit:
+        print(f"     目标准确率 {target:.2f}: 最小 K={hit[0]}，该点总样本成本={hit[0]}，每正确成本={hit[2]:.3f}")
+    else:
+        print(f"     目标准确率 {target:.2f}: 本表 K&lt;=32 内未达标，须继续增大 K")
+print("   与 Snell 等(2024) 一致：测试时计算是「用预算换达标」，简单题少采样、难题才追加。")
+print()
+
+# ============================================================
+print("=== Part 5: 温度 / top-p 解码数值核对（d-algo 手算用）===")
+Z = [2.0, 1.0, 0.0, -1.0, -2.0, -3.0]
+V = len(Z)
+
+
+def sm(z, T):
+    mx = max(v / T for v in z)
+    e = [math.exp(v / T - mx) for v in z]
+    s = sum(e)
+    return [x / s for x in e]
+
+
+def entropy(p):
+    return -sum(x * math.log(x) for x in p if x &gt; 0)
+
+
+print("logits z =", Z, " 词表 V =", V)
+for T in [0.5, 1.0, 2.0]:
+    p = sm(Z, T)
+    print(f"T={T}: p={fmt(p)}  H={entropy(p):.4f} nats  argmax=第 {p.index(max(p))+1} 类")
+print("T=0.1 极限: p=%s  -&gt; 逼近贪心 one-hot" % fmt(sm(Z, 0.1)))
+p1 = sm(Z, 1.0)
+order = sorted(range(V), key=lambda i: -p1[i])
+cum, S = 0.0, []
+for i in order:
+    S.append(i)
+    cum += p1[i]
+    if cum &gt;= 0.9:
+        break
+tot = sum(p1[i] for i in S)
+ptop = [(p1[i] / tot if i in S else 0.0) for i in range(V)]
+print(f"top-p=0.9 (T=1): 核 S={[i+1 for i in S]}, 累积原概率={tot:.4f}")
+print(f"  重归一化 p_top={fmt(ptop)}  sum={sum(ptop):.4f}  H={entropy([x for x in ptop if x&gt;0]):.4f} nats")
+print("顺序: 先温度缩放再做 top-p；核内重归一化是「条件于核事件」的合法分布。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 0: 案例口径（知学云 · 在线课程完课率，N=12000, seed=20261107）===
+overall completed : 5,967 / 12,000 = 0.4973
+study_minutes/week: mean=95.30  sd=43.43
+quiz_avg          : mean=79.76  sd=14.58
+corr(study, quiz) : 0.4792   OLS slope=0.160833 R2=0.2296   2x2 OR=3.7158
+下列实验用解析可解的小模型核对公式；案例数字用于固定全站口径。
+
+=== Part 1: 共轭高斯模型里把 ELBO 恒等式逐项核对 ===
+模型: p(z)=N(0,1), p(x|z)=N(z,1.0), 观测 x=1.0
+log p(x) = -1.515512 nats   (解析值)
+精确后验 p(z|x) = N(mu=0.5000, var=0.5000)
+
+     mu     s2         ELBO   KL(q||post)     ELBO+gap    log p(x)          误差
+   0.00   0.25    -1.862086      0.346574    -1.515512   -1.515512    0.00e+00
+   0.00   0.50    -1.765512      0.250000    -1.515512   -1.515512    0.00e+00
+   0.00   1.00    -1.918939      0.403426    -1.515512   -1.515512    0.00e+00
+   0.00   2.00    -2.572365      1.056853    -1.515512   -1.515512    0.00e+00
+   0.25   0.25    -1.674586      0.159074    -1.515512   -1.515512    0.00e+00
+   0.25   0.50    -1.578012      0.062500    -1.515512   -1.515512    0.00e+00
+   0.25   1.00    -1.731439      0.215926    -1.515512   -1.515512    0.00e+00
+   0.25   2.00    -2.384865      0.869353    -1.515512   -1.515512    0.00e+00
+   0.50   0.25    -1.612086      0.096574    -1.515512   -1.515512    0.00e+00
+   0.50   0.50    -1.515512      0.000000    -1.515512   -1.515512    0.00e+00
+   0.50   1.00    -1.668939      0.153426    -1.515512   -1.515512    0.00e+00
+   0.50   2.00    -2.322365      0.806853    -1.515512   -1.515512    0.00e+00
+   0.75   0.25    -1.674586      0.159074    -1.515512   -1.515512    0.00e+00
+   0.75   0.50    -1.578012      0.062500    -1.515512   -1.515512    0.00e+00
+   0.75   1.00    -1.731439      0.215926    -1.515512   -1.515512    0.00e+00
+   0.75   2.00    -2.384865      0.869353    -1.515512   -1.515512    0.00e+00
+   1.00   0.25    -1.862086      0.346574    -1.515512   -1.515512    0.00e+00
+   1.00   0.50    -1.765512      0.250000    -1.515512   -1.515512    0.00e+00
+   1.00   1.00    -1.918939      0.403426    -1.515512   -1.515512    0.00e+00
+   1.00   2.00    -2.572365      1.056853    -1.515512   -1.515512    0.00e+00
+
+网格搜索 max ELBO = -1.515512，在 (mu, s2)=(0.5000, 0.5000)
+解析 log p(x)     = -1.515512，差 = 0.00e+00
+精确后验处 (mu,s2)=(0.5000,0.5000) 的 ELBO = -1.515512，间隙 = 0.00e+00
+结论：ELBO 是 log p(x) 的下界，间隙恰为 KL(q||p(z|x))；q 取到精确后验时下界取等。
+
+=== Part 2: 重参数化 vs score-function 梯度估计的方差（f(z)=z^2）===
+真值 d/dmu E_q[z^2] = 2*mu = 1.0000
+score-function: 均值=0.9822  方差=7.4528  标准误=0.0193
+重参数化      : 均值=0.9946  方差=1.0025  标准误=0.0071
+方差比 = 7.43 倍；同样 20000 个样本，重参数化标准误小约 2.73 倍。
+原因：score-function 把 f 当「奖励」乘上 score，方差随 f 量级放大；
+重参数化把随机性移到与参数无关的 eps 上，梯度走 f 的导数（2z），只含一阶噪声。
+边界：z 离散或 f 不可导时重参数化不可用，只能退回 score-function 或 Gumbel-Softmax。
+
+=== Part 3: DDPM 余弦概率流 ODE vs 整流流直线路径：欧拉步数-误差对照 ===
+数据 x1=(1.0, 2.0)  噪声 eps=(-0.5, 0.3)；t=0 为噪声、t=1 为数据
+DDPM/VP 概率流 ODE: dx/dt = (pi/2)cos(pi t/2) x1 - (pi/2)sin(pi t/2) eps  [余弦调度，速度随 t 变]
+整流流直线路径  : dx/dt = x1 - eps  [常数速度]
+取「理想模型」(速度场精确)，故误差只来自欧拉离散化。
+    步数 M     h=1/M         余弦ODE终点误差          直线路径终点误差
+       1    1.0000          1.443330          0.00e+00
+       2    0.5000          0.823471          0.00e+00
+       4    0.2500          0.436875          0.00e+00
+       8    0.1250          0.224739          4.44e-16
+      16    0.0625          0.113951          6.66e-16
+      32    0.0312          0.057372          1.33e-15
+      64    0.0156          0.028785          2.22e-15
+     128    0.0078          0.014417          5.55e-15
+     256    0.0039          0.007215          9.55e-15
+
+终点误差 &lt; 0.05: 余弦ODE 至少需要 M=37 步；直线路径 M=1 步即满足。
+终点误差 &lt; 0.01: 余弦ODE 至少需要 M=185 步；直线路径 M=1 步即满足。
+终点误差 &lt; 0.001: 余弦ODE 至少需要 M=1849 步；直线路径 M=1 步即满足。
+直线路径速度场为常数，欧拉对任意 M 都精确（误差约 1e-15，浮点零）；
+余弦调度速度随 t 变化，左黎曼和误差约 (pi*h/4)|x1+eps|，按 O(h) 衰减，故需成百上千步。
+条件流匹配核对：u_t=x1-eps=(1.5, 1.7)，若 v_theta=(1.4, 1.8)，则 L_CFM=0.0200
+真实 DDPM 随机反向链需 1000 步、DDIM 20-50 步；整流流+蒸馏可压到 1-4 步，与本表量级一致。
+
+=== Part 4: RAG 忠实度漏斗 + 测试时计算的成本-准确率 ===
+4.1 检索到 != 有据可依：把 grounded 事件沿链路拆成三个条件概率
+   P(检索命中 e)           = 0.90  (recall@k)
+   P(e 进上下文 | 命中)    = 0.85  (截断预算 / lost-in-the-middle)
+   P(忠实综合 | e 进上下文) = 0.80  (faithfulness)
+   P(grounded) = 0.90 * 0.85 * 0.80 = 0.6120
+   即便把检索做到完美(1.00)，上界也只有 1.00*0.85*0.80 = 0.6800
+   单独把 recall 从 0.90 提到 1.00，grounded 仅 +0.0680；边际收益被后两项锁死。
+   失败分解(三段互斥，恰好取等): miss + trunc + halluc = 0.10 + 0.14 + 0.15 = 1-P(grounded)=0.39
+
+4.2 自洽性(self-consistency) 多数投票：二项精确概率 + 候选相关性的饱和
+    K      独立 p=0.6      相关 rho=0.6      成本(相对)       每正确成本
+    1        0.6000          0.6000           1       1.667
+    3        0.6480          0.6000           3       4.630
+    5        0.6826          0.6000           5       7.325
+    9        0.7334          0.6480           9      12.271
+   17        0.8011          0.6480          17      21.222
+   33        0.8789          0.6480          33      37.547
+   独立假设下多数准确率随 K 升到 1；但 rho=0.6 时有效样本数 K/(1+(K-1)rho) 饱和在约 1.67，几乎不涨。
+   每正确成本 K/acc 单调不降：并行采样买的是「准确率上限」，不是「单位效率」。
+
+4.3 验证器引导的 best-of-N：Monte Carlo（验证器分数 correct~N(1,1), wrong~N(0,1)）
+    K         最佳候选正确率(p=0.35)      成本(相对 K)         每正确答案成本
+    1                  0.3530             1           2.833
+    2                  0.4716             2           4.241
+    4                  0.5823             4           6.869
+    8                  0.6735             8          11.878
+   16                  0.7593            16          21.072
+   32                  0.8131            32          39.356
+   每正确答案成本在 K=1 处最小（2.833），且随 K 单调不降：由并集上界 1-(1-p)^K &lt;= Kp 可证 K/acc &gt;= 1/p。
+   给定不可降级的准确率门槛时才有意义：
+     目标准确率 0.50: 最小 K=4，该点总样本成本=4，每正确成本=6.869
+     目标准确率 0.60: 最小 K=8，该点总样本成本=8，每正确成本=11.878
+     目标准确率 0.70: 最小 K=16，该点总样本成本=16，每正确成本=21.072
+     目标准确率 0.80: 最小 K=32，该点总样本成本=32，每正确成本=39.356
+   与 Snell 等(2024) 一致：测试时计算是「用预算换达标」，简单题少采样、难题才追加。
+
+=== Part 5: 温度 / top-p 解码数值核对（d-algo 手算用）===
+logits z = [2.0, 1.0, 0.0, -1.0, -2.0, -3.0]  词表 V = 6
+T=0.5: p=[0.8647, 0.117, 0.0158, 0.0021, 0.0003, 0.0]  H=0.4584 nats  argmax=第 1 类
+T=1.0: p=[0.6337, 0.2331, 0.0858, 0.0315, 0.0116, 0.0043]  H=1.0233 nats  argmax=第 1 类
+T=2.0: p=[0.4141, 0.2512, 0.1523, 0.0924, 0.056, 0.034]  H=1.4952 nats  argmax=第 1 类
+T=0.1 极限: p=[1.0, 0.0, 0.0, 0.0, 0.0, 0.0]  -&gt; 逼近贪心 one-hot
+top-p=0.9 (T=1): 核 S=[1, 2, 3], 累积原概率=0.9526
+  重归一化 p_top=[0.6652, 0.2447, 0.09, 0.0, 0.0, 0.0]  sum=1.0000  H=0.8324 nats
+顺序: 先温度缩放再做 top-p；核内重归一化是「条件于核事件」的合法分布。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">Part 0 的 0.4973 / 95.30 / 0.4792 / 3.7158</span> 是全站共用的「知学云 · 在线课程完课率」案例口径（$N=12000$、seed $=20261107$），与 <a href="m12-ml-algorithms.html">模块 12</a> 及各章代码实验可逐位对照。本片段刻意使用解析可解的小模型（共轭高斯、二维直线路径、6 类词表）来核对公式，案例数字只负责固定全站口径。</p>
+    <p><span class="ci-k">Part 1 的 $-1.515512$</span> 是共轭高斯的<strong>解析</strong> $\log p(x)$（例 15.2 用的是重要性采样估计 $-1.05$，两者是不同模型，不能混用）。精确后验 $p(z\mid x)=\mathcal N(0.5,0.5)$ 让「下界何时取等」变成可验算的等式：20 组 $(\mu,s^2)$ 上 $\mathrm{ELBO}+\mathrm{KL}(q\|p(z\mid x))$ 一列恒为 $-1.515512$、误差全为 $0.00\times10^{0}$，说明 $\log p(x)=\mathrm{ELBO}+D_{\mathrm{KL}}(q\|p(z\mid x))$ 是<strong>恒等式</strong>而非只在最优点成立的不等式。网格搜索 $\max\mathrm{ELBO}=-1.515512$ 且落在 $(0.5000,0.5000)$，间隙 0，正是 Jensen 在 $q=$ 真后验时取等。</p>
+    <p><span class="ci-k">Part 2 的方差 $7.4528$ 对 $1.0025$</span>（比 $\mathbf{7.43}$ 倍）：两个估计器均值 $0.9822$ 与 $0.9946$ 都围绕真值 $1.0$ 波动，说明都无偏；但 score-function 把 $f(z)=z^2$ 当奖励乘上 $\nabla_\mu\log q$，方差被放大约 7 倍，标准误 $0.0193$ 对 $0.0071$。这就是重参数化「非用不可」的定量理由——不是锦上添花，而是决定同样样本预算下梯度能不能用。</p>
+    <p><span class="ci-k">Part 3 的 $1.443330$ 对 $0.00\mathrm{e}{+}00$</span>：$M=1$ 时余弦概率流 ODE 一步欧拉偏了 1.44，而整流流直线路径精确到达。$M=256$ 时余弦误差降到 $0.007215$，直线一列始终是 $10^{-15}$ 量级的浮点零。容差门槛给出 0.05→37 步、0.01→$\mathbf{185}$ 步、0.001→$\mathbf{1849}$ 步，直线路径始终 1 步；这与真实 DDPM 1000 步、DDIM 20–50 步、整流流 + 蒸馏 1–4 步的量级一致。$\mathcal L_{\text{CFM}}=0.0200$ 来自 $u_t=(1.5,1.7)$ 与 $v_\theta=(1.4,1.8)$ 的逐维平方和，它<strong>与步数无关</strong>——直线消掉的是离散误差，不是网络拟合误差。</p>
+    <p><span class="ci-k">Part 4 的 $0.6120$ 与 $0.6800$</span>：漏斗 $0.90\times0.85\times0.80=0.6120$，即便检索完美也只有 $0.6800$，单提召回净增 $+0.0680$。失败分解 $0.10+0.14+0.15=0.39$ 恰好等于 $1-0.6120$，因为三段互斥、并集上界取等。自洽性一列 $0.6000\to0.8789$ 是独立假设，$\rho=0.6$ 修正后从 $K=9$ 起钉在 $0.6480$：$K_{\text{eff}}=K/(1+(K-1)\rho)$ 与 <a href="m12-ml-algorithms.html">模块 12</a> 的 $\rho\sigma^2+(1-\rho)\sigma^2/B$ 是同一个相关性公式的两种用法。</p>
+    <p><span class="ci-k">Part 4 的 $2.833$ 与门槛表</span>：best-of-N 把准确率从 $0.3530$ 抬到 $0.8131$，但每正确答案成本在 $K=1$ 处最小且单调不降——由 $1-(1-p)^K\le Kp$ 得 $K/A\ge1/p$。真正有意义的是门槛视角：0.50→4、0.60→8、0.70→16、0.80→32，对应成本 4 / 8 / 16 / 32。把 $p$ 或验证器强度改掉，整张表会平移，但「单位成本不改善」这一结构性结论不变。</p>
+    <p><span class="ci-k">Part 5 的 $0.4584/1.0233/1.4952$ nats</span> 是 $T=0.5/1/2$ 的熵，随 $T$ 单调上升，$T=0.1$ 时分布退化为 $(1,0,0,0,0,0)$ 即贪心。top-p $=0.9$ 的核 $S=[1,2,3]$、累积 $0.9526$、重归一化 $(0.6652,0.2447,0.0900,0,0,0)$、$H=0.8324$ 与第六步手算逐位一致；$0.8324\lt1.0233$ 说明截断确实降低了熵。把 $z_1$ 改大，首类概率上升、核会缩小——这就是 top-p 的自适应性。</p>
+  </div>
+</div>
+
+<p>下图是本站统一的学习闭环。本片段的两组深度专题与代码实验横跨「建模」与「评估」两环：ELBO 与生成路径属于建模环的目标函数，RAG 忠实度漏斗与测试时计算属于评估 / 部署环的成本—质量权衡。它们的共同契约是「改动了哪个分布就必须在评测时锁定哪个设置」——温度、top-p、检索库版本、验证器强度一旦变动，历史基线就不再可交换，第 9 节的置信区间也随之失效。</p>
+<figure data-figure="flow-learning-loop"></figure>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组内容给出三件东西：用 Jensen 与 KL 代数两条路线推导 ELBO 恒等式、说明重参数化为何必需并用梯度方差量化，再以解析共轭高斯模型核对变分间隙；写出 VP-SDE 的概率流 ODE 与条件流匹配目标，用欧拉步数—误差表对比弯曲调度与直线路径；把 RAG 忠实度拆成三段条件概率的乘积、把测试时计算的成本—准确率写成可判定的不等式；以及把温度 / top-p 解码在 6 类词表上完整手算一遍。<strong>不做</strong>模型训练、不做真实硬件计时、不替代带人类抽检的线上评测。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：共轭高斯的先验/似然方差与观测 $x$、近似后验 $q=\mathcal N(\mu,s^2)$；生成路径的端点 $(x_0,x_1)$ 或 $(x_1,\epsilon)$、调度 $\alpha_t,\sigma_t$、积分步数 $M$；漏斗的三段概率 $P(M),P(C\mid M),P(F\mid C,M)$、单次正确率 $p$、相关系数 $\rho$、候选数 $K$、目标准确率 $A^*$；解码的 logits $z\in\mathbb R^V$、$T$、$p$。输出：ELBO / KL / 间隙（nats）、梯度估计方差、终点误差与所需步数、$P(G)$ 与失败三段、多数投票与 best-of-N 准确率、每正确成本、采样分布与熵。概率无量纲，误差与端点同量纲，熵单位 nats。</td></tr>
+    <tr><th>适用场景</th><td>变分推断目标函数的推导与下界紧度诊断、重参数化适用边界判断、扩散 / 流匹配采样器的步数与误差预算、RAG 系统的分层指标设计与失败归因、测试时计算（自洽性 / best-of-N / 长思维链）的预算分配、以及推理服务里采样分布的可复现配置与评测口径锁定。</td></tr>
+    <tr><th>关键参数</th><td>$\beta$（VAE 的 KL 权重，$\beta\to0$ 放松约束、$\beta\gt1$ 强化解耦）、$q$ 族容量（决定变分间隙）、$\beta(t)$ / 余弦调度（决定概率流 ODE 曲率与所需步数）、积分步数 $M$ 与容差、reflow 迭代次数、$T$（温度，控制熵与候选相关性）、$p$（核质量）、$K$（并行采样数）、$\rho$（候选相关系数）、$A^*$（目标准确率门槛）、检索 $k$ 与上下文预算 $B$、弃权阈值。全部须由验证集或线上灰度标定。</td></tr>
+    <tr><th>边界条件</th><td>在 $q$ 族不含真后验且需要精确似然时「最大化 ELBO 等价最大化 $\log p(x)$」不成立，应改用 IWAE / 归一化流 / MCMC；在隐变量离散或 $f$ 不可导时重参数化不成立，应改用 score-function 或 Gumbel-Softmax；在初次训练未整流、分布多峰、拟合误差仍大时「直线路径 1–4 步」不成立，应改多步积分或保留 DDPM 采样；在候选高度相关或缺乏可靠验证器时「测试时计算随 $K$ 单调换准确率」不成立，应改多样化提示、外部验证器或限制 $K$；在抽取式作答、上下文预算充足时漏斗后两项接近 1，本结论的量化幅度不成立，应转向检索排序与延迟。</td></tr>
+    <tr><th>常见问题</th><td>（1）把 ELBO 当似然本身、或忘记非负 KL 间隙；（2）对角高斯 KL 里用 $\log\sigma$ 而非 $\log\sigma^2$；（3）以为任意流匹配模型天然支持单步采样；（4）只看召回率就宣称 RAG 更可信；（5）把「多采样几次」当成能降低单位成本的免费午餐；（6）top-p 漏做重归一化或顺序写反。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>ELBO 与 $\log p(x)$ 的差到底是什么？为什么不同模型的 ELBO 不能直接比大小？</summary><div class="faq-a">差是 $D_{\mathrm{KL}}(q_\phi(z\mid x)\|p_\theta(z\mid x))\ge0$，即近似后验离真后验的距离。由恒等式 $\log p(x)=\mathrm{ELBO}+\text{间隙}$，抬高 ELBO 同时抬似然、并把 $q$ 拉向真后验；但 $q$ 族越窄，间隙越大、下界越松。两个模型的下界松紧不同，ELBO 高只说明「在自己的 $q$ 族里更好」，不代表似然更高。代码 Part 1 里 20 组 $q$ 的 $\mathrm{ELBO}+\text{间隙}$ 恒为 $-1.515512$，就是这个恒等式的逐格验证；只有 $q=\mathcal N(0.5,0.5)$ 时间隙为 0、ELBO 真正等于似然。需要精确似然时改用 IWAE（多重重要性样本）、归一化流或 MCMC。</div></details>
+  <details><summary>为什么不能「直接从 $q$ 采样然后反向传播」，非得重参数化？</summary><div class="faq-a">因为采样出来的 $z$ 相对参数 $\phi$ 在计算图里是个常数，梯度没有通路。唯一合法的替代是 score-function 估计器 $\mathrm{E}_q[f(z)\nabla_\phi\log q_\phi(z)]$，它不要求 $f$ 可导，但把整个 $f$ 当奖励乘上 score，方差随 $f$ 量级放大。代码 Part 2 在 $f(z)=z^2$、$\mu=\sigma=0.5$ 下测得方差 $7.4528$ 对 $1.0025$（$\mathbf{7.43}$ 倍），标准误 $0.0193$ 对 $0.0071$。重参数化 $z=\mu+\sigma\varepsilon$ 把随机性移到与参数无关的 $\varepsilon$，梯度走 $\nabla_z f\cdot\nabla_\phi g$，噪声只含一阶项。边界：离散隐变量（token、类别）或 $f$ 不可导时这条路走不通，只能退回 score-function（配 baseline 降方差）或 Gumbel-Softmax。</div></details>
+  <details><summary>DDPM 到底要多少步？流匹配真的 1 步就够吗？</summary><div class="faq-a">在「理想模型、速度场完全精确」的最有利条件下，代码 Part 3 给出余弦概率流 ODE 达到终点误差 0.05 / 0.01 / 0.001 分别需 37 / 185 / 1849 步欧拉，而整流流直线路径任意步数都精确（误差 $10^{-15}$ 量级）。真实系统还要叠加网络拟合误差 $\mathcal L_{\text{CFM}}$，所以 DDPM 原始随机链用 1000 步、DDIM 20–50 步；流匹配也<strong>不是天生 1 步</strong>——初次训练的边缘路径未必直，须经 reflow 拉直与一致性 / 渐进蒸馏才能压到 1–4 步。把「直线」与「已整流」混为一谈是最常见的误读。</div></details>
+  <details><summary>检索命中率已经 90% 了，为什么用户还觉得 RAG 在编？</summary><div class="faq-a">因为忠实度是串联漏斗：$P(G)=P(M)P(C\mid M)P(F\mid C,M)$。典型值下 $0.90\times0.85\times0.80=0.6120$，即只有约 $61\%$ 的答案真正有据可依；即便检索做到完美，上界也只有 $0.85\times0.80=0.6800$。失败分解 $0.10+0.14+0.15=0.39$ 显示「检索未命中」只占约四分之一，剩下是上下文截断 / 中间遗忘与幻觉式综合。正确动作是分层量三段：压缩与重排上下文、强制逐断言引用、设弃权阈值，而不是只刷 Recall@k。</div></details>
+  <details><summary>多采样 $K$ 次是不是「花更多算力、但每正确答案更便宜」？</summary><div class="faq-a">恰恰相反。成本随 $K$ 线性增长，而「至少一个正确」满足并集上界 $1-(1-p)^K\le Kp$，于是每正确答案成本 $\frac{K}{A(K)}\ge\frac1p$、在 $K=1$ 处最小且单调不降（代码 Part 4：$2.833\to39.356$）。测试时计算买的是<strong>准确率上限</strong>而非单位效率，价值在于「给定不可降级的门槛用最小 $K$ 达标」：0.50→4、0.60→8、0.70→16、0.80→32。再叠加候选相关性 $\rho$ 时，$K_{\text{eff}}=K/(1+(K-1)\rho)$ 会饱和在 $1/\rho$，收益更快见顶；务必配合温度 / top-p 制造多样性，并按题目难度分配预算。</div></details>
+  <details><summary>温度 $T$ 与 top-p 的先后顺序、以及重归一化，为什么不能省？</summary><div class="faq-a">温度改的是 logits 的尺度，top-p 的累积质量必须基于<strong>缩放后</strong>的概率来算，顺序反了会得到不同的核；工程约定是先 $z/T$ 再 softmax，然后排序取核。重归一化更不能省：把核外概率置零后总质量变成 $\sum_{j\in S_p}p_j$（本例 0.9526），必须除以它才是合法分布，否则抽样器要么报错要么偷偷偏斜。代码 Part 5 里 $p'=(0.6652,0.2447,0.0900,0,0,0)$ 与 $\sum p'=1.0000$ 正是这一步。另外固定 $T,p$ 与随机种子才可复现，评测设置与线上不一致会让历史基线不可交换。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">关于 ELBO 与 $\log p_\theta(x)$ 的关系，下列哪一条是<strong>精确恒等式</strong>而非不等式？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. $\log p(x)\ge\mathrm{ELBO}(q)$</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. $\log p(x)\ge\mathrm{E}_q[\log p(x,z)/q]$</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. $\log p(x)=\mathrm{ELBO}(q)+D_{\mathrm{KL}}(q_\phi(z\mid x)\|p_\theta(z\mid x))$</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. $\mathrm{ELBO}=\mathrm{E}_q[\log p(x\mid z)]+D_{\mathrm{KL}}(q\|p(z))$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：由贝叶斯 $p(z\mid x)=p(x,z)/p(x)$ 做 KL 代数可得 $\log p(x)=\mathrm{ELBO}(q)+D_{\mathrm{KL}}(q\|p(z\mid x))$，对任意 $q$ 都成立（代码 Part 1 中 20 组 $q$ 的误差全为 $0.00\times10^0$）。不等式 $\log p\ge\mathrm{ELBO}$ 只是它加上 $D_{\mathrm{KL}}\ge0$ 的推论；A、B 都是不等式；D 把重构项与 KL 之间的减号写成加号，且漏掉负号。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">共轭高斯模型里，代码网格搜索得到 $\max\mathrm{ELBO}=-1.515512$ 且落在 $(\mu,s^2)=(0.5,0.5)$。这说明？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. ELBO 可以超过 $\log p(x)$</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 该点正是精确后验 $p(z\mid x)=\mathcal N(0.5,0.5)$，此时变分间隙为 0、Jensen 下界取等</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 网格步长还不够小，$\max\mathrm{ELBO}$ 会继续上升</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 说明重要性采样估出的 $-1.05$ 才是真似然</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\log p(x)=-1.515512$ 是解析真值，先验精度与似然精度相加得 2、故后验 $\mathcal N(0.5,0.5)$。$\max\mathrm{ELBO}$ 恰等于 $\log p(x)$ 且间隙为 0，只在 $q=p(z\mid x)$ 时发生。A 违背 $D_{\mathrm{KL}}\ge0$；C 错在 ELBO 有上界 $\log p(x)$；D 把例 15.2 的估计值（不同模型）与本例解析值混为一谈。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">代码 Part 2 中 score-function 估计器方差 7.4528、重参数化估计器方差 1.0025，两者均值都约为 1.0。最合理的解读是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. score-function 估计器有偏，不可用</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 重参数化改变了被估计的梯度真值</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 样本数 20000 太少，两个估计都不可信</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 两者都无偏，但重参数化把随机性移到与参数无关的 $\varepsilon$ 上、梯度走 $\nabla_z f$，方差低 $\mathbf{7.43}$ 倍</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：真梯度 $\nabla_\mu\mathrm{E}[z^2]=2\mu=1.0$，两估计器均值 $0.9822$、$0.9946$ 的偏差来自有限样本，故都无偏。差别在方差：score-function 用 $f(z)\nabla_\mu\log q$，重参数化用 $\nabla_z f\cdot\nabla_\phi g=2z$，只含一阶噪声，方差比 7.43、标准误 $0.0193$ 对 $0.0071$。B 错在被估量相同；A、C 与「均值围绕真值」矛盾。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">代码 Part 3 里，直线路径欧拉在任意 $M$ 下误差都是 $10^{-15}$ 量级，而余弦概率流 ODE 达到 0.01 容差需 185 步。根本原因是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 直线路径速度 $x_1-\epsilon$ 为常数、$\ddot x\equiv0$，欧拉截断误差 $\frac h2\max\|\ddot x\|$ 为零；余弦调度 $\ddot x\ne0$，误差按 $O(h)$ 衰减</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 余弦调度的网络拟合误差更大</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 直线路径用了更高阶的积分器</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 余弦调度的维度比直线路径高</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：代码明确取「理想模型、速度场精确」，两边网络拟合误差都被隔离掉，故 B 错；两者都用同一个一阶欧拉，故 C 错；都是二维 $(x_1,\epsilon)$，故 D 错。直线路径 $x_t=(1-t)x_0+t x_1$ 的条件速度 $u_t=x_1-x_0$ 为常数，$\ddot x\equiv0$，欧拉对任意步长精确；余弦调度 $\alpha_t=\sin(\pi t/2)$、$\sigma_t=\cos(\pi t/2)$ 使 $\ddot x_t=-\frac{\pi^2}{4}(\alpha_t x_1+\sigma_t\epsilon)\ne0$，误差按 $O(h)$ 衰减，故需 37 / 185 / 1849 步。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">RAG 漏斗取 $P(M)=0.90$、$P(C\mid M)=0.85$、$P(F\mid C,M)=0.80$。把检索做到完美（$P(M)=1$）后，$P(G)$ 变为多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. $1.0000$，检索完美即答案必然有据</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. $0.6120$，与原来相同</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. $0.85\times0.80=0.6800$，仅比原来 $0.6120$ 提高 $+0.0680$</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. $0.90\times0.85\times0.80\times1.1=0.6732$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$P(G)=P(M)P(C\mid M)P(F\mid C,M)$ 是乘积，检索完美只把第一项换成 1，上界由后两项锁定为 $0.85\times0.80=0.6800$；净增 $0.6800-0.6120=0.0680$。失败分解 $0.10+0.14+0.15=0.39=1-0.6120$ 中，「检索未命中」只占 $0.10$，其余 $0.29$ 来自上下文截断与幻觉式综合——这正是「检索到不等于用上了」的算术版本。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">关于测试时计算，下列说法正确的是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q6" value="A"> A. $K$ 越大，每正确答案成本越低，因为准确率提升更快</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="B"> B. 由 $1-(1-p)^K\le Kp$ 得 $K/A(K)\ge1/p$，每正确答案成本在 $K=1$ 处最小且单调不降；测试时计算的用途是「给定门槛用最小 $K$ 达标」</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="C"> C. 候选越相关（$\rho$ 越大），多数投票收益越高</label>
+      <label class="quiz-opt"><input type="radio" name="q6" value="D"> D. 降低温度 $T$ 能提升 best-of-N 的候选多样性</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：代码 Part 4 的每正确答案成本从 $2.833$ 单调升到 $39.356$，从未下降；并集上界给出 $K/A\ge1/p$ 的结构性下界，故 A 错。$\rho$ 越大，$K_{\text{eff}}=K/(1+(K-1)\rho)$ 越被压到 $1/\rho$，收益饱和得越快，故 C 错。降低 $T$ 让分布更尖、候选更趋同、$\rho\to1$，故 D 错（应提高 $T$ / 放宽 top-p）。B 同时给出不等式与门槛视角：0.50→4、0.60→8、0.70→16、0.80→32。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>

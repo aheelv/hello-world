@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04 · 随机变量与常见分布 · 统计 · 智能学习体系</title>
+<meta name="description" content="随机变量与常见分布：PMF/PDF/CDF、期望方差与矩母函数、二项泊松正态指数伽马卡方t与F分布、中心极限定理与抽样分布。">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/learning.css">
+<link rel="stylesheet" href="../assets/vendor/katex/dist/katex.min.css">
+</head>
+<body data-page="m04" data-prefix="../">
+<div class="progress-bar" id="progress-bar"></div>
+
+<header class="site-header">
+  <button class="icon-btn" data-sidebar-toggle aria-label="打开目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">Σ</span>
+    <span data-site-name>统计 · 智能学习体系</span>
+    <span class="brand-sub" data-site-tagline>从统计学到生成式 AI</span>
+  </a>
+  <div class="header-spacer"></div>
+  <div class="header-actions">
+    <button class="icon-btn search-trigger" data-search-open aria-label="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span class="label">搜索</span><span class="kbd">Ctrl K</span>
+    </button>
+    <button class="icon-btn" data-theme-toggle aria-label="切换主题"><span class="theme-label">深色</span></button>
+    <a class="icon-btn" href="../roadmap.html">路线图</a>
+    <a class="icon-btn" href="../resources.html">资源库</a>
+    <a class="icon-btn" href="../timeline.html">时间线</a>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+<!-- V3:HEAD:START -->
+<section class="chapter-position" id="pos" aria-label="本章定位与知识依赖">
+  <div class="eyebrow">本章定位 · Chapter Position</div>
+  <div class="pos-grid">
+    <div class="pos-cell"><span class="k">所属阶段</span><span class="v">阶段 1 · <a href="../stages/statistics.html">统计学</a></span></div>
+    <div class="pos-cell"><span class="k">难度层级</span><span class="v"><span class="lv-tag l2">L2 基础</span> · 8 学时</span></div>
+    <div class="pos-cell"><span class="k">先修知识</span><span class="v">模块 03 · 上一篇：<a href="m03-probability.html">03 · 概率论基础</a></span></div>
+    <div class="pos-cell"><span class="k">进阶衔接</span><span class="v">下一篇：<a href="m05-inference.html">05 · 统计推断：估计与检验</a></span></div>
+  </div>
+  <div class="dep-chain" aria-label="知识依赖链"><span class="k" style="font-size:var(--fs-xs);font-weight:700;color:var(--text-3)">知识依赖</span><a class="dep-node" href="m02-descriptive.html">02 描述统计与可视化</a><span class="dep-arrow">→</span><a class="dep-node" href="m03-probability.html">03 概率论基础</a><span class="dep-arrow">→</span><a class="dep-node current" href="m04-distributions.html">04 随机变量与常见分布</a><span class="dep-arrow">→</span><a class="dep-node" href="m05-inference.html">05 统计推断：估计与检验</a></div>
+  <div class="term-strip"><span class="k">本章术语口径 · </span>统一以 <a href="../glossary.html">术语表</a> 为准：概率质量函数, 概率密度函数, 期望, 方差, 二项分布, 泊松分布, 正态分布, 中心极限定理, 重尾</div>
+</section>
+<nav class="loop-nav" aria-label="本章学习闭环导航"><span class="loop-label">学习闭环</span><a href="#obj"><span class="n">①</span>学习目标</a><a href="#core-q"><span class="n">②</span>核心问题</a><a href="#s1"><span class="n">③</span>专题讲解</a><a href="#examples"><span class="n">④</span>典型例题</a><a href="#d-code"><span class="n">⑤</span>代码实验</a><a href="#self-test"><span class="n">⑥</span>练习自测</a><a href="#d-summary"><span class="n">⑦</span>总结延伸</a></nav>
+<section class="core-q" id="core-q" aria-label="本章核心问题">
+  <div class="cq-title">本章核心问题 · 带着问题读</div>
+  <ol><li>二项、泊松、正态三种分布之间有哪些极限关系？ <a class="q-anchor" href="#s4">→ 对应讲解</a></li><li>为什么「正态分布」在统计推断里无处不在？ <a class="q-anchor" href="#s5">→ 对应讲解</a></li><li>期望与方差的可加性分别需要什么条件？ <a class="q-anchor" href="#s2">→ 对应讲解</a></li><li>重尾分布下，用 σ 描述风险会低估什么？ <a class="q-anchor" href="#d-deep-1">→ 对应讲解</a></li></ol>
+</section>
+<!-- V3:HEAD:END -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-body">
+  <aside class="sidebar"><nav id="sidebar-nav"></nav></aside>
+
+  <main class="content">
+    <article class="module" data-module="m04">
+
+      <header class="module-header">
+        <div class="crumbs"><a href="../index.html">首页</a> / <a href="../roadmap.html">学习路线图</a> / <a href="../stages/statistics.html">阶段 1 · 统计学</a> / 04 · 随机变量与常见分布</div>
+        <h1>04 · 随机变量与常见分布</h1>
+        <p class="lead">
+          概率论给了我们「不确定性」的语言，本模块把它<strong>数字化</strong>：用随机变量把随机结果翻译成数字，
+          用分布描述数字出现的规律，用期望与方差刻画规律的中心与离散程度。
+          最后登场的是统计学最重要的定理——中心极限定理，它解释了「为什么样本均值近似正态」，
+          是通往推断统计（模块 05）的唯一桥梁。
+        </p>
+        <div class="module-meta">
+          <span class="badge ok">基础</span>
+          <span class="badge">8 学时</span>
+          <span class="badge">前置：模块 03</span>
+          <span class="badge brand">阶段二 · 核心推断</span>
+        </div>
+      </header>
+
+      <!-- ===== 学习目标 ===== -->
+      <div id="obj"></div>
+      <div class="callout tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+          学习目标
+        </div>
+        <ul class="check-list">
+          <li>区分离散与连续随机变量，说清 PMF、PDF、CDF 各自回答什么问题</li>
+          <li>牢记「PDF 的高度不是概率，曲线下的面积才是概率」</li>
+          <li>会算期望、方差、标准差，理解矩母函数的两个用途</li>
+          <li>掌握二项、泊松、正态、指数四类核心分布的公式与适用场景</li>
+          <li>会用标准化 $Z=\frac{X-\mu}{\sigma}$ 查标准正态表，并记住 $1.96$ 与 $1.645$ 两个常用分位数</li>
+          <li>用自己的话复述中心极限定理，并解释它为何是推断统计的基石</li>
+          <li>写出样本均值、样本比例、样本方差的抽样分布</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <h2 id="s1">1 · 随机变量：把随机结果翻译成数字</h2>
+
+      <h3 id="s1-1">1.1 什么是随机变量</h3>
+      <p>抛硬币的结果是「正面 / 反面」，掷骰子的结果是「1 点到 6 点」——它们是文字或符号，不好做算术。<strong>随机变量（Random Variable）</strong>就是一台翻译器：把每一个随机结果对应到一个实数。</p>
+      <ul>
+        <li>抛硬币：令 $X=1$ 表示正面，$X=0$ 表示反面。</li>
+        <li>掷骰子：令 $X$ 等于出现的点数，取值 $1,2,\dots,6$。</li>
+        <li>客服中心：令 $X$ 等于一小时内接到的来电次数，取值 $0,1,2,\dots$。</li>
+        <li>灯泡寿命：令 $X$ 等于使用寿命小时数，取值 $(0,+\infty)$。</li>
+      </ul>
+      <p>「随机」指的是取值前不知道会取到哪个值；「变量」指的是它终究是个可以参与运算的数。一旦翻译成数字，概率论的全套工具（分布、期望、方差）就都能用上了。</p>
+
+      <h3 id="s1-2">1.2 离散型与连续型</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>对比项</th><th>离散型随机变量</th><th>连续型随机变量</th></tr></thead>
+          <tbody>
+            <tr><td>取值</td><td>有限个或可数无穷个（如 $0,1,2,\dots$）</td><td>某个区间内的一切实数</td></tr>
+            <tr><td>典型例子</td><td>次数、人数、中奖个数、分类编码</td><td>时间、长度、重量、温度、误差</td></tr>
+            <tr><td>描述工具</td><td>概率质量函数 PMF</td><td>概率密度函数 PDF</td></tr>
+            <tr><td>如何求概率</td><td>把对应取值的概率<strong>相加</strong></td><td>对密度<strong>积分</strong>（求面积）</td></tr>
+            <tr><td>单点概率</td><td>$P(X=c)$ 可以大于 0</td><td>$P(X=c)=0$，只有区间才有概率</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s1-3">1.3 概率质量函数与概率密度函数</h3>
+      <p><strong>离散型：概率质量函数（PMF）</strong> $p(x)=P(X=x)$。它必须满足两条：每个值的概率不小于 0，且所有取值的概率之和等于 1。例如均匀骰子 $p(k)=\frac{1}{6}$，$k=1,\dots,6$。</p>
+      <p><strong>连续型：概率密度函数（PDF）</strong> $f(x)$。它描述的是「概率在 $x$ 附近的密集程度」，<strong>本身不是概率</strong>——$f(x)$ 可以大于 1，只要曲线下的总面积等于 1。概率由面积给出：</p>
+
+      <div class="formula-box">
+        <div class="f-name">连续型随机变量落在区间内的概率</div>
+        $$ P(a \le X \le b) = \int_{a}^{b} f(x)\, dx $$
+        <div class="f-note">其中 $f(x)\ge 0$，且 $\int_{-\infty}^{\infty} f(x)\,dx = 1$。读法：概率 = 密度曲线在 $[a,b]$ 上方的面积。因为单点面积为零，所以 $P(a\le X\le b)=P(a\le X\lt b)=P(a\lt X\le b)$。</div>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：PDF 的高度不是概率
+        </div>
+        <p>看到 $f(0)=0.4$ 就说「$X=0$ 的概率是 0.4」是错的。连续型变量单点概率恒为 0；密度 0.4 的含义是「$x=0$ 附近每单位长度摊到约 0.4 的概率质量」。只有把它乘上一小段宽度（或积分）才得到概率。正因为如此，密度可以是 3、是 100，概率却永远在 $[0,1]$ 之间。</p>
+      </div>
+
+      <h3 id="s1-4">1.4 累积分布函数 CDF</h3>
+      <p><strong>累积分布函数（CDF）</strong>统一描述离散与连续：</p>
+      <div class="formula-box">
+        <div class="f-name">CDF 的定义与三个性质</div>
+        $$ F(x) = P(X \le x) $$
+        <div class="f-note">性质：① $F(x)$ 单调不减；② $\lim_{x\to-\infty}F(x)=0$，$\lim_{x\to+\infty}F(x)=1$；③ 连续型时 $F(x)=\int_{-\infty}^{x} f(t)\,dt$，且 $f(x)=F'(x)$。区间概率用 $P(a\lt X\le b)=F(b)-F(a)$ 一步算出。</div>
+      </div>
+      <ul>
+        <li>离散型的 CDF 是<strong>阶梯函数</strong>，每遇到一个可能取值就向上跳一级，跳的高度就是该点的概率。</li>
+        <li>连续型的 CDF 是<strong>光滑上升曲线</strong>，从 0 平滑爬到 1。</li>
+      </ul>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：CDF、PDF、PMF 三兄弟别混
+        </div>
+        <p>记号约定：$F$ 大写是累积（Cumulative，永远从 $-\infty$ 累加到 $x$，取值在 $[0,1]$）；$f$ 小写是密度（Density，可大于 1）；离散的 $p(x)$ 是质量（Mass，本身就是概率）。考试中把 $f(x)$ 当概率、把 $F(x)$ 当密度是最常见的丢分点。</p>
+      </div>
+
+      <!-- ===== 2 ===== -->
+      <h2 id="s2">2 · 期望、方差与矩母函数</h2>
+
+      <h3 id="s2-1">2.1 期望：分布的重心</h3>
+      <p><strong>期望（Expectation，均值）</strong>是把每个取值按其概率加权平均，代表分布的「中心位置」。长期大量重复实验时，观测值的平均会稳定在这个数附近。</p>
+      <div class="formula-box">
+        <div class="f-name">期望的定义</div>
+        $$ \mathbb{E}(X) = \sum_{k} x_k\, p(x_k) \quad (\text{离散}) \qquad\qquad \mathbb{E}(X) = \int_{-\infty}^{\infty} x\, f(x)\, dx \quad (\text{连续}) $$
+        <div class="f-note">符号：$x_k$ 是可能取值，$p(x_k)$ 是其概率，$f(x)$ 是密度。线性性质：$\mathbb{E}(aX+b)=a\,\mathbb{E}(X)+b$，任何分布都成立。</div>
+      </div>
+      <p>例如均匀骰子 $\mathbb{E}(X)=1\times\frac16+\cdots+6\times\frac16=3.5$——即使 3.5 根本掷不出来，它仍是分布的重心。</p>
+
+      <h3 id="s2-2">2.2 方差与标准差</h3>
+      <p>期望告诉我们「中心在哪」，<strong>方差（Variance）</strong>告诉我们「数据散得有多开」：取值与均值之差的平方的期望。</p>
+      <div class="formula-box">
+        <div class="f-name">方差与标准差</div>
+        $$ \mathrm{Var}(X) = \mathbb{E}\!\left[(X-\mu)^2\right] = \mathbb{E}(X^2) - \left[\mathbb{E}(X)\right]^2, \qquad \sigma = \sqrt{\mathrm{Var}(X)} $$
+        <div class="f-note">其中 $\mu=\mathbb{E}(X)$。第二个等号是计算捷径（先算 $\mathbb{E}(X^2)$，再减去均值的平方）。性质：$\mathrm{Var}(aX+b)=a^2\mathrm{Var}(X)$。标准差 $\sigma$ 与 $X$ 同单位，实际报告更常用它。</div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：$\mathbb{E}(X^2) \ne \left[\mathbb{E}(X)\right]^2$
+        </div>
+        <p>除非方差为 0，否则「先平方再平均」一定大于「先平均再平方」，两者之差恰好是方差。例如掷骰子：$\mathbb{E}(X^2)=\frac{91}{6}\approx 15.17$，而 $[\mathbb{E}(X)]^2=3.5^2=12.25$，差值 $2.92$ 正是方差。</p>
+      </div>
+
+      <h3 id="s2-3">2.3 矩与矩母函数</h3>
+      <ul>
+        <li><strong>原点矩</strong>：$\mathbb{E}(X^k)$ 称为 $k$ 阶原点矩。一阶原点矩就是均值。</li>
+        <li><strong>中心矩</strong>：$\mathbb{E}[(X-\mu)^k]$。二阶中心矩就是方差；三阶与<strong>偏度</strong>（分布是否歪斜）有关；四阶与<strong>峰度</strong>（尾部厚薄）有关。</li>
+      </ul>
+      <div class="formula-box">
+        <div class="f-name">矩母函数 MGF</div>
+        $$ M_X(t) = \mathbb{E}\!\left[e^{tX}\right], \qquad M_X'(0)=\mathbb{E}(X), \quad M_X''(0)=\mathbb{E}(X^2) $$
+        <div class="f-note">符号：$t$ 是辅助变量，$e^{tX}$ 是指数变换。两大用途：① <strong>唯一性</strong>——分布与 MGF 一一对应，只要算出 MGF 就等于认出了分布（证明若干分布的可加性时极好用）；② <strong>求矩</strong>——在 $t=0$ 处求导即可得到各阶矩，比直接积分容易。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 2.1</span>
+          <span class="ex-title">矩母函数求矩，并用唯一性定理证明「指数分布可加」</span>
+        </div>
+        <div class="example-body">
+          <p>设某元件寿命 $X$ 服从指数分布 $\mathrm{Exp}(\lambda)$，其中 $\lambda = 0.25$（即平均寿命 $4$ 小时）。（a）求 $X$ 的矩母函数 $M_X(t)$，并用它求出 $\mathbb{E}(X)$ 与 $\mathrm{Var}(X)$；（b）设 $X_1, X_2$ 相互独立且同分布，请用 MGF 证明 $X_1 + X_2$ 服从伽马分布 $\mathrm{Gamma}(2,\lambda)$，并写出这个和的均值与方差。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）第一步：算 MGF。</strong>由定义 $M_X(t) = \mathbb{E}(e^{tX}) = \int_{0}^{\infty} e^{tx}\lambda e^{-\lambda x}\, dx$：</p>
+              $$ M_X(t) = \lambda \int_{0}^{\infty} e^{-(\lambda - t)x}\, dx = \frac{\lambda}{\lambda - t}, \qquad t < \lambda $$
+              <p>积分只在 $t &lt; \lambda$ 时收敛（否则 $e^{(\lambda-t)x}$ 越积越大），这叫 MGF 的<strong>收敛域</strong>。</p>
+              <p><strong>第二步：在 $t=0$ 处求导取矩。</strong></p>
+              $$ M_X'(t) = \frac{\lambda}{(\lambda-t)^2} \;\Rightarrow\; \mathbb{E}(X) = M_X'(0) = \frac{1}{\lambda} = 4 $$
+              $$ M_X''(t) = \frac{2\lambda}{(\lambda-t)^3} \;\Rightarrow\; \mathbb{E}(X^2) = M_X''(0) = \frac{2}{\lambda^2} = 32 $$
+              <p><strong>第三步：由二阶矩得方差。</strong></p>
+              $$ \mathrm{Var}(X) = \mathbb{E}(X^2) - [\mathbb{E}(X)]^2 = 32 - 4^2 = 16 = \frac{1}{\lambda^2} $$
+              <p><strong>（b）第一步：独立随机变量之和的 MGF 可以相乘。</strong></p>
+              $$ M_{X_1+X_2}(t) = \mathbb{E}\!\left[e^{t(X_1+X_2)}\right] = \mathbb{E}\!\left[e^{tX_1}\right]\mathbb{E}\!\left[e^{tX_2}\right] = \left(\frac{\lambda}{\lambda-t}\right)^{\!2} = \frac{\lambda^2}{(\lambda-t)^2} $$
+              <p><strong>第二步：认出一个已知的 MGF。</strong>伽马分布 $\mathrm{Gamma}(k,\lambda)$ 的 MGF 恰为 $\dfrac{\lambda^k}{(\lambda-t)^k}$，取 $k=2$ 就是上式。</p>
+              <p><strong>第三步：用唯一性定理下结论。</strong>两个 MGF 相同 ⟹ 分布相同，故 $X_1+X_2 \sim \mathrm{Gamma}(2, 0.25)$。</p>
+              <p><strong>第四步：均值与方差。</strong>伽马分布的均值 $k/\lambda$、方差 $k/\lambda^2$，代入 $k=2$、$\lambda=0.25$：</p>
+              $$ \mathbb{E}(X_1+X_2) = \frac{2}{0.25} = 8, \qquad \mathrm{Var}(X_1+X_2) = \frac{2}{0.25^2} = 32 $$
+              <p>这正是「等两段等待时间之和」的分布，也是排队论里「服务两位顾客总时长」的标准模型。</p>
+              <p><strong>易错提示：</strong>① MGF 的积分只在 $t&lt;\lambda$ 收敛，写公式时要注明定义域；② $M_X''(0)=\mathbb{E}(X^2)=32$ <em>不是</em>方差，方差还要减去均值的平方 $16$；③ 「独立」是 MGF 可乘的前提，若 $X_1,X_2$ 相关则 $M_{X_1+X_2}\ne M_{X_1}M_{X_2}$，整条证明链就断了。</p>
+              <p><strong>应用/AI 关联：</strong>「独立指数等待时间之和」是排队论与可靠性工程的基本积木——GPU 集群的任务完成时间、多阶段流水线的总时延都可以这样拆解。AI 系统里的<strong>指数退避重试（exponential backoff）</strong>正是把重试间隔设成指数分布，让「系统负载」与「故障恢复」共享同一套建模语言；生成模型中泊松—伽马混合也是同一族 MGF 的组合。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 3 ===== -->
+      <h2 id="s3">3 · 离散分布族</h2>
+
+      <h3 id="s3-1">3.1 伯努利分布与二项分布</h3>
+      <p><strong>伯努利分布 Bernoulli($p$)</strong>：只做一次「成 / 败」试验。令 $X=1$（成功）概率为 $p$，$X=0$ 概率为 $1-p$。</p>
+      <ul>
+        <li>$\mathbb{E}(X)=p$，$\mathrm{Var}(X)=p(1-p)$。</li>
+        <li>它是所有离散分布的原子：点击/未点击、次品/合格、流失/留存。</li>
+      </ul>
+      <p><strong>二项分布 Binomial($n,p$)</strong>：把 $n$ 次<strong>相互独立</strong>、成功概率同为 $p$ 的伯努利试验做下去，数成功次数 $X$。</p>
+      <div class="formula-box">
+        <div class="f-name">二项分布的 PMF、期望与方差</div>
+        $$ P(X=k) = \binom{n}{k} p^{k}(1-p)^{\,n-k}, \quad k=0,1,\dots,n $$
+        $$ \mathbb{E}(X)=np, \qquad \mathrm{Var}(X)=np(1-p) $$
+        <div class="f-note">符号：$\binom{n}{k}=\frac{n!}{k!(n-k)!}$ 表示「$n$ 次里选 $k$ 次成功」的方案数；$p^k$ 是 $k$ 次成功的概率，$(1-p)^{n-k}$ 是其余失败的概率。典型场景：抽检 $n$ 件中的次品数、$n$ 名用户中的付费人数、$n$ 次抛硬币的正面数。</div>
+      </div>
+
+      <h3 id="s3-2">3.2 多项分布（简提）</h3>
+      <p>当每次试验的结果不止「成 / 败」两类，而是 $k$ 个互斥类别（概率 $p_1,\dots,p_k$，$\sum p_i=1$），做 $n$ 次独立试验后各类别出现次数 $(X_1,\dots,X_k)$ 服从<strong>多项分布</strong>：</p>
+      $$ P(X_1=x_1,\dots,X_k=x_k) = \frac{n!}{x_1!\,x_2!\cdots x_k!}\, p_1^{x_1} p_2^{x_2}\cdots p_k^{x_k}, \qquad \sum_{i=1}^{k}x_i = n $$
+      <p>它是二项分布的直接推广（$k=2$ 时退化为二项），常用于调查问卷的选项分布、多分类标签计数。每一维单独看有 $\mathbb{E}(X_i)=np_i$，$\mathrm{Var}(X_i)=np_i(1-p_i)$。</p>
+
+      <h3 id="s3-3">3.3 泊松分布</h3>
+      <p><strong>泊松分布 Poisson($\lambda$)</strong>描述「单位时间 / 单位空间内稀有事件发生的次数」：一小时的来电数、一页书的错别字数、一平方米布匹的疵点数。</p>
+      <div class="formula-box">
+        <div class="f-name">泊松分布的 PMF、期望与方差</div>
+        $$ P(X=k) = \frac{\lambda^{k} e^{-\lambda}}{k!}, \quad k=0,1,2,\dots $$
+        $$ \mathbb{E}(X)=\lambda, \qquad \mathrm{Var}(X)=\lambda $$
+        <div class="f-note">符号：$\lambda&gt;0$ 是单位区间内事件的平均发生次数，$e\approx 2.71828$。泊松分布的标志特征：<strong>期望 = 方差 = $\lambda$</strong>。若实测数据的方差远大于均值（过离散），泊松假设就要存疑。</div>
+      </div>
+
+      <h3 id="s3-4">3.4 泊松近似二项</h3>
+      <p>当 $n$ 很大、$p$ 很小、$np$ 适中时，二项分布可以用泊松分布近似，取 $\lambda = np$。经验条件：$n\ge 20$ 且 $p\le 0.05$，或直接看 $np\le 5\sim 10$。好处是省去大组合数的计算。</p>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 3.1</span>
+          <span class="ex-title">泊松近似二项：芯片瑕疵</span>
+        </div>
+        <div class="example-body">
+          <p>某芯片生产线的单片瑕疵率 $p=0.001$。随机抽取 $n=1000$ 片，求「一片瑕疵都没有」的概率。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>精确解（二项）：</strong>$P(X=0)=\binom{1000}{0}(0.001)^0(0.999)^{1000}=(0.999)^{1000}\approx 0.3677$。</p>
+              <p><strong>近似解（泊松）：</strong>$\lambda = np = 1000\times 0.001 = 1$，于是 $P(X=0)=\frac{1^0 e^{-1}}{0!}=e^{-1}\approx 0.3679$。</p>
+              <p><strong>结论：</strong>两者只差 0.0002。$n$ 大、$p$ 小时，泊松近似既快又准；这也解释了为什么泊松分布常出现在「稀有事件」场合——它本来就是二项的极限形态。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s3-5">3.5 几何分布与负二项分布</h3>
+      <ul>
+        <li><strong>几何分布 Geometric($p$)</strong>：不停重复伯努利试验，数「首次成功出现在第几次」。$P(X=k)=(1-p)^{k-1}p$，$k=1,2,\dots$；$\mathbb{E}(X)=\frac1p$，$\mathrm{Var}(X)=\frac{1-p}{p^2}$。它具有<strong>无记忆性</strong>：已知前 $s$ 次都失败，剩余等待时间的分布与从头开始完全一样。</li>
+        <li><strong>负二项分布</strong>：数「第 $r$ 次成功出现在第几次」，是几何分布的推广：$P(X=k)=\binom{k-1}{r-1}p^{r}(1-p)^{k-r}$。它比泊松更灵活，方差大于均值，常用于刻画「过离散」的计数数据（如用户购买次数）。</li>
+      </ul>
+
+      <!-- ===== 4 ===== -->
+      <h2 id="s4">4 · 连续分布族</h2>
+
+      <h3 id="s4-1">4.1 均匀分布</h3>
+      <p><strong>均匀分布 $U(a,b)$</strong>：区间 $[a,b]$ 上每一点「机会均等」，密度是一条水平线。</p>
+      $$ f(x) = \frac{1}{b-a}\ (a\le x\le b), \qquad \mathbb{E}(X)=\frac{a+b}{2}, \qquad \mathrm{Var}(X)=\frac{(b-a)^2}{12} $$
+      <p>它是随机数生成的基础（Python 的 <code>random.random()</code> 生成 $U(0,1)$），也常用于「对参数一无所知」时的粗略建模。</p>
+
+      <h3 id="s4-2">4.2 正态分布：最重要的分布</h3>
+      <p><strong>正态分布（高斯分布）$N(\mu,\sigma^2)$</strong>呈钟形、关于 $\mu$ 对称、单峰。$\mu$ 决定中心位置，$\sigma$ 决定胖瘦。测量误差、身高体重、考试成绩、生产误差等大量现象都近似正态；更关键的是，它是<strong>样本均值的极限分布</strong>（见中心极限定理）。</p>
+      <div class="formula-box">
+        <div class="f-name">正态密度与标准化</div>
+        $$ f(x) = \frac{1}{\sigma\sqrt{2\pi}}\, \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right), \qquad Z = \frac{X-\mu}{\sigma} \sim N(0,1) $$
+        <div class="f-note">符号：$\pi\approx 3.14159$，$\exp(u)=e^u$。标准化把任意正态 $N(\mu,\sigma^2)$ 平移缩放成标准正态 $N(0,1)$，从而<strong>一张标准正态表通吃所有正态概率</strong>。本课程记号约定 $N(\mu,\sigma^2)$ 的第二个参数是<strong>方差</strong>：$N(100,15^2)$ 表示 $\sigma=15$。</div>
+      </div>
+
+      <p><strong>经验法则（68–95–99.7）</strong>：对任何正态分布，</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>区间</th><th>包含的概率</th><th>记忆口诀</th></tr></thead>
+          <tbody>
+            <tr><td>$\mu \pm 1\sigma$</td><td>约 68.3%</td><td>三分之二的数据在 1 个标准差内</td></tr>
+            <tr><td>$\mu \pm 2\sigma$</td><td>约 95.4%</td><td>20 个数据约 19 个在 2 个标准差内</td></tr>
+            <tr><td>$\mu \pm 3\sigma$</td><td>约 99.7%</td><td>超出 3σ 的极端值非常罕见</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>标准正态表的查表思路：</strong>表给出累积概率 $\Phi(z)=P(Z\le z)$。求任意区间概率用 $P(a\le Z\le b)=\Phi(b)-\Phi(a)$；利用对称性 $\Phi(-z)=1-\Phi(z)$ 处理负值。两个必须背下来的分位数：</p>
+      <ul>
+        <li>$z_{0.025}=1.96$：$P(|Z|\le 1.96)=0.95$，双侧 95% 的分界线（置信区间的核心常数）。</li>
+        <li>$z_{0.05}=1.645$：$P(Z\ge 1.645)=0.05$，单侧 95% 的分界线。</li>
+      </ul>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：$N(\mu,\sigma^2)$ 的第二个参数是方差
+        </div>
+        <p>不同教材习惯不同：有的写 $N(\mu,\sigma^2)$，有的写 $N(\mu,\sigma)$。<strong>本课程统一写 $N(\mu,\sigma^2)$（方差）。</strong>所以 $X\sim N(100,15^2)$ 表示 $\mu=100$、$\sigma=15$、$\sigma^2=225$；而 $X\sim N(100,225)$ 与它同义。标准化时除以的是<strong>标准差</strong> $\sigma$，不是方差——除错了整个概率就全错。</p>
+      </div>
+
+      <h3 id="s4-3">4.3 指数分布</h3>
+      <p><strong>指数分布 Exp($\lambda$)</strong>描述「下一次事件发生的等待时间」：下一位来电到达的间隔、下一次故障前的工作时长。它是唯一具有无记忆性的连续分布。</p>
+      $$ f(x) = \lambda e^{-\lambda x}\ (x\ge 0), \qquad \mathbb{E}(X)=\frac1\lambda, \qquad \mathrm{Var}(X)=\frac1{\lambda^2} $$
+      <div class="formula-box">
+        <div class="f-name">指数分布的无记忆性</div>
+        $$ P(X &gt; s+t \mid X &gt; s) = P(X &gt; t) $$
+        <div class="f-note">读法：已经等待了 $s$ 还没等到，之后还要再等超过 $t$ 的概率，与「从零开始等超过 $t$」完全相同。$\lambda$ 是单位时间内事件的平均发生率（到达率），均值 $\frac1\lambda$ 是平均等待时间。注意：指数分布刻画「间隔」，泊松分布刻画「次数」，两者是同一过程的两面。</div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.1</span>
+          <span class="ex-title">无记忆性：老元件不「变老」</span>
+        </div>
+        <div class="example-body">
+          <p>某电子元件寿命 $X\sim \mathrm{Exp}(\lambda)$，平均寿命 1000 小时（即 $\lambda = 1/1000 = 0.001$）。一个元件已经正常工作了 500 小时，求它还能再工作超过 1000 小时的概率。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>所求为条件概率 $P(X &gt; 500+1000 \mid X &gt; 500)$。由无记忆性：</p>
+              $$ P(X &gt; 1500 \mid X &gt; 500) = P(X &gt; 1000) = e^{-\lambda \cdot 1000} = e^{-1} \approx 0.3679 $$
+              <p><strong>解读：</strong>约 36.8%。这与「全新元件寿命超过 1000 小时」的概率一模一样——指数分布不会因为「已经用了多久」而改变剩余寿命的分布。<strong>警示：</strong>只有指数（及几何）分布才有无记忆性；人的寿命、机器的磨损都不满足它，不能乱用。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s4-4">4.4 伽马分布与卡方分布</h3>
+      <ul>
+        <li><strong>伽马分布 Gamma($k,\lambda$)</strong>：形状参数 $k$、到达率 $\lambda$。它是 $k$ 个独立 Exp($\lambda$) 等待时间之和的分布；当 $k$ 为整数时也叫爱尔朗分布，常用于排队论中「服务 $k$ 位顾客的总时长」。</li>
+        <li><strong>卡方分布 $\chi^2_n$</strong>：$n$ 个相互独立的标准正态变量的<strong>平方和</strong>。若 $Z_1,\dots,Z_n$ 独立且均服从 $N(0,1)$，则 $\sum_{i=1}^{n} Z_i^2 \sim \chi^2_n$，其中 $n$ 称为<strong>自由度</strong>。其期望 $\mathbb{E}(\chi^2_n)=n$，方差 $\mathrm{Var}=2n$。它是下一节样本方差分布的母体，也是模块 05 中 $\chi^2$ 检验的基础。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.2</span>
+          <span class="ex-title">卡方分布与样本方差：$P(s^2 &gt; 30)$ 该怎么算</span>
+        </div>
+        <div class="example-body">
+          <p>某零件长度服从正态分布 $N(20,\ 5^2)$（单位：毫米）。随机抽取 $n = 16$ 件，测得样本方差 $s^2 = 30$。（a）求 $P(s^2 &gt; 30)$；（b）求使 $P(s^2 &gt; s^2_{\text{临界}}) = 0.05$ 的临界值 $s^2_{\text{临界}}$。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：写出抽样分布。</strong>正态总体下有</p>
+              $$ \frac{(n-1)s^2}{\sigma^2} \;\sim\; \chi^2_{n-1} $$
+              <p>这里 $n = 16$，所以自由度 $\nu = n - 1 = 15$，$\sigma^2 = 25$。</p>
+              <p><strong>第二步（a）：把样本方差换算成卡方统计量。</strong></p>
+              $$ \chi^2 = \frac{(n-1)s^2}{\sigma^2} = \frac{15 \times 30}{25} = 18 $$
+              <p>于是要算的是卡方分布的<strong>右尾概率</strong>：</p>
+              $$ P(s^2 > 30) = P(\chi^2_{15} > 18) \approx 0.263 $$
+              <p><strong>第三步（b）：由尾概率反查临界值。</strong>先查卡方表：$\chi^2_{0.05,\,15} = 24.996$（即 $P(\chi^2_{15} > 24.996) = 0.05$），再换算回 $s^2$：</p>
+              $$ s^2_{\text{临界}} = \frac{\sigma^2}{n-1}\chi^2_{0.05,\,15} = \frac{25 \times 24.996}{15} \approx 41.66 $$
+              <p><strong>解读：</strong>观测到的 $s^2 = 30$ 远低于临界值 $41.66$，$p$ 值约 $0.26$——<strong>不足以判定加工过程失控</strong>。另外注意 $\mathbb{E}(\chi^2_{15}) = 15$，而我们的统计量是 $18 > 15$：卡方分布右偏，统计量略大于自由度是常态，只有明显偏大（右尾）才说明方差偏大。</p>
+              <p><strong>易错提示：</strong>① 自由度是 $n-1 = 15$ 而<strong>不是</strong> $n = 16$（因为估计均值时用掉了一个自由度）；② 不要把 $s^2$ 的分母 $n-1$ 漏掉写成 $ns^2/\sigma^2$；③ 卡方分布右偏，「统计量 &gt; 自由度」本身不是异常证据，要看右尾概率；④ 由临界值反求 $s^2$ 时别忘了乘回 $\sigma^2/(n-1)$。</p>
+              <p><strong>应用/AI 关联：</strong>卡方是「方差类统计量」的通用语言。在线模型的<strong>数据漂移监控</strong>（把特征分箱后比较实际与预期频数）、训练集与线上日志的<strong>分布一致性检验</strong>、A/B 实验中比较两组波动的稳定性，用的都是「构造标准化统计量 → 查卡方尾概率」这一条流水线；特征工程里的卡方筛选（$\chi^2$ test）与离散化分箱也基于同一分布。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <h3 id="s4-5">4.5 t 分布与 F 分布</h3>
+      <ul>
+        <li><strong>t 分布（Student）</strong>：当总体标准差 $\sigma$ 未知、用样本标准差 $s$ 代替时，样本均值的标准化量不再服从标准正态，而服从 $t$ 分布：
+        $T = \dfrac{Z}{\sqrt{V/\nu}}$，其中 $Z\sim N(0,1)$，$V\sim\chi^2_\nu$，两者独立，$\nu$ 为自由度（单样本时 $\nu=n-1$）。</li>
+        <li>t 分布同样对称、钟形，但<strong>尾部比正态厚</strong>——这反映了「用 $s$ 估计 $\sigma$ 带来的额外不确定性」。$\nu$ 越大越接近正态；$\nu\ge 30$ 时与正态差别很小。</li>
+        <li><strong>F 分布</strong>：两个独立卡方变量各除以自由度后的比值 $F = \dfrac{U/\nu_1}{V/\nu_2}$，$U\sim\chi^2_{\nu_1}$，$V\sim\chi^2_{\nu_2}$。它用于比较两个方差、方差分析（ANOVA）与回归整体显著性检验（模块 06、08）。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 4.3</span>
+          <span class="ex-title">t 分布与 F 分布的分工：一个均值区间 + 一个方差检验</span>
+        </div>
+        <div class="example-body">
+          <p>（a）某厂零件尺寸服从正态分布。随机抽 $n = 12$ 件，测得 $\bar{x} = 50$ 毫米、$s = 6$ 毫米，$\sigma$ 未知。求总体均值 $\mu$ 的 95% 置信区间。<br>（b）现要比较两台机床的加工精度（方差是否相同）。各抽 $n_1 = n_2 = 10$ 件，样本方差分别为 $s_1^2 = 16$、$s_2^2 = 4$。在 $\alpha = 0.05$ 下检验两台机床的方差有无差异。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）用 t 分布，因为 $\sigma$ 未知。</strong>临界值 $t_{0.025,\,11} = 2.201$，标准误</p>
+              $$ \mathrm{SE} = \frac{s}{\sqrt{n}} = \frac{6}{\sqrt{12}} = \frac{6}{3.464} \approx 1.732 $$
+              $$ E = 2.201 \times 1.732 \approx 3.81, \qquad \bar{x} \pm E = 50 \pm 3.81 = (46.19,\ 53.81) $$
+              <p>若当初知道 $\sigma = 6$，则该用 $z$ 区间（$1.96 \times 1.732 = 3.39$），区间反而更窄——这正是「用 $s$ 代替 $\sigma$ 要付的额外不确定性」的体现：t 分布尾部更厚，临界值更大。</p>
+              <p><strong>（b）用 F 分布，因为这是方差之比。</strong>令 $H_0:\ \sigma_1^2 = \sigma_2^2$，检验统计量</p>
+              $$ F = \frac{s_1^2}{s_2^2} = \frac{16}{4} = 4, \qquad \nu_1 = n_1 - 1 = 9,\quad \nu_2 = n_2 - 1 = 9 $$
+              <p>双侧检验 $\alpha = 0.05$，临界值取上 $\alpha/2$ 分位数：$F_{0.025,\,9,\,9} = 4.026$；等价地，双侧 p 值</p>
+              $$ p = 2\,P(F_{9,9} > 4) = 2 \times 0.0255 \approx 0.051 $$
+              <p><strong>结论：</strong>$4 &lt; 4.026$，且 $p \approx 0.051 &gt; 0.05$——<strong>不拒绝</strong>「两台机床方差相同」。两种判定方法（临界值法与 p 值法）给出完全一致的结论，这正是检验流程标准化的价值。</p>
+              <p><strong>提醒：</strong>本题的 $p$ 值恰好压在 $0.05$ 线上，属于「边缘结论」。实务中应当如实报告 $p \approx 0.05$ 并说明样本量太小、证据不足，而不是硬说「两台机床完全一样」。</p>
+              <p><strong>易错提示：</strong>① t 分布管<strong>均值</strong>（$\sigma$ 未知），F 分布管<strong>方差</strong>，两者别混用；② F 检验是<strong>双侧</strong>问题，$\alpha = 0.05$ 时临界值要用 $F_{0.025}$（即 $\alpha/2$），不是 $F_{0.05}$；③ $F$ 的分子分母别放反（通常把较大的方差放分子，配合双侧 p 值一起看）；④ 方差检验对正态假设敏感，数据明显偏态时应改用 Levene 检验。</p>
+              <p><strong>应用/AI 关联：</strong>「两组数据的噪声水平是否相同」直接决定用等方差 t 检验还是 Welch 检验，是模型评测中对比两个训练方案时的常规动作；训练集与验证集划分前的<strong>协变量漂移检查</strong>也会比较两组的均值与方差；深度学习不同随机种子的指标波动若方差不齐，直接套 t 检验会给出不可靠的显著性结论。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <caption>表 4.1 常见分布速查</caption>
+          <thead><tr><th>分布</th><th>类型</th><th>期望</th><th>方差</th><th>典型场景</th></tr></thead>
+          <tbody>
+            <tr><td>伯努利 $B(1,p)$</td><td>离散</td><td>$p$</td><td>$p(1-p)$</td><td>一次成败</td></tr>
+            <tr><td>二项 $B(n,p)$</td><td>离散</td><td>$np$</td><td>$np(1-p)$</td><td>$n$ 次中的成功数</td></tr>
+            <tr><td>泊松 $P(\lambda)$</td><td>离散</td><td>$\lambda$</td><td>$\lambda$</td><td>稀有事件计数</td></tr>
+            <tr><td>几何 $G(p)$</td><td>离散</td><td>$1/p$</td><td>$(1-p)/p^2$</td><td>首次成功前的试验数</td></tr>
+            <tr><td>均匀 $U(a,b)$</td><td>连续</td><td>$\frac{a+b}{2}$</td><td>$\frac{(b-a)^2}{12}$</td><td>随机取点</td></tr>
+            <tr><td>正态 $N(\mu,\sigma^2)$</td><td>连续</td><td>$\mu$</td><td>$\sigma^2$</td><td>测量误差、样本均值</td></tr>
+            <tr><td>指数 $\mathrm{Exp}(\lambda)$</td><td>连续</td><td>$1/\lambda$</td><td>$1/\lambda^2$</td><td>等待时间、寿命</td></tr>
+            <tr><td>卡方 $\chi^2_n$</td><td>连续</td><td>$n$</td><td>$2n$</td><td>正态平方和、样本方差</td></tr>
+            <tr><td>t 分布 $t_\nu$</td><td>连续</td><td>0（$\nu&gt;1$）</td><td>$\frac{\nu}{\nu-2}$（$\nu&gt;2$）</td><td>小样本均值推断</td></tr>
+            <tr><td>F 分布 $F_{\nu_1,\nu_2}$</td><td>连续</td><td>$\frac{\nu_2}{\nu_2-2}$（$\nu_2&gt;2$）</td><td>略</td><td>方差比较、ANOVA</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== 5 ===== -->
+      <h2 id="s5">5 · 中心极限定理：统计学第一定理</h2>
+
+      <h3 id="s5-1">5.1 先分清：大数定律 vs 中心极限定理</h3>
+      <ul>
+        <li><strong>大数定律（LLN）</strong>：样本均值 $\bar{X}$ 会随着 $n$ 增大<strong>收敛到</strong>总体均值 $\mu$。它回答「平均值最终停在哪里」，但<strong>不描述</strong>它停靠过程中的波动形状。</li>
+        <li><strong>中心极限定理（CLT）</strong>：样本均值 $\bar{X}$ 的波动形状<strong>近似正态</strong>，并且波动幅度按 $\frac{\sigma}{\sqrt{n}}$ 缩小。它回答「平均值在真值附近怎样跳动」。</li>
+      </ul>
+      <p>一句话：<em>大数定律说它去哪，中心极限定理说它怎么去。</em></p>
+
+      <h3 id="s5-2">5.2 定理内容</h3>
+      <div class="formula-box">
+        <div class="f-name">中心极限定理（CLT）</div>
+        $$ \bar{X} \;\approx\; N\!\left(\mu,\ \frac{\sigma^2}{n}\right), \qquad \text{即} \quad \frac{\bar{X}-\mu}{\sigma/\sqrt{n}} \;\approx\; N(0,1) $$
+        <div class="f-note">条件：$X_1,X_2,\dots,X_n$ 相互独立同分布（i.i.d.），总体均值 $\mu$、方差 $\sigma^2$ 有限。<strong>无论总体本身服从什么分布</strong>（均匀、指数、偏态都行），只要 $n$ 足够大，样本均值就近似正态。经验上 $n\ge 30$ 通常够用；总体越接近正态，所需 $n$ 越小；总体严重偏态或厚尾时需更大样本。</div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：CLT 说的是均值，不是数据本身
+        </div>
+        <p>「样本量一大，原始数据就服从正态」是<strong>严重误解</strong>。收入分布永远是右偏的，抽 10 万人也只是更精确地右偏。CLT 改变的是<strong>统计量（均值、总和）</strong>的抽样分布，而不是总体本身。用 CLT 做概率计算时，被正态化的对象必须是 $\bar{X}$ 或 $\sum X_i$。</p>
+      </div>
+
+      <h3 id="s5-3">5.3 为什么它是推断统计的基石</h3>
+      <ul>
+        <li><strong>形状已知</strong>：只要知道 $\bar{X}$ 近似正态，就能算出「样本均值落在某区间」的概率——这正是下一节抽样分布的全部内容。</li>
+        <li><strong>不依赖总体分布</strong>：现实总体几乎都不是标准正态，CLT 让我们不必纠结总体的精确形状。</li>
+        <li><strong>误差可量化</strong>：标准误 $\frac{\sigma}{\sqrt{n}}$ 告诉我们「样本量翻 4 倍，误差减半」，这是样本量设计（模块 05）的理论依据。</li>
+        <li><strong>后续方法的地基</strong>：置信区间、$z$ 检验、$t$ 检验、回归系数的显著性、A/B 测试的均值比较，全部建立在「统计量近似正态」之上。AI 中对损失取平均、对梯度取平均、对 AUC 误差做区间估计，背后都是 CLT。</li>
+      </ul>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 5.1</span>
+          <span class="ex-title">CLT 什么时候会失效：重尾数据与柯西分布</span>
+        </div>
+        <div class="example-body">
+          <p>中心极限定理要求「总体方差有限、样本量足够大」。请举出两个会让它失效的情形，并定量说明后果。（提示：先考虑总体尾部很厚、或样本里混进极端值的情形。）</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>反例一：重尾 + 极端值，均值被少数点绑架。</strong>某社区 10 户家庭年收入（万元）为</p>
+              $$ 2,\ 2.5,\ 3,\ 3.5,\ 4,\ 4.5,\ 5,\ 5.5,\ 6,\ 200 $$
+              <p>若按 CLT 给均值做区间估计（$\sigma$ 未知，用 $s$ 代替）：</p>
+              $$ \bar{x} = \frac{236}{10} = 23.6, \qquad s = \sqrt{\frac{\sum(x_i-\bar{x})^2}{9}} \approx 61.99 $$
+              $$ \mathrm{SE} = \frac{61.99}{\sqrt{10}} \approx 19.60, \qquad 95\%\ \text{CI} = 23.6 \pm 1.96\times 19.60 = (-14.82,\ 62.02) $$
+              <p>一个「收入不可能为负」的荒谬区间！再看中位数与稳健统计量：</p>
+              $$ \text{中位数} = \frac{4 + 4.5}{2} = 4.25, \qquad \text{去掉极端值后：}\ \bar{x} = 4.0,\ s \approx 1.37 $$
+              <p>中位数几乎不受那个 $200$ 万的影响，而均值被抬高到 $23.6$、标准差被放大到 $61.99$——<strong>标准误本身就不可信</strong>，区间宽度是稳健做法的十几倍。</p>
+              <p><strong>反例二：理论上极端的情形——柯西分布。</strong>标准柯西分布的密度是 $f(x) = \dfrac{1}{\pi(1+x^2)}$，它的数学期望<strong>根本不存在</strong>（$\mathbb{E}|X| = \infty$），CLT 的「方差有限」前提直接不成立。更有意思的是：</p>
+              $$ P(|X| \le 1) = 0.5, \qquad P(|X| \le 10) \approx 0.9365, \qquad P(|X| \le 10^6) \approx 0.9999994 $$
+              <p>样本量再大，样本均值落在 $|X| \le 1$ 的概率也永远是 $0.5$；由于柯西分布是「稳定分布」，$n$ 个独立柯西变量的均值<strong>仍然服从同一个柯西分布</strong>，永远不会收敛到任何常数。</p>
+              <p><strong>结论：</strong>CLT 是一条有前提的定理。① 存在极端值或尾部很厚时，$n \ge 30$ 的经验法则会失效，此时应改用<strong>中位数、截尾均值</strong>，或用<strong>自助法（bootstrap）</strong>构造区间；② 若总体的矩不存在，任何基于均值的推断都无从谈起。</p>
+              <p><strong>易错提示：</strong>① 「$n$ 大就行」是错的——CLT 要求有限方差，重尾分布再大的 $n$ 也救不回来；② 用 $s$ 估计 $\sigma$ 时若样本含极端值，标准误会同步被污染，置信区间宽度随之失真；③ 看到区间端点出现负数、负百分比这类不合理结果，要立刻回头检查分布假设与异常值，而不是直接汇报。</p>
+              <p><strong>应用/AI 关联：</strong>LLM 训练中的 token 级损失、金融风控中的单笔交易金额、推荐系统的曝光与消费金额都是典型重尾数据——用「均值 $\pm$ 标准误」汇报结果会给出极宽甚至荒谬的区间，应改报<strong>中位数与分位数区间</strong>。更实际的影响是：少数极端样本贡献了大部分 loss，也就主导了梯度方向，这正是<strong>梯度裁剪</strong>与 <strong>Huber 等稳健损失</strong>存在的理由；评测指标同理——用 AUC / 中位绝对误差比用「平均误差 $\pm$ 误差棒」稳健得多。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 6 ===== -->
+      <h2 id="s6">6 · 抽样分布：统计量也有自己的分布</h2>
+      <p>从同一总体反复抽样，每次算出的 $\bar{X}$、$\hat{p}$、$s^2$ 都会不同——它们也是随机变量，也有分布，称为<strong>抽样分布</strong>。这是模块 05 的直接前奏。</p>
+
+      <h3 id="s6-1">6.1 样本均值的分布</h3>
+      <div class="formula-box">
+        <div class="f-name">样本均值的抽样分布</div>
+        $$ \mathbb{E}(\bar{X}) = \mu, \qquad \mathrm{Var}(\bar{X}) = \frac{\sigma^2}{n}, \qquad \mathrm{SE}(\bar{X}) = \frac{\sigma}{\sqrt{n}} $$
+        <div class="f-note">符号：$\mathrm{SE}$（Standard Error，标准误）是统计量的标准差，刻画「换一次抽样，$\bar{X}$ 平均会晃动多少」。当 $n$ 较大或总体正态时 $\bar{X}\sim N(\mu,\sigma^2/n)$。注意：$n$ 越大，$\bar{X}$ 越稳定，但<strong>个体差异 $\sigma$ 不会变小</strong>。</div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          易错点：标准差 SD ≠ 标准误 SE
+        </div>
+        <p><strong>标准差 $\sigma$（或 $s$）</strong>描述<em>个体之间</em>的离散程度（「这批灯泡寿命差多少」）；<strong>标准误 $\frac{\sigma}{\sqrt{n}}$</strong>描述<em>统计量</em>的离散程度（「换一批抽样，均值差多少」）。新闻里说「均值 23.6 分钟」，读者关心的是 SE 而不是 SD。两者混用会导致把「个体差异大」误读成「估计不准」。</p>
+      </div>
+
+      <h3 id="s6-2">6.2 样本比例的分布</h3>
+      <div class="formula-box">
+        <div class="f-name">样本比例的抽样分布</div>
+        $$ \hat{p} \;\approx\; N\!\left(p,\ \frac{p(1-p)}{n}\right), \qquad \mathrm{SE}(\hat{p}) = \sqrt{\frac{p(1-p)}{n}} $$
+        <div class="f-note">条件：$np\ge 5$ 且 $n(1-p)\ge 5$（严格些用 10）。符号：$p$ 是总体比例（如真实支持率），$\hat{p}$ 是样本比例（如调查支持率）。这也是民调「误差 ±3%」的来源——模块 05 的比例置信区间直接使用它。</div>
+      </div>
+
+      <h3 id="s6-3">6.3 样本方差与卡方分布</h3>
+      <div class="formula-box">
+        <div class="f-name">样本方差的抽样分布</div>
+        $$ \frac{(n-1)s^2}{\sigma^2} \;\sim\; \chi^2_{n-1}, \qquad s^2 = \frac{\sum_{i=1}^{n}(x_i-\bar{x})^2}{n-1} $$
+        <div class="f-note">自由度是 $n-1$ 而非 $n$：因为计算 $s^2$ 时先用了样本均值 $\bar{x}$ 估计 $\mu$，$n$ 个离差 $(x_i-\bar{x})$ 只有 $n-1$ 个能自由取值（它们的和恒为 0）。这样定义的 $s^2$ 是<strong>无偏</strong>的：$\mathbb{E}(s^2)=\sigma^2$。</div>
+      </div>
+
+      <!-- ===== 7 ===== -->
+      <div id="examples"></div><h2 id="s7">7 · 本章例题精讲</h2>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.1</span>
+          <span class="ex-title">二项分布：10 次抛硬币至少 7 次正面</span>
+        </div>
+        <div class="example-body">
+          <p>均匀硬币独立抛 10 次，$X$ 为正面次数。求 $P(X\ge 7)$，并给出 $X$ 的均值与标准差。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p>$X\sim B(10,0.5)$，$P(X=k)=\binom{10}{k}(0.5)^{10} = \frac{\binom{10}{k}}{1024}$。</p>
+              <p><strong>第一步：列需要的组合数。</strong>$\binom{10}{7}=120$，$\binom{10}{8}=45$，$\binom{10}{9}=10$，$\binom{10}{10}=1$。</p>
+              <p><strong>第二步：相加。</strong></p>
+              $$ P(X\ge 7) = \frac{120+45+10+1}{1024} = \frac{176}{1024} \approx 0.1719 $$
+              <p><strong>第三步：数字特征。</strong>$\mathbb{E}(X)=np=10\times 0.5 = 5$，$\mathrm{Var}(X)=np(1-p)=2.5$，$\sigma = \sqrt{2.5}\approx 1.581$。</p>
+              <p><strong>解读：</strong>「至少 7 次正面」的概率约 17.2%——连抛 6 次左右是常态，7 次及以上已经算小概率事件。注意对称性：$P(X\ge 7)=P(X\le 3)$。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.2</span>
+          <span class="ex-title">泊松分布：客服中心来电</span>
+        </div>
+        <div class="example-body">
+          <p>某客服中心每小时来电数 $X\sim \mathrm{Poisson}(\lambda=4)$。求：（a）一小时内一个电话都没有的概率；（b）一小时内至少接到 3 个电话的概率。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）</strong>$P(X=0)=\frac{4^0 e^{-4}}{0!}=e^{-4}\approx 0.0183$。</p>
+              <p><strong>（b）</strong>用对立事件更省力：$P(X\ge 3)=1-P(X\le 2)=1-[P(0)+P(1)+P(2)]$。逐项：</p>
+              <ul>
+                <li>$P(X=0)=e^{-4}\approx 0.0183$</li>
+                <li>$P(X=1)=4e^{-4}\approx 0.0733$</li>
+                <li>$P(X=2)=\frac{4^2 e^{-4}}{2!}=8e^{-4}\approx 0.1465$</li>
+              </ul>
+              $$ P(X\ge 3) = 1 - (0.0183+0.0733+0.1465) = 1 - 0.2381 = 0.7619 $$
+              <p><strong>解读：</strong>约 76.2% 的小时会接到至少 3 个电话。$\lambda=4$ 既是均值也是方差（故标准差 $=2$），说明来电数波动不小，排班时要留出余量。实务中可据此计算「需要几名客服才能把等待概率压到 5% 以下」——排队论的入门问题。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.3</span>
+          <span class="ex-title">正态标准化：智商测验的高分段</span>
+        </div>
+        <div class="example-body">
+          <p>某标准化测验分数 $X\sim N(100,15^2)$（$\mu=100$，$\sigma=15$）。求 $P(X&gt;130)$，并解释其含义。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：标准化。</strong></p>
+              $$ z = \frac{130-100}{15} = \frac{30}{15} = 2.00 $$
+              <p><strong>第二步：查标准正态表。</strong>$P(X&gt;130)=P(Z&gt;2)=1-\Phi(2)=1-0.9772=0.0228$。</p>
+              <p><strong>第三步：解释。</strong>约 <strong>2.28%</strong> 的人分数超过 130。注意这正好落在经验法则的 2σ 之外（$100+2\times 15 = 130$），故概率约为 $1-0.9544 = 0.0456$ 的一半（单侧），即 2.28%。</p>
+              <p><strong>延伸：</strong>同理 $P(85&lt;X&lt;115)=P(-1&lt;Z&lt;1)\approx 0.6826$；若要「前 5%」的分数线，则 $x = 100 + 1.645\times 15 \approx 124.7$ 分。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.4</span>
+          <span class="ex-title">中心极限定理：非正态总体的样本均值</span>
+        </div>
+        <div class="example-body">
+          <p>某产品寿命总体<strong>右偏</strong>（不是正态），均值 $\mu=500$ 小时，标准差 $\sigma=100$ 小时。随机抽取 $n=100$ 件，求样本均值 $\bar{X}$ 落在 480 至 520 小时之间的概率。</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：用 CLT 写出 $\bar{X}$ 的分布。</strong>尽管总体右偏，$n=100$ 足够大：</p>
+              $$ \bar{X} \approx N\!\left(500,\ \frac{100^2}{100}\right) = N(500,\ 100), \qquad \mathrm{SE} = \frac{100}{\sqrt{100}} = 10 $$
+              <p><strong>第二步：标准化两端。</strong></p>
+              $$ z_1 = \frac{480-500}{10} = -2, \qquad z_2 = \frac{520-500}{10} = 2 $$
+              <p><strong>第三步：查表。</strong></p>
+              $$ P(480 \le \bar{X} \le 520) = \Phi(2)-\Phi(-2) = 0.9772 - 0.0228 = 0.9544 $$
+              <p><strong>第四步：解读。</strong>约 <strong>95.4%</strong> 的样本均值会落在 $500\pm 20$ 小时内。若把 $n$ 加大到 400，$\mathrm{SE}$ 降到 5，同样的 $\pm 20$ 就变成 $\pm 4$ 个标准误，概率升到约 99.99%——<strong>样本量越大，均值越稳</strong>。补问：$P(\bar{X}&gt;515)=P(Z&gt;1.5)=1-0.9332=0.0668$，即均值超过 515 的概率约 6.7%。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.5</span>
+          <span class="ex-title">样本比例的抽样分布：民调精度</span>
+        </div>
+        <div class="example-body">
+          <p>某项政策的真实支持率 $p=0.4$。随机调查 $n=200$ 人，样本支持率 $\hat{p}$ 落在 $0.35$ 到 $0.45$ 之间的概率是多少？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>第一步：检查条件。</strong>$np=80$，$n(1-p)=120$，都远大于 10，可用正态近似。</p>
+              <p><strong>第二步：求标准误。</strong></p>
+              $$ \mathrm{SE} = \sqrt{\frac{p(1-p)}{n}} = \sqrt{\frac{0.4\times 0.6}{200}} = \sqrt{0.0012} \approx 0.0346 $$
+              <p><strong>第三步：标准化。</strong>$z = \pm\dfrac{0.05}{0.0346} \approx \pm 1.44$。</p>
+              <p><strong>第四步：查表。</strong></p>
+              $$ P(0.35 \le \hat{p} \le 0.45) = \Phi(1.44)-\Phi(-1.44) = 0.9251 - 0.0749 = 0.8502 $$
+              <p><strong>解读：</strong>约 85% 的调查会给出 $0.35\sim 0.45$ 的支持率。换句话说，单次调查结果与真值相差超过 ±5 个百分点的情形约 15%，这正是民调必须报告「误差范围」的原因——模块 05 的置信区间会给它一个正式名字。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="example-head">
+          <span class="ex-tag">例 7.6</span>
+          <span class="ex-title">综合挑战：泊松近似二项、$\chi^2$ 拟合优度与「过离散」</span>
+        </div>
+        <div class="example-body">
+          <p>（a）某零件次品率 $p = 0.02$，随机抽检 $n = 150$ 件。请先判断能否用泊松分布近似二项分布，再分别用精确二项与泊松近似求出「次品不超过 1 件」的概率。<br>（b）记录某车间连续 6 天的设备故障次数：$4,\ 7,\ 9,\ 11,\ 8,\ 6$。用 $\chi^2$ 拟合优度检验判断故障次数是否服从泊松分布（$\alpha = 0.05$）。<br>（c）若某设备 30 天的故障次数<strong>均值</strong>为 $4.2$ 而<strong>方差</strong>高达 $9.1$，这说明什么？该改用什么分布？</p>
+          <details class="solution">
+            <summary>查看解答</summary>
+            <div class="sol-body">
+              <p><strong>（a）第一步：验证近似条件。</strong>经验条件是 $n \ge 20$ 且 $p \le 0.05$（或 $np \le 5\sim 10$）。这里 $n = 150 \ge 20$ ✓，$p = 0.02 \le 0.05$ ✓，且 $\lambda = np = 150 \times 0.02 = 3$ 适中，<strong>可以用泊松近似</strong>。</p>
+              <p><strong>第二步：精确二项。</strong></p>
+              $$ P(X \le 1) = (0.98)^{150} + \binom{150}{1}(0.02)(0.98)^{149} = 0.0483 + 0.1478 = 0.1961 $$
+              <p><strong>第三步：泊松近似（$\lambda = 3$）。</strong></p>
+              $$ P(X \le 1) = e^{-3}\left(1 + 3\right) = 4e^{-3} \approx 0.1991 $$
+              <p>两者只差 $0.003$。再看 $P(X=2)$：二项 $0.2248$，泊松 $\dfrac{3^2 e^{-3}}{2!} \approx 0.2240$，几乎一致——省掉大组合数而精度几乎不损失，这就是泊松近似的价值。</p>
+              <p><strong>（b）第一步：写出假设与期望频数。</strong>$H_0$：故障次数服从泊松分布，参数由样本估计 $\hat{\lambda} = \dfrac{45}{6} = 7.5$，于是各天期望频数均为 $E_i = 7.5$。</p>
+              <p><strong>第二步：算自由度。</strong>类别数 $6$ 个，估计了 1 个参数（$\lambda$），故 $df = 6 - 1 - 1 = 4$。</p>
+              <p><strong>第三步：算 $\chi^2$ 统计量。</strong></p>
+              $$ \chi^2 = \frac{(4-7.5)^2 + (7-7.5)^2 + (9-7.5)^2 + (11-7.5)^2 + (8-7.5)^2 + (6-7.5)^2}{7.5} = \frac{12.25 + 0.25 + 2.25 + 12.25 + 0.25 + 2.25}{7.5} = \frac{29.5}{7.5} \approx 3.933 $$
+              <p><strong>第四步：与临界值比较。</strong>$\chi^2_{0.05,\,4} = 9.488$，而 $3.933 &lt; 9.488$（$p \approx 0.42$），<strong>不拒绝</strong>泊松假设：这 6 天的故障次数与 $\mathrm{Poisson}(7.5)$ 是相容的。</p>
+              <p><strong>（c）方差与均值之比是诊断「过离散」的关键指标。</strong></p>
+              $$ \frac{\mathrm{Var}}{\mathbb{E}} = \frac{9.1}{4.2} \approx 2.17 > 1 $$
+              <p>泊松分布的招牌特征是<strong>期望 = 方差</strong>，比值应当等于 1。现在方差是均值的两倍多，说明故障次数<strong>比泊松更分散</strong>——常见原因是「故障群聚」（同一台设备连续坏、同一批物料连着出问题），这会使数据<strong>过度离散（over-dispersed）</strong>。</p>
+              <p><strong>对策：</strong>改用<strong>负二项分布</strong>（或准泊松、泊松—伽马混合）。例如负二项 $r = 2,\ p = 0.35$ 时，均值 $\dfrac{r}{p} \approx 5.71$、方差 $\dfrac{r(1-p)}{p^2} \approx 10.61$，方差与均值之比约 $1.86 > 1$，才具备描述这种「群聚」现象的能力。若仍用泊松，方差会被低估，置信区间会窄得不真实。</p>
+              <p><strong>易错提示：</strong>① 用泊松近似前必须逐条检查条件（$n$ 大、$p$ 小、$np$ 适中）；$np$ 很大时泊松近似会严重失真。② $\chi^2$ 拟合优度的自由度要<strong>减去估计的参数个数</strong>：6 类且估计了 $\lambda$，自由度是 $4$ 而不是 $5$。③ 「方差 &gt; 均值」不是数据有问题，而是<strong>泊松假设不成立</strong>的信号——它提示存在群聚、混合总体或过度离散，不能硬套泊松。</p>
+              <p><strong>应用/AI 关联：</strong>线上服务的错误率、告警条数、用户请求失败数、模型训练中的异常样本数，都是典型的计数型数据，常用泊松 / 负二项建模。A/B 实验中「转化次数」的方差往往也大于均值，若按泊松计算标准误会低估不确定性、导致假阳性；模型异常检测里，用 $\chi^2$ 拟合优度判断「故障率是否符合预期分布」是最基础的守门动作。</p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- ===== 8 ===== -->
+      <!-- V3:DEEP:START -->
+<section id="d-deep-wrap" aria-label="深度专题与工程规格"><!-- 深度片段 · 模块 04 随机变量与常见分布 -->
+<!-- 本片段只补充「深度」：正文已有的学习目标、九道例题、练习与小结不重复 -->
+
+<h2 id="d-deep-1">深度专题一 · 三条极限关系：二项 → 泊松 → 正态，以及中心极限定理为什么成立</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：一条被逼出来的「便宜替身」之路</h3>
+  <p>正文已经给出三条结论：二项在大 $n$ 小 $p$ 时近似泊松、二项与泊松在样本足够大时近似正态、样本均值在中心极限定理（CLT）下近似正态。本专题要回答的是<strong>它们为什么是同一件事</strong>，以及 CLT 凭什么对几乎任何总体都成立。</p>
+  <p>历史顺序恰好是「由特殊到一般」。1733 年 de Moivre 为了计算赌博中「抛 $n$ 次硬币出现 $k$ 次正面」这类概率，发现直接算 $\binom{n}{k}$ 在大 $n$ 时根本算不动，于是找到一条钟形曲线来近似它；1812 年 Laplace 把这套近似系统化；1837 年 Poisson 研究「单位时间内稀有事件次数」时，写出了另一条极限——把二项试验切得极碎、成功机会极小，但保持平均次数 $\lambda = np$ 不变，得到的分布只由 $\lambda$ 决定。到 19 世纪末至 20 世纪初，Chebyshev、Lyapunov、Lindeberg 等人把「为什么一定是钟形」证明成了普遍定理。</p>
+  <p>动机非常工程化：<strong>精确公式太贵，近似公式几乎免费</strong>。计算 $\binom{1000}{500}$ 需要大整数或对数伽马函数；而 $\Phi(z)$ 用一次 <code>math.erf</code> 就能得到。直到今天，A/B 平台算转化率置信区间、风控系统算「一天内故障次数超阈值」的概率、排队论算客服排班，用的仍是这条 300 年前的近似链。</p>
+  <p>三条关系不是三个孤立技巧，而是一条链的两端加一个推广：</p>
+  <ul>
+    <li>左端：<strong>二项 $\to$ 泊松</strong>，让「试验次数 $n$」消失，只剩平均发生率 $\lambda$；</li>
+    <li>右端：<strong>泊松 / 二项 $\to$ 正态</strong>，让「离散的计数」被连续的钟形曲线覆盖；</li>
+    <li>推广：<strong>CLT</strong>，把「二项之和」换成「任意有限方差的独立随机变量之和」，结论照样成立。</li>
+  </ul>
+
+  <h3>直觉：先把公式全部忘掉</h3>
+  <p>先想二项为什么变泊松。二项 $B(n,p)$ 是「做 $n$ 次独立试验，数成功次数」。现在把每次试验再切成 $m$ 个更细的小片段，每片段成功概率变成 $p/m$，总片段数变成 $nm$，但平均成功次数仍是 $nm \cdot (p/m) = np = \lambda$。当片段切得无穷细时，同一个瞬间发生两次成功的概率小到可以忽略，于是「一共成功几次」只取决于<strong>平均发生率 $\lambda$</strong>，而不再关心你到底切了多少刀、每刀概率多小。这就是为什么泊松分布里 $n$ 和 $p$ 都消失了，只剩一个 $\lambda$。</p>
+  <p>再想泊松为什么变正态。$\lambda$ 很小时泊松明显右偏（$0$ 次最常见，长尾拖向右边）；但 $\lambda$ 增大到 $10$、$30$、$100$ 时，分布逐渐关于 $\lambda$ 左右对称、单峰、钟形——因为大量独立小事件的叠加，正偏差与负偏差互相抵消，剩下的形状被「平均」成一口钟。二项在 $n$ 大、$p$ 不靠近 $0$ 或 $1$ 时也是同样的道理。</p>
+  <p>CLT 把这口钟的来源说透了：把很多个独立的小扰动加起来，<strong>一阶信息（偏斜的方向）在标准化时被减掉，二阶信息（波动大小）被缩放成统一尺度，三阶及更高阶的信息随样本量增大而消失</strong>，于是极限里只剩「方差」这一个数字。所有具体分布的长相都被抹平，剩下一模一样的 $e^{t^2/2}$。正文反复强调「CLT 说的是均值不是数据本身」，原因就在这里：被平均的是统计量，不是原始总体。</p>
+  <p>一个物理画面：高尔顿板上，小球每碰一层钉子就以一半概率向左或向右。落点 = 很多次「$\pm 1$」之和。层数越多，落点分布越接近钟形——无论钉子摆得多不均匀，只要每层左右机会接近均等，最终形状都一样。</p>
+
+  <h3>形式化：用矩母函数把三条关系一次串起来</h3>
+  <p>矩母函数（MGF）正文已定义为 $M_X(t)=\mathbb{E}\!\left[e^{tX}\right]$。这里用到它的两条性质：① <strong>唯一性</strong>——若两个随机变量在 $t=0$ 邻域内 MGF 相同，则分布相同；② <strong>独立和的 MGF 可乘</strong>——$X,Y$ 独立时 $M_{X+Y}(t)=M_X(t)M_Y(t)$。下面每行公式都配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">第一步：二项的 MGF，令 $\lambda = np$ 固定、$n \to \infty$</div>
+    $$ M_{B(n,p)}(t)=\left(1-p+p e^{t}\right)^{n}=\left(1+\frac{\lambda\left(e^{t}-1\right)}{n}\right)^{n} \;\longrightarrow\; \exp\!\left(\lambda\left(e^{t}-1\right)\right) $$
+    <div class="f-note">白话：把 $p=\lambda/n$ 代进去，得到「$1$ 加一个很小的量，再取 $n$ 次方」，这正是 $(1+u/n)^n \to e^u$ 的标准极限。右边 $\exp(\lambda(e^t-1))$ 恰是 $\mathrm{Poisson}(\lambda)$ 的 MGF，由唯一性定理即知分布收敛到泊松。<strong>$n$ 与 $p$ 在极限里被 $\lambda$ 完全吸收</strong>，这就是「泊松只认平均次数」的数学根源。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第二步：泊松标准化后的 MGF，令 $\lambda \to \infty$</div>
+    $$ M_{\frac{X-\lambda}{\sqrt{\lambda}}}(t)=e^{-t\sqrt{\lambda}}\cdot\exp\!\left(\lambda\left(e^{t/\sqrt{\lambda}}-1\right)\right) $$
+    $$ e^{t/\sqrt{\lambda}}=1+\frac{t}{\sqrt{\lambda}}+\frac{t^{2}}{2\lambda}+O\!\left(\lambda^{-3/2}\right) \;\Longrightarrow\; M \;\longrightarrow\; e^{t^{2}/2} $$
+    <div class="f-note">白话：先把 $X$ 减去均值 $\lambda$、除以标准差 $\sqrt{\lambda}$（标准化），再展开指数。一次项 $t\sqrt\lambda$ 与减去的 $t\sqrt\lambda$ 正好抵消，二次项留下 $\frac{t^2}{2}$，更高阶项随 $\lambda$ 增大趋于零。$e^{t^2/2}$ 是标准正态 $N(0,1)$ 的 MGF，故 $\frac{X-\lambda}{\sqrt\lambda}\to N(0,1)$。这解释了「$\lambda$ 大时泊松近似 $N(\lambda,\lambda)$」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第三步：一般 CLT 的一页证明（为什么与总体形状无关）</div>
+    $$ Z_n=\frac{\sum_{i=1}^{n}Y_i-n\mu}{\sigma\sqrt{n}}, \qquad M_{Z_n}(t)=\left[\,M_{Y}\!\left(\frac{t}{\sigma\sqrt{n}}\right)e^{-t\mu/(\sigma\sqrt{n})}\right]^{n} $$
+    $$ M_Y(s)=1+\mu s+\frac{\mathbb{E}(Y^2)}{2}s^{2}+O(s^{3}) \;\Longrightarrow\; M_{Z_n}(t)=\left[1+\frac{t^{2}}{2n}+o\!\left(\frac{1}{n}\right)\right]^{n}\;\longrightarrow\;e^{t^{2}/2} $$
+    <div class="f-note">白话：$Y_i$ 独立同分布、均值 $\mu$、方差 $\sigma^2$ 有限。把单个 $Y$ 的 MGF 在 $0$ 处展开，再平移（减 $\mu$）与缩放（除 $\sigma\sqrt n$）。平移消掉一阶项，缩放把二阶项凑成 $\frac{t^2}{2n}$，三阶及以上变成 $o(1/n)$；取 $n$ 次方后一切都趋于 $e^{t^2/2}$。<strong>关键在于：极限里只用到「方差有限」，三阶以上的具体形状全部被 $n$ 稀释掉了</strong>——这就是 CLT 对均匀、指数、偏态总体一视同仁的原因。</div>
+  </div>
+
+  <p>把三步连起来读，就是完整的一条链：</p>
+  <div class="formula-box">
+    <div class="f-name">三条极限关系的统一视图</div>
+    $$ B(n,p)\ \xrightarrow[\ n\to\infty,\ \lambda=np\ \text{固定}\ ]{\text{MGF 极限}}\ \mathrm{Poisson}(\lambda)\ \xrightarrow[\ \lambda\to\infty\ ]{\text{标准化}}\ N(\lambda,\lambda) $$
+    $$ B(n,p)\ \xrightarrow[\ n\to\infty,\ p\ \text{固定}\ ]{\text{de Moivre–Laplace / CLT}}\ N\!\left(np,\ np(1-p)\right) $$
+    <div class="f-note">白话：上路是「稀有事件」的极限，下路是「大量独立伯努利之和」的极限；两者在「$n$ 大、$np$ 也大」的区域汇合到同一口钟。工程上选哪条近似，只看 $np$ 是小还是大：$np \le 10$ 用泊松更准，$np \ge 10$ 且 $n(1-p) \ge 10$ 用正态更省。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    二项 $\to$ 泊松靠的是「把试验切碎、保持平均次数 $\lambda$ 不变」；泊松 / 二项 $\to$ 正态以及一般 CLT 靠的是「标准化后 MGF 只剩 $\frac{t^2}{2}$」。三者共用同一个机制：<strong>独立的微小扰动相加时，除均值与方差外的一切信息都会被 $n$ 抹平</strong>。因此 CLT 的适用前提可以压缩成一句话：<strong>独立 + 方差有限</strong>。
+  </div>
+
+  <p><strong>边界：</strong>在总体方差不存在（柯西分布、尾部指数 $\alpha \le 2$ 的帕累托分布）、样本之间存在强相关或群聚、或样本量虽大但被极少数极端值主导的条件下，本结论不成立，应改用稳定分布模型、中位数与分位数、截尾均值，或用自助法（bootstrap）直接构造区间，<strong>不能</strong>套用「均值 $\pm 1.96\,\sigma/\sqrt n$」。</p>
+
+  <figure class="figure" id="fig-curve-clt">
+  <svg class="dia" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="中心极限定理：样本均值的分布随 n 收敛"><line class="dg-grid" x1="62" y1="26.0" x2="654" y2="26.0"/><line class="dg-grid" x1="62" y1="83.0" x2="654" y2="83.0"/><line class="dg-grid" x1="62" y1="140.0" x2="654" y2="140.0"/><line class="dg-grid" x1="62" y1="197.0" x2="654" y2="197.0"/><line class="dg-grid" x1="62" y1="254.0" x2="654" y2="254.0"/><line class="dg-axis" x1="62" y1="26" x2="62" y2="254"/><line class="dg-axis" x1="62" y1="254" x2="654" y2="254"/><path class="dg-curve alt" d="M 62.0 218.0 L 121.2 212.6 L 180.4 203.9 L 239.6 190.0 L 298.8 171.7 L 358.0 161.4 L 417.2 171.7 L 476.4 190.0 L 535.6 203.9 L 594.8 212.6 L 654.0 218.0"/><text class="dg-elabel" x="364.0" y="152.39148114285712" text-anchor="start">n = 1（近似总体形状）</text><path class="dg-curve " d="M 62.0 235.6 L 121.2 229.8 L 180.4 219.0 L 239.6 196.5 L 298.8 149.7 L 358.0 106.4 L 417.2 149.7 L 476.4 196.5 L 535.6 219.0 L 594.8 229.8 L 654.0 235.6"/><text class="dg-elabel" x="364.0" y="97.43058285714287" text-anchor="start">n = 5</text><path class="dg-curve ok" d="M 62.0 254.0 L 121.2 250.5 L 180.4 243.2 L 239.6 224.7 L 298.8 162.2 L 358.0 26.0 L 417.2 162.2 L 476.4 224.7 L 535.6 243.2 L 594.8 250.5 L 654.0 254.0"/><text class="dg-elabel" x="364.0" y="17.0" text-anchor="start">n = 30</text><text class="dg-ts" x="358.0" y="290" text-anchor="middle">样本均值 x̄</text><text class="dg-ts" x="14" y="140.0" text-anchor="start">密度</text></svg>
+  <figcaption>
+    <span class="fig-no">图 1</span><span class="fig-title">中心极限定理：样本均值的分布随 n 收敛</span>
+    <span class="fig-note">三条曲线示意不同样本量下均值的抽样分布；n 增大时方差按 σ²/n 收缩并趋于正态，与总体分布形态无关。</span>
+    <span class="fig-src">类型：结构图 · 来源：<a href="../modules/m05-inference.html">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+  <figure class="figure-placeholder" id="fig-classic-m04-0">
+  <div class="ph-frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span class="ph-k">插图占位 · 图 4-A</span>
+    <span class="ph-s">本站为离线站点，不内嵌 / 不热链外部图片；请按下方来源链接查看原图</span>
+  </div>
+  <figcaption>
+    <span class="fig-no">图 2</span><span class="fig-title">高尔顿板（Galton Board）：二项分布收敛到正态的实体装置</span>
+    <span class="fig-note">小球逐层左右等概率分流，落入底部槽中的频数近似二项分布；层数增多时轮廓趋于钟形，是中心极限定理最经典的物理演示。</span>
+    <span class="fig-src">来源：Galton (1889), Natural Inheritance；概念核对见本站资源库 t03 与 s10 · 查看：<a href="https://www.statlearning.com/" target="_blank" rel="noopener">https://www.statlearning.com/</a> · 核验状态：来源链接已核对，原图未内嵌</span>
+  </figcaption>
+</figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 重尾分布：用 σ 描述风险，究竟在哪里失效</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：当「标准差」被当成万能尺子</h3>
+  <p>正文在 CLT 的边界里已经埋了一个伏笔：收入数据里混进一个 $200$ 万的极端值，样本标准差会被放大到 $61.99$，置信区间宽到荒谬。本专题把这个现象从「一个反例」升级成「一整类分布的系统性失效」。</p>
+  <p>20 世纪的定量金融几乎把「风险」等同于「波动率 $\sigma$」：Markowitz 的均值—方差组合理论用方差度量风险，VaR（风险价值）常写成 $\mu - k\sigma$，$3\sigma$ 被当成「几乎不可能越过」的边界。1963 年 Mandelbrot 研究棉花价格时发现，价格变化的尾部远比正态厚，样本方差随样本量增大并不稳定；后来 Taleb 用「黑天鹅」把这个警告带进大众视野。今天它在 AI 工程里同样具体：LLM 训练中少数极难 token 贡献了大部分 loss、推荐系统里少数头部用户贡献了大部分消费金额、线上服务的少数慢请求决定了 P99 延迟——这些都是重尾。</p>
+  <p>正文里已经出现过对策的名字：梯度裁剪、Huber 稳健损失、报中位数与分位数区间。本专题给出「为什么必须这么做」的定量理由。</p>
+
+  <h3>直觉：σ 量的是「典型波动」，风险问的是「最坏能多坏」</h3>
+  <p>标准差的定义是「偏离均值的平方再平均再开方」。平方这一步很关键：一个偏离 $10$ 倍的点，在 $\sigma$ 里贡献 $100$ 倍。轻尾分布（正态、均匀分布、有界区间）里，极端值本来就极少出现，所以 $\sigma$ 稳定、可解释；但重尾分布里，偶尔出现的一个巨大值会把 $\sigma$ 整个撑大，而它出现的概率又低到让人误以为「已经被 $\sigma$ 覆盖了」。</p>
+  <p>打个比方：用「平均身高」描述一群人没问题；但若人群里可能混进一个 $30$ 米高的巨人，那么「平均身高 $\pm 3$ 倍标准差」既不能告诉你平常人长什么样，也不能告诉你巨人会出现在哪。<strong>σ 回答的是「典型情况波动多大」，风险回答的是「尾部有多厚、有多长」——这是两个不同的问题。</strong></p>
+  <p>更麻烦的是稳定性：轻尾分布的样本 $\sigma$ 会随 $n$ 增大收敛到一个固定常数；重尾分布（方差无穷时）的样本 $\sigma$ 会随 $n$ 增大不断被新出现的更大极端值刷新，永远不收敛。这意味着「用历史数据估一个 $\sigma$ 再外推未来风险」在重尾下从根上就不成立——历史里没出现过的极端值，不代表未来不会出现。</p>
+
+  <h3>形式化：尾部指数 $\alpha$ 决定一切</h3>
+  <p>用帕累托型尾来刻画重尾：存在常数 $C \gt 0$ 与尾部指数 $\alpha \gt 0$，使</p>
+  <div class="formula-box">
+    <div class="f-name">重尾的尾概率与矩的存在性</div>
+    $$ \mathbb{P}(X \gt x)\ \sim\ C\,x^{-\alpha}\quad (x\to\infty), \qquad \mathbb{E}\left[X^{k}\right]\ \text{存在}\ \Longleftrightarrow\ k \lt \alpha $$
+    <div class="f-note">白话：尾概率按幂律 $x^{-\alpha}$ 衰减，比正态的指数级 $e^{-x^2/2}$ 慢得多。$\alpha$ 越小尾越厚。矩的存在性只看 $\alpha$：要 $k$ 阶矩有限，必须 $k \lt \alpha$。于是 $\alpha \le 1$ 时连期望都不存在，$\alpha \le 2$ 时方差 $\sigma^2$ 不存在——「用 $\sigma$ 度量风险」在这两种情形下连定义都没有。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">柯西分布：连期望都不存在</div>
+    $$ f(x)=\frac{1}{\pi\left(1+x^{2}\right)}, \qquad \mathbb{E}|X|=\int_{-\infty}^{\infty}\frac{|x|}{\pi(1+x^{2})}\,dx=+\infty $$
+    <div class="f-note">白话：柯西的尾部 $\sim \frac{1}{\pi x^2}$，对应 $\alpha = 1$。均值、方差都不存在，切比雪夫不等式 $\mathbb{P}(|X-\mu|\ge k\sigma)\le 1/k^2$ 这一步从前提就断了。正文里说过「$n$ 个独立柯西变量的均值仍服从同一个柯西分布」——那是稳定分布的特例，正好说明「样本量再大也救不回来」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">即使方差存在，σ 仍会低估尾部：对数正态的定量反例</div>
+    $$ \text{设 } \ln X \sim N(0,\tau^{2}),\quad \mu=\mathbb{E}(X)=e^{\tau^{2}/2},\quad \sigma^{2}=\left(e^{\tau^{2}}-1\right)e^{\tau^{2}} $$
+    $$ \text{正态模型声称：}\ \mathbb{P}(X \gt \mu+3\sigma)=1-\Phi(3)\approx 0.00135 $$
+    $$ \text{真实概率：}\ \mathbb{P}(X \gt \mu+3\sigma)=1-\Phi\!\left(\frac{\ln(\mu+3\sigma)}{\tau}\right) $$
+    <div class="f-note">白话：取 $\tau = 1.5$，则 $\mu \approx 3.08$、$\sigma \approx 8.97$、$\mu+3\sigma \approx 30.0$。若天真地用「均值 $\pm 3\sigma$」当 $99.87\%$ 上界，正态模型给出超越概率 $0.135\%$；而对数正态的真实超越概率是 $1-\Phi\!\left(\frac{\ln 30}{1.5}\right)=1-\Phi(2.27)\approx 1.16\%$，<strong>低估约 $8.6$ 倍</strong>。方差在这里是有限的，$\sigma$ 却依然严重低估尾部——因为 $\sigma$ 只压缩二阶信息，而尾部由整个分布形状决定。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">该改用什么：把「二阶矩」换成「分位数 / 条件尾期望」</div>
+    $$ \mathrm{VaR}_{q}=F^{-1}(q), \qquad \mathrm{CVaR}_{q}=\mathbb{E}\!\left[X \mid X \gt \mathrm{VaR}_{q}\right], \qquad \mathrm{IQR}=F^{-1}(0.75)-F^{-1}(0.25) $$
+    <div class="f-note">白话：$\mathrm{VaR}_q$ 直接问「$q$ 分位数在哪」，不需要方差存在；$\mathrm{CVaR}_q$（期望短缺）进一步问「一旦越过阈值，平均会损失多少」，这正是保险与风控真正关心的量；四分位距 IQR 与中位数则是描述统计里现成的稳健替身。极值理论（GEV / GPD）专门负责拟合超出历史最大值的那一段尾。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    $\sigma$ 只是二阶矩的平方根，它<strong>不包含尾部形状的信息</strong>。当 $\alpha \le 2$ 时方差根本不存在，样本 $\sigma$ 随 $n$ 发散；即使 $\alpha \gt 2$（方差有限），用 $\mu \pm 3\sigma$ 或「$\sigma$ 乘一个常数」的 VaR 仍会系统性低估极端事件。稳健做法是：报中位数与分位数、用 VaR / CVaR 或极值理论量化尾部、用中位数绝对偏差与 IQR 描述离散度、在训练里用梯度裁剪与 Huber 损失限制单个极端样本的话语权。
+  </div>
+
+  <p><strong>边界：</strong>在总体服从轻尾分布（正态、指数、或有界区间）、样本独立同分布、且确认无录入错误与异常值污染的条件下，本结论不成立，应改用基于 $\sigma$ 的参数化风险度量（$3\sigma$ 界、方差—协方差 VaR、均值 $\pm$ 标准误的置信区间），因为此时 $\sigma$ 收敛快、估计效率高、且切比雪夫与 CLT 提供的保证全部有效。</p>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 二项分布的正态近似（含连续性修正）</h2>
+
+<div class="algo-spec">
+
+  <h3>原理：把离散的「柱子」换成连续的「面积」</h3>
+  <p>目标：对 $X\sim B(n,p)$，快速算出 $\mathbb{P}(X \le k)$ 这类累积概率，而不去逐项累加 $\binom{n}{i}p^i(1-p)^{n-i}$。</p>
+  <p>由上一专题的 de Moivre–Laplace 极限，$n$ 大时 $B(n,p)$ 近似 $N\!\left(\mu=np,\ \sigma^2=np(1-p)\right)$。但这里有一个容易被忽略的细节：<strong>二项是离散的，正态是连续的</strong>。$\mathbb{P}(X \le k)$ 在直方图上是「$0,1,\dots,k$ 这些整数柱子面积之和」，每根柱子实际占据区间 $[i-0.5,\ i+0.5]$；而连续正态在单点概率为 $0$，若直接算 $\Phi\!\left(\frac{k-\mu}{\sigma}\right)$，等于只累计到柱子 $k$ 的<strong>左边界</strong>，会系统性少算半根柱子。</p>
+  <p><strong>连续性修正</strong>就是把这个半根柱子补回来：把整数边界向外扩 $0.5$。几何解释是「用连续曲线下方的面积去覆盖一组宽为 $1$ 的离散矩形」。这一步不改变极限正确性，却把近似误差从 $O(1/\sqrt n)$ 压到更小的量级，是本章算法真正的技术点。</p>
+  <div class="formula-box">
+    <div class="f-name">近似公式与三种边界的修正规则</div>
+    $$ \mathbb{P}(X \le k)\ \approx\ \Phi\!\left(\frac{k+0.5-\mu}{\sigma}\right), \qquad \mathbb{P}(X \ge k)\ \approx\ 1-\Phi\!\left(\frac{k-0.5-\mu}{\sigma}\right) $$
+    $$ \mathbb{P}(a \le X \le b)\ \approx\ \Phi\!\left(\frac{b+0.5-\mu}{\sigma}\right)-\Phi\!\left(\frac{a-0.5-\mu}{\sigma}\right) $$
+    <div class="f-note">白话：$\mu=np$，$\sigma=\sqrt{np(1-p)}$，$\Phi$ 是标准正态累积分布函数（用 <code>math.erf</code> 即可算，无需查表）。规则一句话：<strong>「要包含某个整数，就把边界往远离中心的方向多推 $0.5$」</strong>。不加这 $0.5$ 的「朴素正态近似」是它的退化版本。</div>
+  </div>
+  <p>配套的「分布拟合 / 识别」流程（与正文 MGF 呼应）：拿到计数数据先算样本均值 $\bar x$ 与样本方差 $s^2$；若 $s^2 \approx \bar x$ 选泊松、若 $s^2 \lt \bar x$ 选二项、若 $s^2 \gg \bar x$ 则提示过离散、改用负二项；再用 MGF 唯一性或 $\chi^2$ 拟合优度确认。这一步决定「该不该用正态近似」。</p>
+
+  <h3>编号步骤：照着做一遍就会</h3>
+  <ol>
+    <li><strong>写出模型与事件。</strong>明确 $n$、$p$ 以及要算的是 $\mathbb{P}(X\le k)$、$\mathbb{P}(X\ge k)$ 还是 $\mathbb{P}(a\le X\le b)$；把「至少」「不超过」翻译成 $\le$ / $\ge$。</li>
+    <li><strong>检查适用条件。</strong>要求 $np \ge 5$ 且 $n(1-p)\ge 5$（严格场合用 $10$）；$p$ 越靠近 $0$ 或 $1$ 所需 $n$ 越大。若 $np \le 10$，改用泊松近似更准。</li>
+    <li><strong>算两个数字。</strong>$\mu = np$，$\sigma = \sqrt{np(1-p)}$。注意这里除以的是标准差而不是方差。</li>
+    <li><strong>做连续性修正。</strong>把整数边界外扩 $0.5$：$\le k$ 变 $k+0.5$；$\ge k$ 变 $k-0.5$；区间 $[a,b]$ 变 $[a-0.5,\ b+0.5]$。</li>
+    <li><strong>标准化。</strong>对每个修正后的边界 $y$ 算 $z=\dfrac{y-\mu}{\sigma}$，把任意正态平移缩放成标准正态。</li>
+    <li><strong>求面积。</strong>用 $\Phi(z)=\frac12\left[1+\mathrm{erf}\!\left(\frac{z}{\sqrt2}\right)\right]$ 求值，按事件做差或用 $1-\Phi$。</li>
+    <li><strong>报告与校验。</strong>给出近似值，并在条件允许时用精确二项累加或泊松近似对照一次，写明误差量级与「本近似在本次是否够用」。</li>
+  </ol>
+
+  <h3>适用条件</h3>
+  <ul>
+    <li>数据：一次计数，来自 $n$ 次<strong>相互独立</strong>、成功概率恒为 $p$ 的伯努利试验；不是时间序列、不是群聚事件。</li>
+    <li>规模：$n$ 足够大，经验门槛 $np\ge 5$ 且 $n(1-p)\ge 5$；$p$ 固定、不极端。</li>
+    <li>分布：只用于二项族（或经检验与二项相容的计数）；$\mathrm{Var}/\mathbb{E}\approx 1-p \lt 1$ 是二项的标志。</li>
+    <li>特征类型：离散非负整数 $0,1,\dots,n$；连续测量值不适用。</li>
+    <li>工程位置：位于「建模 → 概率计算 → 阈值告警」链条中，是 A/B 平台与监控系统的<strong>在线推理</strong>环节，上游是埋点计数，下游是告警决策。</li>
+  </ul>
+
+  <div class="complexity">
+    <span><b>训练</b>：无需训练，$O(1)$</span>
+    <span><b>推理（单次概率）</b>：时间 $O(1)$，空间 $O(1)$</span>
+    <span><b>对照</b>：精确二项 $O(k)$ 累加，泊松 $O(k)$ 累加</span>
+  </div>
+  <p>说明：本算法没有「训练」阶段（参数 $n,p$ 由问题给定或由数据直接估计）。一次概率只需约十次算术加一次 <code>math.erf</code>，与 $n$ 无关；这正是它在超大 $n$ 场景不可替代的原因。精确二项要累加 $k+1$ 项，每项含组合数，时间随 $k$ 线性增长且大 $n$ 时易数值溢出。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>速度恒定：$n=10^6$ 与 $n=10^2$ 耗时一样，全靠一次 erf。</li>
+        <li>连续性修正把误差压得很低，在 $np\ge 10$ 时常到 $10^{-3}$ 量级。</li>
+        <li>结果可直接接到置信区间与假设检验（$z$ 统计量的同一套 $\Phi$）。</li>
+        <li>无需大整数与对数伽马函数，纯标准库即可落地，便于嵌入式 / 边缘设备。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>缺点</h4>
+      <ul>
+        <li>尾部概率误差大：算 $\mathbb{P}(X\le k)$ 且 $k$ 远离 $\mu$ 时，相对误差可能显著。</li>
+        <li>依赖独立同分布假设；试验相关（群聚、重复用户）会悄悄失效。</li>
+        <li>$p$ 极接近 $0$ 或 $1$ 时收敛极慢，$n$ 要非常大才准。</li>
+        <li>只能给概率，不能像精确 PMF 那样逐个列出每个取值的概率。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>示例推演：手算到底（$n=100,\ p=0.5,\ \mathbb{P}(X\le 60)$）</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span> 抛 $100$ 次均匀硬币，$X$ 为正面次数，$X\sim B(100,0.5)$，求 $\mathbb{P}(X\le 60)$。</div>
+    <div class="solve-step"><span class="ss-k">检查条件。</span> $np = 100\times0.5 = 50 \ge 5$ ✓，$n(1-p)=100\times0.5=50\ge 5$ ✓，且 $p=0.5$ 不极端，可用正态近似。</div>
+    <div class="solve-step"><span class="ss-k">算两个数字。</span> $\mu = np = 50$；$\sigma = \sqrt{np(1-p)} = \sqrt{100\times0.5\times0.5} = \sqrt{25} = 5$。</div>
+    <div class="solve-step"><span class="ss-k">连续性修正。</span> 事件 $\mathbb{P}(X\le 60)$ 要包含整数 $60$ 整根柱子，故边界取 $y = 60 + 0.5 = 60.5$。（若不修正则用 $y=60$。）</div>
+    <div class="solve-step"><span class="ss-k">标准化。</span> $z = \dfrac{60.5 - 50}{5} = \dfrac{10.5}{5} = 2.10$；不修正时 $z_0 = \dfrac{60-50}{5}=2.00$。</div>
+    <div class="solve-step"><span class="ss-k">查 $\Phi$。</span> $\Phi(2.10) = 0.9821$；对照 $\Phi(2.00)=0.9772$。精确二项累加为 $0.9824$（见下方代码实验）。</div>
+    <div class="solve-step"><span class="ss-k">算误差、下结论。</span> 带修正：$|0.9821 - 0.9824| = 0.0003$；不带修正：$|0.9772-0.9824| = 0.0052$。<strong>半个柱子的修正把误差缩小了约 $17$ 倍</strong>。故 $\mathbb{P}(X\le 60)\approx 0.982$，即「$100$ 次里正面不超过 $60$ 次」几乎必然发生。</div>
+    <div class="solve-step"><span class="ss-k">解释与边界。</span> $z=2.10$ 表示修正后的边界落在均值右侧 $2.1$ 个标准差处。若把 $n$ 降到 $20$、$p=0.05$（$np=1$），条件不再满足，本结论作废，应改用精确二项或泊松 $\mathrm{Poisson}(1)$。</div>
+  </div>
+
+  <h3>横向对比：三种算同一概率的方法</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>维度</th><th>精确二项累加</th><th>泊松近似 $\mathrm{Poisson}(np)$</th><th class="best">正态近似 + 连续性修正</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>任意 $n,p$；但大 $n$ 时组合数易溢出</td>
+        <td>$n$ 大、$p$ 小、$\lambda=np\le 10$</td>
+        <td class="best">$np\ge 5$ 且 $n(1-p)\ge 5$，$p$ 不极端、试验独立</td>
+      </tr>
+      <tr>
+        <th>时间与空间复杂度</th>
+        <td>时间 $O(k)$，空间 $O(1)$；需大整数或对数伽马</td>
+        <td>时间 $O(k)$，空间 $O(1)$</td>
+        <td class="best">时间 $O(1)$、空间 $O(1)$，与 $n,k$ 无关</td>
+      </tr>
+      <tr>
+        <th>关键超参数</th>
+        <td>无（精确解）</td>
+        <td>$\lambda = np$；$n$ 大 $p$ 小才成立</td>
+        <td class="best">连续性偏移 $0.5$（固定，不调）；条件门槛 $5$ 或 $10$</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td>基准真值，可作金标准校验其他近似</td>
+        <td>$p$ 小时极准，公式最简，无需 erf</td>
+        <td class="best">最快；$np$ 大时精度高；可直接接 $z$ 检验与置信区间</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>$n$ 极大时计算不可行；$p$ 极端时数值下溢</td>
+        <td>$np$ 大时明显失真（方差被低估为 $\lambda$）；不适用于 $p$ 不小</td>
+        <td class="best">尾部相对误差大；试验相关或 $p$ 接近 $0/1$ 时失效，应改用精确二项或负二项</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>逐项可解释，但工程实现最重</td>
+        <td>实现最轻，只需 $e^{-\lambda}$ 与阶乘</td>
+        <td class="best">「半个柱子」直观；<code>math.erf</code> 一行落地，在线服务零依赖</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>对照口径与全站一致（适用条件 / 复杂度 / 关键超参 / 优点 / 局限与失效边界 / 可解释性与工程成本）。选择规则很朴素：<strong>能用精确就用精确做金标准，$np$ 小用泊松，$np$ 大且要快用带修正的正态</strong>。</p>
+</div>
+
+<h2 id="d-code">代码实验 · 亲手验证三条极限关系与重尾失效</h2>
+
+<div class="code-lab">
+  <div class="cl-head">
+    <span class="cl-lang">Python 3 · 纯标准库</span>
+    <span>实验：MGF 极限 / 连续性修正 / CLT 仿真 / 重尾 σ 失效</span>
+    <span class="cl-grow"></span>
+    <span>固定种子 · 可复现</span>
+  </div>
+  <pre>__PY_CODE__</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout，逐字粘贴自 Bash 执行结果）</div>
+    <pre>__PY_OUTPUT__</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">[1] 二项→泊松</span>四行的 <code>abs_err</code> 从约 $10^{-2}$ 单调降到 $10^{-5}$ 量级，正是「保持 $\lambda=6$ 不变、$n$ 变大 $p$ 变小」时 MGF 收敛到 $\exp(\lambda(e^t-1))$ 的数值证据。注意 $n=60,p=0.10$ 时误差还偏大——$p$ 不够小，极限尚未到位，这就是正文强调「$p\le0.05$」的原因。</p>
+    <p><span class="ci-k">[2] 连续性修正</span><code>exact</code> 是精确二项累加；<code>no correction</code> 只把边界取 $60$，误差明显；<code>+0.5 correction</code> 取 $60.5$，误差缩小一个数量级以上。三个数字就是上面 <code>step-solve</code> 第 6、7 步的来源，$\mu=50$、$\sigma=5$ 也与手算一致。</p>
+    <p><span class="ci-k">[3] 泊松→正态</span>$\lambda=10$ 时泊松已近似钟形；加 $0.5$ 修正后与精确泊松 CDF 更贴近，验证了「$\lambda$ 大时 $\mathrm{Poisson}(\lambda)\approx N(\lambda,\lambda)$」。</p>
+    <p><span class="ci-k">[4] CLT 仿真</span>总体是指数分布 $\mathrm{Exp}(1)$（明显右偏，$\mu=\sigma=1$）。$n$ 从 $1$ 增到 $30$，<code>se_emp</code> 始终贴合 <code>se_clt</code> $=1/\sqrt n$，且「样本均值落在 $\mu\pm0.5$」的仿真频率逐步逼近 CLT 预测值。<strong>关键是：总体本身一直右偏，变正态的只有「均值」</strong>——这正是正文「CLT 说的是统计量不是数据」的实证。</p>
+    <p><span class="ci-k">[5] 柯西 vs 正态</span>柯西样本的 <code>sigma</code> 随 $n$ 从千级涨到万级、十万级，<strong>完全不收敛</strong>；对照组 $\mathrm{Normal}(0,1)$ 的 <code>sigma</code> 始终贴近 $1$。这就是「方差不存在时 $\sigma$ 不是稳定量」的直接数值表现：换一批数据、换一个样本量，$\sigma$ 就换一个数，拿它做风险上限毫无意义。</p>
+    <p><span class="ci-k">[6] 对数正态尾部</span>$\mu\approx3.08$、$\sigma\approx8.97$、$\mu+3\sigma\approx30.0$。正态模型按 $3\sigma$ 声称超越概率 $0.00135$，真实对数正态是约 $0.0116$，<code>underestimation factor</code> 约 $8.6$ 倍；<code>Monte-Carlo</code> 用 $20$ 万次抽样独立核对了这个数。<strong>方差有限也救不了 σ</strong>：低估的是「尾部形状」，不是「二阶矩」。</p>
+    <p><span class="ci-k">何时会变</span>把 <code>slog</code> 调小（如 $0.5$），对数正态趋近正态，低估倍数趋近 $1$；把 $\lambda$ 调大，[3] 的误差继续下降；把 [4] 的 $n$ 调到 $2$，CLT 预测会明显偏离仿真——因为偏态总体需要更大的 $n$ 才能抹平三阶项。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr>
+      <th>功能说明</th>
+      <td>用「矩母函数极限 + CLT」把二项 / 泊松的计数概率换算成标准正态面积，并给出连续性修正与重尾失效判据。<strong>做</strong>：快速算累积概率、判断该用泊松还是正态、识别 $\sigma$ 不可信的情形。<strong>不做</strong>：不逐点给出 PMF、不处理相关试验、不拟合非二项族的分布参数。</td>
+    </tr>
+    <tr>
+      <th>输入 / 输出</th>
+      <td>输入：整数 $n\ge 0$、概率 $p\in[0,1]$、整数边界 $k$（或区间 $[a,b]$）；量纲为「次数」与「无量纲概率」。输出：一个无量纲概率 $\in[0,1]$，以及可选的误差对照值。中间量 $\mu,\sigma,z$ 分别为「次数」「次数」「无量纲标准分」。</td>
+    </tr>
+    <tr>
+      <th>适用场景</th>
+      <td>$n$ 大时的在线概率计算：A/B 平台转化率阈值告警、客服来电 / 故障次数的排班与容量规划、抽检次品数、点击 / 完课计数，以及为置信区间与 $z$ 检验提供 $\Phi$ 数值。</td>
+    </tr>
+    <tr>
+      <th>关键参数</th>
+      <td><code>n</code>、<code>p</code>：决定 $\mu=np$ 与 $\sigma=\sqrt{np(1-p)}$，对结果最敏感；<code>continuity</code>（固定 $0.5$，默认开启，不要调成别的值）；条件门槛 <code>np_min</code>（默认 $5$，严格场景调 $10$）；<code>slog</code>（仅重尾实验，控制尾厚，越大低估越严重）。调参方向：若误差偏大，先提高 <code>n</code> 或换精确法，而不是改 $0.5$。</td>
+    </tr>
+    <tr>
+      <th>边界条件</th>
+      <td>在 $np \lt 5$ 或 $n(1-p) \lt 5$ 的条件下不适用，应改用精确二项累加或泊松近似；在试验相关、存在群聚、或总体为 $\alpha\le2$ 的重尾分布的条件下不适用，应改用负二项 / 中位数与分位数 / CVaR；在需要精确尾部概率（如 $\alpha=0.0001$ 的告警阈值）时应改用精确二项或大偏差方法。</td>
+    </tr>
+    <tr>
+      <th>常见问题</th>
+      <td>① 忘记加 $0.5$，误差比预期大一个量级；② 把 $N(\mu,\sigma^2)$ 的第二个参数当成标准差，标准化时除错；③ 看到「$n\ge30$」就以为重尾数据也能用，忽略方差有限这一前提。详见下方常见问题。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details>
+    <summary>为什么连续性修正是加 $0.5$，不是加 $1$ 或减 $0.5$？</summary>
+    <div class="faq-a">因为二项的每个整数 $i$ 在直方图上对应宽为 $1$ 的矩形 $[i-0.5,\ i+0.5]$。事件 $X\le k$ 要覆盖到整数 $k$ 这根柱子的<strong>右边界</strong>，即 $k+0.5$。少算的是「半根柱子」，所以是 $0.5$ 不是 $1$。方向永远朝「让区间更宽」：上界事件加、下界事件减、双边界两边都外扩。若把 $\mathbb{P}(X\ge k)$ 错写成 $k+0.5$，会把区间收窄，误差反而变大。</div>
+  </details>
+  <details>
+    <summary>$np\ge 5$ 和 $np\ge 10$ 到底用哪个？</summary>
+    <div class="faq-a">$5$ 是「勉强可用」的下限，$10$ 是「误差通常可接受」的稳妥线。$p$ 越偏离 $0.5$，所需 $n$ 越大：$p=0.01$ 时即使 $np=10$，分布仍明显右偏，正态近似在左尾会失真。经验做法：两条都检查（$np$ 与 $n(1-p)$），并额外要求 $p$ 不极端；若结果要用于高风险决策，一律用精确二项或泊松做一次对照。</div>
+  </details>
+  <details>
+    <summary>既然 CLT 说「任何分布都行」，为什么重尾还是不行？</summary>
+    <div class="faq-a">CLT 的前提是「方差有限」四个字，而重尾（$\alpha\le2$）恰好让方差不存在。此时标准化量 $\frac{\bar X-\mu}{\sigma/\sqrt n}$ 里的 $\sigma$ 本身没有定义，定理链条从第一步就断了。柯西分布是最极端的例子：$n$ 个独立柯西变量的均值仍服从同一个柯西分布，样本量再大也不向任何钟形收敛。<strong>「$n$ 大就行」是对 CLT 最常见的误读</strong>。</div>
+  </details>
+  <details>
+    <summary>样本标准差很大，是不是一定说明数据重尾？</summary>
+    <div class="faq-a">不一定。单个录入错误（多打一个零）、量纲混用、两个子群体混在一起，都会把 $\sigma$ 撑大。诊断顺序应是：先画直方图与箱线图看是否有孤立点，再核对数据源与量纲，然后比较 $\bar x$ 与中位数、$s$ 与 IQR 的差距，最后才判断是否重尾。若删去一个点后 $\sigma$ 大幅回落，那是<strong>异常值</strong>而非重尾；若 $\sigma$ 随样本量持续攀升且分位数稳定，才是重尾。</div>
+  </details>
+  <details>
+    <summary>方差有限时，用均值 ± 3σ 做风险上限总该安全吧？</summary>
+    <div class="faq-a">不安全。本专题 [6] 的反例里，对数正态方差有限，但 $\mu+3\sigma$ 的真实超越概率是正态模型声称值的约 $8.6$ 倍。原因是 $3\sigma$ 的「$99.87\%$」来自正态的特定形状，不是任何分布的通用定理；切比雪夫不等式只给 $\le 1/9 \approx 11\%$ 这种松得多的保证。要量化尾部，请直接用分位数 VaR 与 CVaR，不要把 $3\sigma$ 当普适常数。</div>
+  </details>
+  <details>
+    <summary>没有装 numpy / scipy，怎么算 $\Phi$ 和查分位数？</summary>
+    <div class="faq-a">标准库 <code>math.erf</code> 就够：$\Phi(z)=\frac12\left[1+\mathrm{erf}(z/\sqrt2)\right]$。反查分位数可以对 $\Phi$ 做二分法（本实验的 <code>norm_ppf</code> 就是这样从 <code>math.erf</code> 反解出 $z_{0.975}\approx1.959964$），无需任何外部依赖。这也解释了为什么本站所有代码实验都坚持纯标准库：离线站点、任何机器、任何时间运行结果一致。</div>
+  </details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测 · 极限关系与重尾</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">设 $X_n\sim B(n,p)$，保持 $\lambda = np$ 不变并令 $n\to\infty$、$p\to 0$。$X_n$ 的极限分布是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q1" value="A"> A. $N(\lambda,\ \lambda)$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q1" value="B"> B. $\mathrm{Poisson}(\lambda)$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q1" value="C"> C. $N(0,1)$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：由二项 MGF $(1+\lambda(e^t-1)/n)^n \to \exp(\lambda(e^t-1))$，而后者正是 $\mathrm{Poisson}(\lambda)$ 的 MGF（唯一性定理）。$N(\lambda,\lambda)$ 是再令 $\lambda\to\infty$ 之后的第二层极限，别把两层混了。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">用正态近似计算 $\mathbb{P}(X\le 60)$，其中 $X\sim B(100,0.5)$。带连续性修正的标准化分位数是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q2" value="A"> A. $z = (60-50)/5 = 2.00$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q2" value="B"> B. $z = (59.5-50)/5 = 1.90$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q2" value="C"> C. $z = (60.5-50)/5 = 2.10$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mu=np=50$、$\sigma=\sqrt{25}=5$。$\mathbb{P}(X\le 60)$ 要覆盖整数 $60$ 整根柱子，边界外扩到 $60.5$，故 $z=10.5/5=2.10$。A 是忘记修正的退化版本，B 的方向反了（把区间收窄）。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">CLT 的 MGF 证明里，为什么极限只剩 $e^{t^2/2}$，与总体分布形状无关？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q3" value="A"> A. 标准化消掉一阶项，二阶项凑出 $t^2/2$，三阶及以上被 $n$ 稀释为 $o(1/n)$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q3" value="B"> B. 因为所有总体本来就是正态分布</label>
+      <label class="quiz-opt"><input type="radio" name="m04q3" value="C"> C. 因为 $n$ 大时样本量会把偏度自动变成 0</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：把 $M_Y(s)$ 在 $0$ 处展开，减 $\mu$ 消一阶、除 $\sigma\sqrt n$ 把二阶凑成 $t^2/(2n)$，更高阶项除以 powers of $\sqrt n$ 后变成 $o(1/n)$，取 $n$ 次方后趋于零。极限只依赖「方差有限」，故与三阶以上形状无关——这正是「CLT 对偏态总体也成立」的原因。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">标准柯西分布的样本标准差，随样本量 $n$ 增大将如何变化？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q4" value="A"> A. 收敛到一个固定常数</label>
+      <label class="quiz-opt"><input type="radio" name="m04q4" value="B"> B. 按 $1/\sqrt n$ 收敛到 0</label>
+      <label class="quiz-opt"><input type="radio" name="m04q4" value="C"> C. 不收敛，随更大极端值的出现不断跳升</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：柯西尾部指数 $\alpha=1$，连期望都不存在，方差更不存在。代码实验 [5] 显示 $n$ 从 $10^3$ 到 $10^5$ 时 <code>sigma</code> 一路暴涨，而对照组正态始终贴近 $1$。B 描述的是「样本均值的标准误」，与样本标准差是两回事，别混。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">某计数数据 $n$ 很大、$p=0.02$，且实测 $\mathrm{Var}/\mathbb{E}\approx 2.2$。最合适的处理是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q5" value="A"> A. 直接用泊松 $\mathrm{Poisson}(np)$，因为它最省算力</label>
+      <label class="quiz-opt"><input type="radio" name="m04q5" value="B"> B. 怀疑过离散与群聚，改用负二项分布，或先做 $\chi^2$ 拟合优度检验</label>
+      <label class="quiz-opt"><input type="radio" name="m04q5" value="C"> C. 直接套 $N(np,\ np(1-p))$，因为 $n$ 已经很大</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：泊松的招牌是 $\mathrm{Var}=\mathbb{E}$，比值 $2.2$ 远大于 $1$，说明存在群聚或混合总体（过度离散）；二项则必有 $\mathrm{Var}/\mathbb{E}=1-p \lt 1$。两个候选族都与数据不相容，硬套任何一个都会低估方差、把置信区间算窄。应先用 $\chi^2$ 拟合优度确认不相容，再改用负二项或准泊松。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+<h2 id="d-figures">本章图示汇总</h2>
+<figure class="figure" id="fig-flow-learning-loop">
+  <svg class="dia" viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="章节学习闭环：九个环节的阅读顺序"><rect class="dg-box alt" x="20.0" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="54.57142857142857" y="94.0" text-anchor="middle">① 学习目标</text><text class="dg-ts" x="54.57142857142857" y="111.0" text-anchor="middle">可测量</text><rect class="dg-box alt" x="115.14285714285714" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="149.71428571428572" y="94.0" text-anchor="middle">② 核心问题</text><text class="dg-ts" x="149.71428571428572" y="111.0" text-anchor="middle">带着问题读</text><line class="dg-edge" x1="89.14285714285714" y1="97.0" x2="115.14285714285714" y2="97.0"/><polygon class="dg-edge" points="115.14285714285714,97.0 107.83814562035867,100.26208362447656 107.83814562035867,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="210.28571428571428" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="244.85714285714283" y="94.0" text-anchor="middle">③ 专题讲解</text><text class="dg-ts" x="244.85714285714283" y="111.0" text-anchor="middle">直觉先于形式</text><line class="dg-edge" x1="184.28571428571428" y1="97.0" x2="210.28571428571428" y2="97.0"/><polygon class="dg-edge" points="210.28571428571428,97.0 202.9810027632158,100.26208362447656 202.9810027632158,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box" x="305.42857142857144" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="340.0" y="94.0" text-anchor="middle">④ 典型例题</text><text class="dg-ts" x="340.0" y="111.0" text-anchor="middle">逐步推演</text><line class="dg-edge" x1="279.42857142857144" y1="97.0" x2="305.42857142857144" y2="97.0"/><polygon class="dg-edge" points="305.42857142857144,97.0 298.123859906073,100.26208362447656 298.123859906073,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="400.57142857142856" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="435.1428571428571" y="94.0" text-anchor="middle">⑤ 代码实验</text><text class="dg-ts" x="435.1428571428571" y="111.0" text-anchor="middle">真实输出</text><line class="dg-edge" x1="374.57142857142856" y1="97.0" x2="400.57142857142856" y2="97.0"/><polygon class="dg-edge" points="400.57142857142856,97.0 393.2667170489301,100.26208362447656 393.2667170489301,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box info" x="495.71428571428567" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="530.2857142857142" y="94.0" text-anchor="middle">⑥ 练习自测</text><text class="dg-ts" x="530.2857142857142" y="111.0" text-anchor="middle">即时反馈</text><line class="dg-edge" x1="469.71428571428567" y1="97.0" x2="495.71428571428567" y2="97.0"/><polygon class="dg-edge" points="495.71428571428567,97.0 488.4095741917872,100.26208362447656 488.4095741917872,93.73791637552344" fill="var(--line-strong)" stroke="none"/><rect class="dg-box ok" x="590.8571428571429" y="66" width="69.14285714285714" height="62" rx="8"/><text class="dg-t" x="625.4285714285714" y="94.0" text-anchor="middle">⑦ 总结延伸</text><text class="dg-ts" x="625.4285714285714" y="111.0" text-anchor="middle">回到体系</text><line class="dg-edge" x1="564.8571428571429" y1="97.0" x2="590.8571428571429" y2="97.0"/><polygon class="dg-edge" points="590.8571428571429,97.0 583.5524313346444,100.26208362447656 583.5524313346444,93.73791637552344" fill="var(--line-strong)" stroke="none"/></svg>
+  <figcaption>
+    <span class="fig-no">图 3</span><span class="fig-title">章节学习闭环：九个环节的阅读顺序</span>
+    <span class="fig-note">每章按「目标 → 核心问题 → 讲解 → 例题 → 代码实验 → 练习自测 → 总结 → 延伸」组织，可独立成章使用。</span>
+    <span class="fig-src">类型：流程图 · 来源：<a href="../DATA-GUIDE.md">作者自绘 · 依据本站资源库已核验条目</a> · 本站离线自绘，双主题自适配</span>
+  </figcaption>
+</figure>
+</section>
+<!-- V3:DEEP:END -->
+<h2 id="s8">8 · 练习题</h2>
+
+      <div class="callout exam">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          动笔练习
+        </div>
+        <ol>
+          <li>某产品次品率 $p=0.1$。随机抽取 20 件，求恰好有 2 件次品的概率，并写出该分布的均值与标准差。</li>
+          <li>某路口每分钟平均通过 3 辆车（服从泊松分布），求 1 分钟内恰好通过 5 辆车的概率。</li>
+          <li>设 $X\sim N(64, 8^2)$，求 $P(X&gt;80)$ 与 $P(56&lt;X&lt;72)$。</li>
+          <li>总体均值 $\mu=30$、标准差 $\sigma=12$（分布未知），随机抽 $n=64$ 个观测。求样本均值落在 $28.5$ 到 $31.5$ 之间的概率。</li>
+          <li>真实支持率 $p=0.3$，随机调查 $n=400$ 人，求样本比例落在 $0.25$ 到 $0.35$ 之间的概率。</li>
+        </ol>
+        <details class="solution">
+          <summary>查看答案与提示</summary>
+          <div class="sol-body">
+            <p><strong>1.</strong> $X\sim B(20,0.1)$，$P(X=2)=\binom{20}{2}(0.1)^2(0.9)^{18} = 190\times 0.01\times 0.1501 \approx 0.285$。均值 $np=2$，方差 $np(1-p)=1.8$，标准差 $\approx 1.342$。</p>
+            <p><strong>2.</strong> $\lambda=3$，$P(X=5)=\dfrac{3^5 e^{-3}}{5!} = \dfrac{243\times 0.04979}{120} \approx 0.1008$。</p>
+            <p><strong>3.</strong> $P(X&gt;80)=P(Z&gt;2)=0.0228$；$P(56&lt;X&lt;72)=P(-1&lt;Z&lt;1)\approx 0.6826$。</p>
+            <p><strong>4.</strong> 由 CLT，$\mathrm{SE}=\dfrac{12}{\sqrt{64}}=1.5$，$z=\pm\dfrac{1.5}{1.5}=\pm 1$，概率 $\approx 0.6826$。</p>
+            <p><strong>5.</strong> $\mathrm{SE}=\sqrt{\dfrac{0.3\times 0.7}{400}}\approx 0.0229$，$z=\pm\dfrac{0.05}{0.0229}\approx \pm 2.18$，概率 $=2\Phi(2.18)-1 = 2\times 0.9854 - 1 \approx 0.971$。</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ===== 9 ===== -->
+      <h2 id="s9">9 · 本章小结</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>概念</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>随机变量</td><td>把随机结果翻译成数字；离散可数、连续取区间</td></tr>
+            <tr><td>PMF / PDF / CDF</td><td>PMF 直接给概率；PDF 是密度（概率 = 面积）；CDF 是累积概率 $P(X\le x)$</td></tr>
+            <tr><td>期望与方差</td><td>期望是重心，方差是散度；$\mathrm{Var}(X)=\mathbb{E}(X^2)-[\mathbb{E}(X)]^2$</td></tr>
+            <tr><td>矩母函数</td><td>$M_X(t)=\mathbb{E}[e^{tX}]$；唯一性认分布，求导得矩</td></tr>
+            <tr><td>离散分布族</td><td>伯努利/二项（成败计数）、泊松（稀有事件，$\mathbb{E}=\mathrm{Var}=\lambda$）、几何与负二项（等待）</td></tr>
+            <tr><td>连续分布族</td><td>均匀、正态（$Z$ 标准化与 68–95–99.7）、指数（无记忆）、伽马/卡方、t 与 F</td></tr>
+            <tr><td>中心极限定理</td><td>$\bar{X}\approx N(\mu,\sigma^2/n)$；$n\ge 30$ 经验值；只对统计量成立</td></tr>
+            <tr><td>抽样分布</td><td>$\bar{X}$、$\hat{p}\approx N(p,p(1-p)/n)$、$(n-1)s^2/\sigma^2\sim\chi^2_{n-1}$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+                                                            <!-- V3:TAIL:START -->
+<section class="case-leg" id="d-case" aria-label="跨模块贯穿案例">
+  <div class="cl-title">跨模块贯穿案例 · <span class="cl-baton">知学云 · 在线课程完课率提升项目</span></div>
+  <p><strong>本章接棒：随机变量与分布。</strong>用二项分布刻画完课数、泊松分布刻画发帖数、正态分布近似测验分。</p>
+  <p class="small muted">数据集固定为 <code>N=12,000</code> 名学员、14 个字段，随机种子 <code>20261107</code>，由 <code>assets/js/case-data.py</code> 用纯标准库确定性生成；全站各章的代码实验共用同一份数据，因此数字可跨章对照。字段字典与规范统计量见 <a href="../DATA-GUIDE.md">数据维护说明</a>。</p>
+  <div class="case-relay" aria-label="15 章案例接力"><a class="" href="m01-data.html" title="数据理解与偏差识别">M01</a><a class="" href="m02-descriptive.html" title="描述统计与可视化">M02</a><a class="" href="m03-probability.html" title="概率与条件概率">M03</a><a class="current" href="m04-distributions.html" title="随机变量与分布">M04</a><a class="" href="m05-inference.html" title="估计与检验">M05</a><a class="" href="m06-regression.html" title="回归建模">M06</a><a class="" href="m07-bayesian.html" title="贝叶斯更新">M07</a><a class="" href="m08-experiment.html" title="实验与因果">M08</a><a class="" href="m09-ml-stats.html" title="泛化与模型选择">M09</a><a class="" href="m10-ai-stats.html" title="AI 前沿统计">M10</a><a class="" href="m11-big-data.html" title="规模化统计">M11</a><a class="" href="m12-ml-algorithms.html" title="经典算法">M12</a><a class="" href="m13-deep-training.html" title="深度训练">M13</a><a class="" href="m14-architectures.html" title="网络架构">M14</a><a class="" href="m15-genai-systems.html" title="生成式系统">M15</a></div>
+</section>
+<section class="learning-summary" id="d-summary" aria-label="总结与延伸阅读">
+  <h2>延伸阅读 · 回到体系</h2>
+  <div class="callout note"><div class="callout-title">本章小结与本章的衔接</div>
+    <p>上表的「本章小结」负责压缩本章概念；本节负责把概念接回六阶段体系：先按上方「本章定位」确认先修与后继，再按「跨模块案例」看同一份数据在下一章如何换一种方法重算，最后用下列资料把直觉补成可推导的形式。难度按 L1→L5 递进，来源与核验状态以 <a href="../resources.html">全站资源库</a> 为准。</p>
+  </div>
+  <h3>延伸阅读（按与本章的相关度排序）</h3>
+  <div class="further-reading"><div class="fr-item"><span class="fr-tag">教材</span><span class="fr-body"><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning（第 1 版）</a> <span class="muted small">（2013 · 已核验）</span><span class="fr-why">为什么读：ISLR 附录给出常用分布与矩的速查。</span></span></div><div class="fr-item"><span class="fr-tag">理论</span><span class="fr-body"><a href="../resources.html#r-t03">中心极限定理</a> <span class="muted small">（1810 · 权威共识）</span><span class="fr-why">为什么读：中心极限定理里程碑条目，衔接到模块 05 的抽样分布。</span></span></div><div class="fr-item"><span class="fr-tag">工具</span><span class="fr-body"><a href="https://numpy.org/" target="_blank" rel="noopener">NumPy / SciPy</a> <span class="muted small">（2006 · 权威共识）</span><span class="fr-why">为什么读：NumPy / SciPy 官方 distributions 文档：各分布的参数化口径。</span></span></div></div>
+</section>
+<!-- V3:TAIL:END -->
+      <div class="flex-between mt-6">
+        <div class="muted small">继续学习下一章，或标记本章完成以记录进度。</div>
+        <button class="btn primary" data-complete-btn="m04">标记本章完成</button>
+      </div>
+
+      <nav class="module-nav">
+        <a class="prev" href="m03-probability.html"><span class="dir">← 上一篇</span><span class="ttl">03 · 概率论基础</span></a>
+        <a class="next" href="m05-inference.html"><span class="dir">下一篇 →</span><span class="ttl">05 · 统计推断：估计与检验</span></a>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">本页目录</div>
+    <nav id="toc-list"></nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <p><span data-site-footer></span> · 数据更新 2026-11-07</p>
+  <p>内容与来源见 <a href="../resources.html">资源库</a> · <a href="../timeline.html">时间线</a> · <a href="../glossary.html">术语表</a> · <a href="../roadmap.html">学习路线图</a> · <a href="../DATA-GUIDE.md">数据维护说明</a> · <a href="../TEMPLATE-GUIDE.md">模板复用指南</a></p>
+</footer>
+
+<button class="back-top" id="back-top" aria-label="返回顶部">↑</button>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="搜索概念、公式、例题…">
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-hint">输入关键词搜索章节、概念、公式或例题。</div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/vendor/katex/dist/katex.min.js"></script>
+<script src="../assets/vendor/katex/dist/contrib/auto-render.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site-data.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script src="../assets/js/learning-index.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/site-ui.js"></script>
+<script src="../assets/js/learning.js"></script>
+</body>
+</html>

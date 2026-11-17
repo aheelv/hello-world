@@ -1,0 +1,442 @@
+<h2 id="d-deep-1">深度专题一 · 共轭与非共轭：解析可算性究竟花掉了什么</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>把后验算出来，要拿什么去换</h3></div>
+  <p class="dt-lead">本章正文已经会手算 $Beta(\alpha,\beta)\to Beta(\alpha+s,\ \beta+n-s)$。这一节追问一个更根本的问题：这种「参数直接相加」的便利，是用什么换来的，以及什么时候这笔交易不划算。</p>
+
+  <h4>背景：一个算不出来的积分</h4>
+  <p>贝叶斯推断的发动机是 $p(\theta\mid x)=p(x\mid\theta)p(\theta)/p(x)$，而分母 $p(x)=\int p(x\mid\theta)p(\theta)\,d\theta$ 在绝大多数真实模型里没有闭式解。在计算机普及之前，统计学家想出一个巧办法：把先验挑成与似然「配套」的分布族，使后验仍落在同一族里，只改变少数几个参数。这套做法由 Raiffa 与 Schlaifer 在 1960 年前后系统化为<strong>共轭先验</strong>，让贝叶斯推断可以纯手算完成。当时它被看作一个无害的技术限制；直到层级模型、非指数族似然、双峰先验进入视野，人们才意识到被限制的不是计算步骤，而是<strong>模型能表达的世界</strong>。</p>
+
+  <h4>直觉：一本只有两格的账本</h4>
+  <p>把后验想成一本账。共轭结构相当于一本固定格式的账本，只有「成功格」和「失败格」两个格子：每来一批数据，只往两格里各加一个数，永远不用翻回去重排；所以更新是 $O(1)$，还能把「本轮后验」直接当「下轮先验」连续记下去。非共轭则像每来一批数据都得把整本账重排一遍——要么做数值积分，要么跑采样或优化。</p>
+  <p>但固定两格的账本只记得住「一共成功多少次、一共失败多少次」。你想记「前一千人完课率高、后一千人完课率低」这种<strong>时间漂移</strong>，或者「我事先认为完课率要么很低、要么很高，中间不太可能」这种<strong>双峰信念</strong>，账本里根本没有对应格子。于是所谓「解析可算」，其实是拿「把信念压缩成两个数」去换「永远不用算积分」；被压缩掉的，正是数据里的结构与先验里的形状。这就是代价，而且它<strong>不会因为数据变多而退还</strong>。</p>
+
+  <h4>形式化：指数族里的「相加」从哪来</h4>
+  <p>先看似然。若它属于指数族，就能写成「数据摘要」与「参数函数」相乘再取指数的形式：</p>
+  $$ p(x\mid\theta)=h(x)\exp\bigl(\eta(\theta)^{\top}T(x)-A(\theta)\bigr) $$
+  <p class="dt-lead">白话：$T(x)$ 是数据被压缩后剩下的<strong>充分统计量</strong>（二项分布里就是成功数 $s$ 与试验数 $n$），$\eta,A$ 只跟参数有关，$h(x)$ 与参数无关。常见二项、正态、泊松都在这一族里。</p>
+
+  <p>共轭先验<strong>故意</strong>写成和似然同样的形状：</p>
+  $$ p(\theta\mid\tau_0,\nu_0)\ \propto\ \exp\bigl(\eta(\theta)^{\top}\tau_0-\nu_0 A(\theta)\bigr) $$
+  <p class="dt-lead">白话：先验与似然「同形状」，乘起来还是同形状，所以后验不用重新识别分布。$\tau_0$ 是「事前的摘要」，$\nu_0$ 是「事前的伪观测数」。</p>
+
+  <p>把 $n$ 个观测相乘，充分统计量累加为 $T_{\text{tot}}=\sum_{i=1}^{n}T(x_i)$，后验的全部更新就是：</p>
+  $$ \tau_n=\tau_0+T_{\text{tot}},\qquad \nu_n=\nu_0+n $$
+  <p class="dt-lead">白话：共轭更新的全部内容只是<strong>两个数分别相加</strong>——没有积分、没有优化、没有随机数、没有收敛诊断。这是「解析可算性」四个字的确切含义。</p>
+
+  <p>落到共享案例「知学云」上：先验取 $Beta(2,2)$，$n=12000$ 名学员中完课 $s=5967$ 人，未完课 $f=12000-5967=6033$ 人，于是</p>
+  $$ p(\theta\mid x)=Beta(2+5967,\ 2+6033)=Beta(5969,\ 6035) $$
+  <p class="dt-lead">白话：$\alpha$ 是「事前成功计数」，$\beta$ 是「事前失败计数」，各加一次即可；整个后验被压进 $(5969,6035)$ 两个数里。</p>
+  $$ E(\theta\mid x)=\frac{5969}{5969+6035}=\frac{5969}{12004}=0.497251 $$
+  <p class="dt-lead">白话：后验均值就是一个除法，与站点共享案例数字严格一致。</p>
+
+  <p>现在看被压掉了什么。共轭后验<strong>只</strong>由 $(s,n)$ 决定：</p>
+  $$ T(x)=(s,n)\ \Longrightarrow\ \text{任意满足 } s'=s,\ n'=n \text{ 的数据集给出同一后验} $$
+  <p class="dt-lead">白话：把 12000 条记录的到达顺序任意打乱、把完课记录挪到任何位置，后验一模一样。若真实机制里存在「学期初完课率高、期末走低」的漂移，$(s,n)$ 对它就<strong>不再充分</strong>，而共轭结构会悄悄把这段信息平均掉。</p>
+
+  <p>再看先验形状的限制。若把先验换成双峰混合，$\tfrac12 Beta(2,8)+\tfrac12 Beta(8,2)$，似然仍是二项，则后验为</p>
+  $$ p(\theta\mid x)\ \propto\ \theta^{s}(1-\theta)^{n-s}\Bigl[\tfrac12 Beta(2,8)+\tfrac12 Beta(8,2)\Bigr] $$
+  $$ =\ w\,Beta(2+s,\ 8+n-s)+(1-w)\,Beta(8+s,\ 2+n-s) $$
+  <p>其中权重 $w$ 由两个分量的边缘似然之比决定：</p>
+  $$ w=\frac{B(2+s,\ 8+n-s)/B(2,8)}{B(2+s,\ 8+n-s)/B(2,8)+B(8+s,\ 2+n-s)/B(8,2)} $$
+  <p class="dt-lead">白话：结果不再是「一个 Beta」，而是「两个 Beta 的加权混合」，而且权重本身还要算 Beta 函数的比值。共轭性一破，计算并没有消失，只是从「加两个数」挪到了「算权重 + 维护两个分量」。</p>
+
+  <p>把代价列清楚，一共四条：</p>
+  <ul>
+    <li><strong>先验形状受限</strong>：$Beta(\alpha,\beta)$ 只有两个超参数，只能表达 $[0,1]$ 上的单峰信念；双峰、厚尾、点质量（spike）都写不出来。</li>
+    <li><strong>似然受限</strong>：必须属指数族且 $T(x)$ 维数固定；逻辑回归、含随机效应的层级模型、神经网络都不共轭。</li>
+    <li><strong>结构信息被丢弃</strong>：时间漂移、簇结构、个体异质性被压进 $(s,n)$ 后无法恢复。</li>
+    <li><strong>序贯方便但不可回退</strong>：只存两个数意味着无法「撤销某批数据」或做局部修正，除非重头再算。</li>
+  </ul>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>共轭 = 用「把先验锁进某个分布族 + 把数据压缩成固定维充分统计量」换「后验闭式解、$O(1)$ 空间、可序贯更新」；非共轭 = 用「每步算似然、采样或优化的计算预算」换「任意先验形状与任意似然」。二者不是精度高低之争，而是<strong>模型弹性</strong>与<strong>计算预算</strong>之间的交换率。共享案例里 $Beta(5969,6035)$ 这两个上万的大数，正是「压缩到极致」的标本：12000 条记录最终只剩两个整数。</div>
+
+  <h4>边界：什么时候这笔交易不成立</h4>
+  <p>在<strong>先验与似然不构成共轭对</strong>（例如混合先验、层级超先验、逻辑回归或神经网络似然），或<strong>真实数据生成机制含时间漂移与簇结构因而 $(s,n)$ 不再充分</strong>的条件下，「后验仍是同一族、只需存两个超参数」这一结论不成立，应改用 Metropolis–Hastings / NUTS 等 MCMC 采样或变分推断去近似后验，并把后验摘要的蒙特卡洛误差一并报告。</p>
+
+  <figure data-figure="flow-bayes-update"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 可信区间与置信区间：可操作的差别，以及先验何时不会被淹没</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>数值会趋同，但能回答的问题不会</h3></div>
+  <p class="dt-lead">正文的对照表已经说清「95%」的含义不同。这一节把差别落到可执行的动作上：哪些句子能说、哪些决策能算、停止规则改变后谁还站得住；再给出「数据必然淹没先验」这一流行说法的成立条件与四类反例。</p>
+
+  <h4>背景：两套保证，两种「随机」</h4>
+  <p>置信区间由 Neyman 在 1937 年给出，保证的是<strong>造区间这台机器</strong>的长期覆盖率；可信区间来自后验分布，保证的是<strong>参数本身</strong>落在区间里的概率。教科书常说「数值接近、解释不同」，容易让人以为只是措辞之差。实际上，一旦进入决策流程（要不要全量上线、要不要停机检修），这两句话会导向完全不同的操作。</p>
+
+  <h4>直觉：渔网与画圈</h4>
+  <p>把参数想成一条固定不动的鱼。置信区间像<strong>撒网</strong>：网是随机的，鱼是固定的；「95%」说的是「重复撒 100 次网，约 95 次会罩住这条鱼」。因此对着<strong>已经撒到的这一张网</strong>，不能说「鱼在网里的概率是 95%」——鱼要么在、要么不在，只是你不知道。可信区间像<strong>给鱼的位置画圈</strong>：参数被当作不确定的量，「95%」直接就是「鱼在这个圈里的概率」。</p>
+  <p>由此产生四条可操作差异：</p>
+  <ul>
+    <li><strong>能否直接回答概率问句</strong>。业务方问「完课率超过 $50\%$ 的概率有多大」，可信区间能直接算 $P(\theta &gt; 0.5\mid x)$；置信区间手里只有 p 值，回答的是「若真值恰好等于某个数，看到这份数据的概率」，方向反过来。</li>
+    <li><strong>能否做门槛门禁</strong>。规则「$P(\theta &gt; \theta_0\mid x) &gt; 0.95$ 才上线」是贝叶斯可以直接计算的；频率框架没有对应量，只能退回显著性检验。</li>
+    <li><strong>是否依赖停止规则</strong>。置信区间的 95% 建立在「样本量事先固定、只检验一次」之上；每天偷看、一显著就停（模块 08 的 peeking）会让覆盖率承诺失效。可信区间只用到已观测数据的后验，与你「原本打算什么时候停」无关，这叫<strong>似然原则</strong>。</li>
+    <li><strong>是否尊重参数空间边界</strong>。成功率 $\theta\in[0,1]$，Wald 置信区间 $\hat p\pm1.96\,\mathrm{se}$ 在小样本或 $\hat p$ 靠近 $0$、$1$ 时会越界到 $[0,1]$ 之外；可信区间取后验分位数，天然落在先验支撑集内，还可以是不对称的。</li>
+  </ul>
+
+  <h4>形式化：两行定义，两种随机变量</h4>
+  <p>置信区间（频率）：</p>
+  $$ P_{\theta}\bigl(L(X)\ \le\ \theta\ \le\ U(X)\bigr)\ \ge\ 1-\alpha $$
+  <p class="dt-lead">白话：随机的是端点 $L(X),U(X)$，$\theta$ 是固定常数；$P_{\theta}$ 的下标提醒我们概率是对「数据 $X$」取的。等号右边是「重复抽样时区间盖住真值的比例」。</p>
+
+  <p>可信区间（贝叶斯）：</p>
+  $$ P\bigl(\theta\in[q_{0.025},\ q_{0.975}]\mid x\bigr)=0.95 $$
+  <p class="dt-lead">白话：数据 $x$ 已经固定，$\theta$ 才有分布；条件竖线右边的 $x$ 说明概率是对「参数」取的。这句话可以直接念出口，不需要附加「假如重复做实验」。</p>
+
+  <p>决策量的差别最关键。贝叶斯能算</p>
+  $$ P(\theta&gt;\theta_0\mid x)=\int_{\theta_0}^{1}p(\theta\mid x)\,d\theta $$
+  <p class="dt-lead">白话：把后验曲线在门槛 $\theta_0$ 右侧的面积积分出来，就是「参数超过门槛」的概率。频率学派能算的 $p$ 值是 $P(\text{数据或更极端}\mid H_0)$，条件方向恰好相反，二者不能互换。</p>
+
+  <h4>形式化：先验到底什么时候被淹没</h4>
+  <p>后验均值可以写成「先验均值」与「频率估计」的加权平均，权重一目了然：</p>
+  $$ E(\theta\mid x)=\frac{(\alpha+\beta)\,\mu_0+n\,\hat p}{\alpha+\beta+n},\qquad w_0=\frac{\alpha+\beta}{\alpha+\beta+n} $$
+  <p class="dt-lead">白话：先验的话语权就是「先验伪计数 /（伪计数 + 数据量）」。$n$ 越大 $w_0$ 越小，看起来数据必然淹没先验。</p>
+
+  <p>代入共享案例：$\alpha+\beta=4$，$n=12000$，</p>
+  $$ w_0=\frac{4}{12004}=0.000333,\qquad E(\theta\mid x)=0.497251,\qquad \hat p=\frac{5967}{12000}=0.497250 $$
+  <p class="dt-lead">白话：先验只剩约 $0.03\%$ 的话语权，后验均值与极大似然估计只差约 $10^{-6}$ ——这一次，先验确实被淹没了。</p>
+
+  <p>把「淹没」写成定理，就是 Bernstein–von Mises 定理。在模型正则、先验在真值附近密度为正、参数可识别的条件下：</p>
+  $$ \sqrt{n}\,(\theta-\hat\theta_{\text{MLE}})\mid x\ \xrightarrow{\ d\ }\ N\bigl(0,\ I(\theta_0)^{-1}\bigr) $$
+  <p class="dt-lead">白话：$n$ 够大时后验自动变成以极大似然估计为中心、方差由 Fisher 信息 $I(\theta_0)$ 决定的正态，先验从公式里<strong>消失</strong>。这就是「数据淹没先验」的严格版本——注意它带着一串前提。</p>
+
+  <p>下面五类情形，前提不成立，先验<strong>不会</strong>被淹没：</p>
+  <ul>
+    <li><strong>（1）小样本</strong>：$n \ll \alpha+\beta$。用共享案例做小样本对照：只看 $n=8,\ s=5$ 人，后验 $Beta(7,5)$，均值 $7/12=0.583333$，而频率估计 $0.625000$，先验把估计往回拉了 $0.041667$；此时 $w_0=4/12=0.333333$，先验占三分之一话语权。</li>
+    <li><strong>（2）先验支撑集不含真值</strong>：若先验在 $\theta_0$ 附近密度为 $0$（硬约束先验），由 $p(\theta\mid x)\propto p(x\mid\theta)p(\theta)$ 可知该处后验恒为 $0$，再多数据也进不去；上面的加权平均公式直接失效。白话：事先把某个可能性判了死刑，数据翻不了案。</li>
+    <li><strong>（3）参数不可识别</strong>：$I(\theta_0)\to0$，BvM 的方差项爆炸，似然对参数几乎是平的，数据「没意见」，后验约等于先验。</li>
+    <li><strong>（4）高维稀疏 / 层级冷启动</strong>：总样本量可以很大，但分到每个条目头上的观测只有几个，$n_{\text{eff}}$ 很小；超先验持续主导。决定权不在总 $n$，而在「每个参数分到多少数据」。</li>
+    <li><strong>（5）结构性稀疏先验</strong>：spike-and-slab、horseshoe、L1 类先验主动把大量维度压到 $0$，收缩是结构性的而非一个数值投票，数据无法「淹没」它。</li>
+  </ul>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>两者的数值在大样本下趋同，但「能回答的问题」不同：可信区间允许 $P(\theta\in\cdot\mid x)$、$P(\theta&gt;\theta_0\mid x)$ 这类<strong>直接概率陈述</strong>，不依赖停止规则、不越出参数空间、可自然不对称；置信区间只承诺固定抽样计划下的重复覆盖率，一旦改动停止规则或样本量，该承诺即失效。而「数据必然淹没先验」是 Bernstein–von Mises 正则条件下的<strong>渐近结论</strong>，不是无条件真理——共享案例 $w_0=0.000333$ 只是它成立时的一个样本点。</div>
+
+  <h4>边界：什么时候不能套用「淹没」</h4>
+  <p>在<strong>先验支撑集不含真实参数、参数不可识别、样本量远小于先验伪计数（$n \ll \alpha+\beta$）、或采用结构性稀疏先验</strong>的条件下，「数据会淹没先验、可信区间与置信区间数值趋同」这一结论不成立，应改用<strong>多组先验的敏感性分析</strong>（换几组合理先验逐一重算，比较区间宽度与决策结论是否翻转），并把后验对先验的显式依赖一并报告，而不是直接套用正态近似或 $w_0\to0$ 的渐近式。</p>
+
+  <figure data-classic="0"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · Metropolis–Hastings MCMC</h2>
+<div class="algo-spec">
+
+  <h3>1. 原理：让链的稳态分布恰好是后验</h3>
+  <p>目标是从 $p(\theta\mid x)$ 抽样，从而绕开算不出来的 $p(x)$。做法是构造一条马尔可夫链，使它的<strong>平稳分布</strong>就是后验。充分条件是<strong>细致平衡</strong>：任取两点，来回流动的概率质量相等，链就不会在某处堆积或流失。</p>
+  $$ \pi(\theta)\,q(\theta'\mid\theta)\,\alpha(\theta,\theta')\ =\ \pi(\theta')\,q(\theta\mid\theta')\,\alpha(\theta',\theta) $$
+  <p class="dt-lead">白话：$\pi$ 是想要的平稳分布（后验），$q$ 是「从当前点提议下一个点」的分布，$\alpha$ 是接受概率；等式要求「$\theta\to\theta'$ 的流量」等于「$\theta'\to\theta$ 的流量」。</p>
+
+  <p>把它解出来，就是 Metropolis–Hastings 接受率：</p>
+  $$ \alpha=\min\left(1,\ \frac{\tilde p(\theta'\mid x)\,q(\theta\mid\theta')}{\tilde p(\theta\mid x)\,q(\theta'\mid\theta)}\right),\qquad \tilde p(\theta\mid x)=p(x\mid\theta)\,p(\theta) $$
+  <p class="dt-lead">白话：分子分母里的归一化常数 $p(x)$ 被约掉了，所以只需要能逐点计算「似然 $\times$ 先验」，这正是它绕开积分的关键。</p>
+
+  <p>若用<strong>对称随机游走</strong>提议（$\theta'=\theta^{(t)}+\eta$，$\eta\sim N(0,\tau^2)$），则 $q(\theta\mid\theta')=q(\theta'\mid\theta)$，公式简化为：</p>
+  $$ \alpha=\min\left(1,\ \frac{\tilde p(\theta'\mid x)}{\tilde p(\theta^{(t)}\mid x)}\right) $$
+  <p class="dt-lead">白话：往密度更高处走必接受；往密度更低处走，以「密度比值」为概率接受。<strong>允许下坡</strong>，链才不会卡在局部高峰、才能遍历整个后验。</p>
+
+  <p>几何解释：这条链在参数空间里随机行走，在高密度区域停留更久；长期来看，停留在各处的<strong>时间比例正比于后验密度</strong>，于是「把链上的点当样本」就等价于从后验抽样。共享案例的后验 $Beta(5969,6035)$ 极尖（$\mathrm{sd}\approx0.004563$），正好用来演示：步长稍大就会被拒绝，步长稍小链又走得慢。</p>
+
+  <h3>2. 编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>选起点</strong> $\theta^{(0)}$。取先验均值或粗略估计即可，例如 $\theta^{(0)}=0.5$。</li>
+    <li><strong>定提议与预算</strong>：对称随机游走 $N(0,\tau^2)$，给总步数 $T$、预热步数 $T_b$、链数 $C\ \ge\ 2$，并固定随机种子以便复现。</li>
+    <li><strong>提议</strong>：第 $t$ 步抽 $\theta'=\theta^{(t)}+\eta$，$\eta\sim N(0,\tau^2)$；若 $\theta'$ 越出参数空间（如 $[0,1]$），直接判为拒绝并原地记一次。</li>
+    <li><strong>算接受率（务必取对数）</strong>：$\log\alpha=\log\tilde p(\theta')-\log\tilde p(\theta^{(t)})$，再取 $\alpha=\min(1,\ e^{\log\alpha})$。共享案例的核是 $\theta^{5968}(1-\theta)^{6034}$，直接算会下溢成 $0$，必须用 $\log\tilde p(\theta)=5968\ln\theta+6034\ln(1-\theta)$。</li>
+    <li><strong>掷骰子</strong>：抽 $u\sim U(0,1)$；若 $\log u &lt; \log\alpha$ 则接受 $\theta^{(t+1)}=\theta'$，否则拒绝并令 $\theta^{(t+1)}=\theta^{(t)}$。<strong>拒绝时也必须把当前值再记一次样本</strong>，跳过会让稳态分布偏移。</li>
+    <li><strong>重复</strong>第 3–5 步共 $T$ 次，得到一条链；用 $C$ 个不同起点与种子各跑一条。</li>
+    <li><strong>诊断</strong>：丢弃前 $T_b$ 步（burn-in），再看轨迹图、$\hat R$（多链链间 / 链内方差比）、ESS（有效样本量）、经验接受率；任一不达标就回到第 2 步调 $\tau$ 或加长 $T$。</li>
+    <li><strong>报告</strong>：用保留样本算均值、标准差、$2.5\%$ / $97.5\%$ 分位数，并给出蒙特卡洛标准误 $\mathrm{sd}/\sqrt{\mathrm{ESS}}$；不要把步数 $T$ 当样本量写进结论。</li>
+  </ol>
+
+  <h3>3. 适用条件</h3>
+  <ul>
+    <li><strong>数据假设</strong>：能逐点计算未归一化对数后验 $\log\tilde p$（似然与先验都可调用）；观测可交换、似然可分解，每步扫描 $n$ 条数据。</li>
+    <li><strong>规模</strong>：中低维（经验上 $d$ 在个位数到二十几）；$n$ 不宜大到每步 $O(n)$ 都难以承受。</li>
+    <li><strong>分布与特征类型</strong>：参数连续、后验单峰或近似单峰；提议分布支撑集必须覆盖后验支撑集，链需不可约、非周期、正常返，遍历定理才成立。</li>
+    <li><strong>失效边界</strong>：后验多峰（随机游走困在单峰）应改用并行回火；高维强相关应改用 HMC / NUTS；含离散参数应改用 Gibbs；似然不可算应改用 ABC 或伪边际方法；数据极大应改用随机梯度 MCMC 或子采样 MH。</li>
+  </ul>
+
+  <div class="complexity">
+    <b>训练（采样）</b>：每步 $O(n\,d)$（扫全量数据算对数似然），$T$ 步共 $O(T\,n\,d)$；
+    <b>推理（后验摘要）</b>：均值 / 方差 $O(T)$，分位数需排序 $O(T\log T)$；
+    <b>空间</b>：仅当前状态 $O(d)$，保留全链做诊断 $O(T\,d)$，多链并行乘以 $C$；
+    <b>通信</b>：$O(C\,d)$，与 $n$ 无关。
+  </div>
+  <p class="dt-lead">白话：贵的不是内存，是「每一步都要把全量数据过一遍」以及「相邻样本高度相关，不得不跑很多步」。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>渐近精确：步数足够时逼近真后验，无系统性近似偏差。</li>
+        <li>只需<strong>未归一化</strong>后验，天然绕开 $p(x)$ 这个算不动的积分。</li>
+        <li>先验与似然可任意指定，不受共轭族限制——正是专题一的解药。</li>
+        <li>输出是样本，均值、分位数、$P(\theta&gt;\theta_0\mid x)$ 都能直接读。</li>
+        <li>有明确的收敛诊断量（$\hat R$、ESS）可审计，不是黑箱。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>相邻样本自相关，$\mathrm{ESS}\ll T$；十万步可能只有几千个有效样本。</li>
+        <li>收敛没有绝对判据，$\hat R$ 接近 $1$ 只是必要而非充分（多峰时各链可一起困住）。</li>
+        <li>提议步长需手调：过大几乎全拒绝、链卡住；过小游走慢、自相关强。</li>
+        <li>每步 $O(n)$，海量数据下成本高；高维与多峰后验混合极慢。</li>
+        <li>结果是随机的，必须固定种子并报告 MC 标准误才能复现。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>4. 示例推演：手算到底</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>共享案例：先验 $Beta(2,2)$，$n=12000$，$s=5967$，失败数 $f=6033$。目标后验 $Beta(5969,6035)$，其未归一化核为 $\tilde p(\theta)=\theta^{5968}(1-\theta)^{6034}$。</div>
+    <div class="solve-step"><span class="ss-k">后验均值。</span>$E(\theta\mid x)=\dfrac{5969}{5969+6035}=\dfrac{5969}{12004}=0.497251$，与站点共享案例数字一致。</div>
+    <div class="solve-step"><span class="ss-k">后验方差与标准差。</span>$\mathrm{Var}=\dfrac{5969\times6035}{12004^{2}\times12005}=\dfrac{36\,022\,915}{1.7299\times10^{12}}\approx2.0823\times10^{-5}$，故 $\mathrm{sd}\approx0.004563$。白话：12000 条数据把成功率锁在约 $\pm0.46$ 个百分点内。</div>
+    <div class="solve-step"><span class="ss-k">95% 可信区间（正态近似）。</span>$0.497251\pm1.96\times0.004563=(0.488307,\ 0.506195)$。这是后面判断采样是否可信的参照。</div>
+    <div class="solve-step"><span class="ss-k">MH 单步：取对数核。</span>$\log\tilde p(\theta)=5968\ln\theta+6034\ln(1-\theta)$。当前 $\theta^{(t)}=0.50$，对称提议 $\theta'=0.51$（步长 $0.01$），$q$ 之比 $=1$。</div>
+    <div class="solve-step"><span class="ss-k">算对数接受率。</span>$\ln(0.51/0.50)=\ln1.02=0.019803$，$\ln(0.49/0.50)=\ln0.98=-0.020203$；$\log\alpha=5968\times0.019803+6034\times(-0.020203)=118.182-121.903=-3.721$。</div>
+    <div class="solve-step"><span class="ss-k">还原接受率。</span>$\alpha=e^{-3.721056}=0.024208$。若 $u=0.01 &lt; 0.024208$ 接受；若 $u=0.50 &gt; 0.024208$ 拒绝并原地记一次样本。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>仅 $2.4\%$ 接受率，因为 $0.50$ 已在均值上方约 $0.6$ 个标准差，再跳 $+0.01$ 相当于往尾部走约 $2.8$ 个标准差。可见接受率由「当前位置 + 步长」共同决定，不能凭直觉拍；也说明必须用 log 核逐点算。</div>
+    <div class="solve-step"><span class="ss-k">R-hat 手算（教学迷你链，两个起点各 6 个保留样本，单位放大 $10^{3}$ 倍）。</span>链 1：$496,498,500,497,499,498$，均值 $498$；链 2：$498,500,502,499,501,500$，均值 $500$；总均值 $499$。</div>
+    <div class="solve-step"><span class="ss-k">链内方差 W。</span>两链离差平方和都是 $10$，各除以 $n-1=5$ 得 $2.0$，故 $W=2.0$。链间方差 $B=\dfrac{n}{C-1}\sum(\bar\theta_j-\bar\theta)^2=6\times(1+1)=12.0$。</div>
+    <div class="solve-step"><span class="ss-k">合成与判定。</span>$\widehat{\mathrm{var}}^{+}=\dfrac{n-1}{n}W+\dfrac{B}{n}=\dfrac56\times2+\dfrac{12}{6}=3.6667$，$\hat R=\sqrt{3.6667/2.0}=1.3540 &gt; 1.1$ → <strong>判定未收敛</strong>。白话：两条链均值只差 2 个单位、样本又只有 6 个，$B$ 被 $n$ 放大后立刻报警；$\hat R$ 对「链间漂移」很敏感，样本太少时诊断本身也不稳。</div>
+    <div class="solve-step"><span class="ss-k">ESS 手算（另一条 6 点链，演示正相关）。</span>取 $494,495,497,499,501,502$，均值 $498$，离差 $d=[-4,-3,-1,1,3,4]$，$\sum d^{2}=52$；$\sum_{t=1}^{5}d_td_{t+1}=12+3-1+3+12=29$，$\hat\rho_1=29/52=0.5577$。</div>
+    <div class="solve-step"><span class="ss-k">折算有效样本。</span>$\mathrm{ESS}\approx\dfrac{n}{1+2\rho_1}=\dfrac{6}{1+1.1154}=2.84$。白话：6 步只相当于约 2.8 个独立样本——这条链有明显上升趋势，正是「还没忘记起点」的形态。真实实现会按 Geyer 初始正序列累加多个滞后，但结论一致：<strong>看 ESS，不看步数</strong>。</div>
+  </div>
+
+  <h3>5. 横向对比：六维口径</h3>
+  <table class="compare-table">
+    <thead><tr><th>维度</th><th>Metropolis–Hastings（本章）</th><th>Beta-Binomial 共轭解析更新</th><th>Gibbs 采样</th><th>变分推断 VI（平均场）</th></tr></thead>
+    <tbody>
+      <tr><th>适用条件</th><td>任意可逐点算 $\log\tilde p$ 的后验；连续、中低维、近似单峰</td><td>先验与似然须属同一共轭对；$(s,n)$ 对参数充分</td><td>满条件分布可解析抽样；参数可分块、后验相关不太强</td><td>分布族 $\mathcal Q$ 可参数化、ELBO 可优化；规模大、要速度</td></tr>
+      <tr><th>复杂度</th><td>采样 $O(T\,n\,d)$；分位 $O(T\log T)$；空间 $O(T\,d)$</td><td class="best">一次扫描 $O(n)$；空间 $O(1)$；序贯更新 $O(1)$</td><td>每轮 $O(k\,n)$；空间 $O(k)$；无需调步长</td><td>$O(\text{迭代}\times n\,d)$；空间 $O(d)$；可与自动微分结合</td></tr>
+      <tr><th>关键超参</th><td>提议步长 $\tau$、总步数 $T$、预热 $T_b$、链数 $C$、种子</td><td>先验强度 $\alpha_0+\beta_0$（伪计数）</td><td>分块方式、扫描顺序、迭代轮数</td><td>变分族结构、学习率、ELBO 收敛容差</td></tr>
+      <tr><th>优点</th><td class="best">渐近精确；只需未归一化后验；任意先验 / 似然；诊断可审计</td><td>闭式、可手算、无 MC 误差、天然流式</td><td>接受率恒为 $1$、无步长调参；条件独立时高效</td><td>最快、可扩展到海量数据、易嵌入训练管线</td></tr>
+      <tr><th>局限与失效边界</th><td>自相关、多峰 / 高维混合慢、收敛需诊断、每步 $O(n)$</td><td>先验族受限、结构信息被压掉；非共轭即失效</td><td>满条件难抽时不可用；参数强相关时混合极慢</td><td>系统性低估方差；平均场漏掉依赖；无渐近精确保证</td></tr>
+      <tr><th>可解释性与工程成本</th><td>需跑 $\hat R$ / ESS / 轨迹图并报告 MC 标准误，成本最高</td><td class="best">一行公式可读、零运维，成本最低</td><td>需推导每个满条件，调试成本中等</td><td>输出是优化结果，需查 ELBO 曲线与校准，成本中等</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="d-code">代码实验 · 共轭更新、先验淹没与 MH 收敛诊断</h2>
+<p>下面这段程序只用 Python 标准库，把专题一、专题二与算法详解里的每个数字都算了一遍：先做共享案例的共轭更新，再对照小样本下先验不被淹没的情形，接着手算 MH 单步接受率，最后跑两条链并输出 $\hat R$ / ESS 与步长扫描。固定种子，输出可逐字复现。</p>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow">可复现：固定种子 20261107 / 20261108，不依赖 numpy / scipy / pandas</span></div>
+  <pre># -*- coding: utf-8 -*-
+"""m07 代码实验：共轭更新、先验淹没、MH 采样与 R-hat/ESS 诊断（纯标准库）"""
+import math, random
+
+# ---- 1) 共享案例的 Beta-Binomial 共轭更新 ----
+N, S = 12000, 5967          # 知学云：12000 名学员，5967 人完课
+a0, b0 = 2, 2                # 先验 Beta(2,2)
+a, b = a0 + S, b0 + (N - S)
+post_mean = a / (a + b)
+post_var = a * b / ((a + b) ** 2 * (a + b + 1))
+post_sd = math.sqrt(post_var)
+freq = S / N
+w0 = (a0 + b0) / (a0 + b0 + N)   # 先验权重
+print("[1] Beta-Binomial 共轭更新")
+print("    prior        : Beta(%d, %d)" % (a0, b0))
+print("    posterior    : Beta(%d, %d)" % (a, b))
+print("    post mean    : %.6f" % post_mean)
+print("    freq (MLE)   : %.6f" % freq)
+print("    prior weight : %.6f  (= (a0+b0)/(a0+b0+N))" % w0)
+print("    post sd      : %.6f" % post_sd)
+print("    95%% CrI(normal): [%.6f, %.6f]" % (post_mean - 1.96*post_sd, post_mean + 1.96*post_sd))
+
+# ---- 2) 小样本：先验没被淹没 ----
+n2, s2 = 8, 5
+a2, b2 = a0 + s2, b0 + (n2 - s2)
+print("[2] 小样本对照 n=8, s=5")
+print("    posterior    : Beta(%d, %d)" % (a2, b2))
+print("    post mean    : %.6f  freq=%.6f  prior pull=%.6f" % (a2/(a2+b2), s2/n2, s2/n2 - a2/(a2+b2)))
+print("    prior weight : %.6f" % ((a0+b0)/(a0+b0+n2)))
+
+# ---- 3) MH 单步手算（用 log 核，避免下溢）----
+def log_kernel(t, a, b):
+    return (a - 1) * math.log(t) + (b - 1) * math.log1p(-t)
+
+cur, prop = 0.50, 0.51
+log_ratio = log_kernel(prop, a, b) - log_kernel(cur, a, b)
+acc = min(1.0, math.exp(log_ratio))
+print("[3] MH 单步（对称随机游走，q 之比 = 1）")
+print("    theta=%.2f -&gt; %.2f" % (cur, prop))
+print("    log alpha   : %.6f" % log_ratio)
+print("    alpha       : %.6f" % acc)
+
+# ---- 4) MH 采样共享案例后验 + 收敛诊断 ----
+def mh_chain(seed, T=20000, burn=2000, step=0.004):
+    r = random.Random(seed)
+    x, chain, accepts = 0.50, [], 0
+    lk = log_kernel(x, a, b)
+    for t in range(T):
+        y = x + r.gauss(0.0, step)
+        if 0.0 &lt; y &lt; 1.0:
+            ly = log_kernel(y, a, b)
+            if math.log(r.random()) &lt; ly - lk:
+                x, lk = y, ly
+                accepts += 1
+        chain.append(x)
+    return chain[burn:], accepts / T
+
+def ess(xs):
+    T = len(xs)
+    m = sum(xs) / T
+    den = sum((v - m) ** 2 for v in xs)
+    rho1 = sum((xs[i] - m) * (xs[i+1] - m) for i in range(T - 1)) / den
+    return T / (1 + 2 * rho1), rho1
+
+def rhat(chains):
+    C, n = len(chains), len(chains[0])
+    means = [sum(c) / n for c in chains]
+    grand = sum(means) / C
+    B = n * sum((m - grand) ** 2 for m in means) / (C - 1)
+    W = sum(sum((v - m) ** 2 for v in c) / (n - 1) for c, m in zip(chains, means)) / C
+    varp = (n - 1) / n * W + B / n
+    return math.sqrt(varp / W), W, B
+
+c1, ar1 = mh_chain(20261107)
+c2, ar2 = mh_chain(20261108)
+allx = c1 + c2
+m = sum(allx) / len(allx)
+sd = math.sqrt(sum((v - m) ** 2 for v in allx) / (len(allx) - 1))
+srt = sorted(allx)
+q025 = srt[int(0.025 * len(srt))]
+q975 = srt[int(0.975 * len(srt))]
+e, rho1 = ess(c1)
+rh, W, B = rhat([c1, c2])
+print("[4] MH 采样（2 链 x 18000 保留步，步长 0.004）")
+print("    accept rate : %.4f / %.4f" % (ar1, ar2))
+print("    sample mean : %.6f   (解析值 0.497251)" % m)
+print("    sample sd   : %.6f   (解析值 %.6f)" % (sd, post_sd))
+print("    95%% CrI     : [%.6f, %.6f]" % (q025, q975))
+print("    rho1=%.4f   ESS(链1)=%.1f / %d" % (rho1, e, len(c1)))
+print("    W=%.8f  B=%.8f  R-hat=%.4f" % (W, B, rh))
+
+# ---- 5) 提议步长对混合效率的影响 ----
+print("[5] 步长扫描（单链，T=20000，burn=2000）")
+for step in (0.002, 0.004, 0.008, 0.012):
+    ch, ar = mh_chain(777, step=step)
+    ee, rr = ess(ch)
+    print("    step=%.3f  accept=%.4f  rho1=%.4f  ESS=%6.1f  ESS/T=%.3f" % (step, ar, rr, ee, ee/len(ch)))
+</pre>
+  <div class="run-output">
+    <div class="ro-head">真实运行输出（python3 直接执行上方代码所得 stdout）</div>
+    <pre>[1] Beta-Binomial 共轭更新
+    prior        : Beta(2, 2)
+    posterior    : Beta(5969, 6035)
+    post mean    : 0.497251
+    freq (MLE)   : 0.497250
+    prior weight : 0.000333  (= (a0+b0)/(a0+b0+N))
+    post sd      : 0.004563
+    95% CrI(normal): [0.488307, 0.506195]
+[2] 小样本对照 n=8, s=5
+    posterior    : Beta(7, 5)
+    post mean    : 0.583333  freq=0.625000  prior pull=0.041667
+    prior weight : 0.333333
+[3] MH 单步（对称随机游走，q 之比 = 1）
+    theta=0.50 -&gt; 0.51
+    log alpha   : -3.721056
+    alpha       : 0.024208
+[4] MH 采样（2 链 x 18000 保留步，步长 0.004）
+    accept rate : 0.7356 / 0.7349
+    sample mean : 0.497281   (解析值 0.497251)
+    sample sd   : 0.004564   (解析值 0.004563)
+    95% CrI     : [0.488306, 0.506354]
+    rho1=0.8076   ESS(链1)=6882.7 / 18000
+    W=0.00002083  B=0.00004362  R-hat=1.0000
+[5] 步长扫描（单链，T=20000，burn=2000）
+    step=0.002  accept=0.8653  rho1=0.9242  ESS=6319.5  ESS/T=0.351
+    step=0.004  accept=0.7366  rho1=0.8020  ESS=6912.6  ESS/T=0.384
+    step=0.008  accept=0.5448  rho1=0.6407  ESS=7889.7  ESS/T=0.438
+    step=0.012  accept=0.4174  rho1=0.6279  ESS=7979.3  ESS/T=0.443</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">0.497251 / 0.497250</span>分别对应专题二的 $E(\theta\mid x)$ 与 $\hat p$。两者相差约 $10^{-6}$，正是 $w_0=0.000333$ 的后果：先验被 12000 条数据淹没，共轭后验均值几乎贴上极大似然估计。改先验为 $Beta(200,200)$ 时 $w_0$ 升到约 $0.032$，这个差会放大约一百倍。</p>
+    <p><span class="ci-k">0.000333</span>是 $4/12004$，专题二里「先验话语权」的精确值。<span class="ci-k">0.004563</span>是后验标准差，乘 $1.96$ 得 $\pm0.008944$，即输出里的 $95\%$ 可信区间 $[0.488307,\ 0.506195]$ ——它完全落在 $[0,1]$ 内，印证了「可信区间不越界」那条可操作差异。</p>
+    <p><span class="ci-k">0.583333 / 0.625000 / 0.041667 / 0.333333</span>是专题二反例（1）的小样本对照：只有 8 个观测时 $Beta(2,2)$ 仍占 $1/3$ 权重，把频率估计 $0.625$ 拉回到 $0.583333$，拉动量 $0.041667$。若把 $n$ 从 8 提到 12000，这一拉动量按 $w_0$ 同比例衰减到可忽略。</p>
+    <p><span class="ci-k">-3.721056 / 0.024208</span>是算法详解「手算到底」里 MH 单步的 $\log\alpha$ 与 $\alpha$：代码用 `log_kernel` 复算，与手算的 $5968\ln(1.02)+6034\ln(0.98)$ 完全一致。它也说明为什么必须用对数核——直接算 $\theta^{5968}(1-\theta)^{6034}$ 会下溢成 $0$。</p>
+    <p><span class="ci-k">0.497281 vs 0.497251</span>是两条链共 36000 个保留样本的均值与解析值之差，约 $3.0\times10^{-5}$。蒙特卡洛标准误约为 $\mathrm{sd}/\sqrt{\mathrm{ESS}}\approx0.004563/\sqrt{6882.7}\approx5.5\times10^{-5}$，差值落在 $1$ 个标准误内，链可信。<span class="ci-k">0.004564 vs 0.004563</span>、<span class="ci-k">[0.488306, 0.506354] vs [0.488307, 0.506195]</span>同理，采样分位数与解析正态近似吻合。</p>
+    <p><span class="ci-k">0.7356 / 0.7349</span>是两条链的经验接受率，明显高于一维随机游走的理论最优约 $0.44$，说明步长 $0.004$ 偏小。<span class="ci-k">rho1=0.8076 与 ESS=6882.7/18000</span>把后果量化了：18000 步只有约 $38\%$ 是有效样本，与算法详解第 8 步「不要把 $T$ 当样本量」严格对应。</p>
+    <p><span class="ci-k">W=0.00002083 / B=0.00004362 / R-hat=1.0000</span>：虽然链间方差 $B$ 的绝对值大于链内方差 $W$，但 $B$ 在 $\widehat{\mathrm{var}}^{+}=((n-1)/n)W+B/n$ 里被 $n=18000$ 除掉后只剩约 $2.4\times10^{-9}$，相对 $W$ 可忽略，故 $\hat R$ 保留四位小数为 $1.0000$，判定收敛。对照手算的迷你链 $\hat R=1.3540$，可见「链数少 + 样本少 + 链均值有漂移」会立刻让诊断报警。</p>
+    <p><span class="ci-k">步长扫描四行</span>把调参逻辑变成可测量事实：步长从 $0.002$ 增到 $0.012$，接受率从 $0.8653$ 降到 $0.4174$（逼近最优 $0.44$），$\rho_1$ 从 $0.9242$ 降到 $0.6279$，$\mathrm{ESS}/T$ 从 $0.351$ 升到 $0.443$。改种子会小幅改变末位数字，但「步长偏小 → 自相关强 → ESS 低」的单调关系不会变；这就是把 $\tau$ 列为关键超参的原因。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>Metropolis–Hastings 从任意可逐点计算密度的后验中抽取相关样本，用样本近似后验均值、标准差、分位数与 $P(\theta&gt;\theta_0\mid x)$。它<strong>不做</strong>点估计优化，也<strong>不</strong>自动判断模型对错；模型检查需另做后验预测。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：可调用的 $\log\tilde p(\theta)=\log p(x\mid\theta)+\log p(\theta)$、起点 $\theta^{(0)}$、对称提议分布（步长 $\tau$）、总步数 $T$、预热 $T_b$、链数 $C$、随机种子。输出：$C$ 条保留样本链（量纲与 $\theta$ 相同）、后验摘要（均值 / sd / 分位数）、诊断量（经验接受率、$\hat R$、ESS、MC 标准误）。</td></tr>
+    <tr><th>适用场景</th><td>非共轭先验或层级模型；中低维连续参数；需要高保真可信区间、不对称后验、或「参数超过业务门槛的概率」的决策；小样本需借先验稳定估计；模型比较需边缘似然的近似。</td></tr>
+    <tr><th>关键参数</th><td>提议步长 $\tau$（最敏感，建议按后验 sd 的约 $2.4$ 倍起调，调到接受率约 $0.2$–$0.5$）、总步数 $T$（默认 20000）、预热 $T_b$（默认 2000）、链数 $C\ \ge\ 2$（默认 2）、随机种子（默认固定值）。判停方向：接受率达标、$\hat R &lt; 1.01$、$\mathrm{ESS}$ 足够大（如大于 1000）且 MC 标准误小于业务可容忍误差，再报告摘要。</td></tr>
+    <tr><th>边界条件</th><td>在先验支撑集不含真值、参数不可识别、后验多峰且随机游走无法跨峰、维度 $d$ 很大而每步 $O(n)$ 似然不可承受、或似然本身不可计算时，本算法不适用，应分别改用 NUTS / HMC（连续高维）、并行回火（多峰）、Gibbs 采样（离散或满条件易抽）、变分推断（海量数据）或 ABC / 伪边际方法（似然不可算）。</td></tr>
+    <tr><th>常见问题</th><td>第一，把步数 $T$ 当样本量写进结论（应看 ESS）；第二，拒绝时跳过、不重复记录当前值（稳态分布偏移）；第三，直接算 $\theta^{5968}(1-\theta)^{6034}$ 导致下溢（应取对数核）；第四，只跑一条链、不看 $\hat R$ 就报告可信区间。详见下方常见问题。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>后验明明是共轭的，为什么还要用 MH 采样？</summary><div class="faq-a">本例用 $Beta(5969,6035)$ 作靶子，是为了让「采样结果」有一个可逐位核对的解析真值：均值 $0.497251$、sd $0.004563$、区间 $[0.488307,0.506195]$ 都能手算。真实价值在于同一段代码把 $\log\tilde p$ 换成<strong>任意</strong>非共轭密度即可运行——专题一里双峰混合先验、层级模型、逻辑回归似然都属此类，那时共轭更新根本写不出来，MH 才成为唯一可走的通用路径。</div></details>
+  <details><summary>接受率越高越好吗？0.7356 是不是说明链很健康？</summary><div class="faq-a">不是。一维随机游走 MH 的理论最优接受率约 $0.44$；接受率过高意味着步长太小，链每步只挪一点点，相邻样本高度相关。代码里 $0.7356$ 对应 $\rho_1=0.8076$、$\mathrm{ESS}/T=0.384$，正是「走得慢」的证据。步长扫描显示把 $\tau$ 从 $0.004$ 调到 $0.012$，接受率降到 $0.4174$ 反而把 $\mathrm{ESS}/T$ 提到 $0.443$。判断健康看的是 ESS 与 $\hat R$，不是接受率本身。</div></details>
+  <details><summary>为什么拒绝时必须把当前值再记一次？</summary><div class="faq-a">因为「原地不动」本身就是马尔可夫链的一步：在这一步里，链以概率 $1-\alpha$ 停留在 $\theta^{(t)}$。若拒绝时跳过、不写入样本，等于人为删掉了所有停留步，链在状态间的停留时间比例就不再正比于后验密度，平稳分布会被抬高到「更愿意移动」的区域。代码里无论接受与否都执行 <code>chain.append(x)</code>，正是这个要求。</div></details>
+  <details><summary>$\hat R$ 已经等于 1.0000，还需要看 ESS 吗？</summary><div class="faq-a">需要，两者管的是不同风险。$\hat R$ 比较链间与链内方差，回答「几条链有没有收敛到同一片区域」；ESS 回答「这片区域里我究竟攒了多少个<strong>独立</strong>样本」。多峰后验里几条链可以一起困在同一个峰，$\hat R$ 依然接近 $1$ 却完全错了；反过来样本高度自相关时 $\hat R$ 正常但区间估计仍被 MC 噪声放大。代码四个诊断量一起输出，就是为了不让我们只盯一个数字。</div></details>
+  <details><summary>共享案例里 $w_0=0.000333$，是不是就可以永远忽略先验？</summary><div class="faq-a">不能。$w_0\to0$ 是 Bernstein–von Mises 正则条件下的渐近结论，专题二列了五类反例：小样本、先验支撑集不含真值、参数不可识别、高维稀疏冷启动、结构性稀疏先验。工程上稳妥的做法是<strong>先验敏感性分析</strong>：换 $Beta(1,1)$、$Beta(2,2)$、$Beta(50,50)$ 各跑一次，若后验均值与决策结论不变，才有资格说「先验不重要」；否则必须把先验写进报告。</div></details>
+  <details><summary>把 MH 放进「采集 → 存储计算 → 建模 → 评估 → 部署」链条，它站在哪里？</summary><div class="faq-a">它站在<strong>建模</strong>环节，上游契约是「建模层要拿到一份可逐点调用的对数似然与对数先验」，下游契约是「评估层要拿到带 MC 标准误的后验样本，而不是一个点估计」。它不负责采集与存储，但每步 $O(n)$ 的代价意味着上游的数据布局会直接决定采样速度；部署时若把采样结果做成在线服务，通常要改成先跑 VI 出初值、再局部 MCMC 精修的混合策略。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">共轭先验带来的「解析可算性」，本质上是用什么换来的？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 用更大的样本量换更小的方差</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 把先验锁进某个分布族、把数据压成固定维充分统计量</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 用更快的计算机换取精确积分</label>
+    </div>
+    <div class="quiz-feedback" data-explain="共轭更新的全部内容只是 τ_n=τ_0+T(x)、ν_n=ν_0+n 两个数相加；代价是先验形状必须属于配套分布族，且数据里除 (s,n) 以外的结构（顺序、漂移、异质性）全被丢掉。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">共享案例的后验是 $Beta(5969,6035)$，其后验均值是多少？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 0.497250</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 0.500000</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 0.497251</label>
+    </div>
+    <div class="quiz-feedback" data-explain="E(θ|x)=α/(α+β)=5969/(5969+6035)=5969/12004=0.497251。0.497250 是极大似然估计 5967/12000，两者只差约 10⁻⁶，正因为先验权重 w₀=4/12004=0.000333 极小。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">下面哪句话<strong>只有</strong>贝叶斯可信区间可以直接说？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 参数落在 (0.488, 0.506) 内的概率是 95%</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 重复抽样构造的区间中约有 95% 会覆盖真值</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 若真值等于 0.5，看到这份数据的概率不小于 0.05</label>
+    </div>
+    <div class="quiz-feedback" data-explain="A 是对参数取概率，正是可信区间的定义；B 是置信区间的覆盖率承诺，随机的是区间而非参数；C 是 p 值的口径，条件方向恰好反过来。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">代码里 18000 步的链给出 $\rho_1=0.8076$、$\mathrm{ESS}=6882.7$，正确的解读是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 18000 步全部是独立样本，可以直接当样本量用</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 只有约 38% 是有效样本，报告区间时应看 ESS 而非步数</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. ESS 大于步数，说明链过度混合、结果不可信</label>
+    </div>
+    <div class="quiz-feedback" data-explain="ESS/T=6882.7/18000≈0.38。相邻样本高度自相关，蒙特卡洛标准误约为 sd/√ESS≈5.5×10⁻⁵，必须用 ESS 而不是 T 来折算精度。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">下列哪种情形下，「数据会淹没先验」这一结论<strong>不成立</strong>？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 先验在真实参数附近密度为 0，或参数本身不可识别</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 先验 Beta(2,2)、样本量 12000、数据在真值附近有信息</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 模型正则且满足 Bernstein–von Mises 定理的前提</label>
+    </div>
+    <div class="quiz-feedback" data-explain="B、C 正是 BvM 成立的情形；A 违反了「先验在真值附近密度为正」与「参数可识别」两条前提，此时后验被先验钉死或几乎等于先验，应改用敏感性分析而不是套用 w₀→0。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>

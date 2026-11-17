@@ -1,0 +1,380 @@
+<!-- 深度片段 · 模块 04 随机变量与常见分布 -->
+<!-- 本片段只补充「深度」：正文已有的学习目标、九道例题、练习与小结不重复 -->
+
+<h2 id="d-deep-1">深度专题一 · 三条极限关系：二项 → 泊松 → 正态，以及中心极限定理为什么成立</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：一条被逼出来的「便宜替身」之路</h3>
+  <p>正文已经给出三条结论：二项在大 $n$ 小 $p$ 时近似泊松、二项与泊松在样本足够大时近似正态、样本均值在中心极限定理（CLT）下近似正态。本专题要回答的是<strong>它们为什么是同一件事</strong>，以及 CLT 凭什么对几乎任何总体都成立。</p>
+  <p>历史顺序恰好是「由特殊到一般」。1733 年 de Moivre 为了计算赌博中「抛 $n$ 次硬币出现 $k$ 次正面」这类概率，发现直接算 $\binom{n}{k}$ 在大 $n$ 时根本算不动，于是找到一条钟形曲线来近似它；1812 年 Laplace 把这套近似系统化；1837 年 Poisson 研究「单位时间内稀有事件次数」时，写出了另一条极限——把二项试验切得极碎、成功机会极小，但保持平均次数 $\lambda = np$ 不变，得到的分布只由 $\lambda$ 决定。到 19 世纪末至 20 世纪初，Chebyshev、Lyapunov、Lindeberg 等人把「为什么一定是钟形」证明成了普遍定理。</p>
+  <p>动机非常工程化：<strong>精确公式太贵，近似公式几乎免费</strong>。计算 $\binom{1000}{500}$ 需要大整数或对数伽马函数；而 $\Phi(z)$ 用一次 <code>math.erf</code> 就能得到。直到今天，A/B 平台算转化率置信区间、风控系统算「一天内故障次数超阈值」的概率、排队论算客服排班，用的仍是这条 300 年前的近似链。</p>
+  <p>三条关系不是三个孤立技巧，而是一条链的两端加一个推广：</p>
+  <ul>
+    <li>左端：<strong>二项 $\to$ 泊松</strong>，让「试验次数 $n$」消失，只剩平均发生率 $\lambda$；</li>
+    <li>右端：<strong>泊松 / 二项 $\to$ 正态</strong>，让「离散的计数」被连续的钟形曲线覆盖；</li>
+    <li>推广：<strong>CLT</strong>，把「二项之和」换成「任意有限方差的独立随机变量之和」，结论照样成立。</li>
+  </ul>
+
+  <h3>直觉：先把公式全部忘掉</h3>
+  <p>先想二项为什么变泊松。二项 $B(n,p)$ 是「做 $n$ 次独立试验，数成功次数」。现在把每次试验再切成 $m$ 个更细的小片段，每片段成功概率变成 $p/m$，总片段数变成 $nm$，但平均成功次数仍是 $nm \cdot (p/m) = np = \lambda$。当片段切得无穷细时，同一个瞬间发生两次成功的概率小到可以忽略，于是「一共成功几次」只取决于<strong>平均发生率 $\lambda$</strong>，而不再关心你到底切了多少刀、每刀概率多小。这就是为什么泊松分布里 $n$ 和 $p$ 都消失了，只剩一个 $\lambda$。</p>
+  <p>再想泊松为什么变正态。$\lambda$ 很小时泊松明显右偏（$0$ 次最常见，长尾拖向右边）；但 $\lambda$ 增大到 $10$、$30$、$100$ 时，分布逐渐关于 $\lambda$ 左右对称、单峰、钟形——因为大量独立小事件的叠加，正偏差与负偏差互相抵消，剩下的形状被「平均」成一口钟。二项在 $n$ 大、$p$ 不靠近 $0$ 或 $1$ 时也是同样的道理。</p>
+  <p>CLT 把这口钟的来源说透了：把很多个独立的小扰动加起来，<strong>一阶信息（偏斜的方向）在标准化时被减掉，二阶信息（波动大小）被缩放成统一尺度，三阶及更高阶的信息随样本量增大而消失</strong>，于是极限里只剩「方差」这一个数字。所有具体分布的长相都被抹平，剩下一模一样的 $e^{t^2/2}$。正文反复强调「CLT 说的是均值不是数据本身」，原因就在这里：被平均的是统计量，不是原始总体。</p>
+  <p>一个物理画面：高尔顿板上，小球每碰一层钉子就以一半概率向左或向右。落点 = 很多次「$\pm 1$」之和。层数越多，落点分布越接近钟形——无论钉子摆得多不均匀，只要每层左右机会接近均等，最终形状都一样。</p>
+
+  <h3>形式化：用矩母函数把三条关系一次串起来</h3>
+  <p>矩母函数（MGF）正文已定义为 $M_X(t)=\mathbb{E}\!\left[e^{tX}\right]$。这里用到它的两条性质：① <strong>唯一性</strong>——若两个随机变量在 $t=0$ 邻域内 MGF 相同，则分布相同；② <strong>独立和的 MGF 可乘</strong>——$X,Y$ 独立时 $M_{X+Y}(t)=M_X(t)M_Y(t)$。下面每行公式都配一句白话。</p>
+
+  <div class="formula-box">
+    <div class="f-name">第一步：二项的 MGF，令 $\lambda = np$ 固定、$n \to \infty$</div>
+    $$ M_{B(n,p)}(t)=\left(1-p+p e^{t}\right)^{n}=\left(1+\frac{\lambda\left(e^{t}-1\right)}{n}\right)^{n} \;\longrightarrow\; \exp\!\left(\lambda\left(e^{t}-1\right)\right) $$
+    <div class="f-note">白话：把 $p=\lambda/n$ 代进去，得到「$1$ 加一个很小的量，再取 $n$ 次方」，这正是 $(1+u/n)^n \to e^u$ 的标准极限。右边 $\exp(\lambda(e^t-1))$ 恰是 $\mathrm{Poisson}(\lambda)$ 的 MGF，由唯一性定理即知分布收敛到泊松。<strong>$n$ 与 $p$ 在极限里被 $\lambda$ 完全吸收</strong>，这就是「泊松只认平均次数」的数学根源。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第二步：泊松标准化后的 MGF，令 $\lambda \to \infty$</div>
+    $$ M_{\frac{X-\lambda}{\sqrt{\lambda}}}(t)=e^{-t\sqrt{\lambda}}\cdot\exp\!\left(\lambda\left(e^{t/\sqrt{\lambda}}-1\right)\right) $$
+    $$ e^{t/\sqrt{\lambda}}=1+\frac{t}{\sqrt{\lambda}}+\frac{t^{2}}{2\lambda}+O\!\left(\lambda^{-3/2}\right) \;\Longrightarrow\; M \;\longrightarrow\; e^{t^{2}/2} $$
+    <div class="f-note">白话：先把 $X$ 减去均值 $\lambda$、除以标准差 $\sqrt{\lambda}$（标准化），再展开指数。一次项 $t\sqrt\lambda$ 与减去的 $t\sqrt\lambda$ 正好抵消，二次项留下 $\frac{t^2}{2}$，更高阶项随 $\lambda$ 增大趋于零。$e^{t^2/2}$ 是标准正态 $N(0,1)$ 的 MGF，故 $\frac{X-\lambda}{\sqrt\lambda}\to N(0,1)$。这解释了「$\lambda$ 大时泊松近似 $N(\lambda,\lambda)$」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">第三步：一般 CLT 的一页证明（为什么与总体形状无关）</div>
+    $$ Z_n=\frac{\sum_{i=1}^{n}Y_i-n\mu}{\sigma\sqrt{n}}, \qquad M_{Z_n}(t)=\left[\,M_{Y}\!\left(\frac{t}{\sigma\sqrt{n}}\right)e^{-t\mu/(\sigma\sqrt{n})}\right]^{n} $$
+    $$ M_Y(s)=1+\mu s+\frac{\mathbb{E}(Y^2)}{2}s^{2}+O(s^{3}) \;\Longrightarrow\; M_{Z_n}(t)=\left[1+\frac{t^{2}}{2n}+o\!\left(\frac{1}{n}\right)\right]^{n}\;\longrightarrow\;e^{t^{2}/2} $$
+    <div class="f-note">白话：$Y_i$ 独立同分布、均值 $\mu$、方差 $\sigma^2$ 有限。把单个 $Y$ 的 MGF 在 $0$ 处展开，再平移（减 $\mu$）与缩放（除 $\sigma\sqrt n$）。平移消掉一阶项，缩放把二阶项凑成 $\frac{t^2}{2n}$，三阶及以上变成 $o(1/n)$；取 $n$ 次方后一切都趋于 $e^{t^2/2}$。<strong>关键在于：极限里只用到「方差有限」，三阶以上的具体形状全部被 $n$ 稀释掉了</strong>——这就是 CLT 对均匀、指数、偏态总体一视同仁的原因。</div>
+  </div>
+
+  <p>把三步连起来读，就是完整的一条链：</p>
+  <div class="formula-box">
+    <div class="f-name">三条极限关系的统一视图</div>
+    $$ B(n,p)\ \xrightarrow[\ n\to\infty,\ \lambda=np\ \text{固定}\ ]{\text{MGF 极限}}\ \mathrm{Poisson}(\lambda)\ \xrightarrow[\ \lambda\to\infty\ ]{\text{标准化}}\ N(\lambda,\lambda) $$
+    $$ B(n,p)\ \xrightarrow[\ n\to\infty,\ p\ \text{固定}\ ]{\text{de Moivre–Laplace / CLT}}\ N\!\left(np,\ np(1-p)\right) $$
+    <div class="f-note">白话：上路是「稀有事件」的极限，下路是「大量独立伯努利之和」的极限；两者在「$n$ 大、$np$ 也大」的区域汇合到同一口钟。工程上选哪条近似，只看 $np$ 是小还是大：$np \le 10$ 用泊松更准，$np \ge 10$ 且 $n(1-p) \ge 10$ 用正态更省。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    二项 $\to$ 泊松靠的是「把试验切碎、保持平均次数 $\lambda$ 不变」；泊松 / 二项 $\to$ 正态以及一般 CLT 靠的是「标准化后 MGF 只剩 $\frac{t^2}{2}$」。三者共用同一个机制：<strong>独立的微小扰动相加时，除均值与方差外的一切信息都会被 $n$ 抹平</strong>。因此 CLT 的适用前提可以压缩成一句话：<strong>独立 + 方差有限</strong>。
+  </div>
+
+  <p><strong>边界：</strong>在总体方差不存在（柯西分布、尾部指数 $\alpha \le 2$ 的帕累托分布）、样本之间存在强相关或群聚、或样本量虽大但被极少数极端值主导的条件下，本结论不成立，应改用稳定分布模型、中位数与分位数、截尾均值，或用自助法（bootstrap）直接构造区间，<strong>不能</strong>套用「均值 $\pm 1.96\,\sigma/\sqrt n$」。</p>
+
+  <figure data-figure="curve-clt"></figure>
+  <figure data-classic="0"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 重尾分布：用 σ 描述风险，究竟在哪里失效</h2>
+
+<div class="deep-topic">
+
+  <h3>背景：当「标准差」被当成万能尺子</h3>
+  <p>正文在 CLT 的边界里已经埋了一个伏笔：收入数据里混进一个 $200$ 万的极端值，样本标准差会被放大到 $61.99$，置信区间宽到荒谬。本专题把这个现象从「一个反例」升级成「一整类分布的系统性失效」。</p>
+  <p>20 世纪的定量金融几乎把「风险」等同于「波动率 $\sigma$」：Markowitz 的均值—方差组合理论用方差度量风险，VaR（风险价值）常写成 $\mu - k\sigma$，$3\sigma$ 被当成「几乎不可能越过」的边界。1963 年 Mandelbrot 研究棉花价格时发现，价格变化的尾部远比正态厚，样本方差随样本量增大并不稳定；后来 Taleb 用「黑天鹅」把这个警告带进大众视野。今天它在 AI 工程里同样具体：LLM 训练中少数极难 token 贡献了大部分 loss、推荐系统里少数头部用户贡献了大部分消费金额、线上服务的少数慢请求决定了 P99 延迟——这些都是重尾。</p>
+  <p>正文里已经出现过对策的名字：梯度裁剪、Huber 稳健损失、报中位数与分位数区间。本专题给出「为什么必须这么做」的定量理由。</p>
+
+  <h3>直觉：σ 量的是「典型波动」，风险问的是「最坏能多坏」</h3>
+  <p>标准差的定义是「偏离均值的平方再平均再开方」。平方这一步很关键：一个偏离 $10$ 倍的点，在 $\sigma$ 里贡献 $100$ 倍。轻尾分布（正态、均匀分布、有界区间）里，极端值本来就极少出现，所以 $\sigma$ 稳定、可解释；但重尾分布里，偶尔出现的一个巨大值会把 $\sigma$ 整个撑大，而它出现的概率又低到让人误以为「已经被 $\sigma$ 覆盖了」。</p>
+  <p>打个比方：用「平均身高」描述一群人没问题；但若人群里可能混进一个 $30$ 米高的巨人，那么「平均身高 $\pm 3$ 倍标准差」既不能告诉你平常人长什么样，也不能告诉你巨人会出现在哪。<strong>σ 回答的是「典型情况波动多大」，风险回答的是「尾部有多厚、有多长」——这是两个不同的问题。</strong></p>
+  <p>更麻烦的是稳定性：轻尾分布的样本 $\sigma$ 会随 $n$ 增大收敛到一个固定常数；重尾分布（方差无穷时）的样本 $\sigma$ 会随 $n$ 增大不断被新出现的更大极端值刷新，永远不收敛。这意味着「用历史数据估一个 $\sigma$ 再外推未来风险」在重尾下从根上就不成立——历史里没出现过的极端值，不代表未来不会出现。</p>
+
+  <h3>形式化：尾部指数 $\alpha$ 决定一切</h3>
+  <p>用帕累托型尾来刻画重尾：存在常数 $C \gt 0$ 与尾部指数 $\alpha \gt 0$，使</p>
+  <div class="formula-box">
+    <div class="f-name">重尾的尾概率与矩的存在性</div>
+    $$ \mathbb{P}(X \gt x)\ \sim\ C\,x^{-\alpha}\quad (x\to\infty), \qquad \mathbb{E}\left[X^{k}\right]\ \text{存在}\ \Longleftrightarrow\ k \lt \alpha $$
+    <div class="f-note">白话：尾概率按幂律 $x^{-\alpha}$ 衰减，比正态的指数级 $e^{-x^2/2}$ 慢得多。$\alpha$ 越小尾越厚。矩的存在性只看 $\alpha$：要 $k$ 阶矩有限，必须 $k \lt \alpha$。于是 $\alpha \le 1$ 时连期望都不存在，$\alpha \le 2$ 时方差 $\sigma^2$ 不存在——「用 $\sigma$ 度量风险」在这两种情形下连定义都没有。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">柯西分布：连期望都不存在</div>
+    $$ f(x)=\frac{1}{\pi\left(1+x^{2}\right)}, \qquad \mathbb{E}|X|=\int_{-\infty}^{\infty}\frac{|x|}{\pi(1+x^{2})}\,dx=+\infty $$
+    <div class="f-note">白话：柯西的尾部 $\sim \frac{1}{\pi x^2}$，对应 $\alpha = 1$。均值、方差都不存在，切比雪夫不等式 $\mathbb{P}(|X-\mu|\ge k\sigma)\le 1/k^2$ 这一步从前提就断了。正文里说过「$n$ 个独立柯西变量的均值仍服从同一个柯西分布」——那是稳定分布的特例，正好说明「样本量再大也救不回来」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">即使方差存在，σ 仍会低估尾部：对数正态的定量反例</div>
+    $$ \text{设 } \ln X \sim N(0,\tau^{2}),\quad \mu=\mathbb{E}(X)=e^{\tau^{2}/2},\quad \sigma^{2}=\left(e^{\tau^{2}}-1\right)e^{\tau^{2}} $$
+    $$ \text{正态模型声称：}\ \mathbb{P}(X \gt \mu+3\sigma)=1-\Phi(3)\approx 0.00135 $$
+    $$ \text{真实概率：}\ \mathbb{P}(X \gt \mu+3\sigma)=1-\Phi\!\left(\frac{\ln(\mu+3\sigma)}{\tau}\right) $$
+    <div class="f-note">白话：取 $\tau = 1.5$，则 $\mu \approx 3.08$、$\sigma \approx 8.97$、$\mu+3\sigma \approx 30.0$。若天真地用「均值 $\pm 3\sigma$」当 $99.87\%$ 上界，正态模型给出超越概率 $0.135\%$；而对数正态的真实超越概率是 $1-\Phi\!\left(\frac{\ln 30}{1.5}\right)=1-\Phi(2.27)\approx 1.16\%$，<strong>低估约 $8.6$ 倍</strong>。方差在这里是有限的，$\sigma$ 却依然严重低估尾部——因为 $\sigma$ 只压缩二阶信息，而尾部由整个分布形状决定。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">该改用什么：把「二阶矩」换成「分位数 / 条件尾期望」</div>
+    $$ \mathrm{VaR}_{q}=F^{-1}(q), \qquad \mathrm{CVaR}_{q}=\mathbb{E}\!\left[X \mid X \gt \mathrm{VaR}_{q}\right], \qquad \mathrm{IQR}=F^{-1}(0.75)-F^{-1}(0.25) $$
+    <div class="f-note">白话：$\mathrm{VaR}_q$ 直接问「$q$ 分位数在哪」，不需要方差存在；$\mathrm{CVaR}_q$（期望短缺）进一步问「一旦越过阈值，平均会损失多少」，这正是保险与风控真正关心的量；四分位距 IQR 与中位数则是描述统计里现成的稳健替身。极值理论（GEV / GPD）专门负责拟合超出历史最大值的那一段尾。</div>
+  </div>
+
+  <div class="key-result">
+    <span class="kr-k">关键结论</span>
+    $\sigma$ 只是二阶矩的平方根，它<strong>不包含尾部形状的信息</strong>。当 $\alpha \le 2$ 时方差根本不存在，样本 $\sigma$ 随 $n$ 发散；即使 $\alpha \gt 2$（方差有限），用 $\mu \pm 3\sigma$ 或「$\sigma$ 乘一个常数」的 VaR 仍会系统性低估极端事件。稳健做法是：报中位数与分位数、用 VaR / CVaR 或极值理论量化尾部、用中位数绝对偏差与 IQR 描述离散度、在训练里用梯度裁剪与 Huber 损失限制单个极端样本的话语权。
+  </div>
+
+  <p><strong>边界：</strong>在总体服从轻尾分布（正态、指数、或有界区间）、样本独立同分布、且确认无录入错误与异常值污染的条件下，本结论不成立，应改用基于 $\sigma$ 的参数化风险度量（$3\sigma$ 界、方差—协方差 VaR、均值 $\pm$ 标准误的置信区间），因为此时 $\sigma$ 收敛快、估计效率高、且切比雪夫与 CLT 提供的保证全部有效。</p>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 二项分布的正态近似（含连续性修正）</h2>
+
+<div class="algo-spec">
+
+  <h3>原理：把离散的「柱子」换成连续的「面积」</h3>
+  <p>目标：对 $X\sim B(n,p)$，快速算出 $\mathbb{P}(X \le k)$ 这类累积概率，而不去逐项累加 $\binom{n}{i}p^i(1-p)^{n-i}$。</p>
+  <p>由上一专题的 de Moivre–Laplace 极限，$n$ 大时 $B(n,p)$ 近似 $N\!\left(\mu=np,\ \sigma^2=np(1-p)\right)$。但这里有一个容易被忽略的细节：<strong>二项是离散的，正态是连续的</strong>。$\mathbb{P}(X \le k)$ 在直方图上是「$0,1,\dots,k$ 这些整数柱子面积之和」，每根柱子实际占据区间 $[i-0.5,\ i+0.5]$；而连续正态在单点概率为 $0$，若直接算 $\Phi\!\left(\frac{k-\mu}{\sigma}\right)$，等于只累计到柱子 $k$ 的<strong>左边界</strong>，会系统性少算半根柱子。</p>
+  <p><strong>连续性修正</strong>就是把这个半根柱子补回来：把整数边界向外扩 $0.5$。几何解释是「用连续曲线下方的面积去覆盖一组宽为 $1$ 的离散矩形」。这一步不改变极限正确性，却把近似误差从 $O(1/\sqrt n)$ 压到更小的量级，是本章算法真正的技术点。</p>
+  <div class="formula-box">
+    <div class="f-name">近似公式与三种边界的修正规则</div>
+    $$ \mathbb{P}(X \le k)\ \approx\ \Phi\!\left(\frac{k+0.5-\mu}{\sigma}\right), \qquad \mathbb{P}(X \ge k)\ \approx\ 1-\Phi\!\left(\frac{k-0.5-\mu}{\sigma}\right) $$
+    $$ \mathbb{P}(a \le X \le b)\ \approx\ \Phi\!\left(\frac{b+0.5-\mu}{\sigma}\right)-\Phi\!\left(\frac{a-0.5-\mu}{\sigma}\right) $$
+    <div class="f-note">白话：$\mu=np$，$\sigma=\sqrt{np(1-p)}$，$\Phi$ 是标准正态累积分布函数（用 <code>math.erf</code> 即可算，无需查表）。规则一句话：<strong>「要包含某个整数，就把边界往远离中心的方向多推 $0.5$」</strong>。不加这 $0.5$ 的「朴素正态近似」是它的退化版本。</div>
+  </div>
+  <p>配套的「分布拟合 / 识别」流程（与正文 MGF 呼应）：拿到计数数据先算样本均值 $\bar x$ 与样本方差 $s^2$；若 $s^2 \approx \bar x$ 选泊松、若 $s^2 \lt \bar x$ 选二项、若 $s^2 \gg \bar x$ 则提示过离散、改用负二项；再用 MGF 唯一性或 $\chi^2$ 拟合优度确认。这一步决定「该不该用正态近似」。</p>
+
+  <h3>编号步骤：照着做一遍就会</h3>
+  <ol>
+    <li><strong>写出模型与事件。</strong>明确 $n$、$p$ 以及要算的是 $\mathbb{P}(X\le k)$、$\mathbb{P}(X\ge k)$ 还是 $\mathbb{P}(a\le X\le b)$；把「至少」「不超过」翻译成 $\le$ / $\ge$。</li>
+    <li><strong>检查适用条件。</strong>要求 $np \ge 5$ 且 $n(1-p)\ge 5$（严格场合用 $10$）；$p$ 越靠近 $0$ 或 $1$ 所需 $n$ 越大。若 $np \le 10$，改用泊松近似更准。</li>
+    <li><strong>算两个数字。</strong>$\mu = np$，$\sigma = \sqrt{np(1-p)}$。注意这里除以的是标准差而不是方差。</li>
+    <li><strong>做连续性修正。</strong>把整数边界外扩 $0.5$：$\le k$ 变 $k+0.5$；$\ge k$ 变 $k-0.5$；区间 $[a,b]$ 变 $[a-0.5,\ b+0.5]$。</li>
+    <li><strong>标准化。</strong>对每个修正后的边界 $y$ 算 $z=\dfrac{y-\mu}{\sigma}$，把任意正态平移缩放成标准正态。</li>
+    <li><strong>求面积。</strong>用 $\Phi(z)=\frac12\left[1+\mathrm{erf}\!\left(\frac{z}{\sqrt2}\right)\right]$ 求值，按事件做差或用 $1-\Phi$。</li>
+    <li><strong>报告与校验。</strong>给出近似值，并在条件允许时用精确二项累加或泊松近似对照一次，写明误差量级与「本近似在本次是否够用」。</li>
+  </ol>
+
+  <h3>适用条件</h3>
+  <ul>
+    <li>数据：一次计数，来自 $n$ 次<strong>相互独立</strong>、成功概率恒为 $p$ 的伯努利试验；不是时间序列、不是群聚事件。</li>
+    <li>规模：$n$ 足够大，经验门槛 $np\ge 5$ 且 $n(1-p)\ge 5$；$p$ 固定、不极端。</li>
+    <li>分布：只用于二项族（或经检验与二项相容的计数）；$\mathrm{Var}/\mathbb{E}\approx 1-p \lt 1$ 是二项的标志。</li>
+    <li>特征类型：离散非负整数 $0,1,\dots,n$；连续测量值不适用。</li>
+    <li>工程位置：位于「建模 → 概率计算 → 阈值告警」链条中，是 A/B 平台与监控系统的<strong>在线推理</strong>环节，上游是埋点计数，下游是告警决策。</li>
+  </ul>
+
+  <div class="complexity">
+    <span><b>训练</b>：无需训练，$O(1)$</span>
+    <span><b>推理（单次概率）</b>：时间 $O(1)$，空间 $O(1)$</span>
+    <span><b>对照</b>：精确二项 $O(k)$ 累加，泊松 $O(k)$ 累加</span>
+  </div>
+  <p>说明：本算法没有「训练」阶段（参数 $n,p$ 由问题给定或由数据直接估计）。一次概率只需约十次算术加一次 <code>math.erf</code>，与 $n$ 无关；这正是它在超大 $n$ 场景不可替代的原因。精确二项要累加 $k+1$ 项，每项含组合数，时间随 $k$ 线性增长且大 $n$ 时易数值溢出。</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>速度恒定：$n=10^6$ 与 $n=10^2$ 耗时一样，全靠一次 erf。</li>
+        <li>连续性修正把误差压得很低，在 $np\ge 10$ 时常到 $10^{-3}$ 量级。</li>
+        <li>结果可直接接到置信区间与假设检验（$z$ 统计量的同一套 $\Phi$）。</li>
+        <li>无需大整数与对数伽马函数，纯标准库即可落地，便于嵌入式 / 边缘设备。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>缺点</h4>
+      <ul>
+        <li>尾部概率误差大：算 $\mathbb{P}(X\le k)$ 且 $k$ 远离 $\mu$ 时，相对误差可能显著。</li>
+        <li>依赖独立同分布假设；试验相关（群聚、重复用户）会悄悄失效。</li>
+        <li>$p$ 极接近 $0$ 或 $1$ 时收敛极慢，$n$ 要非常大才准。</li>
+        <li>只能给概率，不能像精确 PMF 那样逐个列出每个取值的概率。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>示例推演：手算到底（$n=100,\ p=0.5,\ \mathbb{P}(X\le 60)$）</h3>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span> 抛 $100$ 次均匀硬币，$X$ 为正面次数，$X\sim B(100,0.5)$，求 $\mathbb{P}(X\le 60)$。</div>
+    <div class="solve-step"><span class="ss-k">检查条件。</span> $np = 100\times0.5 = 50 \ge 5$ ✓，$n(1-p)=100\times0.5=50\ge 5$ ✓，且 $p=0.5$ 不极端，可用正态近似。</div>
+    <div class="solve-step"><span class="ss-k">算两个数字。</span> $\mu = np = 50$；$\sigma = \sqrt{np(1-p)} = \sqrt{100\times0.5\times0.5} = \sqrt{25} = 5$。</div>
+    <div class="solve-step"><span class="ss-k">连续性修正。</span> 事件 $\mathbb{P}(X\le 60)$ 要包含整数 $60$ 整根柱子，故边界取 $y = 60 + 0.5 = 60.5$。（若不修正则用 $y=60$。）</div>
+    <div class="solve-step"><span class="ss-k">标准化。</span> $z = \dfrac{60.5 - 50}{5} = \dfrac{10.5}{5} = 2.10$；不修正时 $z_0 = \dfrac{60-50}{5}=2.00$。</div>
+    <div class="solve-step"><span class="ss-k">查 $\Phi$。</span> $\Phi(2.10) = 0.9821$；对照 $\Phi(2.00)=0.9772$。精确二项累加为 $0.9824$（见下方代码实验）。</div>
+    <div class="solve-step"><span class="ss-k">算误差、下结论。</span> 带修正：$|0.9821 - 0.9824| = 0.0003$；不带修正：$|0.9772-0.9824| = 0.0052$。<strong>半个柱子的修正把误差缩小了约 $17$ 倍</strong>。故 $\mathbb{P}(X\le 60)\approx 0.982$，即「$100$ 次里正面不超过 $60$ 次」几乎必然发生。</div>
+    <div class="solve-step"><span class="ss-k">解释与边界。</span> $z=2.10$ 表示修正后的边界落在均值右侧 $2.1$ 个标准差处。若把 $n$ 降到 $20$、$p=0.05$（$np=1$），条件不再满足，本结论作废，应改用精确二项或泊松 $\mathrm{Poisson}(1)$。</div>
+  </div>
+
+  <h3>横向对比：三种算同一概率的方法</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>维度</th><th>精确二项累加</th><th>泊松近似 $\mathrm{Poisson}(np)$</th><th class="best">正态近似 + 连续性修正</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>任意 $n,p$；但大 $n$ 时组合数易溢出</td>
+        <td>$n$ 大、$p$ 小、$\lambda=np\le 10$</td>
+        <td class="best">$np\ge 5$ 且 $n(1-p)\ge 5$，$p$ 不极端、试验独立</td>
+      </tr>
+      <tr>
+        <th>时间与空间复杂度</th>
+        <td>时间 $O(k)$，空间 $O(1)$；需大整数或对数伽马</td>
+        <td>时间 $O(k)$，空间 $O(1)$</td>
+        <td class="best">时间 $O(1)$、空间 $O(1)$，与 $n,k$ 无关</td>
+      </tr>
+      <tr>
+        <th>关键超参数</th>
+        <td>无（精确解）</td>
+        <td>$\lambda = np$；$n$ 大 $p$ 小才成立</td>
+        <td class="best">连续性偏移 $0.5$（固定，不调）；条件门槛 $5$ 或 $10$</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td>基准真值，可作金标准校验其他近似</td>
+        <td>$p$ 小时极准，公式最简，无需 erf</td>
+        <td class="best">最快；$np$ 大时精度高；可直接接 $z$ 检验与置信区间</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>$n$ 极大时计算不可行；$p$ 极端时数值下溢</td>
+        <td>$np$ 大时明显失真（方差被低估为 $\lambda$）；不适用于 $p$ 不小</td>
+        <td class="best">尾部相对误差大；试验相关或 $p$ 接近 $0/1$ 时失效，应改用精确二项或负二项</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>逐项可解释，但工程实现最重</td>
+        <td>实现最轻，只需 $e^{-\lambda}$ 与阶乘</td>
+        <td class="best">「半个柱子」直观；<code>math.erf</code> 一行落地，在线服务零依赖</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>对照口径与全站一致（适用条件 / 复杂度 / 关键超参 / 优点 / 局限与失效边界 / 可解释性与工程成本）。选择规则很朴素：<strong>能用精确就用精确做金标准，$np$ 小用泊松，$np$ 大且要快用带修正的正态</strong>。</p>
+</div>
+
+<h2 id="d-code">代码实验 · 亲手验证三条极限关系与重尾失效</h2>
+
+<div class="code-lab">
+  <div class="cl-head">
+    <span class="cl-lang">Python 3 · 纯标准库</span>
+    <span>实验：MGF 极限 / 连续性修正 / CLT 仿真 / 重尾 σ 失效</span>
+    <span class="cl-grow"></span>
+    <span>固定种子 · 可复现</span>
+  </div>
+  <pre>__PY_CODE__</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout，逐字粘贴自 Bash 执行结果）</div>
+    <pre>__PY_OUTPUT__</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">[1] 二项→泊松</span>四行的 <code>abs_err</code> 从约 $10^{-2}$ 单调降到 $10^{-5}$ 量级，正是「保持 $\lambda=6$ 不变、$n$ 变大 $p$ 变小」时 MGF 收敛到 $\exp(\lambda(e^t-1))$ 的数值证据。注意 $n=60,p=0.10$ 时误差还偏大——$p$ 不够小，极限尚未到位，这就是正文强调「$p\le0.05$」的原因。</p>
+    <p><span class="ci-k">[2] 连续性修正</span><code>exact</code> 是精确二项累加；<code>no correction</code> 只把边界取 $60$，误差明显；<code>+0.5 correction</code> 取 $60.5$，误差缩小一个数量级以上。三个数字就是上面 <code>step-solve</code> 第 6、7 步的来源，$\mu=50$、$\sigma=5$ 也与手算一致。</p>
+    <p><span class="ci-k">[3] 泊松→正态</span>$\lambda=10$ 时泊松已近似钟形；加 $0.5$ 修正后与精确泊松 CDF 更贴近，验证了「$\lambda$ 大时 $\mathrm{Poisson}(\lambda)\approx N(\lambda,\lambda)$」。</p>
+    <p><span class="ci-k">[4] CLT 仿真</span>总体是指数分布 $\mathrm{Exp}(1)$（明显右偏，$\mu=\sigma=1$）。$n$ 从 $1$ 增到 $30$，<code>se_emp</code> 始终贴合 <code>se_clt</code> $=1/\sqrt n$，且「样本均值落在 $\mu\pm0.5$」的仿真频率逐步逼近 CLT 预测值。<strong>关键是：总体本身一直右偏，变正态的只有「均值」</strong>——这正是正文「CLT 说的是统计量不是数据」的实证。</p>
+    <p><span class="ci-k">[5] 柯西 vs 正态</span>柯西样本的 <code>sigma</code> 随 $n$ 从千级涨到万级、十万级，<strong>完全不收敛</strong>；对照组 $\mathrm{Normal}(0,1)$ 的 <code>sigma</code> 始终贴近 $1$。这就是「方差不存在时 $\sigma$ 不是稳定量」的直接数值表现：换一批数据、换一个样本量，$\sigma$ 就换一个数，拿它做风险上限毫无意义。</p>
+    <p><span class="ci-k">[6] 对数正态尾部</span>$\mu\approx3.08$、$\sigma\approx8.97$、$\mu+3\sigma\approx30.0$。正态模型按 $3\sigma$ 声称超越概率 $0.00135$，真实对数正态是约 $0.0116$，<code>underestimation factor</code> 约 $8.6$ 倍；<code>Monte-Carlo</code> 用 $20$ 万次抽样独立核对了这个数。<strong>方差有限也救不了 σ</strong>：低估的是「尾部形状」，不是「二阶矩」。</p>
+    <p><span class="ci-k">何时会变</span>把 <code>slog</code> 调小（如 $0.5$），对数正态趋近正态，低估倍数趋近 $1$；把 $\lambda$ 调大，[3] 的误差继续下降；把 [4] 的 $n$ 调到 $2$，CLT 预测会明显偏离仿真——因为偏态总体需要更大的 $n$ 才能抹平三阶项。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr>
+      <th>功能说明</th>
+      <td>用「矩母函数极限 + CLT」把二项 / 泊松的计数概率换算成标准正态面积，并给出连续性修正与重尾失效判据。<strong>做</strong>：快速算累积概率、判断该用泊松还是正态、识别 $\sigma$ 不可信的情形。<strong>不做</strong>：不逐点给出 PMF、不处理相关试验、不拟合非二项族的分布参数。</td>
+    </tr>
+    <tr>
+      <th>输入 / 输出</th>
+      <td>输入：整数 $n\ge 0$、概率 $p\in[0,1]$、整数边界 $k$（或区间 $[a,b]$）；量纲为「次数」与「无量纲概率」。输出：一个无量纲概率 $\in[0,1]$，以及可选的误差对照值。中间量 $\mu,\sigma,z$ 分别为「次数」「次数」「无量纲标准分」。</td>
+    </tr>
+    <tr>
+      <th>适用场景</th>
+      <td>$n$ 大时的在线概率计算：A/B 平台转化率阈值告警、客服来电 / 故障次数的排班与容量规划、抽检次品数、点击 / 完课计数，以及为置信区间与 $z$ 检验提供 $\Phi$ 数值。</td>
+    </tr>
+    <tr>
+      <th>关键参数</th>
+      <td><code>n</code>、<code>p</code>：决定 $\mu=np$ 与 $\sigma=\sqrt{np(1-p)}$，对结果最敏感；<code>continuity</code>（固定 $0.5$，默认开启，不要调成别的值）；条件门槛 <code>np_min</code>（默认 $5$，严格场景调 $10$）；<code>slog</code>（仅重尾实验，控制尾厚，越大低估越严重）。调参方向：若误差偏大，先提高 <code>n</code> 或换精确法，而不是改 $0.5$。</td>
+    </tr>
+    <tr>
+      <th>边界条件</th>
+      <td>在 $np \lt 5$ 或 $n(1-p) \lt 5$ 的条件下不适用，应改用精确二项累加或泊松近似；在试验相关、存在群聚、或总体为 $\alpha\le2$ 的重尾分布的条件下不适用，应改用负二项 / 中位数与分位数 / CVaR；在需要精确尾部概率（如 $\alpha=0.0001$ 的告警阈值）时应改用精确二项或大偏差方法。</td>
+    </tr>
+    <tr>
+      <th>常见问题</th>
+      <td>① 忘记加 $0.5$，误差比预期大一个量级；② 把 $N(\mu,\sigma^2)$ 的第二个参数当成标准差，标准化时除错；③ 看到「$n\ge30$」就以为重尾数据也能用，忽略方差有限这一前提。详见下方常见问题。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details>
+    <summary>为什么连续性修正是加 $0.5$，不是加 $1$ 或减 $0.5$？</summary>
+    <div class="faq-a">因为二项的每个整数 $i$ 在直方图上对应宽为 $1$ 的矩形 $[i-0.5,\ i+0.5]$。事件 $X\le k$ 要覆盖到整数 $k$ 这根柱子的<strong>右边界</strong>，即 $k+0.5$。少算的是「半根柱子」，所以是 $0.5$ 不是 $1$。方向永远朝「让区间更宽」：上界事件加、下界事件减、双边界两边都外扩。若把 $\mathbb{P}(X\ge k)$ 错写成 $k+0.5$，会把区间收窄，误差反而变大。</div>
+  </details>
+  <details>
+    <summary>$np\ge 5$ 和 $np\ge 10$ 到底用哪个？</summary>
+    <div class="faq-a">$5$ 是「勉强可用」的下限，$10$ 是「误差通常可接受」的稳妥线。$p$ 越偏离 $0.5$，所需 $n$ 越大：$p=0.01$ 时即使 $np=10$，分布仍明显右偏，正态近似在左尾会失真。经验做法：两条都检查（$np$ 与 $n(1-p)$），并额外要求 $p$ 不极端；若结果要用于高风险决策，一律用精确二项或泊松做一次对照。</div>
+  </details>
+  <details>
+    <summary>既然 CLT 说「任何分布都行」，为什么重尾还是不行？</summary>
+    <div class="faq-a">CLT 的前提是「方差有限」四个字，而重尾（$\alpha\le2$）恰好让方差不存在。此时标准化量 $\frac{\bar X-\mu}{\sigma/\sqrt n}$ 里的 $\sigma$ 本身没有定义，定理链条从第一步就断了。柯西分布是最极端的例子：$n$ 个独立柯西变量的均值仍服从同一个柯西分布，样本量再大也不向任何钟形收敛。<strong>「$n$ 大就行」是对 CLT 最常见的误读</strong>。</div>
+  </details>
+  <details>
+    <summary>样本标准差很大，是不是一定说明数据重尾？</summary>
+    <div class="faq-a">不一定。单个录入错误（多打一个零）、量纲混用、两个子群体混在一起，都会把 $\sigma$ 撑大。诊断顺序应是：先画直方图与箱线图看是否有孤立点，再核对数据源与量纲，然后比较 $\bar x$ 与中位数、$s$ 与 IQR 的差距，最后才判断是否重尾。若删去一个点后 $\sigma$ 大幅回落，那是<strong>异常值</strong>而非重尾；若 $\sigma$ 随样本量持续攀升且分位数稳定，才是重尾。</div>
+  </details>
+  <details>
+    <summary>方差有限时，用均值 ± 3σ 做风险上限总该安全吧？</summary>
+    <div class="faq-a">不安全。本专题 [6] 的反例里，对数正态方差有限，但 $\mu+3\sigma$ 的真实超越概率是正态模型声称值的约 $8.6$ 倍。原因是 $3\sigma$ 的「$99.87\%$」来自正态的特定形状，不是任何分布的通用定理；切比雪夫不等式只给 $\le 1/9 \approx 11\%$ 这种松得多的保证。要量化尾部，请直接用分位数 VaR 与 CVaR，不要把 $3\sigma$ 当普适常数。</div>
+  </details>
+  <details>
+    <summary>没有装 numpy / scipy，怎么算 $\Phi$ 和查分位数？</summary>
+    <div class="faq-a">标准库 <code>math.erf</code> 就够：$\Phi(z)=\frac12\left[1+\mathrm{erf}(z/\sqrt2)\right]$。反查分位数可以对 $\Phi$ 做二分法（本实验的 <code>norm_ppf</code> 就是这样从 <code>math.erf</code> 反解出 $z_{0.975}\approx1.959964$），无需任何外部依赖。这也解释了为什么本站所有代码实验都坚持纯标准库：离线站点、任何机器、任何时间运行结果一致。</div>
+  </details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测 · 极限关系与重尾</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">设 $X_n\sim B(n,p)$，保持 $\lambda = np$ 不变并令 $n\to\infty$、$p\to 0$。$X_n$ 的极限分布是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q1" value="A"> A. $N(\lambda,\ \lambda)$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q1" value="B"> B. $\mathrm{Poisson}(\lambda)$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q1" value="C"> C. $N(0,1)$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：由二项 MGF $(1+\lambda(e^t-1)/n)^n \to \exp(\lambda(e^t-1))$，而后者正是 $\mathrm{Poisson}(\lambda)$ 的 MGF（唯一性定理）。$N(\lambda,\lambda)$ 是再令 $\lambda\to\infty$ 之后的第二层极限，别把两层混了。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">用正态近似计算 $\mathbb{P}(X\le 60)$，其中 $X\sim B(100,0.5)$。带连续性修正的标准化分位数是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q2" value="A"> A. $z = (60-50)/5 = 2.00$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q2" value="B"> B. $z = (59.5-50)/5 = 1.90$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q2" value="C"> C. $z = (60.5-50)/5 = 2.10$</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mu=np=50$、$\sigma=\sqrt{25}=5$。$\mathbb{P}(X\le 60)$ 要覆盖整数 $60$ 整根柱子，边界外扩到 $60.5$，故 $z=10.5/5=2.10$。A 是忘记修正的退化版本，B 的方向反了（把区间收窄）。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">CLT 的 MGF 证明里，为什么极限只剩 $e^{t^2/2}$，与总体分布形状无关？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q3" value="A"> A. 标准化消掉一阶项，二阶项凑出 $t^2/2$，三阶及以上被 $n$ 稀释为 $o(1/n)$</label>
+      <label class="quiz-opt"><input type="radio" name="m04q3" value="B"> B. 因为所有总体本来就是正态分布</label>
+      <label class="quiz-opt"><input type="radio" name="m04q3" value="C"> C. 因为 $n$ 大时样本量会把偏度自动变成 0</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：把 $M_Y(s)$ 在 $0$ 处展开，减 $\mu$ 消一阶、除 $\sigma\sqrt n$ 把二阶凑成 $t^2/(2n)$，更高阶项除以 powers of $\sqrt n$ 后变成 $o(1/n)$，取 $n$ 次方后趋于零。极限只依赖「方差有限」，故与三阶以上形状无关——这正是「CLT 对偏态总体也成立」的原因。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">标准柯西分布的样本标准差，随样本量 $n$ 增大将如何变化？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q4" value="A"> A. 收敛到一个固定常数</label>
+      <label class="quiz-opt"><input type="radio" name="m04q4" value="B"> B. 按 $1/\sqrt n$ 收敛到 0</label>
+      <label class="quiz-opt"><input type="radio" name="m04q4" value="C"> C. 不收敛，随更大极端值的出现不断跳升</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：柯西尾部指数 $\alpha=1$，连期望都不存在，方差更不存在。代码实验 [5] 显示 $n$ 从 $10^3$ 到 $10^5$ 时 <code>sigma</code> 一路暴涨，而对照组正态始终贴近 $1$。B 描述的是「样本均值的标准误」，与样本标准差是两回事，别混。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">某计数数据 $n$ 很大、$p=0.02$，且实测 $\mathrm{Var}/\mathbb{E}\approx 2.2$。最合适的处理是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="m04q5" value="A"> A. 直接用泊松 $\mathrm{Poisson}(np)$，因为它最省算力</label>
+      <label class="quiz-opt"><input type="radio" name="m04q5" value="B"> B. 怀疑过离散与群聚，改用负二项分布，或先做 $\chi^2$ 拟合优度检验</label>
+      <label class="quiz-opt"><input type="radio" name="m04q5" value="C"> C. 直接套 $N(np,\ np(1-p))$，因为 $n$ 已经很大</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：泊松的招牌是 $\mathrm{Var}=\mathbb{E}$，比值 $2.2$ 远大于 $1$，说明存在群聚或混合总体（过度离散）；二项则必有 $\mathrm{Var}/\mathbb{E}=1-p \lt 1$。两个候选族都与数据不相容，硬套任何一个都会低估方差、把置信区间算窄。应先用 $\chi^2$ 拟合优度确认不相容，再改用负二项或准泊松。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>

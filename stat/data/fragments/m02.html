@@ -1,0 +1,466 @@
+<!-- 深度片段 · 02 描述统计与可视化 -->
+<!-- 已就近放置的图示 ID：data-figure="curve-bias-variance" data-figure="curve-clt" data-classic="0"；其余图示由脚本补入汇总 -->
+
+<h2 id="d-deep-1">深度专题一 · 稳健统计：崩溃点、中位数与截尾均值</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>「不怕异常值」到底能扛到什么程度？把它量化成一个数</h3></div>
+  <p class="dt-lead">对应本章第 2 节（#s2）的提问「均值被一个极端值拉偏时，应该改用哪些稳健统计量，代价是什么」。正文 1.3 节与例 6.2 已经用「老板年薪把均值拉高 52%」演示了现象；这里把「稳健」变成一个可计算、可比较的指标：崩溃点。</p>
+
+  <h4>背景：最优不等于抗造</h4>
+  <p>算术均值在<strong>正态分布假设</strong>下是极大似然估计，方差最小、性质最好，所以整座经典统计推断的大厦（置信区间、t 检验、回归最小二乘）都建在它上面。但 20 世纪 60 年代 Tukey、Huber、Hampel 等人指出：这套最优性对「数据完全符合假设」极其敏感，一个录入错误（把 96 打成 960）就能让均值、标准差、乃至基于它们的全部结论整体翻车。稳健统计（robust statistics）由此诞生，目标不是「更好」，而是「在假设被轻微违背时仍然不崩」。</p>
+  <p>正文已经给了三个候选：中位数、众数、截尾均值（例 6.2 末尾提到「去掉最高最低 5% 后的均值」）。本专题回答一个正文留白的问题：<strong>它们各自最多能容忍多少污染？代价又是什么？</strong></p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>想象桌上排着 20 个数，有人悄悄把其中 1 个改成 100 万。会发生什么：</p>
+  <ul>
+    <li><strong>均值</strong>：它把 20 个数一视同仁地加起来，所以那一个 100 万被平摊进每个人的份额里，均值立刻飞到五万上下。它「全盘接收」每一个观测，一个坏点就能毁掉它。</li>
+    <li><strong>中位数</strong>：它只看排序后正中间的位置。改掉最右端 1 个数，中间那两位纹丝不动。你得把一半以上的数都改成 100 万，才可能把中间位置推走。</li>
+    <li><strong>截尾均值</strong>：先砍掉两端各若干个、再对中间求平均。只要被污染的点都落在被砍掉的那一段里，它就毫发无伤；污染多到「漏进」保留段，才会崩。</li>
+  </ul>
+  <p>于是可以问一个很自然的问题：<strong>至少要污染多少个点，才能让这个统计量彻底失控？</strong>答案就是「崩溃点」（breakdown point）。它把一个模糊的「稳健」变成一个 0 到 50% 之间的百分比：均值约 0%，中位数 50%，20% 截尾均值约 20%。</p>
+  <p>但天下没有免费午餐：数据干净且近似正态时，中位数比均值「浪费」信息——它的波动更大。稳健性是用<strong>效率</strong>换来的，选择哪个统计量，本质是选「愿意用多少效率换多少抗污染能力」。</p>
+
+  <h4>形式化</h4>
+  <div class="formula-box">
+    <div class="f-name">崩溃点的定义（有限样本）</div>
+    $$ \varepsilon^*(T,\mathbf{x}) = \frac{1}{n}\,\min\Big\{\, m : \sup_{\mathbf{x}'}\ \big|T(\mathbf{x}') - T(\mathbf{x})\big| = \infty \,\Big\} $$
+    <div class="f-note">白话：允许把至多 $m$ 个观测替换成任意值；能让统计量 $T$ 跑到无穷大的最小 $m$ 除以 $n$，就是崩溃点。它度量「坏数据最多能占多大比例还不至于毁掉结论」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">均值：一个坏点就崩</div>
+    $$ \bar{x}' = \bar{x} + \frac{M - x_j}{n} \xrightarrow[M\to\infty]{} \infty, \qquad \varepsilon^*(\bar{x}) = \frac{1}{n} \to 0 $$
+    <div class="f-note">白话：把第 $j$ 个数改成任意大的 $M$，均值增加 $(M-x_j)/n$；$M$ 无上界，所以只要污染 1 个点就能把均值推到任意远，崩溃点为 $1/n$，样本量越大越接近 0。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">中位数：最多容忍一半污染</div>
+    $$ \varepsilon^*(\mathrm{med}) = \frac{\lfloor (n+1)/2 \rfloor}{n} \;\to\; \frac{1}{2} $$
+    <div class="f-note">白话：中位数只由排序中间的一个（或两个）位置决定；要把它推走，至少得污染一半的观测，故崩溃点约 50%，这是任何位置统计量能做到的上限。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">$\alpha$ 截尾均值：可调节的折中</div>
+    $$ \bar{x}_{\alpha} = \frac{1}{\,n - 2k\,}\sum_{i=k+1}^{n-k} x_{(i)}, \qquad k = \lfloor \alpha n \rfloor, \qquad \varepsilon^*(\bar{x}_{\alpha}) = \frac{k+1}{n} \approx \alpha $$
+    <div class="f-note">白话：$x_{(i)}$ 是排序后第 $i$ 个数，砍掉两端各 $k$ 个再平均；污染点只要都落在砍掉的段里就不起作用。有限样本下精确崩溃点是 $(k+1)/n$，大样本下趋于 $\alpha$；$\alpha=0$ 退化为均值，$\alpha\to 0.5$ 退化为中位数。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">代价：效率的损失</div>
+    $$ \mathrm{Var}(\bar{x}) = \frac{\sigma^2}{n}, \qquad \mathrm{Var}(\mathrm{med}) \approx \frac{\pi}{2}\cdot\frac{\sigma^2}{n} \approx 1.571\,\frac{\sigma^2}{n} $$
+    <div class="f-note">白话：在干净的正态数据上，中位数的方差约为均值的 1.571 倍，相当于「浪费」了约 57% 的信息；20% 截尾均值只损失几个百分点效率，却把崩溃点从 0 提到 20%，通常是很划算的折中。</div>
+  </div>
+
+  <p>数值演示见代码实验 Part 1：干净样本 $n=20$、均值 79.800；只污染 1 个点，均值立刻变成 50075.00，而中位数仍为 79.50；10% 截尾均值在 $k=3$ 崩溃（62574.19），20% 截尾均值在 $k=5$ 崩溃（83405.83），中位数直到 $k=10$ 才跳到 500039.50。三个崩溃点分别是 $1/20$、$3/20$、$5/20$、$10/20$，与公式 $(\lfloor\alpha n\rfloor+1)/n$、$\lfloor(n+1)/2\rfloor/n$ 逐位吻合。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>崩溃点把「稳健」量化了：均值 $\varepsilon^*=1/n\to 0$、$\alpha$ 截尾均值 $\varepsilon^*\approx\alpha$、中位数 $\varepsilon^*\to 1/2$。选择不是「哪个统计量更好」，而是「愿意用多少效率换多少抗污染能力」：污染风险低且要推断总体时保留均值，右偏／含异常值且要描述典型水平时改用中位数或 20% 截尾均值，并同时报告两套结果。</div>
+
+  <p><strong>边界条件：</strong>在污染比例低于所选估计量的崩溃点、且极端值来自少数录入／测量错误（而非真实业务信号）的条件下，本结论成立；在污染比例超过崩溃点、或极端值本身是真实且重要的信号（大促订单、重症患者、欺诈交易、P99 延迟）的条件下，本结论不成立，应改用显式建模（重尾 t 分布、混合模型、分位数回归）或分层单独报告这些点，而不是简单截掉或一律删除。</p>
+
+  <p>下图是模块 09 的偏差—方差权衡曲线。稳健统计面对的是同一类两难结构：均值把所有观测都用上，方差最小但一旦被污染就产生巨大偏差；截尾均值主动舍弃一部分信息（牺牲一点效率）换取对污染的免疫。横轴含义不同，但「两项之和取最小」的取舍逻辑完全一致。</p>
+  <figure data-figure="curve-bias-variance"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 为什么相同的汇总统计会隐藏截然不同的分布</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>两个数字不可能决定一条密度曲线：从矩问题到双峰</h3></div>
+  <p class="dt-lead">对应本章核心提问「为什么均值与标准差不足以描述一个双峰分布」，并回答第 4 节（#s4）「直方图 bin 宽度如何改变你对分布形状的判断」。正文已用经典配图（Anscombe 四重奏与 Datasaurus Dozen）给出「必须可视化」的证据；这里不重复那张图，而是讲清「凭什么不够」。</p>
+
+  <h4>背景：从一张图到一条定理</h4>
+  <p>1973 年 Anscombe 构造了四组散点，均值、方差、相关系数、回归线几乎完全相同，散点形态却是线性、曲线、离群点、垂直堆叠；2017 年 Matejka 与 Fitzmaurice 把这件事推到极致，做出十三个共享同样统计量、却分别呈恐龙、星形、圆环的数据集。这些例子常被当作「画图很重要」的劝告，其实背后是一条硬定理：<strong>有限个低阶矩不能唯一决定一个分布</strong>，这是概率论里「矩问题」（moment problem）的直接推论。均值与标准差只是前两阶矩，信息量根本不够。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>告诉你「某班平均身高 170 cm、标准差 8 cm」，你能画出身高直方图吗？不能。可能是众人集中在 170 上下的单峰钟形；也可能是「一批 158 cm 与一批 182 cm」两个明显分开的峰，平均起来恰好也是 170。均值只告诉你<strong>重心在哪</strong>，标准差只告诉你<strong>平均离重心多远</strong>，至于「数据堆成几堆、每堆多少人、堆与堆之间有没有空档」，这两个数字一个字都没记录。</p>
+  <p>类比：只知道一个物体的总重量和重心位置，猜不出它是实心球还是哑铃。更反直觉的是，把偏度、峰度也加上（四个数字）仍然不够——你需要的不是几个摘要，而是<strong>整条分布函数</strong>，或者至少一张图。这也是为什么本章正文反复强调「先画散点图／直方图，再算统计量」不是建议而是必需。</p>
+  <p>还要注意一个容易混淆的点：中心极限定理说「样本均值的分布趋近正态」，那是<strong>统计量</strong>的分布，不是<strong>原始数据</strong>的分布。原始数据可以双峰、重尾、完全不对称，而它的均值抽样分布照样是漂亮钟形。把这两件事分开，才不会误以为「CLT 保证了我的数据近似正态」。</p>
+
+  <h4>形式化</h4>
+  <div class="formula-box">
+    <div class="f-name">均值与方差只是前两阶矩</div>
+    $$ \mu = E[X], \qquad \sigma^2 = E\big[(X-\mu)^2\big], \qquad m_r = E[X^r] $$
+    <div class="f-note">白话：均值是一阶矩（重心），方差来自二阶矩（平均平方距离）；$m_r$ 是 $r$ 阶矩，把 $X$ 的 $r$ 次方求平均。我们平时报的「均值 + 标准差」只用到了 $m_1,m_2$。</div>
+  </div>
+
+  <p>下面给出一个<strong>显式构造</strong>，用初中代数就能验证：固定 $\sigma \gt 0$，对任意 $a \ge \sigma$ 定义对称三点分布</p>
+  <div class="formula-box">
+    <div class="f-name">无穷多个分布共享同一个均值与方差</div>
+    $$ P(X_a=-a) = P(X_a=a) = p, \quad P(X_a=0) = 1-2p, \quad p = \frac{\sigma^2}{2a^2} $$
+    $$ E[X_a] = -ap + ap = 0, \qquad \mathrm{Var}(X_a) = 2a^2 p = \sigma^2 $$
+    <div class="f-note">白话：无论 $a$ 取多大，均值恒为 0、方差恒为 $\sigma^2$；但 $a=\sigma$ 时是「只在 $\pm\sigma$ 两点」的分布，$a=\sqrt{2}\,\sigma$ 时一半质量堆在 0，$a$ 很大时几乎全部堆在 0、极小概率甩到 $\pm a$。均值、方差相同，形状天差地别。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">偏度与峰度仍只是两个数字</div>
+    $$ \gamma_1 = \frac{E[(X-\mu)^3]}{\sigma^3}, \qquad \gamma_2 = \frac{E[(X-\mu)^4]}{\sigma^4} - 3 $$
+    <div class="f-note">白话：偏度用三次方保留「尾巴朝哪」，峰度用四次方衡量「尾有多厚」；对上面的三点族，$\gamma_1$ 恒为 0（对称）、$\gamma_2 = a^2/\sigma^2 - 3$ 随 $a$ 变，所以峰度确实能区分它们，但它仍只是一个数，画不出「几堆、各堆多少」。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">矩问题的结论（有限矩不唯一，全部矩才可能唯一）</div>
+    $$ \text{给定有限个 } m_1,\dots,m_r \ \Longrightarrow\ \text{存在无穷多个不同的分布与之相符} $$
+    $$ \text{在有界支撑上，全部矩序列 } \{m_k\}_{k\ge 1} \ \Longrightarrow\ \text{唯一确定分布（Hausdorff）} $$
+    <div class="f-note">白话：只给你前几个矩，分布有无穷多种可能；只有把无穷多个矩全拿到手（且取值有界）才能锁定分布。我们实际算的四个数字离「全部」差得远，所以必须靠图形、经验分布函数或分位数向量来描述形状。</div>
+  </div>
+
+  <p>数值演示见代码实验 Part 3：构造 A（单峰）与 B（双峰）各 40 个数，都用线性重标定对齐案例字段 <code>quiz_avg</code> 的 $\mu=79.7574$、$\sigma=14.5763$。两者均值、标准差、偏度（都精确为 0，由对称构造保证）完全一致，但超额峰度分别为 $+0.6023$ 与 $-1.6036$，五数概括里 IQR 已出现分歧（17.86 对 25.94），而共同分组的 ASCII 直方图最直观：A 只有一个峰，B 有两个峰、中间有一道明显谷底。顺带也回答了 #s4：Sturges 对两者一律给 $k=7$ 组，FD 组距却分别是 10.447 与 15.169——组距规则本身也依赖分布形状。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>均值与标准差（连同偏度、峰度）只是分布的低阶矩摘要，<strong>有限个数字不能决定分布形状</strong>；要描述形状必须给出直方图／核密度／经验分布函数或分位数向量。「均值 + 标准差」只有在已预先假定分布族（如正态，此时二者是充分统计量）时才够用；分布族未知、尤其可能多峰或重尾时，必须先看图。</div>
+
+  <p><strong>边界条件：</strong>在分布族已被先验限定（例如确知数据来自正态分布，$\bar{x}$ 与 $s$ 构成充分统计量）的条件下，本结论不成立，应改用该分布族的充分统计量做参数推断；在分布族未知、可能多峰或重尾时，本结论成立，应改用直方图／核密度／经验分布函数或分布无关的方法（分位数、秩统计、箱线图），并至少用两三种组距交叉核对形状。</p>
+
+  <p>下图是中心极限定理：随着 $n$ 增大，<strong>样本均值</strong>的分布按 $\sigma^2/n$ 收缩并趋于正态。请把它与本专题的结论放在一起读——钟形的是统计量的抽样分布，原始数据仍可以是任意形状；CLT 恰恰说明「汇总统计会抹平形状」这件事有多彻底。</p>
+  <figure data-figure="curve-clt"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 箱线图 1.5×IQR 规则与直方图组距选择（Sturges / Freedman–Diaconis）</h2>
+<div class="algo-spec">
+  <p>这两个工具位于「数据采集 → 存储计算 → 建模 → 评估」链条的<strong>探索性分析入口</strong>：拿到一批数，先用五数概括 + 1.5×IQR 快速筛出疑似异常，再用直方图看形状。上游契约是「一列比率／区间尺度的数值」，下游契约是「异常标记、五数概括、组距与分箱结果」，供模块 04 分布拟合与模块 06 回归诊断使用。</p>
+
+  <h3 id="d-algo-principle">一、原理：用分位数代替均值，用组距控制分辨率</h3>
+  <p>箱线图的全部力量来自<strong>分位数</strong>：它不关心两端多极端，只关心排序位置，因此不会被异常值自己撑大（呼应深度专题一的崩溃点）。直方图则把连续取值切成等宽桶，组距 $h$ 是唯一的分辨率旋钮：$h$ 太大把双峰抹成一个包，$h$ 太小把随机空隙放大成假峰。</p>
+  <div class="formula-box">
+    <div class="f-name">五数概括与 1.5×IQR 栅栏</div>
+    $$ \mathrm{IQR} = Q_3 - Q_1, \qquad \text{下界} = Q_1 - 1.5\,\mathrm{IQR}, \qquad \text{上界} = Q_3 + 1.5\,\mathrm{IQR} $$
+    <div class="f-note">白话：盒子覆盖中间 50% 的数据，把盒子向两端各延长 1.5 个盒长，落在栅栏外的点标为疑似异常；用 $Q_1,Q_3$ 而非 $\bar{x},s$，所以异常值不会反过来抬高栅栏。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">系数 1.5 从哪来：正态下的误判率</div>
+    $$ Q_1 \approx \mu - 0.6745\sigma,\quad Q_3 \approx \mu + 0.6745\sigma,\quad \mathrm{IQR}\approx 1.349\sigma $$
+    $$ \text{上界} \approx \mu + 2.698\sigma \ \Longrightarrow\ P(|Z| \gt 2.698) \approx 2\big(1-\Phi(2.698)\big) \approx 0.007 $$
+    <div class="f-note">白话：1.5 是一个经验折中——在正态数据上，栅栏外只有约 0.7% 的正常点被误标为异常。这正是本章第 2 节提问「它把多少比例的正常点误判为异常」的答案；代码实验 Part 2 用 20 万个模拟点实测 0.0072。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">Sturges 组距（只依赖样本量）</div>
+    $$ k = \lceil \log_2 n \rceil + 1, \qquad h = \frac{x_{\max}-x_{\min}}{k} $$
+    <div class="f-note">白话：假设数据近似单峰、近似正态，用 $n$ 决定分几组；$n$ 翻倍才多一组，对偏态与多峰不敏感。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">Freedman–Diaconis 组距（用 IQR 抗异常值）</div>
+    $$ h = 2\,\mathrm{IQR}\,n^{-1/3}, \qquad k = \left\lceil \frac{x_{\max}-x_{\min}}{h} \right\rceil $$
+    <div class="f-note">白话：用四分位距而不是极差来定组宽，异常值拉不动它；数据越分散组越宽，样本越多组越细（按 $n^{-1/3}$ 收缩）。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">Scott 组距（对照）</div>
+    $$ h = 3.5\,s\,n^{-1/3} $$
+    <div class="f-note">白话：与 FD 同结构但用样本标准差 $s$；一旦有异常值，$s$ 被撑大、组距随之变宽，主体结构容易被抹平——这就是它不如 FD 稳健的原因。</div>
+  </div>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>排序并算五数概括。</strong>把 $n$ 个数升序排列，取最小值、$Q_1$、中位数、$Q_3$、最大值；偶数 $n$ 时 $Q_1,Q_3$ 取对应半段的中位数。</li>
+    <li><strong>算 IQR 与栅栏。</strong>$\mathrm{IQR}=Q_3-Q_1$，下界 $=Q_1-1.5\,\mathrm{IQR}$，上界 $=Q_3+1.5\,\mathrm{IQR}$；把界外点标为疑似异常，另用 $3\times\mathrm{IQR}$ 标极端异常。</li>
+    <li><strong>核查异常点。</strong>逐问：是录入错误吗？是真实但罕见的事件吗？含／不含它结论会变吗？保留两套结果，不急着删。</li>
+    <li><strong>选组距。</strong>先用 Sturges 得 $k_{\text{St}}$、用 FD 得 $h_{\text{FD}}$ 与 $k_{\text{FD}}$；二者差别大时<strong>至少画两张图</strong>交叉核对。</li>
+    <li><strong>分箱计数。</strong>确定起点（通常取 $x_{\min}$），把每个 $x$ 归入 $\lfloor (x-x_{\min})/h \rfloor$ 号桶，统计频数；注意声明纵轴是频数还是密度。</li>
+    <li><strong>读形状。</strong>看峰数、对称性、尾部、空隙；若 Sturges 与 FD 给出不同峰数，以「多组距一致出现」的结构为准，不轻易下结论。</li>
+    <li><strong>报告口径。</strong>同时给出 $n$、组距 $h$、组数 $k$、五数概括、异常点个数与处理决定，保证别人能复现同一张图。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>数据：</strong>单列定量数据，至少区间尺度；样本量建议 $n \ge 20$（小样本的分位数与组距都极不稳定）。</li>
+    <li><strong>1.5×IQR：</strong>分布近似对称时误判率约 0.7%；明显右偏时误判率显著上升（代码实测指数分布 4.84%），应改用按分布校准的栅栏或先做变换。</li>
+    <li><strong>Sturges：</strong>数据近似单峰、近似正态、无明显异常值；$n$ 不大（$n \lt 200$）时最常用。</li>
+    <li><strong>FD / Scott：</strong>数据有异常值、偏态或重尾时优先 FD；注意<strong>双峰数据 IQR 偏大反而使 FD 组数变少</strong>（代码 Part 3 中 $k_{\text{FD}}=4$ 对 $k_{\text{St}}=7$），此时 Sturges 或更窄的组距更能显出两个峰。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>构建（训练）</b> 排序 $O(n\log n)$；已排序后五数概括 $O(1)$，分箱计数 $O(n+k)$；<b>单次查询（推理）</b> 判定一个点是否异常 $O(1)$，归入某个桶 $O(1)$；<b>空间</b> 保留排序副本 $O(n)$，仅存桶计数 $O(k)$，流式分箱可压到 $O(k)$。</div>
+  <p>白话：最贵的一步是把数据排一遍序；排好之后，分位数、栅栏、分箱都是线性扫描，几乎不占内存。这正是它在大规模日志探查中仍然实用的原因。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>基于分位数，崩溃点约 50%，异常值不会自我掩盖（对比 3σ 规则）。</li>
+        <li>五数概括只需 5 个数就能刻画中心、离散与尾部，适合多组并排比较。</li>
+        <li>FD 组距对异常值稳健，且随 $n$ 自适应变细。</li>
+        <li>全部可手算、可复现，不依赖任何第三方库或分布假设。</li>
+        <li>图形直观，能立刻暴露双峰、偏态与空隙（深度专题二的核心诉求）。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>1.5×IQR 在偏态分布下误判率可达 4%~5%，把正常长尾当成异常。</li>
+        <li>Sturges 只看 $n$，对多峰、重尾、小样本都很迟钝。</li>
+        <li>FD 依赖 IQR；双峰数据的 IQR 偏大时组数反而变少，可能抹平双峰。</li>
+        <li>组距、起点、边界归属的微小差别就能改变视觉结论，必须报告口径。</li>
+        <li>箱线图不显示模态个数（单峰与双峰可以画出几乎相同的盒子）。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>某小组 12 名学员的每周学习分钟数（已排序）：</p>
+  <p>$$ 18,\ 22,\ 25,\ 29,\ 31,\ 33,\ 36,\ 38,\ 41,\ 45,\ 52,\ 96 $$</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">写出已知。</span>$n=12$，$x_{\min}=18$，$x_{\max}=96$，极差 $= 78$；末位 96 明显偏大，先不删，交给规则判断。</div>
+    <div class="solve-step"><span class="ss-k">中位数与四分位数。</span>$n$ 为偶数，中位数 $= (33+36)/2 = 34.5$；下半段 $\{18,22,25,29,31,33\}$ 给 $Q_1=(25+29)/2 = 27$；上半段 $\{36,38,41,45,52,96\}$ 给 $Q_3=(41+45)/2 = 43$。</div>
+    <div class="solve-step"><span class="ss-k">IQR 与栅栏。</span>$\mathrm{IQR}=43-27=16$，$1.5\times\mathrm{IQR}=24$；下界 $=27-24=3$，上界 $=43+24=67$。因 $96 \gt 67$，<strong>96 是疑似异常值</strong>。</div>
+    <div class="solve-step"><span class="ss-k">五数概括。</span>$18,\ 27,\ 34.5,\ 43,\ 96$；箱体 $[27,43]$，中位线 34.5 偏左，上须最长只到 52，96 单独画点——右偏形态与规则结论互相印证。</div>
+    <div class="solve-step"><span class="ss-k">Sturges 组距。</span>$\log_2 12 = 3.585$，$\lceil 3.585\rceil + 1 = 5$ 组；$h_{\text{St}} = 78/5 = 15.60$。五组为 $[18,33.6),[33.6,49.2),[49.2,64.8),[64.8,80.4),[80.4,96]$。</div>
+    <div class="solve-step"><span class="ss-k">FD 组距。</span>$12^{1/3} \approx 2.2894$，$h_{\text{FD}} = 2\times 16 / 2.2894 = 13.9773$；$k_{\text{FD}} = \lceil 78/13.9773\rceil = 6$ 组。FD 比 Sturges 多一组，主体部分被切得更细。</div>
+    <div class="solve-step"><span class="ss-k">对照 3σ 规则（重要反例）。</span>$\bar{x}=466/12=38.8333$，$\sigma=\sqrt{382.8056}=19.5654$，上界 $=38.8333+3\times19.5654 = 97.5296$。因 $96 \lt 97.5296$，<strong>3σ 规则没能抓到 96</strong>——因为 96 自己把 $\sigma$ 撑大了，这叫掩蔽效应（masking）。</div>
+    <div class="solve-step"><span class="ss-k">解释。</span>同一组数据，1.5×IQR 判 96 为异常、3σ 判为正常。原因是 IQR 的崩溃点约 50%，而 $\bar{x}$ 与 $s$ 的崩溃点为 0：异常值参与了自己是否被判异常的投票。这正是深度专题一「崩溃点」的直接后果。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>1.5×IQR 异常值规则</th><th>Sturges 组距</th><th>Freedman–Diaconis 组距</th><th>3σ 规则（对照）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>单列数值、$n\ge 20$、近似对称时最准</td>
+        <td>近似单峰、近似正态、无强异常值、$n$ 不大</td>
+        <td>含异常值、偏态、重尾；分布族未知</td>
+        <td>严格正态假设、无异常值污染</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td>排序 $O(n\log n)$，判定 $O(1)$，空间 $O(n)$</td>
+        <td>分箱 $O(n+k)$，空间 $O(k)$</td>
+        <td>需先算 IQR，再 $O(n+k)$，空间 $O(k)$</td>
+        <td>需算 $\bar{x},s$，$O(n)$，空间 $O(1)$</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>倍数 1.5（温和）/ 3（极端）、四分位数口径</td>
+        <td>无（只由 $n$ 决定），隐含正态假设</td>
+        <td>系数 2、指数 $-1/3$、IQR 口径</td>
+        <td>倍数 3，隐含「均值与标准差可靠」</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">崩溃点约 50%，抗污染、可手算</td>
+        <td>最简单，$n$ 给定时无需看数据</td>
+        <td class="best">抗异常值，随 $n$ 自适应变细</td>
+        <td>正态下理论误判率约 0.27%，有明确概率解释</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>偏态分布误判率升到约 4.84%（指数），把正常长尾当异常</td>
+        <td>双峰／重尾下组数固定为 7 左右，容易抹平结构</td>
+        <td>双峰 IQR 偏大反而组数变少（实测 $k=4$），可能隐藏双峰</td>
+        <td>崩溃点 0，异常值撑大 $\sigma$ 造成掩蔽（本例 96 漏判）</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>五数概括仅 5 个数，审计最易；需统一分位数口径</td>
+        <td>口径最轻，但必须说明「假设近似正态」</td>
+        <td>需报告 IQR 与 $h$，审计成本中等</td>
+        <td>口径最少，但结论在污染下不可信，工程风险最高</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="d-code">代码实验 · 崩溃点、误判率与同矩异形的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例 quiz_avg</span></div>
+  <pre>
+# 深度实验：稳健统计 / 1.5×IQR 误判率 / 相同汇总统计下的分布差异
+import random, math
+
+def mean(xs): return sum(xs)/len(xs)
+def sd(xs):
+    m=mean(xs); return math.sqrt(sum((x-m)**2 for x in xs)/len(xs))
+def moment4(xs):
+    m=mean(xs); s=sd(xs); z=[(x-m)/s for x in xs]
+    return sum(t**3 for t in z)/len(z), sum(t**4 for t in z)/len(z)-3
+def quantile(xs,p):
+    s=sorted(xs); t=(len(s)-1)*p; lo=int(t); hi=min(lo+1,len(s)-1); f=t-lo
+    return s[lo]*(1-f)+s[hi]*f
+def trimmed(xs,a):
+    s=sorted(xs); k=int(len(s)*a)
+    return mean(s[k:len(s)-k]) if k&gt;0 else mean(s)
+
+print("=== Part 1: 崩溃点（把最大的 k 个数换成 1000000） ===")
+clean=[62,65,68,70,71,73,75,76,78,79,80,82,84,85,87,89,90,92,94,96]
+print(" clean n=%d mean=%.3f median=%.3f trim10=%.3f trim20=%.3f" % (len(clean),mean(clean),quantile(clean,0.5),trimmed(clean,0.1),trimmed(clean,0.2)))
+print("   k       mean        median      trim10      trim20")
+for k in [0,1,2,3,4,5,9,10,11]:
+    bad=clean[:-k]+[1000000]*k if k&gt;0 else list(clean)
+    print("%4d  %11.2f  %11.2f  %11.2f  %11.2f" % (k, mean(bad), quantile(bad,0.5), trimmed(bad,0.1), trimmed(bad,0.2)))
+
+print()
+print("=== Part 2: 1.5×IQR 规则把多少正常点误判为异常 ===")
+def fp_rate(gen, M=200000):
+    xs=[gen() for _ in range(M)]
+    q1=quantile(xs,0.25); q3=quantile(xs,0.75); iqr=q3-q1
+    lo=q1-1.5*iqr; hi=q3+1.5*iqr
+    out=sum(1 for x in xs if x&lt;lo or x&gt;hi)
+    return q1,q3,lo,hi,out/M
+random.seed(20261107)
+for name,gen in [("normal N(0,1)", lambda: random.gauss(0,1)),
+                 ("exponential Exp(1)", lambda: -math.log(1-random.random()))]:
+    q1,q3,lo,hi,r=fp_rate(gen)
+    print(" %-20s Q1=%.4f Q3=%.4f fence=[%.4f, %.4f]  flagged=%.4f" % (name,q1,q3,lo,hi,r))
+
+print()
+print("=== Part 3: 相同的均值/标准差/偏度，完全不同的形状 ===")
+def rescale(xs,mu,s):
+    m=mean(xs); d=sd(xs); return [mu+(x-m)*s/d for x in xs]
+random.seed(20261107)
+MUQ, SDQ = 79.7574, 14.5763
+g=[random.gauss(0,1) for _ in range(20)]
+A=g+[-x for x in g]
+r=[random.gauss(1.6,0.45) for _ in range(20)]
+B=r+[-x for x in r]
+A=rescale(A,MUQ,SDQ); B=rescale(B,MUQ,SDQ)
+for name,xs in [("A 单峰",A),("B 双峰",B)]:
+    g3,g4=moment4(xs)
+    print(" %s: n=%d mean=%.4f sd=%.4f skew=%+.4f exkurt=%+.4f" % (name,len(xs),mean(xs),sd(xs),g3,g4))
+    print("        min=%.2f Q1=%.2f med=%.2f Q3=%.2f max=%.2f IQR=%.2f" % (min(xs),quantile(xs,0.25),quantile(xs,0.5),quantile(xs,0.75),max(xs),quantile(xs,0.75)-quantile(xs,0.25)))
+    k_st=math.ceil(math.log2(len(xs)))+1
+    h_fd=2*(quantile(xs,0.75)-quantile(xs,0.25))/(len(xs)**(1/3))
+    print("        Sturges k=%d (width=%.3f)   FD width=%.3f -&gt; k=%d" % (k_st,(max(xs)-min(xs))/k_st,h_fd,math.ceil((max(xs)-min(xs))/h_fd)))
+h=2*(quantile(A,0.75)-quantile(A,0.25))/(len(A)**(1/3))
+lo=min(min(A),min(B)); hi=max(max(A),max(B))
+nb=math.ceil((hi-lo)/h)
+def bars(xs):
+    c=[0]*nb
+    for x in xs:
+        i=min(nb-1,int((x-lo)/h)); c[i]+=1
+    return c
+ca,cb=bars(A),bars(B)
+print(" common-bin histogram (width=%.2f, %d bins):" % (h,nb))
+print("  bin              A        B")
+for i in range(nb):
+    print("  [%6.1f,%6.1f)  %-8s %-8s" % (lo+i*h, lo+(i+1)*h, "#"*ca[i], "#"*cb[i]))
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: 崩溃点（把最大的 k 个数换成 1000000） ===
+ clean n=20 mean=79.800 median=79.500 trim10=79.938 trim20=79.917
+   k       mean        median      trim10      trim20
+    0        79.80        79.50        79.94        79.92
+    1     50075.00        79.50        79.94        79.92
+    2    100070.30        79.50        79.94        79.92
+    3    150065.70        79.50     62574.19        79.92
+    4    200061.20        79.50    125068.56        79.92
+    5    250056.75        79.50    187563.00     83405.83
+    9    450039.85        79.50    437541.88    416711.00
+   10    500035.85    500039.50    500036.88    500037.67
+   11    550031.90   1000000.00    562531.94    583364.42
+
+=== Part 2: 1.5×IQR 规则把多少正常点误判为异常 ===
+ normal N(0,1)        Q1=-0.6811 Q3=0.6690 fence=[-2.7061, 2.6941]  flagged=0.0072
+ exponential Exp(1)   Q1=0.2874 Q3=1.3817 fence=[-1.3539, 3.0230]  flagged=0.0484
+
+=== Part 3: 相同的均值/标准差/偏度，完全不同的形状 ===
+ A 单峰: n=40 mean=79.7574 sd=14.5763 skew=+0.0000 exkurt=+0.6023
+        min=41.31 Q1=70.82 med=79.76 Q3=88.69 max=118.21 IQR=17.86
+        Sturges k=7 (width=10.986)   FD width=10.447 -&gt; k=8
+ B 双峰: n=40 mean=79.7574 sd=14.5763 skew=-0.0000 exkurt=-1.6036
+        min=55.95 Q1=66.79 med=79.76 Q3=91.24 max=103.57 IQR=25.94
+        Sturges k=7 (width=6.803)   FD width=15.169 -&gt; k=4
+ common-bin histogram (width=10.45, 8 bins):
+  bin              A        B
+  [  41.3,  51.8)  ##               
+  [  51.8,  62.2)  #        #####   
+  [  62.2,  72.6)  ############ ##############
+  [  72.6,  83.1)  ######### #       
+  [  83.1,  93.5)  ########## ###########
+  [  93.5, 104.0)  ####     #########
+  [ 104.0, 114.4)  #                
+  [ 114.4, 124.9)  #                </pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">Part 1 干净行</span>：$n=20$、均值 79.800、中位数 79.500、10% 截尾 79.938、20% 截尾 79.917，四者一致，说明数据干净时它们几乎等价——这正是「效率损失」还没显现的状态。</p>
+    <p><span class="ci-k">k=1 时 mean=50075.00</span>：一个坏点就把均值抬高约 5 万，对应崩溃点 $1/n=1/20=5\%$（公式给出 $\varepsilon^*(\bar{x})=1/n\to0$）；同一行 median=79.50、trim10=79.94、trim20=79.92 全部不动。</p>
+    <p><span class="ci-k">trim10 在 k=3 崩溃（62574.19）、trim20 在 k=5 崩溃（83405.83）</span>：$\lfloor 0.1\times20\rfloor+1=3$、$\lfloor 0.2\times20\rfloor+1=5$，即有限样本崩溃点 $3/20=15\%$、$5/20=25\%$，与理论 $(\lfloor\alpha n\rfloor+1)/n$ 精确一致。<span class="ci-k">median 直到 k=10 才跳到 500039.50</span>，对应 $\lfloor(20+1)/2\rfloor/20 = 10/20 = 50\%$。四行串起来就是「崩溃点从 0 到 50% 可调」的完整证据。</p>
+    <p><span class="ci-k">Part 2 的 0.0072</span>：正态数据下约 0.72% 的正常点被 1.5×IQR 误标，与理论 $2(1-\Phi(2.698))\approx0.007$ 吻合；实测栅栏 $[-2.7061,\,2.6941]$ 也与 $\pm2.698\sigma$ 一致。<span class="ci-k">0.0484</span>：换成右偏的指数分布后误判率升到 4.84%，约 6.7 倍——因为上栅栏 $3.0230$ 落在指数分布的右尾里。这回答了本章第 2 节的提问，也给出边界：分布明显偏态时，1.5×IQR 的「0.7%」不再成立。</p>
+    <p><span class="ci-k">Part 3 的 mean=79.7574 / sd=14.5763</span>：来自案例字段 <code>quiz_avg</code> 的 mean=79.76、sd=14.58；A 与 B 都被线性重标定到这两个值，所以前两阶矩<strong>完全相同</strong>。<span class="ci-k">skew=±0.0000</span>：两个数据集都由「一组数 + 它的相反数」构造，严格对称，连三阶矩都相同。<span class="ci-k">exkurt +0.6023 对 −1.6036</span>：四阶矩终于出现分歧（双峰分布的超额峰度为负），是一个线索，但单个数字仍画不出形状。</p>
+    <p><span class="ci-k">五数概括</span>：A 的 IQR=17.86、B 的 IQR=25.94，分位数已经比「均值+标准差」更早察觉差异——这也是箱线图比只报两个数字更诚实的原因。<span class="ci-k">Sturges k=7 对两者一律相同</span>（它只依赖 $n=40$）；<span class="ci-k">FD width 10.447（k=8）对 15.169（k=4）</span>：FD 依赖 IQR，而 B 的 IQR 更大，反而给出更少的组，可能把双峰抹平；本例 Sturges 的 width=6.803 更细，反而更能显出两个峰。这正是「必须多组距交叉核对」的数值理由。</p>
+    <p><span class="ci-k">共同分组直方图（width=10.45，8 组）</span>：A 在 $[62.2,72.6)$ 有 12 个、单峰；B 在 $[62.2,72.6)$ 有 14 个、在 $[83.1,104.0)$ 有 11+9 个，中间 $[72.6,83.1)$ 只剩 1 个，形成明显谷底。前两阶矩、甚至偏度都相同，形状却一个是单峰、一个是双峰——深度专题二的结论在这里可以直接数出来。改动 <code>random.gauss(1.6,0.45)</code> 里的 1.6（峰间距）会改变谷底深度；把它调到 0.8 以下，两个峰会合并，直方图就又看不出差别了。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>用五数概括 + 1.5×IQR 栅栏筛查疑似异常，并用 Sturges / Freedman–Diaconis 组距画直方图揭示分布形状；<strong>不做</strong>异常值归因、不做缺失填补、不做分布拟合，也不自动删除任何观测。</td></tr>
+    <tr><th>输入 / 输出</th><td>输入：一列区间／比率尺度的数值、样本量 $n$、可选的分位数口径与组距规则；输出：五数概括（与原量纲一致）、IQR、上下栅栏、疑似异常点清单、组距 $h$ 与组数 $k$、各桶频数。频数量纲为「个数」，密度量纲为「1/原单位」。</td></tr>
+    <tr><th>适用场景</th><td>探索性数据分析（EDA）、多组分布并排比较、模型残差诊断、时延／收入等右偏指标的异常筛查、训练前的特征体检、以及任何「必须先看清形状再选模型」的环节。</td></tr>
+    <tr><th>关键参数</th><td>栅栏倍数（默认 1.5，极端用 3，调大则误判更少但漏检更多）；截尾比例 $\alpha$（默认 0.1~0.2，越大越稳健、效率越低）；组距规则（Sturges / FD / Scott）；分位数插值口径（不同软件对 $Q_1,Q_3$ 定义略有差异，须固定并写明）；直方图起点与边界归属。</td></tr>
+    <tr><th>边界条件</th><td>在分布明显偏态、或样本量 $n \lt 20$ 的条件下，1.5×IQR 的「约 0.7% 误判率」与分位数估计都不适用，应改用按分布校准的栅栏、先做对数变换，或直接用分位数回归／重尾模型；在分布族已确知（如正态）时应改用该族的充分统计量 $\bar{x},s$ 做参数推断，而非反复调组距。</td></tr>
+    <tr><th>常见问题</th><td>① 以为 1.5×IQR 的误判率恒为 0.7%；② 把异常值一律删除而不报告两套结果；③ 只用一种组距就下「单峰／双峰」结论；④ 用 3σ 规则筛异常却被异常值自身掩蔽。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>1.5×IQR 规则到底会把多少正常点误判为异常？</summary><div class="faq-a">在近似正态的数据上约 0.7%（代码实测 0.0072），因为上栅栏落在 $\mu+2.698\sigma$ 附近。但这个数<strong>依赖分布</strong>：右偏的指数分布实测 0.0484，约 4.84%，高近 7 倍；重尾或明显偏态时还会更高。所以「0.7%」不是规则的属性，而是「规则 + 正态假设」共同的属性。</div></details>
+  <details><summary>箱线图没显示出双峰，是不是说明数据就是单峰？</summary><div class="faq-a">不是。箱线图只画五数概括，单峰与双峰完全可以共享同样的最小值、$Q_1$、中位数、$Q_3$、最大值（代码 Part 3 里 A 与 B 的均值、标准差、偏度都相同，IQR 已开始分歧但盒子形状仍相近）。判断峰数必须看直方图或核密度，而且要用两三种组距交叉核对——这正是深度专题二与算法第七步强调的。</div></details>
+  <details><summary>Sturges 和 Freedman–Diaconis 该用哪个？为什么 FD 有时反而组数更少？</summary><div class="faq-a">近似单峰、近似正态、无明显异常值且 $n$ 不大时，Sturges 简单够用；有异常值、偏态、重尾时优先 FD（用 IQR 而非极差定组宽，抗污染）。但 FD 的 $h=2\,\mathrm{IQR}\,n^{-1/3}$ 会随 IQR 增大而变宽：<strong>双峰数据 IQR 偏大，FD 反而给出更少的组</strong>（实测 B 的 $k_{\text{FD}}=4$ 而 $k_{\text{St}}=7$），可能抹平双峰。稳妥做法是两者都画，必要时再补一张更窄组距的图，只把「多种组距都出现」的结构当结论。</div></details>
+  <details><summary>为什么 3σ 规则没把 96 判成异常？</summary><div class="faq-a">因为 96 参与了自己是否被判异常的投票：它把 $\bar{x}$ 拉到 38.8333、把 $\sigma$ 撑到 19.5654，上界随之变成 97.5296，于是 96 反而落在界内。这叫掩蔽效应（masking），根源是 $\bar{x}$ 与 $s$ 的崩溃点为 0（深度专题一）。1.5×IQR 用崩溃点约 50% 的分位数，不受此影响，本例正确判出 96（上界 67）。</div></details>
+  <details><summary>截尾均值砍掉多少比例合适？删掉的点要报告吗？</summary><div class="faq-a">常用 10%~20%：崩溃点从 0 提到 10%~20%，而正态效率只损失几个百分点，性价比最高（对比中位数虽崩溃点 50%，但效率损失约 57%）。任何删除都必须报告：给「含异常值」与「不含异常值」两套结果，说明判定依据与比例；若极端值是真实业务信号（P99 延迟、大额欺诈），应单独建模或分层报告，而不是截掉。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">把 20 个数中最大的 1 个改成 100 万后，下列哪个统计量几乎不变？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 算术均值</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 标准差</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 中位数</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. 极差</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：中位数的崩溃点约 50%，只由排序中间位置决定，改 1 个端点不影响它。均值崩溃点 $1/n$，一个坏点即可推到无穷；标准差、极差同样依赖端点。代码 Part 1 中 $k=1$ 时 mean=50075.00 而 median 仍为 79.50。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">$n=20$ 时，20% 截尾均值（每端砍 $\lfloor 0.2\times20\rfloor=4$ 个）的有限样本崩溃点约为？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 1/20</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 5/20</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 10/20</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 20/20</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\varepsilon^*=(\lfloor\alpha n\rfloor+1)/n=(4+1)/20=5/20=25\%$。代码 Part 1 中 trim20 在 $k=4$ 仍为 79.92、到 $k=5$ 才跳到 83405.83，正好验证。10/20 是中位数的崩溃点。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="A">
+    <div class="q-text">在近似正态的数据上，1.5×IQR 规则把多少比例的正常点误判为异常？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 约 0.7%</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 约 5%</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 约 32%</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 恰好 0</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：上栅栏约 $\mu+2.698\sigma$，双侧误判率 $2(1-\Phi(2.698))\approx0.007$，代码实测 0.0072。注意这只在近似正态时成立；右偏指数分布实测 0.0484。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">关于「均值与标准差足以描述一个分布」的说法，下列哪项正确？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 总是正确，因为二者是充分统计量</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 加上偏度与峰度后就一定唯一确定分布</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 只要样本量足够大就成立</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 仅在预先假定分布族（如正态）时成立</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：有限个低阶矩不能唯一决定分布（矩问题）；代码 Part 3 构造了均值、标准差、偏度都相同但一个单峰、一个双峰的两组数据。只有先假定分布族（如正态，$\bar{x},s$ 为充分统计量）时，两个数字才够用；样本量再大也改变不了「有限矩不唯一」这一事实。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">某数据 $n=12$、$Q_1=27$、$Q_3=43$，用 Sturges 得到的组数与用 FD 得到的组数分别是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. 5 与 5</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. 5 与 6</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. 6 与 5</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 7 与 4</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mathrm{IQR}=16$，$\lceil\log_2 12\rceil+1 = 4+1 = 5$ 组（$h=15.60$）；$h_{\text{FD}}=2\times16/12^{1/3}=13.9773$，$\lceil78/13.9773\rceil=6$ 组。算法第六步有完整手算；两者不同时应至少画两张图交叉核对。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure data-classic="0"></figure>

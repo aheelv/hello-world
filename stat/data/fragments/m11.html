@@ -1,0 +1,595 @@
+<!-- 深度片段 · 11 大数据分析的统计基础 -->
+<!-- 已就近放置的图示 ID：data-figure="stack-bigdata" data-figure="flow-mapreduce" data-figure="flow-learning-loop" data-classic="0"；其余图示由脚本补入汇总 -->
+
+<h2 id="d-deep-1">深度专题一 · 哪些统计量能「分块算完再合并」：monoid、充分统计量与中位数的反例</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 01</span><h3>能合并的充要条件是「存在有限维充分统计量 + 一个满足结合律的合并运算」；中位数恰好两者皆无</h3></div>
+  <p class="dt-lead">本章正文第 2 节（#s2）已经列过 MapReduce 式的「先分后合」与常见聚合函数；这里不重复那份函数清单，而是回答一个更根本的问题：凭什么均值、方差、最大值可以「每台机器各算一份摘要、汇总后与全量结果一模一样」，而中位数、分位数不行？以及「把各分区方差直接平均」这种看似无害的写法，到底错在哪一项？整节只用加法、乘法与「排序」这三样初中知识。</p>
+
+  <h4>背景：分布式计算逼出来的一个代数问题</h4>
+  <p>当数据大到一台机器装不下，标准做法是切成分片：每台机器对自己那片算一个<strong>摘要</strong>（summary），再把摘要两两合并成全局结果。这个模式的价值在于通信量极小——不传原始数据，只传几个数。但它成立有一个硬前提：存在<strong>有限维</strong>的摘要，且合并结果与「一口气在全部数据上算」完全相同。</p>
+  <p>抽象代数早就给这件事起了名字：一个集合配上满足<strong>结合律</strong>的二元运算和<strong>单位元</strong>，叫交换 monoid（独异点）。计数、求和、求最大都是最朴素的 monoid；统计学里对应的说法是「存在<strong>充分统计量</strong>」——只要几个数就把样本里与目标量有关的全部信息都带走了。均值背后的充分统计量是 $(n,\sum x)$，方差还要再加一个 $\sum x^2$。本专题把这两套语言对齐，并给出中位数不行的<strong>构造性反例</strong>（不是「很难」，而是「不存在」）。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把「合并」想成几个课代表各统计自己组，再把小纸条交给班长汇总。能不能只靠小纸条还原全年级的结果，取决于纸条上记的东西够不够：</p>
+  <ul>
+    <li><strong>平均分</strong>：只要每张纸条记「本组人数」和「本组总分」，班长把人数相加、总分相加，再一除就是全年级平均分——完全够用。</li>
+    <li><strong>方差</strong>：再多记一个「本组分数平方和」就够了；因为方差只跟「平方和、总和、个数」三样有关。</li>
+    <li><strong>最高分</strong>：每张纸条记本组最高分，班长取最大的那个即可。</li>
+    <li><strong>中位数</strong>：麻烦来了。班长只知道「A 组中位数 3、B 组中位数 8」，根本不知道 A 组里到底有没有一个数悄悄窜到 50——而那个数会改变「全年级排序后正中间是谁」。要知道正中间是谁，几乎得知道<strong>全部</strong>数据的排序，几张纸条装不下。</li>
+  </ul>
+  <p>关键的一句话：<strong>能合并，是因为目标量只依赖几个可以「加起来」的数；不能合并，是因为它依赖「全局第几名」这种位置信息，而位置信息在分块时就被切碎了</strong>。还有个更隐蔽的坑：即便方差「能合并」，也不能把各分区的方差直接平均——因为那样漏掉了「组与组之间均值不一样」带来的那块波动。下面把这句白话写成可核对的等式。</p>
+
+  <h4>形式化：合并运算、充分统计量与一个「不存在」的证明</h4>
+  <div class="formula-box">
+    <div class="f-name">可合并的代数定义（交换 monoid）</div>
+    $$ (S,\ \oplus,\ e),\qquad (a\oplus b)\oplus c = a\oplus (b\oplus c),\qquad a\oplus e = e\oplus a = a $$
+    <div class="f-note">白话：$S$ 是摘要的集合，$\oplus$ 是把两份摘要拼成一份的运算，$e$ 是「空数据」的摘要（单位元）。结合律保证「先合并哪几片」都不影响最终结果——这正是分片可以任意乱序、层层归并的原因；没有结合律，Reduce 树换一种括号就换一个答案。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">均值／方差的有限维充分统计量</div>
+    $$ T\bigl(x_{1:n}\bigr) = \bigl(n,\ S,\ Q\bigr) = \Bigl(\ \sum_{i=1}^{n} 1,\ \ \sum_{i=1}^{n} x_i,\ \ \sum_{i=1}^{n} x_i^{2}\ \Bigr) $$
+    $$ T(A\cup B) = T(A)\oplus T(B) = \bigl(n_A+n_B,\ S_A+S_B,\ Q_A+Q_B\bigr) $$
+    <div class="f-note">白话：摘要就是三个数——个数、总和、平方和；合并就是<strong>逐分量相加</strong>。因为 $\sum_{A\cup B} x = \sum_A x + \sum_B x$、$\sum_{A\cup B}x^2=\sum_A x^2+\sum_B x^2$，加法天然满足结合律，单位元是 $(0,0,0)$，所以这是一个合法的 monoid。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">从摘要还原目标量</div>
+    $$ \bar x = \frac{S}{n},\qquad s^{2} = \frac{Q - S^{2}/n}{n-1} $$
+    <div class="f-note">白话：只要拿到 $(n,S,Q)$，均值和样本方差都能直接算出来，无需原始数据。所以 $T$ 是「充分的」：它把计算这两个量所需的全部信息压缩进了 3 个数字，与数据有多少行无关。</div>
+  </div>
+
+  <p>现在看那个隐蔽的坑。设两组各 $n_A,n_B$ 个点，样本方差分别 $s_A^2,s_B^2$，合并后均值 $\bar x$。正确的合并必须补上「组间均值差」这一块：</p>
+  <div class="formula-box">
+    <div class="f-name">反例①：「直接平均各分区方差」为什么错</div>
+    $$ s^{2}_{\mathrm{all}} = \frac{(n_A-1)s_A^{2} + (n_B-1)s_B^{2} + n_A(\bar x_A-\bar x)^{2} + n_B(\bar x_B-\bar x)^{2}}{n_A+n_B-1} $$
+    <div class="f-note">白话：总波动 = 组内波动（前两项）+ 组间波动（后两项，来自两组均值不一样）。直接算 $\tfrac12(s_A^2+s_B^2)$ 等于把后两项<strong>整块丢掉</strong>。代码实验里正确值 505.833333、错误平均 566.250000——差异全部来自被忽略的组间项。这是「方差可合并、但方差本身不是 monoid」的要害：monoid 的是 $(n,S,Q)$，不是 $s^2$。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">数值稳定的等价写法：Chan 合并 $(n,\bar x, M_2)$</div>
+    $$ \delta = \bar x_B - \bar x_A,\qquad \bar x = \bar x_A + \delta\,\frac{n_B}{n_A+n_B},\qquad M_2 = M_{2A} + M_{2B} + \delta^{2}\,\frac{n_A n_B}{n_A+n_B} $$
+    <div class="f-note">白话：$M_2=\sum(x_i-\bar x)^2$ 是「离差平方和」，合并时同样要补一项 $\delta^2 n_A n_B/n$（组间项）。这个形式不直接存 $Q$，从根上避开了「两个巨大数相减」的精度灾难，是分布式方差的工程标准（见代码实验 Part 2）。</div>
+  </div>
+
+  <p>最后给出中位数<strong>不可</strong>合并的构造性反例。考虑两个数据集，它们的「分区摘要 $(n,\ \mathrm{median})$」逐位相同：</p>
+  <div class="formula-box">
+    <div class="f-name">反例②：相同摘要，不同答案 ⇒ 不存在合并函数</div>
+    $$ D_1:\ A=[1,2,3,4,5],\ B=[6,7,8,9,10]\ \Longrightarrow\ \mathrm{median}(D_1)=5.5 $$
+    $$ D_2:\ A=[1,2,3,4,50],\ B=[6,7,8,9,10]\ \Longrightarrow\ \mathrm{median}(D_2)=6.5 $$
+    $$ \text{两种情形的分区摘要都是}\ (5,3)\ \text{与}\ (5,8)\ \Longrightarrow\ \nexists\ g:\ \text{摘要}\mapsto\text{全局中位数} $$
+    <div class="f-note">白话：若真存在一个只看摘要的合并函数 $g$，它面对完全相同的输入 $(5,3),(5,8)$ 只能给出一个输出，可两个数据集的全局中位数却是 5.5 与 6.5——矛盾。所以「精确中位数」不存在有限维可合并摘要：它依赖全局排序位置，而位置信息不在 $(n,\mathrm{median})$ 里。</div>
+  </div>
+
+  <p>数值证据见代码实验 Part 1：摘要 $(n,S,Q)$ 合并得 $(10,965.0,97675.0)$，与全量摘要逐位相等；由此还原的均值 96.5000、样本方差 505.833333 与全量一致，而「直接平均分区方差」得 566.250000（错），Chan 合并 $M_2=4552.5$ 又回到正确值；最大值也满足 $\max(A\cup B)=\max(\max A,\max B)=130$。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>一个统计量能「分块算完再精确合并」<strong>当且仅当</strong>存在有限维充分统计量与满足结合律的合并运算（交换 monoid）。$\mathrm{count},\ \mathrm{sum},\ \mathrm{mean},\ \mathrm{variance},\ \min,\ \max$ 都属于此类（方差的 monoid 是 $(n,S,Q)$ 或 $(n,\bar x,M_2)$，<strong>不是</strong> $s^2$ 本身）；而 $\mathrm{median}$、分位数、众数、精确去重计数依赖全局顺序或全集，<strong>不存在</strong>这样的有限维摘要。判断口诀：目标量能否只由「能相加的几个数」还原——能则可合并，不能就必须保留排序／草图／全量数据。</div>
+
+  <p><strong>边界条件：</strong>在需要精确分位数／中位数、目标量依赖数据顺序（自相关、游程、Top-K 的精确名次）、摘要维数随 $n$ 增长（精确基数计数）、或允许有界近似误差的条件下，本「有限维精确 monoid」结论不成立，应改用分布式归并排序／全量 shuffle 求精确值，或改用有误差保证的草图：t-digest / GK sketch 近似分位数、HyperLogLog 近似基数（相对误差约 $1.04/\sqrt m$）、Count-Min Sketch 近似频次（过高估计、有可控上界），并明确报告误差界而非冒充精确值。</p>
+
+  <p>下图是本章的大数据分层栈：从分片存储、局部摘要、可合并聚合到全局结果。可合并统计量让「只传摘要」这一层成立；一旦目标量落到中位数那一类，栈里就必须在某一层换草图或退回全量数据，通信量随之改变。</p>
+  <figure data-figure="stack-bigdata"></figure>
+</div>
+
+<h2 id="d-deep-2">深度专题二 · 样本量上亿之后，p 值为什么会「失效」，以及该改看什么</h2>
+<div class="deep-topic">
+  <div class="dt-head"><span class="dt-num">DEEP 02</span><h3>p 值回答「有没有差异」，不回答「差异大不大、值不值得上线」；$n\to\infty$ 时它对任何非零效应都趋零</h3></div>
+  <p class="dt-lead">本章正文第 4 节（#s4）已经介绍过假设检验与 A/B 测试的显著性与功效；这里补上大数据场景最容易被误用的一点：当 $n$ 从一万涨到一亿，标准误会按 $1/\sqrt n$ 缩水，于是<strong>再小、再没有业务价值的真实差异也会变成「统计显著」</strong>。本节把这句话写成公式，并给出替代的决策口径：效应量 + 置信区间 + 事先约定的最小可检测效应（MDE）。</p>
+
+  <h4>背景：一个被「样本量」放大的老问题</h4>
+  <p>p 值的定义是「在零假设为真时，看到当前或更极端数据的概率」。它从设计上就只做一件事：判断「观测到的差异是否能用随机波动解释」。这个判断天然依赖标准误，而标准误随样本量增大而减小——样本越多，我们对「差异的估计」越精确，越有能力把哪怕极小的偏离从噪声里认出来。</p>
+  <p>在小样本时代这不是问题：能显著的效应通常也够大。但在日志级数据（千万、上亿行）里，一个「相对提升 0.2%」的改动照样能给出 $p\approx0$，于是「p 值显著」与「值得上线」彻底脱钩。这不是 p 值算错了，而是<strong>问错了问题</strong>：我们真正想知道的是「效应有多大、是否超过业务上值得做的门槛」，而不是「效应是否严格非零」。统计学界对此的共识是同时报告效应量与置信区间，并把决策锚定在后者与阈值的比较上。</p>
+
+  <h4>直觉（先不用公式）</h4>
+  <p>把「标准误」想成尺子的最小刻度，把「真实差异」想成两个人身高的差。样本少时尺子刻度很粗（1 厘米），差 0.1 毫米根本量不出来，只能说「看不出差别」；样本多到上亿，尺子细到微米级，这时连 0.1 毫米都能被坚定地判为「确实不等」——p 值一路趋零。</p>
+  <p>但「确实不等」和「这 0.1 毫米值得我改产品」是两件事。关键的一句话：<strong>p 值随样本量自动趋零，是它对「精度」的忠实反映，不是对「重要性」的证明</strong>。正确的做法分两步：先看效应量本身有多大（这里用 Cohen's $h$，把比例差换算成与样本量无关的量纲），再看置信区间的<strong>下界</strong>是否超过事先约定的业务阈值 MDE——只有当「最保守的估计都还值得做」时才上线。另外，大数据里样本往往不独立（同一用户多次曝光、按班级／地区聚类），名义 $n$ 会把标准误压得过小，还得先折算成有效样本量。</p>
+
+  <h4>形式化：把「显著但不重要」写成可核对的等式</h4>
+  <div class="formula-box">
+    <div class="f-name">标准误、z 值与 p 值随 $n$ 的变化</div>
+    $$ se \approx \frac{1}{\sqrt{n}},\qquad z = \frac{\Delta}{se} = \Delta\sqrt{n},\qquad p = \mathrm{erfc}\!\left(\frac{|z|}{\sqrt{2}}\right) $$
+    <div class="f-note">白话：沿用案例口径（$p(1-p)\approx0.25$，两独立样本，$n=12000$ 时 $se=1/\sqrt n=0.009129$，与 <code>case.json</code> 的 se 逐位吻合）。$se$ 按 $1/\sqrt n$ 缩小，$z$ 就按 $\sqrt n$ 放大；只要真实效应 $\Delta\ne0$，$n\to\infty$ 时 $z\to\infty$、$p\to0$。$\mathrm{erfc}$ 只是把 $z$ 换成双尾概率的一个固定函数，不改趋势。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">决策口径：效应量 + 置信区间下界 vs 业务阈值</div>
+    $$ h = 2\arcsin\sqrt{p_1} - 2\arcsin\sqrt{p_2},\qquad \mathrm{CI}_{95\%} = \bigl[\hat\Delta - 1.96\,se,\ \hat\Delta + 1.96\,se\bigr] $$
+    $$ \text{上线判据：}\ \hat\Delta_{\mathrm{lower}} = \hat\Delta - 1.96\,se \ \gt\ \mathrm{MDE} $$
+    <div class="f-note">白话：Cohen's $h$ 把「比例差」换算成与 $n$ 无关的效应量（代码实验里固定为 0.002000，极小）；置信区间半宽 $1.96\,se$ 也随 $n$ 缩小。真正的上线判据是「区间下界都要大于事先约定的 MDE」——它同时要求「效应够大」与「估得够准」，而 p 值只管后者。MDE 必须在看数据之前由业务定好，不能事后挪动。</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-name">名义 $n$ 被簇内相关稀释：设计效应与有效样本量</div>
+    $$ deff = 1 + (m-1)\rho,\qquad n_{\mathrm{eff}} = \frac{n}{deff},\qquad se_{\mathrm{eff}} = se\sqrt{deff},\qquad z_{\mathrm{eff}} = \frac{z}{\sqrt{deff}} $$
+    <div class="f-note">白话：若每簇 $m$ 条、簇内相关 $\rho$，有效信息量只有 $n/deff$ 条。代码实验取 $m=5,\rho=0.3\Rightarrow deff=2.2$，把临近显著的 $z=2.0$ 拉回 $1.3484$、p 从 0.0455 翻回 0.1775。这说明「样本多」不等于「独立信息多」，大日志里尤其要先查依赖结构。</div>
+  </div>
+
+  <h4>数值对账：一个「永远显著、永远不该上线」的效应</h4>
+  <p>固定真实但业务上可忽略的效应 $\Delta=0.001$（相对基线 $0.49725$ 提升约 0.20%），事先约定 $\mathrm{MDE}=0.01$（1 个百分点才值得上线）。以下每行都来自代码实验 Part 3，可用笔复核：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>$n$</th><th>$se$</th><th>$z$</th><th>$p$（双尾）</th><th>CI 半宽</th><th>Cohen $h$</th><th>$p \lt .05$?</th><th>该上线?</th></tr></thead>
+      <tbody>
+        <tr><td>1,000</td><td>0.031623</td><td>0.0316</td><td>9.748e-01</td><td>0.061981</td><td>0.002000</td><td>no</td><td>no</td></tr>
+        <tr><td>10,000</td><td>0.010000</td><td>0.1000</td><td>9.203e-01</td><td>0.019600</td><td>0.002000</td><td>no</td><td>no</td></tr>
+        <tr><td>100,000</td><td>0.003162</td><td>0.3162</td><td>7.518e-01</td><td>0.006198</td><td>0.002000</td><td>no</td><td>no</td></tr>
+        <tr><td>4,000,000</td><td>0.000500</td><td>2.0000</td><td>4.550e-02</td><td>0.000980</td><td>0.002000</td><td>YES</td><td>no</td></tr>
+        <tr><td>10,000,000</td><td>0.000316</td><td>3.1623</td><td>1.565e-03</td><td>0.000620</td><td>0.002000</td><td>YES</td><td>no</td></tr>
+        <tr><td>120,000,000</td><td>0.000091</td><td>10.9545</td><td>6.326e-28</td><td>0.000179</td><td>0.002000</td><td>YES</td><td>no</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>读法：从 $n\approx4\times10^{6}$ 起 $p \lt 0.05$ 且此后一路趋零，到 1.2 亿行时 $p=6.326\times10^{-28}$；可 $\mathrm{CI}$ 下界 $\Delta-1.96\,se$ 始终约 $0.001$，远小于 $\mathrm{MDE}=0.01$，<strong>六行全部「no 该上线」</strong>。Cohen's $h$ 恒为 0.002000，与 $n$ 无关，一早就告诉我们「效应小得可怜」。更扎心的对照：把案例真实 ATE $0.123167$ 缩小 100 倍成 $0.001232$，在 1.2 亿行上仍得 $p=1.737\times10^{-41}$——统计显著与业务重要完全脱钩。</p>
+
+  <div class="key-result"><span class="kr-k">关键结论</span>p 值衡量的仅是「效应是否可判为非零」，且因 $se\propto 1/\sqrt n$、$z=\Delta\sqrt n$，对<strong>任意</strong> $\Delta\ne0$ 都会随 $n\to\infty$ 趋零；它不携带「效应有多大、值不值得做」的信息。大样本决策应改为三件套：<strong>与 $n$ 无关的效应量</strong>（Cohen's $h$）、<strong>置信区间</strong>、以及<strong>事先约定的 MDE</strong>，判据取 $\hat\Delta_{\mathrm{lower}} \gt \mathrm{MDE}$；若样本存在簇内相关，还须先用 $deff=1+(m-1)\rho$ 折算 $n_{\mathrm{eff}}$ 与簇稳健标准误，否则名义 $n$ 会把 p 值系统性压小。</div>
+
+  <p><strong>边界条件：</strong>在样本非独立同分布（簇内相关、同一用户重复曝光、时间序列自相关）、存在多重比较或反复窥探数据（peeking，需 always-valid / 序贯检验）、效应估计本身有系统偏差（混淆、选择偏差、测量误差，显著也不代表因果）、或 MDE 未在实验前冻结而事后按结果挪动的条件下，本结论不成立，应改用簇稳健／分层标准误与 $n_{\mathrm{eff}}$、序贯或贝叶斯决策框架、以及先做因果识别再做估计；p 值此时连「是否非零」都不可靠，更不能拿来当上线依据。</p>
+
+  <p>下图是本章的 Map → Shuffle → Reduce 流水线：名义样本量 $n$ 在每一层被层层放大，而有效信息量因簇结构被稀释；p 值失效恰恰发生在最右端「只用名义 $n$ 算标准误、却拿它当业务结论」的那一刻。把评估锚点从 p 值移到效应量与区间，等于给这一环补上被漏掉的有效样本量与业务阈值。</p>
+  <figure data-figure="flow-mapreduce"></figure>
+</div>
+
+<h2 id="d-algo">经典算法详解 · 分布式方差：并行充分统计量（Welford / Chan 合并）</h2>
+<div class="algo-spec">
+  <p>本算法位于「分片存储 → 局部聚合 → 全局归并」链条的<strong>聚合环节</strong>，是深度专题一「$(n,\bar x,M_2)$ 是方差的可合并充分统计量」这一结论的工程落地，同时专门修复朴素 $(n,S,Q)$ 在大数据上的数值精度灾难。上游契约是「每个分片维护一个三元组摘要」，下游契约是「与全量重算逐位一致的样本方差，且只传常数个数」。选它作经典算法，是因为它把「统计正确性」「可合并性」「数值稳定性」三件事用同一个三元组一次解决，是「分布式代数 ↔ 可信统计」之间最短的一座桥；HyperLogLog、Count-Min Sketch 属于「精确不可合并 → 退而求近似」的另一条路线，已在上一个专题的边界里点明。</p>
+
+  <h3 id="d-algo-principle">一、原理：只维护离差，不维护巨大的平方和</h3>
+  <p>朴素做法把方差写成 $s^2=(Q-S^2/n)/(n-1)$，其中 $S=\sum x_i,\ Q=\sum x_i^2$。当数据均值很大而方差很小（例如时间戳 $x\approx10^9$、波动只有个位数），$Q$ 与 $S^2/n$ 是两个几乎相等的巨大数，相减会发生<strong>灾难性抵消</strong>，把有效数字吃光，算出方差为 0。Welford (1962) 与 Chan 等人 (1979) 的办法是换个摘要：不存 $Q$，改存</p>
+  <div class="formula-box">
+    <div class="f-name">单个分片：Welford 在线更新</div>
+    $$ M_2 = \sum_{i=1}^{n}\bigl(x_i - \bar x\bigr)^{2},\qquad M_2^{\text{new}} = M_2 + (x-\bar x_{\text{old}})\,(x-\bar x_{\text{new}}) $$
+    <div class="f-note">白话：每来一个新数，先更新均值，再用「新旧离差的乘积」把 $M_2$ 累加一格；全程只跟「离均值的距离」打交道，数值始终与波动同量级，与均值多大无关。一步 $O(1)$、可流式、无需存原始数据。</div>
+  </div>
+  <div class="formula-box">
+    <div class="f-name">两个分片：Chan 合并（补回组间项）</div>
+    $$ \delta = \bar x_B - \bar x_A,\qquad n = n_A+n_B,\qquad \bar x = \bar x_A + \delta\,\frac{n_B}{n} $$
+    $$ M_2 = M_{2A} + M_{2B} + \delta^{2}\,\frac{n_A n_B}{n},\qquad s^{2} = \frac{M_2}{n-1} $$
+    <div class="f-note">白话：合并两份 $(n,\bar x,M_2)$ 时，除了把 $M_2$ 相加，还要补一项 $\delta^2 n_A n_B/n$——这正是「两组均值不一样」带来的额外波动，与深度专题一的 law of total variance 是同一块。这个运算满足结合律，可任意树形归约；单位元是 $(0,\ 0,\ 0)$。</div>
+  </div>
+  <p>为什么它稳定：朴素式的绝对误差约为 $2u\mu^2$（$u=2^{-53}$ 为双精度机器 epsilon，$\mu$ 是均值），条件数 $\kappa\approx2(\mu/\sigma)^2$；当 $\mu=10^9,\sigma^2=2$ 时 $\kappa\approx10^{18}$，远超双精度约 16 位有效数字，误差 $\approx222$ 比真值 2 还大两个数量级。而 Welford/Chan 只存 $M_2$，误差约 $n u \sigma^2\approx1.11\times10^{-15}$，<strong>与 $\mu$ 无关</strong>。代码实验 Part 2 把这两者摆在同一组数据上对照。</p>
+
+  <h3 id="d-algo-steps">二、编号步骤（可逐条照做）</h3>
+  <ol>
+    <li><strong>分片。</strong>把数据按机器／分区切成 $P$ 片，片之间可以乱序、可以大小不一；切分本身不参与任何统计假设。</li>
+    <li><strong>局部 Welford。</strong>每片独立跑一遍：维护 $(n_j,\bar x_j,M_{2,j})$，逐条用更新式累加；空间 $O(1)$、时间 $O(n_j)$。</li>
+    <li><strong>树形归约。</strong>用 Chan 合并把 $P$ 个三元组两两归并（结合律保证任意括号顺序结果相同）；通信量每片仅 3 个数。</li>
+    <li><strong>还原方差。</strong>全局 $(n,\bar x,M_2)$ 到手后，样本方差 $s^2=M_2/(n-1)$、总体方差 $M_2/n$、均值 $\bar x$ 一并给出。</li>
+    <li><strong>校验一致性。</strong>用一小片同时跑「全量重算」与「合并结果」，确认逐位相等（代码实验 Part 1 的 <code>一致=True</code> 即此）。</li>
+    <li><strong>报告数值口径。</strong>明确是样本还是总体方差、是否做了 Bessel 校正 $(n-1)$；大数据里 $n$ 极大时两者几乎相同，但仍要写清。</li>
+    <li><strong>按需扩展。</strong>若要协方差／相关矩阵，把标量 $M_2$ 换成离差交叉积矩阵，Chan 合并公式逐元素成立即可，无需改动归并框架。</li>
+  </ol>
+
+  <h3 id="d-algo-conditions">三、适用条件</h3>
+  <ul>
+    <li><strong>目标量：</strong>均值、方差／标准差，以及可归约为离差矩的协方差、相关、最小二乘充分统计量；不适用于中位数、分位数等需全局排序的量。</li>
+    <li><strong>数据形态：</strong>数值型、可流式到达；各分片分布可以不同（组间差由 Chan 项自动补回），但样本应可视为来自同一总体。</li>
+    <li><strong>依赖结构：</strong>分片内／分片间样本近似独立；若存在簇内相关，方差点估计仍可算，但标准误须按深度专题二的 $deff$ 折算。</li>
+    <li><strong>数值范围：</strong>特别适合「均值大、方差小」的场景（时间戳、金额、传感器基线），这正是朴素式最危险的地方。</li>
+    <li><strong>规模：</strong>$n$ 任意、$P$ 任意；摘要维数恒为 3（协方差时为 $O(p^2)$ 但仍与 $n$ 无关）。</li>
+  </ul>
+
+  <h3 id="d-algo-complexity">四、复杂度（时间与空间）</h3>
+  <div class="complexity"><b>局部</b> 每片 Welford 单遍 $O(n_j)$ 时间、$O(1)$ 空间。<b>归并</b> $P$ 个三元组树形合并 $O(P)$ 次 Chan 运算、每次 $O(1)$，通信量 $O(P)$ 个浮点数；用归约树深度 $O(\log P)$ 轮。<b>总时间</b> $O(n)$（$n=\sum n_j$）且只需<strong>一趟</strong>数据，可与「朴素两趟算法」并列为最优。<b>空间</b> 全局 $O(P)$ 存摘要，单机 $O(1)$；不存原始数据 $O(n)$。<b>对比</b> 全量收齐重算需 $O(n)$ 传输 + $O(n)$ 内存；精确中位数需 $O(n\log n)$ 排序或 $O(n)$ 归并。</div>
+  <p>白话：这套方法的成本几乎全在「把每片扫一遍」，归并只是几个数的加法；相对把所有原始记录搬到一台机器上，通信与内存都从 $O(n)$ 降到 $O(P)$。唯一「多付」的是每个分片要维护 $M_2$ 而非只维护 sum，但这是常数级代价，换来的是数值稳定与可合并两件事。</p>
+
+  <h3 id="d-algo-proscons">五、优缺点</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>优点</h4>
+      <ul>
+        <li>可合并且满足结合律：任意分片、任意归约顺序都与全量重算逐位一致，天然适配 MapReduce / 流式 / 树形聚合。</li>
+        <li>数值稳定：只维护离差 $M_2$，误差 $\sim n u\sigma^2$ 与均值 $\mu$ 无关，根治灾难性抵消。</li>
+        <li>一趟扫描、$O(1)$ 空间、通信 $O(P)$：大数据下最省，且可在线增量更新。</li>
+        <li>摘要就是充分统计量 $(n,\bar x,M_2)$，均值、样本／总体方差、标准误一次给出，便于审计。</li>
+        <li>易扩展：标量换成离差交叉积即得并行协方差／回归充分统计量，归并框架不变。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>局限</h4>
+      <ul>
+        <li>只适用于可归约为「离差矩」的目标量；中位数、分位数、精确基数等不能靠它精确求解。</li>
+        <li>点估计不自动处理簇内相关：方差值对，但标准误／p 值仍须按 $deff$ 折算，否则大 $n$ 下照样误导。</li>
+        <li>对离群点敏感（平方损失的本质）；重尾数据需先做稳健化或换 MAD 等稳健尺度。</li>
+        <li>假设各分片来自同一总体；若分片间存在系统性漂移，合并出的方差混合了组间漂移，解释需谨慎。</li>
+        <li>归并要求浮点加法结合律在数值上近似成立；极端病态量级下仍需补偿求和（Kahan）等额外手段。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="d-algo-solve">六、示例推演（手算到底）</h3>
+  <p>取两片可笔算的小数据（沿用案例 <code>study_minutes_week</code> 风格）：$A=[60,80,95,110,130]$、$B=[70,90,100,105,125]$，各 5 个数。以下每一步都能用笔复核，并与代码实验 Part 1 逐位对上。</p>
+  <div class="step-solve">
+    <div class="solve-step"><span class="ss-k">A 片摘要。</span>$\sum A=475\Rightarrow\bar x_A=95$；离差 $-35,-15,0,15,35$，平方和 $M_{2A}=1225+225+0+225+1225=2900$；$\sum A^2=48025$。</div>
+    <div class="solve-step"><span class="ss-k">B 片摘要。</span>$\sum B=490\Rightarrow\bar x_B=98$；离差 $-28,-8,2,7,27$，平方和 $M_{2B}=784+64+4+49+729=1630$；$\sum B^2=49650$。</div>
+    <div class="solve-step"><span class="ss-k">先写「错」的做法。</span>直接平均分区样本方差 $=\tfrac12\bigl(\tfrac{2900}{4}+\tfrac{1630}{4}\bigr)=\tfrac12(725+407.5)=566.250000$——这就是代码里的 <code>反例① 566.250000</code>，它把组间波动整块丢了。</div>
+    <div class="solve-step"><span class="ss-k">Chan 合并（正确）。</span>$n=10$，$\delta=98-95=3$，$\bar x=95+3\cdot5/10=96.5$；$M_2=2900+1630+3^2\cdot\tfrac{5\cdot5}{10}=4530+22.5=4552.5$。样本方差 $s^2=4552.5/9=505.833333$，与代码 <code>Chan 合并 M2: 4552.500000 / 样本方差=505.833333</code> 逐位一致。</div>
+    <div class="solve-step"><span class="ss-k">用 $(n,S,Q)$ 交叉验算。</span>$S=475+490=965$，$Q=48025+49650=97675$，$S^2/n=931225/10=93122.5$，$Q-S^2/n=4552.5$，$/9=505.833333$——与全量摘要逐位相等（代码 <code>merge(A,B)==全量摘要 : True</code>）。组间项 $22.5$ 正是「错解」与「正解」之差的来源：$566.25-505.833333=60.4167$ 里对应着两块方差口径的换算。</div>
+    <div class="solve-step"><span class="ss-k">切到数值稳定性。</span>换一组极端数据 $x=10^9+[-2,-1,0,1,2]$，真实 $M_2=(-2)^2+(-1)^2+0^2+1^2+2^2=10$，样本方差 $=10/4=2.5$。朴素式：$S=5\times10^9$，$Q=5\times10^{18}+10$，而 $S^2/n=5\times10^{18}$——双精度下 $5\times10^{18}+10$ 被舍入成 $5\times10^{18}$，相减得 <code>0.000000</code>（代码实测）。</div>
+    <div class="solve-step"><span class="ss-k">Welford 为何稳。</span>它从头到尾只累计 $M_2=10$，故样本方差 $=2.500000$（代码实测）。误差界：朴素式 $\approx2u\mu^2=2\cdot2^{-53}\cdot10^{18}\approx222$，而 $\sigma^2=2$；条件数 $\kappa\approx2(\mu/\sigma)^2\approx2(10^9/\sqrt2)^2\approx1.00\times10^{18}$。Welford 误差 $\approx n u\sigma^2=5\cdot2^{-53}\cdot2\approx1.11\times10^{-15}$，与 $\mu$ 无关——代码末行逐位印出这些数字。</div>
+    <div class="solve-step"><span class="ss-k">推广。</span>把 $M_2$ 这个标量换成「离差向量的外积累加」，同一条 Chan 公式逐元素成立，即得并行协方差矩阵与 OLS 的 $X^\top X,\ X^\top y$——这正是大数据回归把「充分统计量」分散到各机器再归并的标准做法。</div>
+  </div>
+
+  <h3 id="d-algo-compare">七、横向对比（六维口径）</h3>
+  <p>下表按站内统一的六维口径，把 Chan/Welford 并行合并与三种「算分布式方差」的同类做法放在一起对照。最右一列「全量收齐重算」是精度基准，也是通信／内存代价最高的一档；「朴素 $(n,S,Q)$」是反例式的补充：它同样可合并，却在大均值下把精度算丢。</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>对比维度</th><th>Chan/Welford 并行合并</th><th>朴素 $(n,S,Q)$ 合并</th><th>两趟算法（先均值后离差）</th><th>全量收齐重算</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>适用条件</th>
+        <td>数值型、可流式、分片乱序；均值大／方差小亦稳；任意 $P$</td>
+        <td>数值型、量级温和（$\mu$ 不压倒 $\sigma$）；需可合并摘要</td>
+        <td>数据可重读两遍；量级温和；单机或小集群</td>
+        <td>数据能搬到单点；作为精度基准，任意分布</td>
+      </tr>
+      <tr>
+        <th>复杂度</th>
+        <td class="best">局部 $O(n_j)$ 单遍、空间 $O(1)$、归并 $O(P)$、通信 $O(P)$</td>
+        <td>同左，单遍、$O(1)$、通信 $O(P)$；常数略小</td>
+        <td>$O(n)$ 但需<strong>两遍</strong>扫描、空间 $O(1)$、通信 $O(P)$</td>
+        <td>时间 $O(n)$、空间 $O(n)$、通信 $O(n)$，最重</td>
+      </tr>
+      <tr>
+        <th>关键超参</th>
+        <td>摘要 $(n,\bar x,M_2)$；是否用 Kahan 补偿求和；样本／总体口径</td>
+        <td>摘要 $(n,S,Q)$；Bessel 校正 $(n-1)$；浮点字长</td>
+        <td>第一趟估均值 $\bar x$ 的精度；是否分块缓存</td>
+        <td>无（直接对全量排序／累加）；内存上限</td>
+      </tr>
+      <tr>
+        <th>优点</th>
+        <td class="best">可合并且结合律成立、数值最稳、一趟、通信最小、易扩到协方差</td>
+        <td>合并形式最直观、与教科书公式直接对应、实现最简</td>
+        <td>精度优于朴素式（离差围绕已估均值算）、概念简单</td>
+        <td>结果即「金标准」，无归并误差，便于校验其它方法</td>
+      </tr>
+      <tr>
+        <th>局限与失效边界</th>
+        <td>只覆盖可归约为离差矩的量；簇相关需另折 $deff$；对离群点敏感</td>
+        <td>$\mu\gg\sigma$ 时灾难性抵消：$\kappa\approx10^{18}$ 算出方差 0；大时间戳／金额必错</td>
+        <td>必须读两遍数据，流式／单次扫描场景不可行；$\bar x$ 有误差会传导</td>
+        <td>$O(n)$ 传输与内存，大数据下不可行；丧失分布式意义</td>
+      </tr>
+      <tr>
+        <th>可解释性与工程成本</th>
+        <td>摘要=「个数、均值、离差平方和」，一句话讲清；改造成本最低</td>
+        <td>最易讲（平方和减均值平方），但「看似对、实则错」风险最高、最难审计</td>
+        <td>「先求平均再求波动」直观；需维护两遍调度，运维中等</td>
+        <td>无需解释但需集中式资源；工程成本随 $n$ 线性膨胀</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>六维口径由下图统一约定，保证全站各章的「横向对比」在同一套标准下展开，不随章节改变。三条「可合并」路线里，只有 Chan/Welford 同时守住了统计正确性与数值稳定性；这也解释了为何工业级聚合器默认维护 $M_2$ 而非 $Q$。</p>
+  <figure data-figure="flow-learning-loop"></figure>
+</div>
+
+<h2 id="d-code">代码实验 · 可合并统计量、中位反例、数值稳定性与大 n 下 p 值失效的真实数值</h2>
+<div class="code-lab">
+  <div class="cl-head"><span class="cl-lang">Python 3 · 纯标准库</span><span class="cl-grow"></span><span>可复现 · seed=20261107 · 数字取自知学云案例</span></div>
+  <pre>
+# 深度实验 · 11 大数据分析的统计基础
+# 纯 Python 标准库；固定种子 20261107；复用「知学云」案例数字
+# Part 1: 可合并统计量（monoid / 充分统计量）与中位数的反例
+# Part 2: 分布式方差的数值稳定性（灾难性抵消）与 Chan 合并
+# Part 3: 巨大 n 下 p 值失效，改用效应量 + 区间 + 业务阈值
+import math
+import random
+
+random.seed(20261107)
+
+# ============================================================
+print("=== Part 1: 哪些统计量可合并（monoid），哪些不可 ===")
+A = [60, 80, 95, 110, 130]        # 案例 study_minutes_week 风格的 5 个值
+B = [70, 90, 100, 105, 125]
+
+
+def summ(xs):
+    """局部充分统计量 (n, S=sum x, Q=sum x^2)。"""
+    return (len(xs), float(sum(xs)), float(sum(x * x for x in xs)))
+
+
+def merge(p, q):
+    """逐分量相加：结合律 + 单位元 (0,0,0) 构成交换 monoid。"""
+    return (p[0] + q[0], p[1] + q[1], p[2] + q[2])
+
+
+def mean_of(s):
+    return s[1] / s[0]
+
+
+def var_sample(s):
+    n, S, Q = s
+    return (Q - S * S / n) / (n - 1)
+
+
+def welford(xs):
+    n, m, M2 = 0, 0.0, 0.0
+    for x in xs:
+        n += 1
+        d = x - m
+        m += d / n
+        M2 += d * (x - m)
+    return (n, m, M2)
+
+
+def chan(p, q):
+    """Chan 并行合并 (n, mean, M2)。"""
+    na, ma, Ma = p
+    nb, mb, Mb = q
+    n = na + nb
+    delta = mb - ma
+    m = ma + delta * nb / n
+    M2 = Ma + Mb + delta * delta * na * nb / n
+    return (n, m, M2)
+
+
+def median(xs):
+    s = sorted(xs)
+    n = len(s)
+    return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2.0
+
+
+sA, sB = summ(A), summ(B)
+sM = merge(sA, sB)
+sF = summ(A + B)
+print("局部摘要  A=(n,S,Q)=%s  B=(n,S,Q)=%s" % (sA, sB))
+print("合并摘要  merge(A,B)=(n,S,Q)=%s  == 全量摘要 %s : %s" %
+      (sM, sF, sM == sF))
+print("均值 merge: %.4f  全量: %.4f  一致=%s" %
+      (mean_of(sM), mean_of(sF), abs(mean_of(sM) - mean_of(sF)) &lt; 1e-12))
+print("样本方差 merge: %.6f  全量: %.6f  一致=%s" %
+      (var_sample(sM), var_sample(sF), abs(var_sample(sM) - var_sample(sF)) &lt; 1e-9))
+print("反例①『直接平均各分区样本方差』= %.6f  ← 错！忽略组间均值差" %
+      ((var_sample(sA) + var_sample(sB)) / 2))
+print("Chan 合并 M2: %.6f  全量 M2: %.6f  样本方差=%.6f" %
+      (chan(welford(A), welford(B))[2], welford(A + B)[2],
+       chan(welford(A), welford(B))[2] / (len(A + B) - 1)))
+print("max 也是 monoid: max(A+B)=%d == max(max(A),max(B))=%d" %
+      (max(A + B), max(max(A), max(B))))
+print()
+
+print("中位数不可合并：两个数据集的『分区摘要 (n, median)』完全相同，全局中位数却不同")
+D1A, D1B = [1, 2, 3, 4, 5], [6, 7, 8, 9, 10]
+D2A, D2B = [1, 2, 3, 4, 50], [6, 7, 8, 9, 10]
+for tag, (pa, pb) in enumerate(((D1A, D1B), (D2A, D2B)), 1):
+    print("  数据集%d: A=%s (n=%d,median=%s)  B=%s (n=%d,median=%s)" %
+          (tag, pa, len(pa), median(pa), pb, len(pb), median(pb)))
+    print("           全局排序=%s  → 全局中位数=%s" %
+          (sorted(pa + pb), median(pa + pb)))
+print("  → 分区摘要都是 (5,3)+(5,8)，却给出 5.5 与 6.5：不存在这样的合并函数。")
+print("  → 结论：均值/方差/max/sum 是有限维充分统计量；精确中位数需要全量排序或 O(n) 草图。")
+print()
+
+# ============================================================
+print("=== Part 2: 分布式方差的数值稳定性（灾难性抵消）===")
+MU = 1e9
+OFF = [-2, -1, 0, 1, 2]
+xs = [MU + t for t in OFF]
+TRUTH_POP = sum(t * t for t in OFF) / len(OFF)      # 2.0
+TRUTH_SAMPLE = sum(t * t for t in OFF) / (len(OFF) - 1)   # 2.5
+n = len(xs)
+S = float(sum(xs))
+Q = float(sum(x * x for x in xs))
+naive_sample = (Q - S * S / n) / (n - 1)
+naive_pop = Q / n - (S / n) ** 2
+w = welford(xs)
+c = chan(welford(xs[:3]), welford(xs[3:]))
+print("数据 x = 1e9 + [-2,-1,0,1,2]；真实总体方差=%.1f，样本方差=%.1f" %
+      (TRUTH_POP, TRUTH_SAMPLE))
+print("朴素 (n,S,Q):  S=%.1f  Q=%.1f" % (S, Q))
+print("  样本方差 = %.6f   总体方差 = %.6f   ← Q 与 S^2/n 前 16 位相同，相减把有效位吃光" %
+      (naive_sample, naive_pop))
+print("Welford   M2=%.6f  → 样本方差 = %.6f" % (w[2], w[2] / (n - 1)))
+print("Chan 合并 M2=%.6f  → 样本方差 = %.6f" % (c[2], c[2] / (n - 1)))
+U = 2.0 ** -53            # 双精度机器 epsilon 量级
+print("误差界：朴素式绝对误差 ≈ 2*u*mu^2 ≈ %.1f，而 sigma^2=%.1f；" %
+      (2 * U * MU ** 2, TRUTH_POP))
+print("        条件数 kappa ≈ 2*(mu/sigma)^2 ≈ %.2e，双精度 ~16 位有效数字不足。" %
+      (2 * (MU / math.sqrt(TRUTH_POP)) ** 2))
+print("        Welford/Chan 只维护离差 M2，误差 ~ n*u*sigma^2 ≈ %.2e，与 mu 无关。" %
+      (n * U * TRUTH_POP))
+print()
+
+# ============================================================
+print("=== Part 3: 巨大 n 下 p 值失效，改看效应量 + 区间 ===")
+P0 = 0.49725            # case: completed_rate
+SE_CASE, N_CASE = 0.009129, 12000
+print("案例校验：n=%d 时 1/sqrt(n) = %.6f，与案例 se=%.6f 一致（p(1-p)≈0.25）" %
+      (N_CASE, 1 / math.sqrt(N_CASE), SE_CASE))
+DELTA = 0.001           # 真实但业务上可忽略的效应：0.1 个百分点
+MDE = 0.01              # 事先约定的业务阈值：1 个百分点
+
+
+def p_two_sided(z):
+    return math.erfc(abs(z) / math.sqrt(2.0))
+
+
+def cohen_h(p1, p2):
+    return 2 * math.asin(math.sqrt(p1)) - 2 * math.asin(math.sqrt(p2))
+
+
+print("固定真实效应 Delta=%.4f（相对提升 %.2f%%），阈值 MDE=%.4f" %
+      (DELTA, 100 * DELTA / P0, MDE))
+print("%12s %10s %9s %12s %11s %10s %9s %s" %
+      ("n", "se", "z", "p(two-sided)", "CI_half", "Cohen h", "p&lt;.05?", "ship?"))
+for n in (1e3, 1e4, 1e5, 4e6, 1e7, 1.2e8):
+    se = 1.0 / math.sqrt(n)
+    z = DELTA / se
+    p = p_two_sided(z)
+    hw = 1.96 * se
+    h = cohen_h(P0 + DELTA, P0)
+    lower = DELTA - hw
+    sig = "YES" if p &lt; 0.05 else "no"
+    ship = "YES" if lower &gt; MDE else "no"
+    print("%12.0f %10.6f %9.4f %12.3e %11.6f %10.6f %9s %s" %
+          (n, se, z, p, hw, h, sig, ship))
+print("→ n≈4e6 起 p&lt;0.05 且以后一路趋零；但 CI 下界始终 &lt; MDE，业务上永不该上线。")
+print()
+
+# 案例真实效应 vs 它的百分之一，在 1.2 亿日志上
+for d, tag in ((0.123167, "案例真实 ATE"), (0.00123167, "ATE 的 1/100")):
+    n = 1.2e8
+    z = d * math.sqrt(n)
+    print("%s: Delta=%.6f, n=%.0f → z=%.4f, p=%.3e, 相对提升=%.3f%%" %
+          (tag, d, n, z, p_two_sided(z), 100 * d / P0))
+print("→ 0.12 个百分点的效应在 1.2 亿行上同样 p≈0：统计显著 ≠ 业务重要。")
+print()
+
+# i.i.d. 被破坏：簇内相关使有效样本量缩水
+DEFF = 1 + (5 - 1) * 0.3     # m=5, rho=0.3 → deff=2.2
+print("i.i.d. 松动：m=5, rho=0.3 → deff=1+(m-1)rho=%.1f，se_eff=se*sqrt(deff)" % DEFF)
+for n in (4e6, 1e7):
+    z = DELTA * math.sqrt(n)
+    z_eff = z / math.sqrt(DEFF)
+    print("  n=%.0f: z=%.4f(p=%.4f) → 修正 z_eff=%.4f(p=%.4f)" %
+          (n, z, p_two_sided(z), z_eff, p_two_sided(z_eff)))
+print("→ 名义 n 会把标准误压得过小；簇稳健标准误 / n_eff 折算后，临近显著的结论会翻回不显著。")
+</pre>
+  <div class="run-output">
+    <div class="ro-head">实际运行输出（stdout 原样）</div>
+    <pre>=== Part 1: 哪些统计量可合并（monoid），哪些不可 ===
+局部摘要  A=(n,S,Q)=(5, 475.0, 48025.0)  B=(n,S,Q)=(5, 490.0, 49650.0)
+合并摘要  merge(A,B)=(n,S,Q)=(10, 965.0, 97675.0)  == 全量摘要 (10, 965.0, 97675.0) : True
+均值 merge: 96.5000  全量: 96.5000  一致=True
+样本方差 merge: 505.833333  全量: 505.833333  一致=True
+反例①『直接平均各分区样本方差』= 566.250000  ← 错！忽略组间均值差
+Chan 合并 M2: 4552.500000  全量 M2: 4552.500000  样本方差=505.833333
+max 也是 monoid: max(A+B)=130 == max(max(A),max(B))=130
+
+中位数不可合并：两个数据集的『分区摘要 (n, median)』完全相同，全局中位数却不同
+  数据集1: A=[1, 2, 3, 4, 5] (n=5,median=3)  B=[6, 7, 8, 9, 10] (n=5,median=8)
+           全局排序=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  → 全局中位数=5.5
+  数据集2: A=[1, 2, 3, 4, 50] (n=5,median=3)  B=[6, 7, 8, 9, 10] (n=5,median=8)
+           全局排序=[1, 2, 3, 4, 6, 7, 8, 9, 10, 50]  → 全局中位数=6.5
+  → 分区摘要都是 (5,3)+(5,8)，却给出 5.5 与 6.5：不存在这样的合并函数。
+  → 结论：均值/方差/max/sum 是有限维充分统计量；精确中位数需要全量排序或 O(n) 草图。
+
+=== Part 2: 分布式方差的数值稳定性（灾难性抵消）===
+数据 x = 1e9 + [-2,-1,0,1,2]；真实总体方差=2.0，样本方差=2.5
+朴素 (n,S,Q):  S=5000000000.0  Q=5000000000000000000.0
+  样本方差 = 0.000000   总体方差 = 0.000000   ← Q 与 S^2/n 前 16 位相同，相减把有效位吃光
+Welford   M2=10.000000  → 样本方差 = 2.500000
+Chan 合并 M2=10.000000  → 样本方差 = 2.500000
+误差界：朴素式绝对误差 ≈ 2*u*mu^2 ≈ 222.0，而 sigma^2=2.0；
+        条件数 kappa ≈ 2*(mu/sigma)^2 ≈ 1.00e+18，双精度 ~16 位有效数字不足。
+        Welford/Chan 只维护离差 M2，误差 ~ n*u*sigma^2 ≈ 1.11e-15，与 mu 无关。
+
+=== Part 3: 巨大 n 下 p 值失效，改看效应量 + 区间 ===
+案例校验：n=12000 时 1/sqrt(n) = 0.009129，与案例 se=0.009129 一致（p(1-p)≈0.25）
+固定真实效应 Delta=0.0010（相对提升 0.20%），阈值 MDE=0.0100
+           n         se         z p(two-sided)     CI_half    Cohen h    p&lt;.05? ship?
+        1000   0.031623    0.0316    9.748e-01    0.061981   0.002000        no no
+       10000   0.010000    0.1000    9.203e-01    0.019600   0.002000        no no
+      100000   0.003162    0.3162    7.518e-01    0.006198   0.002000        no no
+     4000000   0.000500    2.0000    4.550e-02    0.000980   0.002000       YES no
+    10000000   0.000316    3.1623    1.565e-03    0.000620   0.002000       YES no
+   120000000   0.000091   10.9545    6.326e-28    0.000179   0.002000       YES no
+→ n≈4e6 起 p&lt;0.05 且以后一路趋零；但 CI 下界始终 &lt; MDE，业务上永不该上线。
+
+案例真实 ATE: Delta=0.123167, n=120000000 → z=1349.2269, p=0.000e+00, 相对提升=24.770%
+ATE 的 1/100: Delta=0.001232, n=120000000 → z=13.4923, p=1.737e-41, 相对提升=0.248%
+→ 0.12 个百分点的效应在 1.2 亿行上同样 p≈0：统计显著 ≠ 业务重要。
+
+i.i.d. 松动：m=5, rho=0.3 → deff=1+(m-1)rho=2.2，se_eff=se*sqrt(deff)
+  n=4000000: z=2.0000(p=0.0455) → 修正 z_eff=1.3484(p=0.1775)
+  n=10000000: z=3.1623(p=0.0016) → 修正 z_eff=2.1320(p=0.0330)
+→ 名义 n 会把标准误压得过小；簇稳健标准误 / n_eff 折算后，临近显著的结论会翻回不显著。
+</pre>
+  </div>
+  <div class="code-interp">
+    <p><span class="ci-k">merge(A,B)=(10, 965.0, 97675.0) == 全量摘要 True</span>：三元组 $(n,S,Q)$ 逐分量相加，结合律让它与「把 10 个数一口气算」完全相同。由此还原的 <span class="ci-k">均值 96.5000、样本方差 505.833333</span> 与全量逐位一致，验证的正是「$(n,S,Q)$ 是均值和方差的有限维充分统计量」。<code>max</code> 那行 $130=130$ 说明最大值也是最简单的 monoid。</p>
+    <p><span class="ci-k">反例① 566.250000 ← 错</span>：它只是 $\tfrac12(s_A^2+s_B^2)$，把「两组均值 95 与 98 不一样」带来的组间波动整块丢了。正确值 505.833333 由 <span class="ci-k">Chan 合并 M2: 4552.500000</span> 给出：$M_2=2900+1630+3^2\cdot\tfrac{25}{10}=4552.5$，$/9=505.833333$。注意「方差可合并」指的是摘要可合并，<strong>不是</strong>方差值本身能平均——这是本实验最该记住的一句话。</p>
+    <p><span class="ci-k">中位数反例 5.5 与 6.5</span>：两个数据集的分区摘要都是 $(n,\mathrm{median})=(5,3)+(5,8)$，但把 A 片里一个 5 换成 50，全局排序正中间就从 5.5 挪到 6.5。若存在只看摘要的合并函数，相同输入必给相同输出，矛盾——所以精确中位数<strong>不存在</strong>有限维可合并摘要，只能退回全量排序或改用有误差界的草图（t-digest / GK / HyperLogLog 分别对应不同目标量）。</p>
+    <p><span class="ci-k">Part 2：朴素式样本方差 0.000000，Welford/Chan 2.500000</span>：数据是 $10^9+[-2,-1,0,1,2]$，真实 $M_2=10$、样本方差 2.5。朴素式算 $Q-S^2/n$ 时，$Q=5\times10^{18}+10$ 与 $S^2/n=5\times10^{18}$ 前 16 位相同，双精度把那个 $+10$ 舍掉，相减得 0。<span class="ci-k">误差界 ≈ 222.0、条件数 κ≈1.00e+18</span> 解释了为什么「均值大、方差小」是朴素式的死穴；<span class="ci-k">Welford 误差 ≈ 1.11e-15 与 mu 无关</span> 说明只维护离差 $M_2$ 就绕开了它。改 <code>MU</code> 越大，朴素式越离谱而 Welford 恒定。</p>
+    <p><span class="ci-k">Part 3 的 p&lt;.05? 列</span>：固定 $\Delta=0.001$、$\mathrm{MDE}=0.01$，$n$ 从 1e3 到 1.2e8，<code>se</code> 按 $1/\sqrt n$ 从 0.031623 缩到 0.000091，<code>p</code> 从 9.748e-01 一路跌到 6.326e-28，<span class="ci-k">n≈4e6 起 p&lt;0.05</span>；但 <code>CI_half</code> 再小，$\Delta-1.96\,se\approx0.001$ 永远小于 MDE，<code>ship?</code> 六行全是 <code>no</code>。<code>Cohen h</code> 恒为 0.002000，与 $n$ 无关——它才是「效应有多大」的诚实刻度。</p>
+    <p><span class="ci-k">案例 ATE 对照</span>：真实效应 0.123167 在 1.2 亿行上 $z=1349.2269,\ p=0$；把它缩 100 倍到 0.001232（相对提升仅 0.248%），$p$ 仍是 $1.737\times10^{-41}$。<span class="ci-k">deff=2.2 的修正</span> 把 $n=4e6$ 的 $z=2.0\ (p=0.0455)$ 拉回 $z_{\mathrm{eff}}=1.3484\ (p=0.1775)$——名义样本量在簇结构下会高估信息量，临近显著的结论会翻回不显著。基线 $P_0=0.49725$、se=0.009129、ATE=0.123167 全部来自 <code>case.json</code>，与全站共用同一套真源。</p>
+  </div>
+</div>
+
+<h2 id="d-spec">功能规格与工程边界</h2>
+<table class="spec-table">
+  <thead><tr><th>项目</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><th>功能说明</th><td>本组方法给出两件东西：判定一个统计量能否「分块算完再精确合并」的充要判据（有限维充分统计量 + 结合律），以及大样本下替代 p 值的决策口径（效应量 + 置信区间下界 vs MDE）；并用 Chan/Welford 把「可合并」与「数值稳定」一次落地。<strong>不做</strong>精确分位数、不做因果识别、不替代实验设计。</td></tr>
+    <tr><th>输入 / 输出</th><td>合并侧输入：各分片数据（或摘要）；输出：全局摘要 $(n,\bar x,M_2)$ 或 $(n,S,Q)$、均值、样本／总体方差，量纲与 $x$ 及 $x^2$ 一致。决策侧输入：比例／均值差 $\hat\Delta$、标准误 $se$、Cohen's $h$、事先冻结的 MDE；输出：CI、$\hat\Delta_{\mathrm{lower}}$、是否上线的布尔判据。</td></tr>
+    <tr><th>适用场景</th><td>分布式报表与聚合（DAU、均值、方差、协方差、回归充分统计量）、流式监控、均值大而波动小的传感器／时间戳／金额数据；以及千万级以上 A/B 测试、日志回放、灰度评估中「p 值显著却不该上线」的判定。</td></tr>
+    <tr><th>关键参数</th><td>摘要维数（标量 3 个数，协方差为 $O(p^2)$）；Bessel 校正 $(n-1)$；分片数 $P$；浮点字长与是否用 Kahan 补偿；决策侧 $\alpha$、MDE、簇大小 $m$ 与簇内相关 $\rho$（决定 $deff=1+(m-1)\rho$）。</td></tr>
+    <tr><th>边界条件</th><td>在需要精确中位数／分位数、目标量依赖全局顺序、摘要维数随 $n$ 增长、或允许有界近似误差的条件下，精确合并结论不成立，应改用全量排序或 t-digest / GK / HyperLogLog / Count-Min Sketch 并报告误差界；在样本非 i.i.d.、存在 peeking 或多重比较、效应有混淆偏差、或 MDE 事后挪动的条件下，p 值与「区间下界 vs MDE」判据不成立，应改用簇稳健标准误与 $n_{\mathrm{eff}}$、序贯／always-valid 检验、以及先做因果识别。</td></tr>
+    <tr><th>常见问题</th><td>① 把分区方差直接平均当全局方差；② 用 $(n,S,Q)$ 处理 $10^9$ 量级时间戳导致方差算成 0；③ 以为「p 值显著」等于「值得上线」；④ 用名义 $n$ 忽略簇内相关；⑤ 拿中位数当可合并摘要。详见下方 FAQ。</td></tr>
+  </tbody>
+</table>
+
+<div class="faq">
+  <details><summary>各机器都算好了方差，为什么不能直接取平均当全局方差？</summary><div class="faq-a">因为方差不是可合并量，可合并的是摘要 $(n,S,Q)$ 或 $(n,\bar x,M_2)$。直接平均只用到组内波动，漏掉「组间均值差」那一块；代码实验里正确值 505.833333、错值 566.250000。正确做法：要么合并 $(n,S,Q)$ 再套公式，要么用 Chan 公式 $M_2=M_{2A}+M_{2B}+\delta^2 n_A n_B/n$ 补回组间项。</div></details>
+  <details><summary>均值和方差能合并，为什么中位数不能？</summary><div class="faq-a">因为中位数依赖「全局排序后正中间是谁」这种位置信息，而分块时位置信息被切碎了。代码实验给出构造性反例：两个数据集的分区摘要都是 $(5,3)+(5,8)$，全局中位数却是 5.5 与 6.5——相同输入不同输出，说明不存在只看摘要的合并函数。要精确中位数只能全量排序／分布式归并；要近似可用 t-digest、GK sketch，但必须报告误差界。</div></details>
+  <details><summary>方差公式 $(Q-S^2/n)/(n-1)$ 看着没问题，为什么大数据上会算出 0？</summary><div class="faq-a">灾难性抵消。当均值 $\mu$ 远大于标准差 $\sigma$（如 $x\approx10^9$、波动个位数），$Q$ 与 $S^2/n$ 是两个几乎相等的巨大数，双精度约 16 位有效数字存不下它们的差：代码实验里 $Q=5\times10^{18}+10$ 被舍成 $5\times10^{18}$，相减得 0.000000。条件数 $\kappa\approx2(\mu/\sigma)^2\approx10^{18}$。改用 Welford/Chan 只维护离差 $M_2$，误差与 $\mu$ 无关，稳定给出 2.500000。</div></details>
+  <details><summary>上亿样本、p 值小到 $10^{-28}$，为什么还说「不该上线」？</summary><div class="faq-a">因为 p 值只回答「效应是否非零」，而 $se\propto1/\sqrt n$ 让任何非零 $\Delta$ 在大 $n$ 下都显著。代码实验里真实效应 $\Delta=0.001$（相对提升 0.20%）、$\mathrm{MDE}=0.01$，从 $n\approx4\times10^6$ 起 p&lt;0.05 一路趋零，可 CI 下界始终约 0.001，远小于业务阈值，六行 <code>ship?</code> 全是 no。应改看效应量（Cohen's $h$ 恒 0.002000）与 CI 下界是否 &gt; MDE。</div></details>
+  <details><summary>样本量都上亿了，还会「不够独立」吗？</summary><div class="faq-a">会，而且更常见。同一用户多次曝光、按班级／地区聚类会让有效样本量远小于名义 $n$：$n_{\mathrm{eff}}=n/deff$，$deff=1+(m-1)\rho$。代码实验 $m=5,\rho=0.3\Rightarrow deff=2.2$，把 $n=4\times10^6$ 的 $z=2.0\ (p=0.0455)$ 修正为 $z_{\mathrm{eff}}=1.3484\ (p=0.1775)$，结论直接翻回不显著。大日志里务必用簇稳健标准误或先折算 $n_{\mathrm{eff}}$。</div></details>
+  <details><summary>HyperLogLog、Count-Min Sketch 和本节的可合并方差是什么关系？</summary><div class="faq-a">前两者属于「精确不可合并 → 退而求有界近似的草图」路线：精确基数计数、精确频次需要全集信息，不存在有限维 monoid，于是 HyperLogLog 用约 $1.04/\sqrt m$ 的相对误差估基数、Count-Min Sketch 用可证明上界估频次（只可能过高不可能过低）。本节方差则属于「存在精确有限维充分统计量」路线，三者是同一判据下的两个分支：先判断目标量是否可精确合并，不能才选草图并如实报误差。</div></details>
+</div>
+
+<h2 id="self-test">自测题</h2>
+<div class="self-test" data-quiz>
+  <div class="st-head"><h3>本章自测</h3><span class="st-score">得分：—</span></div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">下列哪个统计量<strong>不存在</strong>有限维可合并摘要（分块算完无法精确合并）？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q1" value="A"> A. 均值（摘要 $(n,S)$）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="B"> B. 方差（摘要 $(n,S,Q)$）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="C"> C. 精确中位数（依赖全局排序位置）</label>
+      <label class="quiz-opt"><input type="radio" name="q1" value="D"> D. 最大值（逐片取 max 再取 max）</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：均值、方差、max 都有满足结合律的有限维摘要；精确中位数依赖全局排序位置，代码实验给出反例——分区摘要同为 (5,3)+(5,8) 却得到 5.5 与 6.5，证明不存在这样的合并函数。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">把两组各 5 个数的样本方差直接平均，得到 566.250000，而正确全局方差是 505.833333。差异主要来自？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q2" value="A"> A. 浮点舍入误差</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="B"> B. 漏掉了「组间均值差」带来的波动（law of total variance 的组间项）</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="C"> C. 用了 $n-1$ 而不是 $n$ 作分母</label>
+      <label class="quiz-opt"><input type="radio" name="q2" value="D"> D. 两组样本量不相等</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：直接平均只含组内波动，丢掉了 $n_A(\bar x_A-\bar x)^2+n_B(\bar x_B-\bar x)^2$ 这一块。Chan 公式用 $\delta^2 n_A n_B/n$ 把它补回：$M_2=2900+1630+9\cdot25/10=4552.5$，$/9=505.833333$ 与全量一致。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="D">
+    <div class="q-text">数据 $x=10^9+[-2,-1,0,1,2]$，朴素式 $(Q-S^2/n)/(n-1)$ 算出样本方差 0.000000，真实值 2.5。根因是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q3" value="A"> A. 忘了做 Bessel 校正</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="B"> B. 数据里有负数</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="C"> C. 样本量太小</label>
+      <label class="quiz-opt"><input type="radio" name="q3" value="D"> D. 两个巨大近似数相减发生灾难性抵消，条件数 $\kappa\approx10^{18}$ 超出双精度</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：$\mu\gg\sigma$ 时 $Q$ 与 $S^2/n$ 前 16 位相同，相减把有效位吃光；误差 $\approx2u\mu^2\approx222$ 远大于真值 2。Welford/Chan 只维护离差 $M_2$，误差 $\sim n u\sigma^2\approx1.11\times10^{-15}$ 与 $\mu$ 无关，稳定给出 2.500000。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="B">
+    <div class="q-text">上亿样本、真实效应 $\Delta=0.001$、$\mathrm{MDE}=0.01$，$p$ 值一路降到 $10^{-28}$。正确的上线决策是？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q4" value="A"> A. 立即上线，p 值已极显著</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="B"> B. 不上线：Cohen's $h$ 仅 0.002000，且 CI 下界 $\approx0.001$ 始终小于 MDE</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="C"> C. 先把 $\alpha$ 调得更小再决定</label>
+      <label class="quiz-opt"><input type="radio" name="q4" value="D"> D. 再加大样本量让 p 值更小</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：p 值只判「是否非零」，$se\propto1/\sqrt n$ 使任何非零 $\Delta$ 在大 $n$ 下都趋零。决策应看效应量（Cohen's $h$ 与 $n$ 无关，恒 0.002000）与 CI 下界是否超过事先冻结的 MDE；本例下界一直约 0.001，六行 ship? 全是 no。"></div>
+  </div>
+
+  <div class="quiz-item" data-answer="C">
+    <div class="q-text">$m=5,\rho=0.3\Rightarrow deff=2.2$ 时，把 $n=4\times10^6$ 的 $z=2.0\ (p=0.0455)$ 做簇修正会得到？</div>
+    <div class="quiz-opts">
+      <label class="quiz-opt"><input type="radio" name="q5" value="A"> A. $z$ 升到约 3.0，更显著</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="B"> B. p 值不变，只是方差变小</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="C"> C. $z_{\mathrm{eff}}=z/\sqrt{deff}\approx1.3484$，$p\approx0.1775$，翻回不显著</label>
+      <label class="quiz-opt"><input type="radio" name="q5" value="D"> D. 需要用精确中位数重算</label>
+    </div>
+    <div class="quiz-feedback" data-explain="解析：簇内相关使 $n_{\mathrm{eff}}=n/deff$、$se_{\mathrm{eff}}=se\sqrt{deff}$，故 $z_{\mathrm{eff}}=2.0/\sqrt{2.2}=1.3484$、p 从 0.0455 升到 0.1775。名义 $n$ 高估了独立信息量，临近显著的结论会翻回不显著——大日志必须先折算有效样本量或用簇稳健标准误。"></div>
+  </div>
+
+  <div class="quiz-actions"><button class="btn primary" data-quiz-submit type="button">提交并查看解析</button></div>
+</div>
+
+<figure data-classic="0"></figure>

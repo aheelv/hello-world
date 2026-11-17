@@ -1,0 +1,546 @@
+[
+  {
+    "l": {
+      "i": 0,
+      "href": "index.html",
+      "text": "Σ\n统计分析自学系统\n从零到 AI 前沿"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/index.html",
+      "title": "统计分析自学系统 · 从零到 AI 前沿",
+      "len": 2152,
+      "h": 3968,
+      "bodyText": 2499,
+      "katex": 0
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 1,
+      "href": "roadmap.html",
+      "text": "路线图"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/roadmap.html",
+      "title": "学习路线图 · 统计分析自学系统",
+      "len": 4182,
+      "h": 6098,
+      "bodyText": 4499,
+      "katex": 0
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 2,
+      "href": "resources.html",
+      "text": "资料库"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/resources.html",
+      "title": "资料库 · 统计分析自学系统",
+      "len": 4555,
+      "h": 6479,
+      "bodyText": 5247,
+      "katex": 0
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 3,
+      "href": "roadmap.html",
+      "text": "学习路线图"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/roadmap.html",
+      "title": "学习路线图 · 统计分析自学系统",
+      "len": 4182,
+      "h": 6098,
+      "bodyText": 4499,
+      "katex": 0
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 4,
+      "href": "resources.html",
+      "text": "资料库"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/resources.html",
+      "title": "资料库 · 统计分析自学系统",
+      "len": 4555,
+      "h": 6479,
+      "bodyText": 5247,
+      "katex": 0
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 5,
+      "href": "glossary.html",
+      "text": "术语表"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/glossary.html",
+      "title": "术语表 · 统计分析自学系统",
+      "len": 5862,
+      "h": 9051,
+      "bodyText": 6181,
+      "katex": 54
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 6,
+      "href": "modules/m01-data.html",
+      "text": "01数据与统计思维\n入门"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m01-data.html",
+      "title": "01 · 数据与统计思维 · 统计分析自学系统",
+      "len": 5465,
+      "h": 9273,
+      "bodyText": 5776,
+      "katex": 26
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 7,
+      "href": "modules/m02-descriptive.html",
+      "text": "02描述统计与可视化\n入门"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m02-descriptive.html",
+      "title": "02 · 描述统计与可视化 · 统计分析自学系统",
+      "len": 8952,
+      "h": 11572,
+      "bodyText": 9263,
+      "katex": 195
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 8,
+      "href": "modules/m03-probability.html",
+      "text": "03概率论基础\n入门"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m03-probability.html",
+      "title": "03 · 概率论基础 · 统计分析自学系统",
+      "len": 8337,
+      "h": 9969,
+      "bodyText": 8648,
+      "katex": 215
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 9,
+      "href": "modules/m04-distributions.html",
+      "text": "04随机变量与常见分布\n基础"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m04-distributions.html",
+      "title": "04 · 随机变量与常见分布 · 统计分析自学系统",
+      "len": 14366,
+      "h": 13463,
+      "bodyText": 14677,
+      "katex": 382
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 10,
+      "href": "modules/m05-inference.html",
+      "text": "05统计推断：估计与检验\n基础"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m05-inference.html",
+      "title": "05 · 统计推断：估计与检验 · 统计分析自学系统",
+      "len": 12227,
+      "h": 12111,
+      "bodyText": 12538,
+      "katex": 358
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 11,
+      "href": "modules/m06-regression.html",
+      "text": "06回归分析\n基础"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m06-regression.html",
+      "title": "06 · 回归分析 · 统计分析自学系统",
+      "len": 14778,
+      "h": 13609,
+      "bodyText": 15089,
+      "katex": 359
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 12,
+      "href": "modules/m07-bayesian.html",
+      "text": "07贝叶斯统计与计算\n进阶"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m07-bayesian.html",
+      "title": "07 · 贝叶斯统计与计算 · 统计分析自学系统",
+      "len": 14614,
+      "h": 13158,
+      "bodyText": 14925,
+      "katex": 272
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 13,
+      "href": "modules/m08-experiment.html",
+      "text": "08实验设计与因果推断\n进阶"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m08-experiment.html",
+      "title": "08 · 实验设计与因果推断 · 统计分析自学系统",
+      "len": 12476,
+      "h": 13478,
+      "bodyText": 12787,
+      "katex": 180
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 14,
+      "href": "modules/m09-ml-stats.html",
+      "text": "09机器学习的统计基础\n高级"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m09-ml-stats.html",
+      "title": "09 · 机器学习的统计基础 · 统计分析自学系统",
+      "len": 10762,
+      "h": 12017,
+      "bodyText": 11073,
+      "katex": 167
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 15,
+      "href": "modules/m10-ai-stats.html",
+      "text": "10AI 前沿：统计学与大模型\nAI 前沿"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m10-ai-stats.html",
+      "title": "10 · AI 前沿：统计学与大模型 · 统计分析自学系统",
+      "len": 11194,
+      "h": 12158,
+      "bodyText": 11505,
+      "katex": 154
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 16,
+      "href": "roadmap.html",
+      "text": "从路线图开始 →"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/roadmap.html",
+      "title": "学习路线图 · 统计分析自学系统",
+      "len": 4182,
+      "h": 6098,
+      "bodyText": 4499,
+      "katex": 0
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 17,
+      "href": "modules/m01-data.html",
+      "text": "直接进入第 1 章"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m01-data.html",
+      "title": "01 · 数据与统计思维 · 统计分析自学系统",
+      "len": 5465,
+      "h": 9273,
+      "bodyText": 5776,
+      "katex": 26
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 18,
+      "href": "modules/m10-ai-stats.html",
+      "text": "直达 AI 前沿专题"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m10-ai-stats.html",
+      "title": "10 · AI 前沿：统计学与大模型 · 统计分析自学系统",
+      "len": 11194,
+      "h": 12158,
+      "bodyText": 11505,
+      "katex": 154
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 19,
+      "href": "modules/m01-data.html",
+      "text": "MODULE 01\n数据与统计思维\n\n什么是统计学？数据"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m01-data.html",
+      "title": "01 · 数据与统计思维 · 统计分析自学系统",
+      "len": 5465,
+      "h": 9273,
+      "bodyText": 5776,
+      "katex": 26
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 20,
+      "href": "modules/m02-descriptive.html",
+      "text": "MODULE 02\n描述统计与可视化\n\n集中趋势、离散程"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m02-descriptive.html",
+      "title": "02 · 描述统计与可视化 · 统计分析自学系统",
+      "len": 8952,
+      "h": 11572,
+      "bodyText": 9263,
+      "katex": 195
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 21,
+      "href": "modules/m03-probability.html",
+      "text": "MODULE 03\n概率论基础\n\n样本空间、条件概率、贝"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m03-probability.html",
+      "title": "03 · 概率论基础 · 统计分析自学系统",
+      "len": 8337,
+      "h": 9969,
+      "bodyText": 8648,
+      "katex": 215
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 22,
+      "href": "modules/m04-distributions.html",
+      "text": "MODULE 04\n随机变量与常见分布\n\n伯努利、二项、"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m04-distributions.html",
+      "title": "04 · 随机变量与常见分布 · 统计分析自学系统",
+      "len": 14366,
+      "h": 13463,
+      "bodyText": 14677,
+      "katex": 382
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 23,
+      "href": "modules/m05-inference.html",
+      "text": "MODULE 05\n统计推断：估计与检验\n\n矩估计、最大"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m05-inference.html",
+      "title": "05 · 统计推断：估计与检验 · 统计分析自学系统",
+      "len": 12227,
+      "h": 12111,
+      "bodyText": 12538,
+      "katex": 358
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 24,
+      "href": "modules/m06-regression.html",
+      "text": "MODULE 06\n回归分析\n\n最小二乘、高斯-马尔可夫"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m06-regression.html",
+      "title": "06 · 回归分析 · 统计分析自学系统",
+      "len": 14778,
+      "h": 13609,
+      "bodyText": 15089,
+      "katex": 359
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 25,
+      "href": "modules/m07-bayesian.html",
+      "text": "MODULE 07\n贝叶斯统计与计算\n\n先验后验、共轭先"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m07-bayesian.html",
+      "title": "07 · 贝叶斯统计与计算 · 统计分析自学系统",
+      "len": 14614,
+      "h": 13158,
+      "bodyText": 14925,
+      "katex": 272
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 26,
+      "href": "modules/m08-experiment.html",
+      "text": "MODULE 08\n实验设计与因果推断\n\n随机对照试验、"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m08-experiment.html",
+      "title": "08 · 实验设计与因果推断 · 统计分析自学系统",
+      "len": 12476,
+      "h": 13478,
+      "bodyText": 12787,
+      "katex": 180
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 27,
+      "href": "modules/m09-ml-stats.html",
+      "text": "MODULE 09\n机器学习的统计基础\n\n偏差-方差、双"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m09-ml-stats.html",
+      "title": "09 · 机器学习的统计基础 · 统计分析自学系统",
+      "len": 10762,
+      "h": 12017,
+      "bodyText": 11073,
+      "katex": 167
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 28,
+      "href": "modules/m10-ai-stats.html",
+      "text": "MODULE 10\nAI 前沿：统计学与大模型\n\n缩放定"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/modules/m10-ai-stats.html",
+      "title": "10 · AI 前沿：统计学与大模型 · 统计分析自学系统",
+      "len": 11194,
+      "h": 12158,
+      "bodyText": 11505,
+      "katex": 154
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 29,
+      "href": "roadmap.html",
+      "text": "学习路线图"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/roadmap.html",
+      "title": "学习路线图 · 统计分析自学系统",
+      "len": 4182,
+      "h": 6098,
+      "bodyText": 4499,
+      "katex": 0
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 30,
+      "href": "resources.html",
+      "text": "资料库"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/resources.html",
+      "title": "资料库 · 统计分析自学系统",
+      "len": 4555,
+      "h": 6479,
+      "bodyText": 5247,
+      "katex": 0
+    },
+    "blank": false,
+    "errors": []
+  },
+  {
+    "l": {
+      "i": 31,
+      "href": "glossary.html",
+      "text": "术语表"
+    },
+    "d": {
+      "url": "file:///D:/AI/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/glossary.html",
+      "title": "术语表 · 统计分析自学系统",
+      "len": 5862,
+      "h": 9051,
+      "bodyText": 6181,
+      "katex": 54
+    },
+    "blank": false,
+    "errors": []
+  }
+]
