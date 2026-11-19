@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2b5cff">
+<meta name="description" content="运筹智仿 OR-SimLab：知识图谱与生成式 AI 双驱动的运筹学虚拟仿真实验教学平台。15 个分层仿真场景、76 道配套练习、55 个知识点构成的可计算知识图谱、两级通道的 AI 助教，以及「一段话生成实验参数」的 AI 建模能力。">
+<meta name="author" content="OR-SimLab">
+<title>运筹智仿 OR-SimLab · AI 增强的运筹学虚拟仿真实验教学平台</title>
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232b5cff'/%3E%3Cstop offset='1' stop-color='%236d4aff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='15' font-weight='bold' fill='%23fff' text-anchor='middle'%3EOR%3C/text%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<div id="app">
+  <!-- 侧栏导航：由 app.js 动态构建 -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="主导航"></aside>
+
+  <div class="main">
+    <!-- 顶栏：面包屑、搜索、AI 入口，由 app.js 动态构建 -->
+    <header class="topbar" id="topbar" role="banner"></header>
+
+    <!-- 视图容器：路由在此渲染 -->
+    <main class="view" id="view" role="main">
+      <noscript>
+        <div class="card" style="margin:40px auto;max-width:560px">
+          <div class="card-body" style="padding:24px">
+            <h3>需要启用 JavaScript</h3>
+            <p class="small muted" style="margin-top:8px">
+              OR-SimLab 是一个纯前端运行的教学系统，全部算法、仿真与可视化都在浏览器内完成。
+              请在浏览器设置中启用 JavaScript 后刷新页面。
+            </p>
+          </div>
+        </div>
+      </noscript>
+    </main>
+  </div>
+
+  <!-- AI 助教面板：由 ai/panel.js 填充 -->
+  <aside class="ai-dock" id="ai-dock" aria-label="AI 助教"></aside>
+</div>
+
+<!-- ==========================================================================
+     云服务 SDK（可选）
+     未加载或加载失败不会阻塞页面：assistant.js 会检测 global.WorkBuddyCloud，
+     不存在时自动降级到「自定义端点 → 离线知识引擎」通道。
+     ======================================================================= -->
+<!--
+  【可选】云端大模型 SDK 挂载点。
+  为保证金独立可分发、不内置任何第三方地址或密钥，提交版本**默认不加载任何外部脚本**。
+  部署单位如需启用云端通道，在此处加入自有 SDK 的 <script src="..."> 即可，
+  assistant.js 会自动识别；未加载时自动走「自定义端点 → 离线知识引擎」通道。
+-->
+
+<!-- ==========================================================================
+     基础层：算法内核 / 仿真引擎 / 可视化 / UI 组件
+     ======================================================================= -->
+<script src="assets/js/lib/orcore.js"></script>
+<script src="assets/js/lib/orsim.js"></script>
+<script src="assets/js/lib/charts.js"></script>
+<script src="assets/js/ui/ui.js"></script>
+
+<!-- ==========================================================================
+     领域层：场景注册表与 15 个实验场景（入门 4 / 进阶 6 / 挑战 5）
+     ======================================================================= -->
+<script src="assets/js/labs/registry.js"></script>
+<script src="assets/js/labs/l1.js"></script>
+<script src="assets/js/labs/l2.js"></script>
+<script src="assets/js/labs/l3.js"></script>
+<script src="assets/js/labs/l4.js"></script>
+
+<!-- ==========================================================================
+     知识层：知识库（知识点数据集）与知识图谱（构建 / 查询 / 布局 / 渲染）
+     kb.js 必须先于 graph.js 加载：图谱的节点与边由知识库与实验注册表共同构建
+     ======================================================================= -->
+<script src="assets/js/kb/kb.js"></script>
+<script src="assets/js/kb/graph.js"></script>
+
+<!-- 文档内容：由 tools/build-docs.js 从 docs/*.md 打包生成 -->
+<script src="assets/js/docs/content.js"></script>
+
+<!-- ==========================================================================
+     AI 助教：两级推理通道
+     ======================================================================= -->
+<script src="assets/js/ai/assistant.js"></script>
+<script src="assets/js/ai/nlmodel.js"></script>
+<script src="assets/js/ai/panel.js"></script>
+
+<!-- ==========================================================================
+     表现层：积木渲染器与各视图
+     ======================================================================= -->
+<script src="assets/js/views/render.js"></script>
+<script src="assets/js/views/problems.js"></script>
+<script src="assets/js/views/lab.js"></script>
+<script src="assets/js/views/knowledge.js"></script>
+<script src="assets/js/views/home.js"></script>
+<script src="assets/js/views/dashboard.js"></script>
+<script src="assets/js/views/settings.js"></script>
+<script src="assets/js/views/docs.js"></script>
+
+<!-- 应用外壳与路由（最后加载） -->
+<script src="assets/js/app.js"></script>
+
+</body>
+</html>
