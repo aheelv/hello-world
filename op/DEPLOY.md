@@ -9,7 +9,7 @@
 
 | 未提交内容 | 原因 | 本地保留位置 |
 | --- | --- | --- |
-| `templates/_zips/*.zip`（5 个原始快照，约 70MB） | 二进制归档，无需浏览器加载 | 本地项目 `templates/` |
+| `templates/_zips/*.zip`（5 个原始快照，约 70MB） | 二进制归档，无需浏览器加载 | `data/` 同源项目本地目录 |
 | `templates/` 下 d3 / mermaid / echarts / quartz / markmap 完整上游源码（约 130MB） | 仅用于调研留档，运行时不加载 | 同上 |
 
 ## 已保留内容

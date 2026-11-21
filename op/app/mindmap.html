@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思维导图 · 通用课程知识图谱系统</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">通用系统</a> / 思维导图</div>
+    <h1>大纲驱动思维导图 <span class="chip orange">借鉴 markmap</span></h1>
+    <div class="sub">左栏是从同一份数据生成的 Markdown 大纲，右栏是可逐级展开/收起的导图；滚轮缩放、拖拽平移。</div>
+  </div>
+
+  <div class="card tight" style="margin-bottom:12px">
+    <div class="inline-controls">
+      <div><label class="field" style="margin:0"><span>章节筛选</span><select id="chapter"></select></label></div>
+      <div class="narrow btn-row" style="padding-bottom:2px">
+        <button class="btn sm" id="expand">展开全部</button>
+        <button class="btn ghost sm" id="collapse">仅显示章节</button>
+        <button class="btn gray sm" id="copy">复制大纲</button>
+        <button class="btn gray sm" id="reset">复位视图</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="split left">
+    <div class="card tight" style="max-height:660px;overflow:auto">
+      <h3 style="font-size:14px">Markdown 大纲</h3>
+      <div class="muted" style="margin-bottom:8px">与导图同源，共 <span id="outline-count"></span> 行</div>
+      <pre class="code" id="outline" style="max-height:560px;white-space:pre"></pre>
+    </div>
+    <div><div id="map" class="graph-wrap" style="height:660px"></div></div>
+  </div>
+
+  <div class="card" id="detail" style="margin-top:14px"><div class="empty">点击导图中的节点查看属性</div></div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../assets/vendor/d3.min.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'app' }); KG.mountFooter(); KG.mountAuthNotice();
+
+document.getElementById('chapter').innerHTML = KG.selectOptions(KG.chapters, '', '全部章节');
+var holder = document.getElementById('map');
+var W = Math.max(holder.clientWidth || 900, 760), H = 660;
+var svg = d3.select(holder).append('svg').attr('width', '100%').attr('height', H).attr('viewBox', '0 0 ' + W + ' ' + H);
+var gZoom = svg.append('g'), gRoot = gZoom.append('g');
+var zoom = d3.zoom().scaleExtent([.3, 3]).on('zoom', function (e) { gZoom.attr('transform', e.transform); });
+svg.call(zoom);
+gZoom.attr('transform', 'translate(' + (W / 2) + ',' + (H / 2) + ')');
+var tip = d3.select(holder).append('div').attr('class', 'graph-tip');
+var tree = d3.tree().nodeSize([24, 155]);
+var root, outlineText = '';
+
+function makeData(chapter) {
+  var roots = KG.hierarchy(chapter || null);
+  function cv(x) { return { name: x.node.name, node: x.node, children: x.children.map(cv) }; }
+  return { name: chapter || '运筹学', node: null, children: roots.map(cv) };
+}
+function buildOutline(chapter) {
+  var lines = ['# 运筹学课程知识图谱', ''];
+  function walk(list, level) {
+    list.forEach(function (x) {
+      lines.push(new Array(level + 1).join('  ') + '- ' + x.node.name);
+      if (x.children.length) walk(x.children, level + 1);
+    });
+  }
+  walk(KG.hierarchy(chapter || null), 1);
+  return lines.join('\n');
+}
+function collapse(d, level, max) {
+  if (!d.children || !d.children.length) return;
+  d._children = d.children;
+  if (level >= max) d.children = null;
+  else { d.children = d._children; d.children.forEach(function (c) { collapse(c, level + 1, max); }); }
+}
+
+function render(animate) {
+  var h = d3.hierarchy(root, function (d) { return d.children; });
+  tree(h);
+  var all = h.descendants(), links = h.links();
+  // 以一级节点（章节）为界，前一半向左、后一半向右
+  var first = h.children || [];
+  var half = Math.ceil(first.length / 2);
+  h.each(function (d) {
+    if (d.depth === 0) { d.px = 0; return; }
+    var top = d.ancestors().find(function (a) { return a.depth === 1; });
+    var idx = first.indexOf(top);
+    d._side = idx < Math.ceil(first.length / 2) ? -1 : 1;
+    d.px = d.y * d._side;
+  });
+
+  var link = gRoot.selectAll('path.mlink').data(links, function (d) {
+    return (d.target.data.node ? d.target.data.node.id : 'x') + '-' + (d.source.data.node ? d.source.data.node.id : 'root');
+  });
+  link.enter().append('path').attr('class', 'mlink').attr('fill', 'none').attr('stroke', '#C8D3E0').attr('stroke-width', 1.6)
+    .merge(link).attr('d', function (d) {
+      return 'M' + d.source.px + ',' + d.source.x + ' C' + ((d.source.px + d.target.px) / 2) + ',' + d.source.x +
+             ' ' + ((d.source.px + d.target.px) / 2) + ',' + d.target.x + ' ' + d.target.px + ',' + d.target.x;
+    });
+  link.exit().remove();
+
+  var node = gRoot.selectAll('g.mnode').data(all, function (d) { return d.data.node ? d.data.node.id : 'root'; });
+  var en = node.enter().append('g').attr('class', 'mnode').style('cursor', 'pointer')
+    .on('click', function (event, d) {
+      if (d.children) { d._children = d.children; d.children = null; }
+      else if (d._children) { d.children = d._children; d._children = null; }
+      render(true);
+      if (d.data.node) document.getElementById('detail').innerHTML = KG.detailHTML(d.data.node);
+    })
+    .on('mouseover', function (event, d) {
+      tip.style('opacity', 1).html('<b>' + KG.esc(d.data.name) + '</b><br><span style="color:#5A6B7B">' +
+        (d.data.node ? KG.esc(d.data.node.type) + ' · 第' + d.data.node.level + '级' : '课程根节点') + '</span>');
+    })
+    .on('mousemove', function (event) {
+      var r = holder.getBoundingClientRect();
+      tip.style('left', Math.min(event.clientX - r.left + 14, r.width - 270) + 'px').style('top', (event.clientY - r.top + 14) + 'px');
+    })
+    .on('mouseout', function () { tip.style('opacity', 0); });
+  en.append('rect').attr('rx', 5).attr('height', 19).attr('y', -9.5);
+  en.append('text').attr('dy', 3.5).style('font-size', '11px');
+  en.append('text').attr('class', 'fold').attr('dy', 3.5).style('font-size', '12px').style('font-weight', '700');
+
+  var mg = en.merge(node);
+  mg.transition().duration(animate ? 250 : 0).attr('transform', function (d) { return 'translate(' + d.px + ',' + d.x + ')'; });
+  mg.select('rect').attr('width', function (d) { return Math.min(180, d.data.name.length * 11 + 14); })
+    .attr('x', function (d) { return d.depth === 0 ? -(d.data.name.length * 11 + 14) / 2 : (d._side < 0 ? -(Math.min(180, d.data.name.length * 11 + 14)) : 0); })
+    .attr('fill', function (d) { return d.depth === 0 ? '#2E5C8A' : (d.data.node ? KG.color(d.data.node.chapter) : '#fff'); })
+    .attr('fill-opacity', function (d) { return d.depth === 0 || d.data.node.type === '知识单元' ? 1 : .82; });
+  mg.select('text').text(function (d) { return d.data.name.length > 15 ? d.data.name.slice(0, 14) + '…' : d.data.name; })
+    .attr('x', function (d) { return d.depth === 0 ? 0 : (d._side < 0 ? -8 : 8); })
+    .attr('text-anchor', function (d) { return d.depth === 0 ? 'middle' : (d._side < 0 ? 'end' : 'start'); })
+    .attr('fill', function (d) { return d.depth === 0 ? '#fff' : '#22303C'; });
+  mg.select('text.fold').text(function (d) { return d._children ? '+' : (d.children ? '−' : ''); })
+    .attr('x', function (d) { return d._side < 0 ? 8 : -8; })
+    .attr('text-anchor', function (d) { return d._side < 0 ? 'start' : 'end'; }).attr('fill', '#2E5C8A');
+  node.exit().remove();
+}
+
+function rebuild(maxLevel) {
+  var ch = document.getElementById('chapter').value;
+  root = makeData(ch);
+  collapse(root, 0, maxLevel);
+  outlineText = buildOutline(ch);
+  document.getElementById('outline').textContent = outlineText;
+  document.getElementById('outline-count').textContent = outlineText.split('\n').length;
+  render(false);
+}
+document.getElementById('chapter').addEventListener('change', function () { rebuild(2); });
+document.getElementById('expand').addEventListener('click', function () { rebuild(99); });
+document.getElementById('collapse').addEventListener('click', function () { rebuild(1); });
+document.getElementById('reset').addEventListener('click', function () {
+  svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity.translate(W / 2, H / 2));
+});
+document.getElementById('copy').addEventListener('click', function () {
+  if (navigator.clipboard) navigator.clipboard.writeText(outlineText).then(function () { KG.toast('大纲已复制'); });
+  else KG.toast('当前环境不支持剪贴板，请手动选中复制');
+});
+rebuild(2);
+</script>
+</body>
+</html>

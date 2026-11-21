@@ -1,0 +1,47 @@
+[
+  {
+    "key": "d3",
+    "repo": "d3/d3",
+    "branch": "main",
+    "url": "https://codeload.github.com/d3/d3/zip/refs/heads/main",
+    "zipMB": 0.71,
+    "files": 201,
+    "sec": 2.2
+  },
+  {
+    "key": "mermaid",
+    "repo": "mermaid-js/mermaid",
+    "branch": "develop",
+    "url": "https://codeload.github.com/mermaid-js/mermaid/zip/refs/heads/develop",
+    "zipMB": 9.46,
+    "files": 4885,
+    "sec": 13.3
+  },
+  {
+    "key": "echarts",
+    "repo": "apache/echarts",
+    "branch": "master",
+    "url": "https://codeload.github.com/apache/echarts/zip/refs/heads/master",
+    "zipMB": 24.88,
+    "files": 2343,
+    "sec": 9.9
+  },
+  {
+    "key": "quartz",
+    "repo": "jackyzha0/quartz",
+    "branch": "v5",
+    "url": "https://codeload.github.com/jackyzha0/quartz/zip/refs/heads/v5",
+    "zipMB": 12.9,
+    "files": 401,
+    "sec": 4.5
+  },
+  {
+    "key": "markmap",
+    "repo": "markmap/markmap",
+    "branch": "master",
+    "url": "https://codeload.github.com/markmap/markmap/zip/refs/heads/master",
+    "zipMB": 0.27,
+    "files": 240,
+    "sec": 3.2
+  }
+]

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>系统总览 · 通用课程知识图谱系统</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / 通用系统 / 总览</div>
+    <h1>课程知识图谱总览 <span class="chip green">超星 16 列兼容</span></h1>
+    <div class="sub" id="meta-line"></div>
+  </div>
+
+  <div class="grid g4" id="stat-cards"></div>
+
+  <div class="section-title">进入系统功能</div>
+  <div class="grid g3" id="view-cards"></div>
+
+  <div class="grid g2" style="margin-top:22px">
+    <div class="card">
+      <h3>章节分布</h3>
+      <div id="chapter-bars"></div>
+      <div class="legend" style="margin-top:12px"><span><i style="background:var(--c-primary)"></i>节点数</span><span><i style="background:var(--c-green)"></i>其中知识点</span></div>
+    </div>
+    <div class="card">
+      <h3>关系与属性分布</h3>
+      <div id="rel-bars"></div>
+      <h3 style="margin-top:20px">难易程度（知识点）</h3>
+      <div id="diff-bars"></div>
+    </div>
+  </div>
+
+  <div class="section-title">7 章导航（点击直达该章关系图）</div>
+  <div class="grid g4" id="chapter-cards"></div>
+
+  <div class="section-title">关系最密集的 10 个知识点</div>
+  <div class="card tight"><div class="scroll"><table class="tbl" id="top-table"></table></div></div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'app' }); KG.mountFooter(); KG.mountAuthNotice();
+
+var m = KG.data.meta, st = KG.stat();
+document.getElementById('meta-line').textContent =
+  m.course + ' · ' + m.title + ' ｜ 数据源 ' + m.singleSourceOfTruth + ' ｜ 生成于 ' + m.generatedAt;
+
+document.getElementById('stat-cards').innerHTML = [
+  ['节点总数', st.nodes, 'var(--c-primary)'], ['知识点', st.points, 'var(--c-green)'],
+  ['知识单元', st.units, 'var(--c-purple)'], ['关系总数', st.edges, 'var(--c-orange)']
+].map(function (x) {
+  return '<div class="card tight stat"><div class="num" style="color:' + x[2] + '">' + x[1] + '</div><div class="lbl">' + x[0] + '</div></div>';
+}).join('');
+
+var views = [
+  ['力导向关系图', 'graph.html', 'var(--c-primary)', '拖拽 / 缩放 / 章节与关系类型筛选 / 邻接高亮'],
+  ['章节层级树', 'tree.html', '#4A90D9', '按 1—7 级层级展开，支持折叠与章节切换'],
+  ['思维导图', 'mindmap.html', 'var(--c-green)', '大纲驱动、逐级展开的放射式导图'],
+  ['知识点检索', 'search.html', 'var(--c-orange)', '全文检索 + 章节/类型/难易筛选 + 属性详情'],
+  ['关系矩阵', 'matrix.html', 'var(--c-pink)', '章节间关系热力矩阵与边清单'],
+  ['节点详情', 'node.html?id=N005', 'var(--c-purple)', '单节点属性、四属性、入边出边与溯源行号']
+];
+document.getElementById('view-cards').innerHTML = views.map(function (v) {
+  return '<a class="tile" href="' + v[1] + '"><div class="ico" style="background:' + v[2] + '">›</div>' +
+    '<h3>' + v[0] + '</h3><p>' + v[3] + '</p></a>';
+}).join('');
+
+function bars(host, items, colorFn, max) {
+  document.getElementById(host).innerHTML = items.map(function (it) {
+    var w = max ? Math.round(it.value / max * 100) : 0;
+    return '<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px">' +
+      '<span>' + KG.esc(it.label) + '</span><b>' + it.value + '</b></div>' +
+      '<div class="bar"><i style="width:' + w + '%;background:' + colorFn(it) + '"></i></div></div>';
+  }).join('');
+}
+bars('chapter-bars', KG.data.chapters.map(function (c) { return { label: c.name, value: c.nodeCount }; }),
+  function () { return 'var(--c-primary)'; }, 35);
+bars('rel-bars', Object.keys(st.relations).map(function (k) { return { label: k + '关系', value: st.relations[k] }; }),
+  function (it) { return KG.relColor[it.label.replace('关系', '')] || '#4A90D9'; }, 200);
+bars('diff-bars', Object.keys(st.difficulty).map(function (k) { return { label: k, value: st.difficulty[k] }; }),
+  function () { return 'var(--c-blue)'; }, 55);
+
+document.getElementById('chapter-cards').innerHTML = KG.data.chapters.map(function (c, i) {
+  return '<a class="tile tight" href="graph.html?chapter=' + encodeURIComponent(c.name) + '">' +
+    '<div class="chip" style="background:' + KG.color(c.name) + ';color:#fff;border:0">第 ' + (i + 1) + ' 章</div>' +
+    '<h3 style="font-size:14px;margin:9px 0 5px">' + KG.esc(c.name) + '</h3>' +
+    '<p>' + c.nodeCount + ' 节点 · ' + c.knowledgePointCount + ' 知识点 · ' + c.unitCount + ' 知识单元</p></a>';
+}).join('');
+
+var hotNodes = KG.data.nodes.filter(function (n) { return n.type === '知识点'; })
+  .sort(function (a, b) { return b.degree - a.degree; }).slice(0, 10);
+document.getElementById('top-table').innerHTML =
+  '<thead><tr><th>#</th><th>知识点</th><th>所属章节</th><th>关系数</th><th>难易</th><th>知识点分类</th></tr></thead><tbody>' +
+  hotNodes.map(function (n, i) {
+    return '<tr><td>' + (i + 1) + '</td><td><a href="' + KG.nodeUrl(n.id) + '">' + KG.esc(n.name) + '</a></td>' +
+      '<td>' + KG.esc(n.chapter) + '</td><td><b>' + n.degree + '</b></td><td>' + KG.esc(n.difficulty) +
+      '</td><td>' + KG.esc(n.category || '—') + '</td></tr>';
+  }).join('') + '</tbody>';
+</script>
+</body>
+</html>

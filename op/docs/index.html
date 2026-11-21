@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>项目说明 · 通用课程知识图谱系统</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / 项目说明</div>
+    <h1>项目说明 <span class="chip green">全部产物仅在本文件夹内</span></h1>
+    <div class="sub">通用课程知识图谱系统 · 运筹学 7 章知识图谱 · 完整版可阅读 <a href="../README.md">README.md</a></div>
+  </div>
+
+  <div class="grid g4" id="stats"></div>
+
+  <div class="section-title">一、任务目标与交付范围</div>
+  <div class="card"><ul class="list">
+    <li><b>调研并保留原始模板</b>：GitHub 星标靠前的 5 个知识图谱静态网站模板，下载快照、记录来源/星标/许可证/功能特点/可借鉴展示形式。</li>
+    <li><b>统一课程图谱数据</b>：以用户上传的运筹学 7 章 xlsx 与超星 16 列标准导入文件为依据，构建全站共用的数据。</li>
+    <li><b>扩展超星能力</b>：在超星导入/导出之上扩展课程图谱展示；不完全兼容处提供清晰的数据转换接口。</li>
+    <li><b>模板特色功能可进入</b>：5 个演示页分别展示各模板进一步特色，全部使用同一份运筹学数据。</li>
+    <li><b>统一登录入口</b>：通往通用系统、模板演示、导入导出；目录清晰、离线可运行、可当堂检查。</li>
+  </ul></div>
+
+  <div class="section-title">二、前置条件与可用资源</div>
+  <div class="grid g2">
+    <div class="card"><h3>前置条件</h3><table class="tbl">
+      <tr><td>运行环境</td><td>任意现代浏览器（Chrome / Edge）；推荐本地服务 <code>http://127.0.0.1:8765/</code>，双击 HTML 亦可</td></tr>
+      <tr><td>后端依赖</td><td><b>无</b>：无服务器、无数据库、无 API Key、无登录鉴权服务</td></tr>
+      <tr><td>网络</td><td>运行时<b>不需要联网</b>；d3 / mermaid / SheetJS / ECharts 均已本地化</td></tr>
+      <tr><td>超星平台</td><td>仅文件级交换；课程绑定、资源挂接、审核发布需在超星后台完成</td></tr>
+      <tr><td>复现工具</td><td>Python 3 + openpyxl（重建数据）、Node.js（接口测试）、Chrome（运行时探针）；仅复跑校验时需要</td></tr>
+    </table></div>
+    <div class="card"><h3>可用资源</h3><table class="tbl">
+      <tr><td>基础数据</td><td><code>data/course-kg.json</code> / <code>.js</code>（186 节点 / 320 关系 / 7 章）</td></tr>
+      <tr><td>原始语料</td><td><code>data/source/</code> 用户上传原件只读副本</td></tr>
+      <tr><td>超星示例</td><td><code>data/chaoxing/</code> 16 列导入、16/15 列导出、模板原文</td></tr>
+      <tr><td>原始模板</td><td><code>templates/</code> 5 个仓库快照 + ZIP + 许可证</td></tr>
+      <tr><td>转换接口</td><td><code>io/js/converter.js</code>（9 个公开 API）</td></tr>
+      <tr><td>三层校验</td><td><code>tools/verify.py</code> 21 项 / <code>tools/test_converter.js</code> 22 项 / <code>tools/runtime_probe.py</code> 16 页 → <a href="04_一致性校验记录.md">静态校验</a> · <a href="05_转换接口测试记录.md">接口测试</a> · <a href="06_浏览器运行时校验记录.md">运行时校验</a></td></tr>
+    </table></div>
+  </div>
+
+  <div class="section-title">三、目录结构与运行</div>
+  <div class="grid g2">
+    <div class="card"><h3>目录结构</h3><pre class="code">课程知识图谱系统/
+├── index.html            统一登录入口
+├── 启动.bat / tools/serve.py
+├── README.md             项目说明（完整版）
+├── assets/               主题 CSS、公共 JS、本地库
+├── data/                 ★ 唯一基础数据 + 超星示例
+├── app/                  通用系统（7 页）
+├── demos/                模板演示（5 页 + 索引）
+├── io/                   导入导出 + 转换接口
+├── docs/                 本文档 + 6 份专题/校验文档
+├── templates/            ★ 5 个原始模板快照
+└── tools/                构建 / 校验 / 服务脚本</pre></div>
+    <div class="card"><h3>运行三步</h3>
+      <ol style="padding-left:20px;line-height:2">
+        <li>双击根目录 <code>启动.bat</code>（或 <code>python tools/serve.py</code>）；</li>
+        <li>浏览器打开 <code>http://127.0.0.1:8765/</code>，用 <code>student / 123456</code> 登录；</li>
+        <li>从工作台进入「通用系统 / 模板演示 / 导入导出」，逐页检查。</li>
+      </ol>
+      <div class="note info"><b>也可完全离线</b>：直接双击 <code>index.html</code>。全站页面用 <code>&lt;script&gt;</code> 引入 <code>data/course-kg.js</code>，绕开 <code>file://</code> 下 fetch 被禁的问题。</div>
+    </div>
+  </div>
+
+  <div class="section-title">四、与超星格式的兼容范围</div>
+  <div class="grid g3">
+    <div class="card"><h3 style="color:var(--c-green)">✅ 完全兼容</h3><ul class="list">
+      <li>16 列 xlsx/csv 读写，复刻第 1 行说明、第 2 行表头、Sheet3</li>
+      <li>A—G 层级、H—J 关系、K—P 属性无损</li>
+      <li>模板 11 项硬约束校验</li></ul></div>
+    <div class="card"><h3 style="color:var(--c-orange)">⚠️ 转换后兼容</h3><ul class="list">
+      <li>15 列 ↔ 16 列（类型/标签/分类/四属性有损）</li>
+      <li>空引用剔除、重复关系合并、方向统一</li>
+      <li>标签与知识点分类保留在统一数据扩展字段</li></ul></div>
+    <div class="card"><h3 style="color:var(--c-pink)">❌ 不在范围</h3><ul class="list">
+      <li>超星在线 API / 账号 / 课程绑定 / 审核发布</li>
+      <li>图片、公式、附件、习题挂载、学习行为数据</li>
+      <li>7 级以上层级、跨课程图谱合并</li></ul></div>
+  </div>
+  <div class="note">完整逐列对照与硬约束清单：<a href="02_超星兼容范围与字段映射.md">02_超星兼容范围与字段映射.md</a>；转换 API：<a href="03_数据转换接口说明.md">03_数据转换接口说明.md</a>。</div>
+
+  <div class="section-title">五、字段映射（16 列 → 统一数据）</div>
+  <div class="card tight"><div class="scroll"><table class="tbl" id="map"></table></div>
+    <div class="note warn"><b>关键细节</b>：关系列只按英文分号 <code>;</code> 切分。节点名本身可能含顿号（如「基、基变量、非基变量的概念」），按顿号切会凭空造出 6 个不存在的节点。</div>
+  </div>
+
+  <div class="section-title">六、示例文件</div>
+  <div class="card tight"><div class="scroll"><table class="tbl" id="samples"></table></div></div>
+
+  <div class="section-title">七、模板来源与许可证</div>
+  <div class="card tight"><div class="scroll"><table class="tbl" id="tpls"></table></div>
+    <div class="muted" style="margin-top:10px">星标数为 2026-11-10 GitHub REST API 实测值；详细筛选过程、下载 SHA 与许可证路径见 <a href="01_GitHub模板调研.md">01_GitHub模板调研.md</a> 与 <a href="../templates/PROVENANCE.md">templates/PROVENANCE.md</a>。</div>
+  </div>
+
+  <div class="section-title">八、操作要点与常见注意事项</div>
+  <div class="grid g2">
+    <div class="card"><h3>操作要点</h3><ul class="list">
+      <li>所有页面共用 <code>data/course-kg.js</code>；不要在页面里另写一份数据。</li>
+      <li>导入页用于校验/转换/生成超星文件，<b>不会替换全站展示数据</b>。</li>
+      <li>导出 16 列 xlsx 含模板第 1/2 行原文，可直接拿去平台导入。</li>
+      <li>15 列导出会列出有损字段，不会静默丢弃。</li>
+      <li>关系图节点半径 = 关系数，颜色 = 章节；点击节点看邻接与属性。</li></ul></div>
+    <div class="card"><h3>常见注意事项</h3><ul class="list">
+      <li><code>file://</code> 下"载入内置示例"会因 fetch 受限而提示，改用手动选择文件即可。</li>
+      <li>Mermaid mindmap 在纯本地 UMD 环境可能不可分包加载，页面会明确提示并保留 flowchart 演示。</li>
+      <li>登录是前端演示，不做真实鉴权；不要把真实账号密码写进本系统。</li>
+      <li>更换基础数据需同步更新 <code>data/course-kg.js</code>，否则各页与 JSON 不一致。</li>
+      <li>原始模板体积较大（约 200 MB），交付时请勿删改；校验脚本会检查其完整性。</li></ul></div>
+  </div>
+  <div class="note info" style="margin-top:14px"><b>三层校验（均可在项目文件夹内复跑）</b>：
+    <code>python tools/verify.py</code>（21 项静态一致性）·
+    <code>node tools/test_converter.js</code>（22 项转换接口）·
+    <code>python tools/runtime_probe.py</code>（Chrome headless 逐页检查 JS 运行时错误）。
+    当前结果依次为 <b>21/21</b>、<b>22/22</b>、<b>16/16 页零错误</b>，详见
+    <a href="04_一致性校验记录.md">04</a> / <a href="05_转换接口测试记录.md">05</a> / <a href="06_浏览器运行时校验记录.md">06</a> 号记录。</div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'docs' }); KG.mountFooter(); KG.mountAuthNotice();
+var st = KG.stat();
+document.getElementById('stats').innerHTML = [
+  ['节点', st.nodes, 'var(--c-primary)'], ['关系', st.edges, 'var(--c-green)'],
+  ['章节', st.chapters, 'var(--c-orange)'], ['页面', 16, 'var(--c-purple)']
+].map(function (x) { return '<div class="card tight stat"><div class="num" style="color:' + x[2] + '">' + x[1] + '</div><div class="lbl">' + x[0] + '</div></div>'; }).join('');
+
+var map = [
+  ['A—G', '一~七级知识节点', 'level + name + parentId + path'],
+  ['H / I / J', '前置 / 后置 / 关联知识节点', 'edges(relation=前置/后置/关联)'],
+  ['K', '节点类型', 'type（知识单元 / 知识点）'],
+  ['L', '节点描述', 'description'],
+  ['M', '难易程度', 'difficulty'],
+  ['N', '重难点', 'keypoint'],
+  ['O', '专业素养', 'literacy'],
+  ['P', '应用能力', 'application'],
+  ['—', '（新版无对应列）', 'tags[] / category / sourceRow（仅本项目保留）']
+];
+document.getElementById('map').innerHTML = '<thead><tr><th>列</th><th>超星表头</th><th>统一数据字段</th><th>兼容</th></tr></thead><tbody>' +
+  map.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + KG.esc(r[1]) + '</td><td><code>' + r[2] + '</code></td><td>' +
+    (r[0] === '—' ? '<span class="chip orange">仅本项目</span>' : '<span class="chip green">无损</span>') + '</td></tr>'; }).join('') + '</tbody>';
+
+var samples = [
+  ['data/source/01-知识图谱-运筹学-7章全部.xlsx', '用户上传原件只读副本（旧版 15 列）'],
+  ['data/chaoxing/示例_超星16列导入.xlsx', '可直接导入超星后台（含模板第 1/2 行）'],
+  ['data/chaoxing/示例_超星16列导出.csv', '由统一数据反向生成，验证 16 列往返'],
+  ['data/chaoxing/示例_超星15列导出.csv', '由统一数据反向生成，验证 15 列转换'],
+  ['data/chaoxing/template-notes.json', '两套模板第 1/2 行原文'],
+  ['data/course-kg.json', '统一课程图谱数据（唯一真源）']
+];
+document.getElementById('samples').innerHTML = '<thead><tr><th>文件</th><th>用途</th><th>位置</th></tr></thead><tbody>' +
+  samples.map(function (s) { return '<tr><td><a href="../' + s[0] + '">' + KG.esc(s[0].split('/').pop()) + '</a></td><td>' + KG.esc(s[1]) +
+    '</td><td><code>' + KG.esc(s[0]) + '</code></td></tr>'; }).join('') + '</tbody>';
+
+var tpls = [
+  ['d3/d3', '113,892', 'ISC', '力导向网络', 'd3-force.html'],
+  ['mermaid-js/mermaid', '91,056', 'MIT', '图谱即文本', 'mermaid-flow.html'],
+  ['apache/echarts', '67,697', 'Apache-2.0', '多布局关系图', 'echarts-graph.html'],
+  ['jackyzha0/quartz', '13,558', 'MIT', '全局/局部图谱 + 反向链接', 'quartz-graph.html'],
+  ['markmap/markmap', '13,229', 'MIT', 'Markdown 大纲导图', 'markmap-outline.html']
+];
+document.getElementById('tpls').innerHTML = '<thead><tr><th>仓库</th><th>星标</th><th>许可证</th><th>展示形式</th><th>演示页</th></tr></thead><tbody>' +
+  tpls.map(function (t) { return '<tr><td><b>' + t[0] + '</b></td><td>★ ' + t[1] + '</td><td>' + t[2] + '</td><td>' + t[3] +
+    '</td><td><a href="../demos/' + t[4] + '">进入演示 →</a></td></tr>'; }).join('') + '</tbody>';
+</script>
+</body>
+</html>

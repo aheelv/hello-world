@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECharts 多布局关系图 · 模板演示</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">模板演示</a> / ECharts</div>
+    <h1>ECharts · 多布局关系图 <span class="chip orange">★ 67,697 · Apache-2.0</span></h1>
+    <div class="sub">展示 ECharts 模板的核心特色：<b>布局切换、图例筛选、roam 漫游、focus adjacency 邻接聚焦</b>。页面直接引用原始模板里的 <code>dist/echarts.min.js</code>。</div>
+  </div>
+
+  <div class="card tight" style="margin-bottom:12px">
+    <div class="inline-controls">
+      <div><label class="field" style="margin:0"><span>布局</span><select id="layout"><option value="force">力引导 force</option><option value="circular">环形 circular</option><option value="none">固定坐标 none</option></select></label></div>
+      <div><label class="field" style="margin:0"><span>章节</span><select id="chapter"></select></label></div>
+      <div><label class="field" style="margin:0"><span>关系类型</span><select id="relation"></select></label></div>
+      <div class="narrow btn-row" style="padding-bottom:2px"><button class="btn ghost sm" id="reset">复位筛选</button></div>
+    </div>
+  </div>
+
+  <div class="card tight"><div id="chart" style="width:100%;height:600px"></div>
+    <div class="muted" style="margin-top:8px" id="info"></div>
+    <div class="note">点击节点会跳转到通用系统的节点详情页；图例可勾选/隐藏章节；鼠标悬停会高亮一跳邻域。</div>
+  </div>
+
+  <div class="section-title">借鉴点说明</div>
+  <div class="grid g3">
+    <div class="card tight"><h3>布局一键切换</h3><p class="muted">同一份 nodes/links 数据，只改 <code>series.layout</code> 即可得到三种完全不同的形态。</p></div>
+    <div class="card tight"><h3>分类图例</h3><p class="muted">7 个章节注册为 7 个 <code>categories</code>，图例既是说明也是过滤器。</p></div>
+    <div class="card tight"><h3>零构建</h3><p class="muted">使用仓库自带 UMD 构建，<code>&lt;script&gt;</code> 引入即可，正是静态模板最值得借鉴的一点。</p></div>
+  </div>
+  <div class="note info">原始模板：<code>templates/echarts/echarts-master/dist/echarts.min.js</code>（未复制、未修改，直接相对引用）；许可证原文 <code>templates/echarts/echarts-master/LICENSE</code>。</div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../templates/echarts/echarts-master/dist/echarts.min.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'demos' }); KG.mountFooter(); KG.mountAuthNotice();
+
+document.getElementById('chapter').innerHTML = KG.selectOptions(KG.chapters, '', '全部章节');
+document.getElementById('relation').innerHTML = KG.selectOptions(['前置', '后置', '关联'], '', '全部关系');
+var chart = echarts.init(document.getElementById('chart'));
+var cats = KG.chapters.map(function (c) { return { name: c, itemStyle: { color: KG.color(c) } }; });
+
+function build() {
+  var ch = document.getElementById('chapter').value, rel = document.getElementById('relation').value;
+  var layout = document.getElementById('layout').value;
+  var nodes = KG.data.nodes.filter(function (n) { return !ch || n.chapter === ch; });
+  var ids = {}; nodes.forEach(function (n) { ids[n.id] = true; });
+  var links = KG.data.edges.filter(function (e) { return ids[e.source] && ids[e.target] && (!rel || e.relation === rel); });
+  var data = nodes.map(function (n) {
+    return {
+      id: n.id, name: n.name, category: KG.chapters.indexOf(n.chapter),
+      value: n.degree, symbolSize: Math.max(8, Math.min(30, 7 + Math.sqrt(n.degree || 0) * 3.6)),
+      label: { show: n.level <= 2 || (n.degree || 0) >= 6 },
+      tooltip: { formatter: '<b>' + n.name + '</b><br>' + n.chapter + ' · ' + n.type + ' · 关系数 ' + n.degree }
+    };
+  });
+  var linkData = links.map(function (e) {
+    return {
+      source: e.source, target: e.target,
+      lineStyle: { color: KG.relColor[e.relation], width: e.relation === '关联' ? 1 : 1.5,
+                   type: e.relation === '关联' ? 'dashed' : 'solid', opacity: .55, curveness: .06 },
+      value: e.relation
+    };
+  });
+  var option = {
+    backgroundColor: '#FFFFFF',
+    tooltip: {},
+    legend: [{ data: KG.chapters, top: 6, type: 'scroll', textStyle: { fontSize: 11, color: '#5A6B7B' } }],
+    animationDurationUpdate: 500,
+    series: [{
+      type: 'graph', layout: layout, roam: true, draggable: layout === 'force',
+      data: data, links: linkData, categories: cats,
+      circular: { rotateLabel: true },
+      force: { repulsion: 130, edgeLength: [45, 130], gravity: .08, layoutAnimation: true },
+      label: { show: true, position: 'right', fontSize: 10, color: '#22303C', overflow: 'truncate', width: 95 },
+      lineStyle: { opacity: .55 },
+      emphasis: { focus: 'adjacency', lineStyle: { width: 3, opacity: 1 }, label: { show: true, fontWeight: 'bold' } },
+      select: { itemStyle: { borderColor: '#E67E22', borderWidth: 3 } },
+      selectedMode: 'single'
+    }]
+  };
+  chart.setOption(option, true);
+  document.getElementById('info').textContent =
+    '当前 ' + nodes.length + ' 节点 / ' + links.length + ' 关系 · 布局 ' + layout + ' · 全量 ' + KG.data.nodes.length + '/' + KG.data.edges.length;
+}
+chart.on('click', function (p) {
+  if (p.dataType === 'node' && p.data && p.data.id) location.href = '../app/node.html?id=' + encodeURIComponent(p.data.id);
+});
+['layout', 'chapter', 'relation'].forEach(function (id) { document.getElementById(id).addEventListener('change', build); });
+document.getElementById('reset').addEventListener('click', function () {
+  document.getElementById('layout').value = 'force'; document.getElementById('chapter').value = '';
+  document.getElementById('relation').value = ''; build();
+});
+window.addEventListener('resize', function () { chart.resize(); });
+build();
+</script>
+</body>
+</html>

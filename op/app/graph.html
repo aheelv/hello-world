@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>力导向关系图 · 通用课程知识图谱系统</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">通用系统</a> / 关系图</div>
+    <h1>力导向关系图 <span class="chip">D3 力模拟</span></h1>
+    <div class="sub">节点半径 = 关系数；颜色 = 所属章节；实线箭头 = 前置/后置，虚线 = 关联。点击节点查看邻接与属性。</div>
+  </div>
+
+  <div class="card tight" style="margin-bottom:14px">
+    <div class="inline-controls">
+      <div><label class="field" style="margin:0"><span>章节筛选</span><select id="f-chapter"></select></label></div>
+      <div><label class="field" style="margin:0"><span>关系类型</span><select id="f-relation"></select></label></div>
+      <div><label class="field" style="margin:0"><span>关键词（含一跳邻居）</span><input type="search" id="f-key" placeholder="例如：单纯形法"></label></div>
+      <div class="narrow btn-row" style="padding-bottom:2px">
+        <button class="btn sm" id="btn-reset">清空筛选</button>
+        <button class="btn ghost sm" id="btn-zoom">复位视图</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div>
+      <div id="graph"></div>
+      <div class="card tight" style="margin-top:12px">
+        <div class="legend" id="legend"></div>
+        <div class="muted" style="margin-top:8px" id="graph-count"></div>
+      </div>
+    </div>
+    <div class="card" id="detail"><div class="empty">点击图中任意节点查看属性与关系</div></div>
+  </div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../assets/vendor/d3.min.js"></script>
+<script src="../assets/js/kg-force.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'app' }); KG.mountFooter(); KG.mountAuthNotice();
+
+var params = new URLSearchParams(location.search);
+document.getElementById('f-chapter').innerHTML = KG.selectOptions(KG.chapters, params.get('chapter') || '', '全部章节');
+document.getElementById('f-relation').innerHTML = KG.selectOptions(['前置', '后置', '关联'], '', '全部关系');
+
+var g = KGForce.create(document.getElementById('graph'), {
+  height: 580,
+  onSelect: function (n) {
+    document.getElementById('detail').innerHTML = KG.detailHTML(n);
+  }
+});
+
+function apply() {
+  var f = {
+    chapter: document.getElementById('f-chapter').value,
+    relation: document.getElementById('f-relation').value,
+    keyword: document.getElementById('f-key').value.trim()
+  };
+  g.setFilter(f);
+  var c = g.count();
+  document.getElementById('graph-count').textContent =
+    '当前显示 ' + c.nodes + ' 个节点 / ' + c.links + ' 条关系（全量 ' + KG.data.nodes.length + ' / ' + KG.data.edges.length + '）';
+  document.getElementById('detail').innerHTML = '<div class="empty">点击图中任意节点查看属性与关系</div>';
+}
+['f-chapter', 'f-relation'].forEach(function (id) {
+  document.getElementById(id).addEventListener('change', apply);
+});
+var timer;
+document.getElementById('f-key').addEventListener('input', function () {
+  clearTimeout(timer); timer = setTimeout(apply, 280);
+});
+document.getElementById('btn-reset').addEventListener('click', function () {
+  document.getElementById('f-chapter').value = '';
+  document.getElementById('f-relation').value = '';
+  document.getElementById('f-key').value = '';
+  apply();
+});
+document.getElementById('btn-zoom').addEventListener('click', function () { g.resetZoom(); });
+
+document.getElementById('legend').innerHTML =
+  KG.chapters.map(function (c) { return '<span><i style="background:' + KG.color(c) + '"></i>' + KG.esc(c) + '</span>'; }).join('') +
+  '<span><i style="background:#B9C7D6"></i>关系连线</span>';
+apply();
+</script>
+</body>
+</html>

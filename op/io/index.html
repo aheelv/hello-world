@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>超星数据导入导出 · 课程知识图谱系统</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / 导入导出</div>
+    <h1>超星数据导入导出工作台 <span class="chip green">16 列无损往返</span></h1>
+    <div class="sub">纯前端文件级转换：不调用超星在线接口、不上传任何数据；无法完全兼容的字段一律列入「有损字段 / 警告清单」。</div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button data-tab="import" class="active">① 导入超星文件</button>
+    <button data-tab="export">② 导出超星文件</button>
+    <button data-tab="convert" id="tab-convert">③ 数据转换接口</button>
+    <button data-tab="samples">④ 示例文件与校验</button>
+  </div>
+
+  <!-- 导入 -->
+  <div class="tab-pane active" id="pane-import">
+    <div class="grid g2">
+      <div class="card">
+        <h3>选择文件</h3>
+        <p class="muted">支持超星新版 16 列 <code>.xlsx</code> / <code>.csv</code>、旧版 15 列 <code>.xlsx</code> / <code>.csv</code>，以及统一数据 <code>.json</code>。可直接把文件拖到下方区域。</p>
+        <div id="drop" style="border:2px dashed var(--c-border);border-radius:10px;padding:26px;text-align:center;background:var(--c-soft2);margin:12px 0">
+          <div style="font-size:26px;color:var(--c-primary)">⇪</div>
+          <div>拖放文件到这里，或</div>
+          <input type="file" id="file" accept=".xlsx,.xls,.csv,.json" style="margin-top:10px">
+        </div>
+        <div class="btn-row"><button class="btn ghost sm" id="demo16">载入内置 16 列示例</button>
+          <button class="btn ghost sm" id="demo15">载入内置 15 列示例</button></div>
+        <div id="import-msg"></div>
+      </div>
+      <div class="card">
+        <h3>格式与字段映射</h3>
+        <div id="fmt-info" class="empty">尚未载入文件</div>
+      </div>
+    </div>
+    <div class="section-title">解析结果预览（前 8 行）</div>
+    <div class="card tight"><div class="scroll"><table class="tbl" id="preview"></table></div></div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card"><h3>校验检查</h3><div id="checks" class="empty">尚未载入文件</div></div>
+      <div class="card"><h3>警告与有损字段</h3><div id="warns" class="empty">尚未载入文件</div></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h3>导入结果可下载</h3>
+      <div class="btn-row">
+        <button class="btn" id="dl-json" disabled>下载统一数据 JSON</button>
+        <button class="btn ghost" id="dl-16" disabled>转成 16 列 .xlsx</button>
+        <button class="btn ghost" id="dl-15" disabled>转成 15 列 .xlsx</button>
+      </div>
+      <div class="note warn" style="margin-top:12px"><b>数据一致性约定</b>：全站展示页面固定读取 <code>data/course-kg.js</code>。导入功能用于<b>校验、转换与生成超星文件</b>，不会在浏览器里替换展示数据，从而保证所有页面始终使用同一份运筹学基础数据。若确需更换基础数据，请用导出的 JSON 覆盖 <code>data/</code> 下文件，再运行 <code>tools/build_data.py</code> 同步 JS 包装。</div>
+    </div>
+  </div>
+
+  <!-- 导出 -->
+  <div class="tab-pane" id="pane-export">
+    <div class="grid g2">
+      <div class="card">
+        <h3>导出设置</h3>
+        <label class="field"><span>目标格式</span><select id="ex-format">
+          <option value="chaoxing16">超星新版 16 列（.xlsx，推荐 · 无损）</option>
+          <option value="chaoxing15">超星旧版 15 列（.xlsx，有损）</option>
+          <option value="csv16">超星新版 16 列（.csv）</option>
+          <option value="csv15">超星旧版 15 列（.csv）</option>
+          <option value="json">统一数据（.json）</option>
+        </select></label>
+        <label class="field"><span>文件名</span><input type="text" id="ex-name" value="运筹学知识图谱_超星导入"></label>
+        <div class="btn-row"><button class="btn" id="ex-run">生成并下载</button>
+          <button class="btn ghost" id="ex-preview">预览前 10 行</button></div>
+        <div id="ex-msg" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <h3>当前基础数据</h3>
+        <dl class="kv" id="ex-meta"></dl>
+        <div class="note info" style="margin-top:12px">导出内容来自 <code>data/course-kg.js</code>，与通用系统、模板演示页完全同源。</div>
+      </div>
+    </div>
+    <div class="section-title">字段映射（导出时逐列写入）</div>
+    <div class="card tight"><div class="scroll"><table class="tbl" id="map-table"></table></div></div>
+    <div class="section-title">导出预览</div>
+    <div class="card tight"><div class="scroll"><table class="tbl" id="ex-table"></table></div></div>
+  </div>
+
+  <!-- 转换接口 -->
+  <div class="tab-pane" id="pane-convert">
+    <div class="note"><b>兼容边界</b>：若无法完全兼容（旧版 15 列缺四属性、新版缺标签列、平台在线接口不可达），本系统提供下列 <b>文件级、可调用、可复现</b> 的转换接口，而不是静默丢弃字段。全部实现在 <code>io/js/converter.js</code>。</div>
+    <div class="card tight" style="margin-top:14px"><div class="scroll"><table class="tbl" id="api-table"></table></div></div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card"><h3>接口在线试验</h3>
+        <label class="field"><span>粘贴统一数据 JSON（或点击使用当前基础数据）</span><textarea id="api-json" rows="7" placeholder='{"meta":...,"nodes":[...],"edges":[...]}'></textarea></label>
+        <div class="btn-row"><button class="btn sm" id="api-current">使用当前基础数据</button>
+          <button class="btn ghost sm" id="api-16">toChaoxing16</button>
+          <button class="btn ghost sm" id="api-15">toChaoxing15</button>
+          <button class="btn gray sm" id="api-val">validate</button></div>
+        <pre class="code" id="api-out" style="margin-top:12px;max-height:300px">等待调用…</pre>
+      </div>
+      <div class="card"><h3>调用示例（浏览器控制台可直接执行）</h3>
+        <pre class="code">// 1) 读取超星文件
+const buf = await file.arrayBuffer();
+const input = KGConverter.readWorkbook(buf);
+// → { format:'chaoxing16'|'chaoxing15', headerRow, sheet, rows }
+
+// 2) 转成统一课程图谱数据
+const parsed = KGConverter.parseRows(input.rows, input.format);
+const unified = KGConverter.toUnified(parsed, { course:'运筹学' });
+
+// 3) 校验（模板硬约束）
+const report = KGConverter.validate(unified);
+
+// 4) 反向导出为超星文件
+KGConverter.exportWorkbook(unified, 'chaoxing16', '导入.xlsx');
+
+// 5) 旧版 / 新版互转（有损字段会列出）
+const t15 = KGConverter.toChaoxing15(unified);
+console.log(t15.lostFields);</pre>
+        <div class="note warn">转换只在浏览器内存中完成，不产生网络请求；结果可下载为文件后再到超星后台导入。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 示例与校验 -->
+  <div class="tab-pane" id="pane-samples">
+    <div class="grid g2">
+      <div class="card"><h3>示例文件（本项目文件夹内）</h3><div id="sample-list"></div></div>
+      <div class="card"><h3>当前基础数据体检</h3><div id="health"></div></div>
+    </div>
+    <div class="section-title">超星兼容范围速览</div>
+    <div class="card tight"><div class="grid g3">
+      <div><h3 style="color:var(--c-green)">✅ 完全兼容</h3><ul class="list">
+        <li>16 列 xlsx 读写（第 1 行说明 / 第 2 行表头 / Sheet3）</li><li>A—G 层级、H—J 关系、K—P 属性</li><li>模板硬约束校验（5000/2000/1000/256）</li></ul></div>
+      <div><h3 style="color:var(--c-orange)">⚠️ 转换后兼容</h3><ul class="list">
+        <li>15 列 ↔ 16 列（类型、标签、分类、四属性有损）</li><li>空引用剔除、重复关系合并</li><li>标签与知识点分类保留在统一数据扩展字段</li></ul></div>
+      <div><h3 style="color:var(--c-pink)">❌ 不在范围</h3><ul class="list">
+        <li>超星在线 API / 账号 / 课程绑定 / 审核发布</li><li>图片、公式、附件、习题挂载</li><li>学习行为数据、平台内渲染样式、7 级以上层级</li></ul></div>
+    </div></div>
+  </div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../data/chaoxing/template-notes.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../assets/vendor/xlsx.full.min.js"></script>
+<script src="js/converter.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'io' }); KG.mountFooter(); KG.mountAuthNotice();
+var C = KGConverter, currentUnified = null;
+
+/* ---------- tabs ---------- */
+function activate(tab) {
+  KG.qsa('#tabs button').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === tab); });
+  KG.qsa('.tab-pane').forEach(function (p) { p.classList.toggle('active', p.id === 'pane-' + tab); });
+}
+KG.qsa('#tabs button').forEach(function (b) { b.addEventListener('click', function () { activate(b.dataset.tab); }); });
+if (location.hash === '#tab-convert') activate('convert');
+
+/* ---------- 导入 ---------- */
+function showResult(d, fmt, msg) {
+  currentUnified = d;
+  var h = C.constants[fmt === 'chaoxing15' ? 'H15' : 'H16'];
+  document.getElementById('fmt-info').innerHTML =
+    '<dl class="kv"><dt>识别格式</dt><dd><span class="chip green">' + (fmt === 'chaoxing15' ? '超星旧版 15 列' : '超星新版 16 列') + '</span></dd>' +
+    '<dt>节点 / 关系</dt><dd>' + d.nodes.length + ' / ' + d.edges.length + '</dd>' +
+    '<dt>章节</dt><dd>' + d.chapters.length + '</dd>' +
+    '<dt>表头列数</dt><dd>' + h.length + '</dd>' +
+    '<dt>工作表名</dt><dd>Sheet3</dd></dl>' +
+    '<div class="section-title" style="margin:14px 0 8px">字段映射</div>' +
+    '<div class="scroll" style="max-height:230px"><table class="tbl"><thead><tr><th>列</th><th>超星表头</th><th>统一数据字段</th></tr></thead><tbody>' +
+    h.map(function (x, i) { return '<tr><td>' + String.fromCharCode(65 + i) + '</td><td>' + KG.esc(x) + '</td><td>' +
+      KG.esc((fmt === 'chaoxing15' ? MAP15 : MAP16)[i] || '—') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  var v = C.validate(d);
+  document.getElementById('checks').innerHTML = v.checks.map(function (c) {
+    return '<div style="font-size:13px;padding:4px 0"><span class="chip ' + (c.passed ? 'green' : 'pink') + '">' +
+      (c.passed ? '通过' : '未通过') + '</span> ' + KG.esc(c.name) + (c.detail ? ' <span class="muted">（' + KG.esc(c.detail) + '）</span>' : '') + '</div>';
+  }).join('') + '<div class="note ' + (v.passed ? '' : 'warn') + '" style="margin-top:8px">总判定：<b>' + (v.passed ? '全部通过' : '存在未通过项') + '</b></div>';
+  var warns = (d.importWarnings || []).concat((d.unresolvedReferences || []).map(function (u) {
+    return '未解析引用：' + u.node + ' → ' + u.target;
+  }));
+  document.getElementById('warns').innerHTML = warns.length
+    ? '<div class="note warn">共 ' + warns.length + ' 条；前 30 条：</div><ul class="list">' +
+      warns.slice(0, 30).map(function (w) { return '<li>' + KG.esc(w) + '</li>'; }).join('') + '</ul>'
+    : '<div class="note">无警告：格式完全兼容，字段无损。</div>';
+  ['dl-json', 'dl-16', 'dl-15'].forEach(function (id) { document.getElementById(id).disabled = false; });
+  document.getElementById('import-msg').innerHTML = '<div class="note">' + KG.esc(msg) + '</div>';
+}
+
+var MAP16 = ['level/name','level/name','level/name','level/name','level/name','level/name','level/name',
+  'edges(前置)','edges(后置)','edges(关联)','type','description','difficulty','keypoint','literacy','application'];
+var MAP15 = ['sourceType','level/name','level/name','level/name','level/name','level/name','level/name','level/name',
+  'edges(前置)','edges(后置)','edges(关联)','tags[]（有损）','category（有损）','description'];
+
+function previewTable(rows, header) {
+  document.getElementById('preview').innerHTML =
+    '<thead><tr><th>#</th>' + header.map(function (h, i) { return '<th>' + String.fromCharCode(65 + i) + '·' + KG.esc(h.length > 10 ? h.slice(0, 9) + '…' : h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+    rows.slice(0, 8).map(function (r, i) {
+      return '<tr><td>' + (i + 3) + '</td>' + header.map(function (_, j) { return '<td>' + KG.esc(String(r[j] == null ? '' : r[j]).slice(0, 30)) + '</td>'; }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+}
+
+function handleFile(file) {
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      if (/\.json$/i.test(file.name)) {
+        var d = C.loadUnified(e.target.result);
+        showResult(d, 'chaoxing16', '已载入统一数据 JSON：' + file.name);
+        previewTable(d.nodes.slice(0, 8).map(function (n) { return [n.level, n.name, n.type, n.description]; }),
+          ['level', 'name', 'type', 'description']);
+        return;
+      }
+      var buf = e.target.result;
+      if (/\.csv$/i.test(file.name)) {
+        // CSV 用 SheetJS 以文本方式解析，兼容 UTF-8 BOM
+        var text = new TextDecoder('utf-8').decode(new Uint8Array(buf));
+        var wb = XLSX.read(text, { type: 'string' });
+        var ws = wb.Sheets[wb.SheetNames[0]];
+        var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+        var found = C.findHeaderRow(rows);
+        var fmt = found.format !== 'unknown' ? found.format : C.detectFormat(rows);
+        var hi = found.index >= 0 ? found.index : 1;
+        var body = rows.slice(hi + 1).filter(function (r) { return r.some(function (v) { return String(v).trim(); }); });
+        finishParse(body, fmt, file.name);
+      } else {
+        var inp = C.readWorkbook(buf);
+        finishParse(inp.rows, inp.format, file.name);
+      }
+    } catch (err) {
+      document.getElementById('import-msg').innerHTML = '<div class="note warn"><b>解析失败</b>：' + KG.esc(err.message) + '</div>';
+    }
+  };
+  if (/\.json$/i.test(file.name) || /\.csv$/i.test(file.name)) reader.readAsArrayBuffer(file);
+  else reader.readAsArrayBuffer(file);
+}
+function finishParse(rows, fmt, name) {
+  if (fmt === 'unknown') {
+    document.getElementById('import-msg').innerHTML = '<div class="note warn">无法识别格式：请确认文件含超星模板第 2 行表头（16 列含「一级知识节点」，15 列含「节点类型*」）。</div>';
+    return;
+  }
+  var parsed = C.parseRows(rows, fmt);
+  var unified = C.toUnified(parsed, { primarySource: name });
+  showResult(unified, fmt, '已解析 ' + name + '：' + parsed.stats.nodes + ' 节点 / ' + parsed.stats.edges + ' 关系');
+  previewTable(rows, C.constants[fmt === 'chaoxing15' ? 'H15' : 'H16']);
+}
+document.getElementById('file').addEventListener('change', function () { if (this.files[0]) handleFile(this.files[0]); });
+var drop = document.getElementById('drop');
+drop.addEventListener('dragover', function (e) { e.preventDefault(); drop.style.borderColor = 'var(--c-blue)'; });
+drop.addEventListener('dragleave', function () { drop.style.borderColor = 'var(--c-border)'; });
+drop.addEventListener('drop', function (e) {
+  e.preventDefault(); drop.style.borderColor = 'var(--c-border)';
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+function fetchDemo(path, isCsv, fmt, name) {
+  fetch(path).then(function (r) { return isCsv ? r.text() : r.arrayBuffer(); }).then(function (x) {
+    var rows;
+    if (isCsv) {
+      var wb = XLSX.read(x, { type: 'string' });
+      var all = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: false });
+      var found = C.findHeaderRow(all);
+      var hi = found.index >= 0 ? found.index : 0;
+      rows = all.slice(hi + 1).filter(function (r) { return r.some(function (v) { return String(v).trim(); }); });
+    } else { rows = C.readWorkbook(x).rows; }
+    finishParse(rows, fmt, name);
+  }).catch(function (err) {
+    document.getElementById('import-msg').innerHTML = '<div class="note warn">本地 file:// 下无法 fetch 示例文件，请使用「选择文件」按钮手动选择，或运行 <code>tools/serve.py</code> 后访问。</div>';
+  });
+}
+document.getElementById('demo16').addEventListener('click', function () {
+  fetchDemo('../data/chaoxing/示例_超星16列导出.csv', true, 'chaoxing16', '示例_超星16列导出.csv');
+});
+document.getElementById('demo15').addEventListener('click', function () {
+  fetchDemo('../data/chaoxing/示例_超星15列导出.csv', true, 'chaoxing15', '示例_超星15列导出.csv');
+});
+
+document.getElementById('dl-json').addEventListener('click', function () {
+  KG.download('course-kg.json', JSON.stringify(currentUnified, null, 2), 'application/json;charset=utf-8');
+});
+document.getElementById('dl-16').addEventListener('click', function () {
+  try { var o = C.exportWorkbook(currentUnified, 'chaoxing16', '转换结果_超星16列.xlsx'); showLost(o); }
+  catch (e) { KG.toast('导出失败：' + e.message); }
+});
+document.getElementById('dl-15').addEventListener('click', function () {
+  try { var o = C.exportWorkbook(currentUnified, 'chaoxing15', '转换结果_超星15列.xlsx'); showLost(o); }
+  catch (e) { KG.toast('导出失败：' + e.message); }
+});
+function showLost(out) {
+  document.getElementById('import-msg').innerHTML += '<div class="note warn"><b>有损字段（不会静默丢弃）</b>：' + out.lostFields.join('、') + '</div>';
+  KG.toast('已导出 ' + out.rows.length + ' 行');
+}
+
+/* ---------- 导出 ---------- */
+var m = KG.data.meta;
+document.getElementById('ex-meta').innerHTML =
+  '<dt>课程</dt><dd>' + KG.esc(m.course) + '</dd><dt>节点</dt><dd>' + m.nodeCount + '</dd>' +
+  '<dt>关系</dt><dd>' + m.edgeCount + '</dd><dt>章节</dt><dd>' + m.chapterCount + '</dd>' +
+  '<dt>数据源</dt><dd><code>' + KG.esc(m.singleSourceOfTruth) + '</code></dd>' +
+  '<dt>生成时间</dt><dd>' + KG.esc(m.generatedAt) + '</dd>';
+document.getElementById('map-table').innerHTML =
+  '<thead><tr><th>列</th><th>新版 16 列表头</th><th>统一数据字段</th><th>兼容</th></tr></thead><tbody>' +
+  C.constants.H16.map(function (h, i) {
+    return '<tr><td>' + String.fromCharCode(65 + i) + '</td><td>' + KG.esc(h) + '</td><td><code>' + MAP16[i] + '</code></td>' +
+      '<td><span class="chip green">无损</span></td></tr>';
+  }).join('') + '</tbody>';
+function exportRows() {
+  var f = document.getElementById('ex-format').value;
+  var is15 = f.indexOf('15') >= 0;
+  return { is15: is15, out: is15 ? C.toChaoxing15(KG.data) : C.toChaoxing16(KG.data), format: f };
+}
+document.getElementById('ex-preview').addEventListener('click', function () {
+  var e = exportRows();
+  document.getElementById('ex-table').innerHTML =
+    '<thead><tr><th>#</th>' + e.out.header.map(function (h, i) { return '<th>' + String.fromCharCode(65 + i) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+    e.out.rows.slice(0, 10).map(function (r, i) {
+      return '<tr><td>' + (i + 3) + '</td>' + r.map(function (v) { return '<td>' + KG.esc(String(v).slice(0, 26)) + '</td>'; }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+  document.getElementById('ex-msg').innerHTML = '<div class="note">已预览前 10 行（共 ' + e.out.rows.length + ' 行）。' +
+    (e.is15 ? '<b>旧版有损字段</b>：' + e.out.lostFields.join('、') : '新版 16 列无损。') + '</div>';
+});
+document.getElementById('ex-run').addEventListener('click', function () {
+  var f = document.getElementById('ex-format').value, name = document.getElementById('ex-name').value.trim() || '导出';
+  try {
+    if (f === 'json') {
+      KG.download(name + '.json', JSON.stringify(KG.data, null, 2), 'application/json;charset=utf-8');
+    } else if (f.indexOf('csv') === 0) {
+      var e = exportRows();
+      var esc = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+      // CSV 以表头为首行（不含 xlsx 模板的合并说明行），符合超星 CSV 导入习惯
+      var csv = '\uFEFF' + e.out.header.map(esc).join(',') + '\n' +
+        e.out.rows.map(function (r) { return r.map(esc).join(','); }).join('\n');
+      KG.download(name + '.csv', csv, 'text/csv;charset=utf-8');
+    } else {
+      var o = C.exportWorkbook(KG.data, f, name + '.xlsx');
+      document.getElementById('ex-msg').innerHTML = '<div class="note">已生成 <b>' + o.rows.length + '</b> 行，含模板第 1 行使用说明与第 2 行表头。' +
+        (o.lostFields.length ? '<br><b>有损字段</b>：' + o.lostFields.join('、') : '') + '</div>';
+      return;
+    }
+    document.getElementById('ex-msg').innerHTML = '<div class="note">已下载：' + KG.esc(name) + '</div>';
+  } catch (err) { document.getElementById('ex-msg').innerHTML = '<div class="note warn">导出失败：' + KG.esc(err.message) + '</div>'; }
+});
+
+/* ---------- 转换接口 ---------- */
+var APIS = [
+  ['detectFormat(rows)', '识别超星 16 列 / 15 列 / unknown', '返回格式标识'],
+  ['readWorkbook(arrayBuffer)', '解析 xlsx，定位表头行，抽取数据行', '{format, headerRow, sheet, header, rows}'],
+  ['parseRows(rows, format)', '按字段映射构建节点、层级、关系，并收集警告', '{nodes, edges, warnings, unresolvedReferences}'],
+  ['toUnified(parsed, meta)', '生成与 data/course-kg.json 同构的统一数据', 'unified object'],
+  ['toChaoxing16(unified)', '反向生成新版 16 列（含第 1/2 行原文）', '{sheet, note, header, rows, lostFields}'],
+  ['toChaoxing15(unified)', '反向生成旧版 15 列（列出有损字段）', '{sheet, note, header, rows, lostFields}'],
+  ['exportWorkbook(unified, format, filename)', '调用 SheetJS 写出可直接导入超星的 .xlsx', '触发下载'],
+  ['validate(unified)', '模板 11 项硬约束校验', '{checks, warnings, passed}'],
+  ['loadUnified(jsonText)', '载入统一数据 JSON 并校验结构', 'unified object']
+];
+document.getElementById('api-table').innerHTML =
+  '<thead><tr><th>接口</th><th>作用</th><th>返回</th></tr></thead><tbody>' +
+  APIS.map(function (a) { return '<tr><td><code>' + KG.esc(a[0]) + '</code></td><td>' + KG.esc(a[1]) + '</td><td>' + KG.esc(a[2]) + '</td></tr>'; }).join('') + '</tbody>';
+function apiData() {
+  var t = document.getElementById('api-json').value.trim();
+  return t ? C.loadUnified(t) : KG.data;
+}
+document.getElementById('api-current').addEventListener('click', function () {
+  document.getElementById('api-json').value = JSON.stringify(KG.data, null, 2).slice(0, 4000) + '\n// ……（截断，仅作试验）';
+  document.getElementById('api-out').textContent = '已填入基础数据片段；试验时请使用完整 JSON 或清空文本框以使用完整基础数据。';
+});
+document.getElementById('api-16').addEventListener('click', function () {
+  try { var o = C.toChaoxing16(apiData()); document.getElementById('api-out').textContent =
+    JSON.stringify({ sheet: o.sheet, note: o.note.slice(0, 60) + '…', header: o.header, rowCount: o.rows.length, firstRow: o.rows[0], lostFields: o.lostFields }, null, 2); }
+  catch (e) { document.getElementById('api-out').textContent = '错误：' + e.message; }
+});
+document.getElementById('api-15').addEventListener('click', function () {
+  try { var o = C.toChaoxing15(apiData()); document.getElementById('api-out').textContent =
+    JSON.stringify({ sheet: o.sheet, header: o.header, rowCount: o.rows.length, firstRow: o.rows[0], lostFields: o.lostFields }, null, 2); }
+  catch (e) { document.getElementById('api-out').textContent = '错误：' + e.message; }
+});
+document.getElementById('api-val').addEventListener('click', function () {
+  try { var v = C.validate(apiData()); document.getElementById('api-out').textContent =
+    JSON.stringify({ passed: v.passed, checks: v.checks, warnings: v.warnings }, null, 2); }
+  catch (e) { document.getElementById('api-out').textContent = '错误：' + e.message; }
+});
+
+/* ---------- 示例与校验 ---------- */
+var samples = [
+  ['data/source/01-知识图谱-运筹学-7章全部.xlsx', '用户上传原件（只读副本，超星旧版 15 列）'],
+  ['data/chaoxing/示例_超星16列导入.xlsx', '可直接导入超星后台的 16 列示例（含模板第 1/2 行）'],
+  ['data/chaoxing/示例_超星16列导出.csv', '由统一数据反向生成的 16 列示例（验证往返一致）'],
+  ['data/chaoxing/示例_超星15列导出.csv', '由统一数据反向生成的 15 列示例'],
+  ['data/chaoxing/template-notes.json', '两套模板第 1/2 行原文'],
+  ['data/course-kg.json', '统一课程图谱数据（唯一真源）'],
+  ['docs/02_超星兼容范围与字段映射.md', '完整字段映射与兼容范围声明']
+];
+document.getElementById('sample-list').innerHTML = '<ul class="list">' + samples.map(function (s) {
+  return '<li><a href="../' + s[0] + '">' + KG.esc(s[0].split('/').pop()) + '</a><div class="muted" style="font-size:12px">' + KG.esc(s[1]) + '</div></li>';
+}).join('') + '</ul>';
+var hv = C.validate(KG.data);
+document.getElementById('health').innerHTML =
+  '<div class="note ' + (hv.passed ? '' : 'warn') + '"><b>' + (hv.passed ? '全部 ' + hv.checks.length + ' 项模板硬约束通过' : '存在未通过项') + '</b></div>' +
+  hv.checks.map(function (c) { return '<div style="font-size:13px;padding:3px 0"><span class="chip ' + (c.passed ? 'green' : 'pink') + '">' +
+    (c.passed ? '✓' : '✗') + '</span> ' + KG.esc(c.name) + '</div>'; }).join('') +
+  '<div class="muted" style="margin-top:10px">节点 ' + KG.data.nodes.length + ' · 关系 ' + KG.data.edges.length +
+  ' · 章节 ' + KG.data.chapters.length + ' · 未解析引用 ' + KG.data.unresolvedReferences.length + '</div>';
+</script>
+</body>
+</html>

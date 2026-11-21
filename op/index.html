@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>统一登录入口 · 课程知识图谱系统</title>
+<link rel="stylesheet" href="assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<div class="container">
+  <div id="login-view">
+    <div class="grid g2" style="grid-template-columns:1.1fr .9fr;align-items:stretch;margin-top:14px">
+      <div class="card hero-card" style="padding:30px">
+        <div class="chip purple" style="margin-bottom:14px">《人工智能工具应用实践》· 课程图谱教学演示</div>
+        <h1 style="font-size:29px;color:var(--c-primary)">运筹学课程知识图谱系统</h1>
+        <p style="font-size:15px;color:var(--c-muted)">以用户上传的 <b>运筹学 7 章知识图谱</b> 为唯一基础数据，在超星知识图谱导入/导出能力之上，扩展课程图谱展示、模板演示与数据转换。</p>
+        <div class="grid g4" id="hero-stats" style="margin:18px 0"></div>
+        <div class="note info"><b>一处数据，处处一致</b>：登录页、通用系统、5 个模板演示页、导入导出页全部读取同一份 <code>data/course-kg.js</code>，任何页面都不会加载第二份数据。</div>
+        <div class="chip-row">
+          <span class="chip green">超星 16 列无损往返</span>
+          <span class="chip orange">15 列转换接口</span>
+          <span class="chip purple">离线可运行</span>
+          <span class="chip">5 个 GitHub 原始模板</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:26px">
+        <h2 style="color:var(--c-primary)">统一登录入口</h2>
+        <p class="muted">登录后进入统一导航，可访问通用系统、模板演示、导入导出三个区域。</p>
+        <form id="login-form">
+          <label class="field"><span>用户名</span><input type="text" id="u" placeholder="例如：teacher / student" autocomplete="username"></label>
+          <label class="field"><span>密码</span><input type="password" id="p" placeholder="演示密码：123456" autocomplete="current-password"></label>
+          <label class="field"><span>身份</span><select id="r"><option value="教师">教师</option><option value="学生" selected>学生</option><option value="访客">访客</option></select></label>
+          <div class="btn-row" style="margin-top:6px"><button class="btn" type="submit">登录并进入</button>
+            <a class="btn ghost" href="app/index.html">访客模式直接进入</a></div>
+        </form>
+        <div id="login-msg"></div>
+        <div class="note" style="margin-top:18px">
+          <b>演示账号</b>（密码统一 <code>123456</code>）：<code>teacher</code> 教师 / <code>student</code> 学生 / <code>guest</code> 访客。也可输入任意用户名 + 123456。<br>
+          <span class="muted">安全说明：本系统为纯静态教学演示，登录仅在浏览器本地保存展示用标识，<b>不连接后端、不做真实身份鉴权、不上传任何数据</b>。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="portal-view" style="display:none">
+    <div class="page-head" style="margin-top:14px">
+      <div class="crumb">统一登录入口 / 工作台</div>
+      <h1>欢迎回来，<span id="welcome"></span></h1>
+      <div class="sub">选择一个入口开始；所有页面共用同一份运筹学基础数据。</div>
+    </div>
+    <div class="grid g3">
+      <a class="tile" href="app/index.html">
+        <div class="ico" style="background:var(--c-primary)">图</div>
+        <h3>通用课程知识图谱系统</h3>
+        <p>课程总览、力导向关系图、层级树、思维导图、知识点检索、关系矩阵与节点详情。</p>
+        <div class="meta">7 个页面 · 覆盖 186 节点 / 320 关系</div>
+      </a>
+      <a class="tile" href="demos/index.html">
+        <div class="ico" style="background:var(--c-orange)">模</div>
+        <h3>GitHub 模板演示</h3>
+        <p>D3 / Mermaid / ECharts / Quartz / markmap 五个模板的特色功能，均使用同一份课程数据渲染。</p>
+        <div class="meta">5 个演示页 · 原始模板见 templates/</div>
+      </a>
+      <a class="tile" href="io/index.html">
+        <div class="ico" style="background:var(--c-green)">导</div>
+        <h3>超星数据导入导出</h3>
+        <p>16 列无损往返、15 列转换接口、字段映射预览、数据校验与示例文件下载。</p>
+        <div class="meta">双向转换 · 带警告清单</div>
+      </a>
+    </div>
+    <div class="section-title">快捷直达</div>
+    <div class="grid g4" id="quick-links"></div>
+    <div class="section-title">数据与文档</div>
+    <div class="grid g3">
+      <a class="tile tight" href="docs/index.html"><h3>项目说明</h3><p>目录结构、运行方式、兼容范围、字段映射与示例文件</p></a>
+      <a class="tile tight" href="docs/01_GitHub模板调研.md"><h3>模板调研（Markdown）</h3><p>来源、星标数、许可证、功能特点与下载凭证</p></a>
+      <a class="tile tight" href="docs/02_超星兼容范围与字段映射.md"><h3>字段映射（Markdown）</h3><p>15 列 / 16 列 ↔ 统一数据逐列对照</p></a>
+    </div>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+<script src="data/course-kg.js"></script>
+<script src="assets/js/kg-core.js"></script>
+<script>
+KG.init(window.COURSE_KG, '');
+KG.mountHeader({ active: 'home' });
+KG.mountFooter();
+
+var st = KG.stat();
+document.getElementById('hero-stats').innerHTML =
+  [['节点', st.nodes], ['关系', st.edges], ['章节', st.chapters], ['知识点', st.points]]
+  .map(function (x) { return '<div class="card tight stat"><div class="num">' + x[1] + '</div><div class="lbl">' + x[0] + '</div></div>'; }).join('');
+
+var quick = [
+  ['课程总览', 'app/index.html', 'var(--c-primary)'], ['关系图', 'app/graph.html', 'var(--c-blue)'],
+  ['知识点检索', 'app/search.html', 'var(--c-green)'], ['模板演示索引', 'demos/index.html', 'var(--c-orange)'],
+  ['超星导入', 'io/index.html', 'var(--c-pink)'], ['数据转换接口', 'io/index.html#tab-convert', 'var(--c-purple)'],
+  ['章节层级树', 'app/tree.html', '#17A2B8'], ['关系矩阵', 'app/matrix.html', 'var(--c-primary)']
+];
+document.getElementById('quick-links').innerHTML = quick.map(function (q) {
+  return '<a class="tile tight" href="' + q[1] + '"><div class="ico" style="width:26px;height:26px;font-size:12px;background:' + q[2] + ';margin-bottom:8px">›</div><h3 style="font-size:14px;margin:0">' + q[0] + '</h3></a>';
+}).join('');
+
+function showPortal() {
+  var u = KG.user();
+  if (!u) return;
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('portal-view').style.display = 'block';
+  document.getElementById('welcome').textContent = u.name + '（' + u.role + '）';
+  // 顶栏登录态刷新
+  KG.mountHeader({ active: 'home' });
+}
+
+document.getElementById('login-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var u = document.getElementById('u').value.trim();
+  var p = document.getElementById('p').value;
+  var r = document.getElementById('r').value;
+  var msg = document.getElementById('login-msg');
+  if (!u || p !== '123456') {
+    msg.innerHTML = '<div class="note warn">请输入用户名与演示密码 <b>123456</b>。</div>';
+    return;
+  }
+  KG.login(u, r);
+  KG.toast('登录成功');
+  showPortal();
+});
+
+if (KG.user()) showPortal();
+</script>
+</body>
+</html>

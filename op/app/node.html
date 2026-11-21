@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>节点详情 · 通用课程知识图谱系统</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">通用系统</a> / 节点详情</div>
+    <h1>节点详情 <span class="chip gray" id="nid"></span></h1>
+    <div class="sub" id="path"></div>
+  </div>
+  <div class="split">
+    <div class="card" id="main"></div>
+    <div>
+      <div class="card tight"><h3>一跳邻域</h3><div id="mini" style="height:250px"></div>
+        <div class="muted" style="margin-top:8px">只显示与该节点直接相连的节点</div></div>
+      <div class="card tight" style="margin-top:14px"><h3>溯源信息</h3>
+        <dl class="kv" id="trace"></dl></div>
+    </div>
+  </div>
+  <div class="section-title">关系明细</div>
+  <div class="card tight"><div class="scroll"><table class="tbl" id="rels"></table></div></div>
+  <div class="btn-row" style="margin-top:16px">
+    <a class="btn ghost" href="index.html">返回总览</a>
+    <a class="btn ghost" id="to-graph" href="graph.html">在关系图中查看</a>
+    <a class="btn gray" id="prev" href="#">上一个节点</a>
+    <a class="btn gray" id="next" href="#">下一个节点</a>
+  </div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../assets/vendor/d3.min.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'app' }); KG.mountFooter(); KG.mountAuthNotice();
+
+var id = new URLSearchParams(location.search).get('id') || KG.data.nodes[0].id;
+var n = KG.byId[id];
+if (!n) { document.getElementById('main').innerHTML = '<div class="empty">节点不存在：' + KG.esc(id) + '</div>'; }
+else {
+  document.title = n.name + ' · 节点详情';
+  document.getElementById('nid').textContent = n.id;
+  document.getElementById('path').textContent = n.path.join(' › ');
+  document.getElementById('main').innerHTML = KG.detailHTML(n);
+  document.getElementById('to-graph').href = 'graph.html?chapter=' + encodeURIComponent(n.chapter);
+
+  document.getElementById('trace').innerHTML =
+    '<dt>源表行号</dt><dd>第 ' + n.sourceRow + ' 行（Sheet3）</dd>' +
+    '<dt>旧版类型</dt><dd>' + KG.esc(n.sourceType) + '</dd>' +
+    '<dt>新版类型</dt><dd>' + KG.esc(n.type) + '</dd>' +
+    '<dt>原始标签</dt><dd>' + (n.tags.length ? KG.esc(n.tags.join('；')) : '—') + '</dd>' +
+    '<dt>知识点分类</dt><dd>' + KG.esc(n.category || '—') + '</dd>' +
+    '<dt>源文件说明</dt><dd>' + KG.esc(n.sourceDescription || '—') + '</dd>';
+
+  var rels = KG.relationsOf(n.id);
+  document.getElementById('rels').innerHTML =
+    '<thead><tr><th>#</th><th>方向</th><th>关系</th><th>另一端节点</th><th>章节</th><th>类型</th></tr></thead><tbody>' +
+    (rels.length ? rels.map(function (e, i) {
+      var outgoing = e.source === n.id, t = KG.byId[outgoing ? e.target : e.source];
+      return '<tr><td>' + (i + 1) + '</td><td>' + (outgoing ? '出边 →' : '← 入边') + '</td>' +
+        '<td><span class="chip" style="color:' + KG.relColor[e.relation] + '">' + e.relation + '</span></td>' +
+        '<td><a href="node.html?id=' + t.id + '">' + KG.esc(t.name) + '</a></td>' +
+        '<td>' + KG.esc(t.chapter) + '</td><td>' + KG.esc(t.type) + '</td></tr>';
+    }).join('') : '<tr><td colspan="6"><div class="empty">该节点没有显式关系（依靠层级组织，如章节点）</div></td></tr>') + '</tbody>';
+
+  // 一跳邻域小图
+  var nb = KG.neighborIds(n.id), ns = [n].concat(Object.keys(nb).map(function (k) { return KG.byId[k]; }));
+  var ids = {}; ns.forEach(function (x) { ids[x.id] = true; });
+  var ls = rels.filter(function (e) { return ids[e.source] && ids[e.target]; }).map(function (e) {
+    return Object.assign({}, e);
+  });
+  var holder = document.getElementById('mini'), W = holder.clientWidth || 280, H = 250;
+  var svg = d3.select(holder).append('svg').attr('width', '100%').attr('height', H).attr('viewBox', '0 0 ' + W + ' ' + H);
+  var sim = d3.forceSimulation(ns.map(function (x) { return Object.assign({}, x); }))
+    .force('link', d3.forceLink(ls.map(function (l) { return { source: l.source, target: l.target }; })).id(function (x) { return x.id; }).distance(62))
+    .force('charge', d3.forceManyBody().strength(-150))
+    .force('center', d3.forceCenter(W / 2, H / 2));
+  var lk = svg.append('g').selectAll('line').data(ls).join('line').attr('stroke', '#C8D3E0').attr('stroke-width', 1.4);
+  var nd = svg.append('g').selectAll('circle').data(sim.nodes()).join('circle')
+    .attr('r', function (d) { return d.id === n.id ? 11 : 6; })
+    .attr('fill', function (d) { return d.id === n.id ? '#E67E22' : KG.color(d.chapter); })
+    .attr('stroke', '#fff').attr('stroke-width', 1.5).style('cursor', 'pointer')
+    .on('click', function (e, d) { location.href = 'node.html?id=' + d.id; });
+  var lb = svg.append('g').selectAll('text').data(sim.nodes()).join('text')
+    .attr('class', 'node-label').attr('text-anchor', 'middle').attr('dy', -12)
+    .text(function (d) { return d.name.length > 9 ? d.name.slice(0, 8) + '…' : d.name; });
+  sim.on('tick', function () {
+    lk.attr('x1', function (l) { return l.source.x; }).attr('y1', function (l) { return l.source.y; })
+      .attr('x2', function (l) { return l.target.x; }).attr('y2', function (l) { return l.target.y; });
+    nd.attr('cx', function (d) { return d.x; }).attr('cy', function (d) { return d.y; });
+    lb.attr('x', function (d) { return d.x; }).attr('y', function (d) { return d.y; });
+  });
+
+  var idx = KG.data.nodes.findIndex(function (x) { return x.id === n.id; });
+  document.getElementById('prev').href = 'node.html?id=' + KG.data.nodes[(idx - 1 + KG.data.nodes.length) % KG.data.nodes.length].id;
+  document.getElementById('next').href = 'node.html?id=' + KG.data.nodes[(idx + 1) % KG.data.nodes.length].id;
+}
+</script>
+</body>
+</html>

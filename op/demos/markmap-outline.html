@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>markmap 大纲思维导图 · 模板演示</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">模板演示</a> / markmap</div>
+    <h1>markmap · Markdown 大纲思维导图 <span class="chip purple">★ 13,229 · MIT</span></h1>
+    <div class="sub">复刻 markmap 的核心范式：<b>Markdown 标题/列表 → 可折叠放射分支，段落作为节点说明</b>。左栏大纲由同一份数据实时生成。</div>
+  </div>
+
+  <div class="card tight" style="margin-bottom:12px">
+    <div class="inline-controls">
+      <div><label class="field" style="margin:0"><span>章节</span><select id="chapter"></select></label></div>
+      <div class="narrow btn-row" style="padding-bottom:2px">
+        <button class="btn sm" id="expand">展开全部分支</button>
+        <button class="btn ghost sm" id="collapse">只留两级</button>
+        <button class="btn gray sm" id="dl">下载大纲 .md</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="split left">
+    <div class="card tight" style="max-height:620px;overflow:auto">
+      <h3 style="font-size:14px">Markdown 大纲</h3>
+      <div class="muted" style="margin-bottom:8px">对应模板 README 的 "Turn Markdown into interactive mind maps"</div>
+      <pre class="code" id="outline" style="max-height:520px;white-space:pre"></pre>
+    </div>
+    <div><div id="map" class="graph-wrap" style="height:620px"></div></div>
+  </div>
+  <div class="card" id="detail" style="margin-top:14px"><div class="empty">点击分支节点查看该知识点的说明与属性</div></div>
+
+  <div class="section-title">借鉴点说明</div>
+  <div class="grid g3">
+    <div class="card tight"><h3>大纲即数据</h3><p class="muted">层级结构直接来自超星 A—G 列，可导出成 Markdown 放进笔记系统，不必手工重画。</p></div>
+    <div class="card tight"><h3>逐级折叠</h3><p class="muted">点击带 +/− 的分支展开或收起，避免 186 个节点同时铺开造成认知过载。</p></div>
+    <div class="card tight"><h3>离线实现</h3><p class="muted">markmap-autoloader 运行时依赖 CDN，本页改用本地 D3 放射布局复刻，保证双击即可查看。</p></div>
+  </div>
+  <div class="note info">原始模板：<code>templates/markmap/markmap-master/README.md</code>、<code>packages/markmap-view/</code>；本页为<b>借鉴实现</b>，未修改原始仓库。</div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../assets/vendor/d3.min.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'demos' }); KG.mountFooter(); KG.mountAuthNotice();
+document.getElementById('chapter').innerHTML = KG.selectOptions(KG.chapters, '绪论', '');
+
+var holder = document.getElementById('map');
+var W = Math.max(holder.clientWidth || 800, 700), H = 620, R = 255;
+var svg = d3.select(holder).append('svg').attr('width', '100%').attr('height', H).attr('viewBox', '0 0 ' + W + ' ' + H);
+var gz = svg.append('g'), gr = gz.append('g');
+var zoom = d3.zoom().scaleExtent([.45, 3]).on('zoom', function (e) { gz.attr('transform', e.transform); });
+svg.call(zoom);
+gz.attr('transform', 'translate(' + (W / 2) + ',' + (H / 2) + ')');
+var tip = d3.select(holder).append('div').attr('class', 'graph-tip');
+var cluster = d3.cluster().size([360, R]);
+var root, outline = '';
+
+function makeData(ch) {
+  var roots = KG.hierarchy(ch || null);
+  function cv(x) { return { name: x.node.name, node: x.node, children: x.children.map(cv) }; }
+  return { name: ch || '运筹学', node: null, children: roots.map(cv) };
+}
+function makeOutline(ch) {
+  var out = ['# 运筹学课程知识图谱', '', '> 由 data/course-kg.json 生成 · 与右侧导图为同一份数据', ''];
+  function walk(list, lv) {
+    list.forEach(function (x) {
+      out.push(new Array(lv + 1).join('  ') + '- ' + x.node.name);
+      if (x.children.length) walk(x.children, lv + 1);
+    });
+  }
+  walk(KG.hierarchy(ch || null), 1);
+  return out.join('\n');
+}
+function collapse(d, lv, max) {
+  if (!d.children || !d.children.length) return;
+  d._children = d.children;
+  if (lv >= max) d.children = null;
+  else { d.children = d._children; d.children.forEach(function (c) { collapse(c, lv + 1, max); }); }
+}
+function pointRadial(x, y) {
+  var a = (x - 90) / 180 * Math.PI;
+  return [Math.cos(a) * y, Math.sin(a) * y];
+}
+
+function render(animate) {
+  var h = d3.hierarchy(root, function (d) { return d.children; });
+  cluster(h);
+  h.each(function (d) { var p = pointRadial(d.x, d.y); d.px = p[0]; d.py = p[1]; });
+  var all = h.descendants(), links = h.links();
+
+  var lk = gr.selectAll('path.rlink').data(links, function (d) {
+    return (d.source.data.node ? d.source.data.node.id : 'root') + '-' + (d.target.data.node ? d.target.data.node.id : 'x');
+  });
+  lk.enter().append('path').attr('class', 'rlink').attr('fill', 'none').attr('stroke', '#C8D3E0').attr('stroke-width', 1.6)
+    .merge(lk).attr('d', d3.linkRadial().angle(function (d) { return (d.x - 90) / 180 * Math.PI; }).radius(function (d) { return d.y; }));
+  lk.exit().remove();
+
+  var nd = gr.selectAll('g.rnode').data(all, function (d) { return d.data.node ? d.data.node.id : 'root'; });
+  var en = nd.enter().append('g').attr('class', 'rnode').style('cursor', 'pointer')
+    .on('click', function (event, d) {
+      if (d.children) { d._children = d.children; d.children = null; }
+      else if (d._children) { d.children = d._children; d._children = null; }
+      render(true);
+      if (d.data.node) document.getElementById('detail').innerHTML = KG.detailHTML(d.data.node);
+    })
+    .on('mouseover', function (event, d) {
+      tip.style('opacity', 1).html('<b>' + KG.esc(d.data.name) + '</b><br><span style="color:#5A6B7B">' +
+        (d.data.node ? KG.esc(d.data.node.type) + ' · 第' + d.data.node.level + '级 · ' + KG.esc(d.data.node.description.slice(0, 40)) : '课程根节点') + '</span>');
+    })
+    .on('mousemove', function (event) {
+      var r = holder.getBoundingClientRect();
+      tip.style('left', Math.min(event.clientX - r.left + 14, r.width - 280) + 'px').style('top', (event.clientY - r.top + 14) + 'px');
+    })
+    .on('mouseout', function () { tip.style('opacity', 0); });
+  en.append('circle').attr('r', 6);
+  en.append('text').attr('dy', 3).style('font-size', '10.5px');
+  en.append('text').attr('class', 'fold').attr('dy', 3).style('font-size', '12px').style('font-weight', '700');
+
+  var mg = en.merge(nd);
+  mg.transition().duration(animate ? 250 : 0).attr('transform', function (d) { return 'translate(' + d.px + ',' + d.py + ')'; });
+  mg.select('circle').attr('r', function (d) { return d.depth === 0 ? 11 : (d.data.node.type === '知识单元' ? 6.5 : 5); })
+    .attr('fill', function (d) { return d.depth === 0 ? '#2E5C8A' : KG.color(d.data.node.chapter); })
+    .attr('stroke', '#fff').attr('stroke-width', 1.6);
+  mg.select('text').text(function (d) { return d.data.name.length > 11 ? d.data.name.slice(0, 10) + '…' : d.data.name; })
+    .attr('x', function (d) { return d.depth === 0 ? 0 : (d.px >= 0 ? 10 : -10); })
+    .attr('text-anchor', function (d) { return d.depth === 0 ? 'middle' : (d.px >= 0 ? 'start' : 'end'); })
+    .attr('fill', function (d) { return d.depth === 0 ? '#fff' : '#22303C'; });
+  mg.select('text.fold').text(function (d) { return d._children ? '+' : (d.children ? '−' : ''); })
+    .attr('x', function (d) { return d.px >= 0 ? -10 : 10; })
+    .attr('text-anchor', function (d) { return d.px >= 0 ? 'end' : 'start'; }).attr('fill', '#2E5C8A');
+  nd.exit().remove();
+}
+
+function rebuild(level) {
+  var ch = document.getElementById('chapter').value;
+  root = makeData(ch); collapse(root, 0, level);
+  outline = makeOutline(ch);
+  document.getElementById('outline').textContent = outline;
+  render(false);
+}
+document.getElementById('chapter').addEventListener('change', function () { rebuild(2); });
+document.getElementById('expand').addEventListener('click', function () { rebuild(99); });
+document.getElementById('collapse').addEventListener('click', function () { rebuild(1); });
+document.getElementById('dl').addEventListener('click', function () {
+  KG.download('运筹学课程大纲.md', outline, 'text/markdown;charset=utf-8'); KG.toast('大纲已下载');
+});
+rebuild(2);
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermaid 图谱即文本 · 模板演示</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">模板演示</a> / Mermaid</div>
+    <h1>Mermaid · 图谱即文本 <span class="chip green">★ 91,056 · MIT</span></h1>
+    <div class="sub">展示 Mermaid 模板的核心特色：<b>把课程层级编译成可复制、可版本管理的图定义</b>（subgraph 分章 + classDef 分色）。</div>
+  </div>
+
+  <div class="card tight" style="margin-bottom:12px">
+    <div class="inline-controls">
+      <div><label class="field" style="margin:0"><span>章节</span><select id="chapter"></select></label></div>
+      <div><label class="field" style="margin:0"><span>图类型</span><select id="kind"><option value="flowchart">flowchart（核心语法）</option><option value="mindmap">mindmap（试验）</option></select></label></div>
+      <div class="narrow btn-row" style="padding-bottom:2px">
+        <button class="btn sm" id="render">重新生成</button>
+        <button class="btn ghost sm" id="copy">复制图定义</button>
+        <button class="btn gray sm" id="dl">下载 .mmd</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div><div class="card tight"><div id="diagram" style="min-height:420px;overflow:auto"></div></div>
+      <div class="note" id="msg">图由下方文本实时编译，未使用任何服务端。</div></div>
+    <div class="card tight">
+      <h3>图定义（可复制 / 可版本管理）</h3>
+      <textarea id="src" style="width:100%;height:380px;font-family:Consolas,monospace;font-size:12px;line-height:1.55"></textarea>
+      <div class="muted" style="margin-top:8px" id="srcline"></div>
+    </div>
+  </div>
+
+  <div class="section-title">借鉴点说明</div>
+  <div class="grid g3">
+    <div class="card tight"><h3>文本即图</h3><p class="muted">图谱结构以纯文本保存，能进 Git、能 diff、能由脚本批量生成——这是课程图谱长期维护最实用的一点。</p></div>
+    <div class="card tight"><h3>subgraph 分章</h3><p class="muted">用 subgraph 把同一章的节点框在一起，天然对应超星 A—G 列的层级语义。</p></div>
+    <div class="card tight"><h3>classDef 分色</h3><p class="muted">知识单元、知识点、难点分别定义样式类，配色与全站一致。</p></div>
+  </div>
+  <div class="note info">原始模板：<code>templates/mermaid/mermaid-develop/</code>（示例 <code>demos/mindmap.html</code>、语法文档 <code>docs/syntax/mindmap.md</code>）；运行时库：本地 UMD <code>mermaid@10.9.5</code>。mindmap 为试验项，若浏览器环境不支持分包动态加载，会给出明确提示而不影响 flowchart 演示。</div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../assets/vendor/mermaid.min.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'demos' }); KG.mountFooter(); KG.mountAuthNotice();
+
+document.getElementById('chapter').innerHTML = KG.selectOptions(KG.chapters, '绪论', '');
+mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'base',
+  themeVariables: { primaryColor: '#EAF1F8', primaryTextColor: '#22303C', lineColor: '#4A90D9', fontSize: '13px' },
+  flowchart: { curve: 'basis', htmlLabels: true } });
+
+function clean(s) { return s.replace(/["\[\](){}<>|#&;]/g, ' ').replace(/\s+/g, ' ').trim(); }
+
+function genFlow(ch) {
+  var ns = KG.data.nodes.filter(function (n) {
+    if (ch) return n.chapter === ch && n.level <= 3;
+    return n.level <= 2;
+  });
+  var ids = {}; ns.forEach(function (n) { ids[n.id] = true; });
+  var groups = {};
+  ns.filter(function (n) { return n.level === 1; }).forEach(function (n) { groups[n.name] = []; });
+  // 按章节组织 subgraph
+  var out = ['flowchart LR'];
+  Object.keys(groups).forEach(function (c, i) {
+    out.push('  subgraph SG' + (i + 1) + '["第 ' + (i + 1) + ' 章 · ' + clean(c) + '"]');
+    ns.filter(function (n) { return n.chapter === c; }).forEach(function (n) {
+      var cls = n.type === '知识单元' ? 'unit' : (n.difficulty === '难' || n.difficulty === '偏难' ? 'hard' : 'point');
+      out.push('    ' + n.id + '["' + clean(n.name) + '"]:::' + cls);
+    });
+    out.push('  end');
+  });
+  ns.forEach(function (n) { if (n.parentId && ids[n.parentId]) out.push('  ' + n.parentId + ' --> ' + n.id); });
+  // 追加少量跨节点关系，展示"关系也能文本化"
+  KG.data.edges.filter(function (e) { return ids[e.source] && ids[e.target] && e.relation === '前置'; }).slice(0, 14)
+    .forEach(function (e) { out.push('  ' + e.source + ' -.前置.-> ' + e.target); });
+  out.push('  classDef unit fill:#2E5C8A,stroke:#2E5C8A,color:#FFFFFF,font-weight:bold;');
+  out.push('  classDef point fill:#EAF1F8,stroke:#C8D3E0,color:#22303C;');
+  out.push('  classDef hard fill:#FCEAF0,stroke:#D4537E,color:#22303C;');
+  return out.join('\n');
+}
+
+function genMindmap(ch) {
+  var roots = KG.hierarchy(ch || null);
+  var lines = ['mindmap', '  root((运筹学))'];
+  function walk(list, lv) {
+    list.slice(0, 12).forEach(function (x) {
+      lines.push(new Array(lv + 2).join('  ') + clean(x.node.name));
+      if (lv < 3 && x.children.length) walk(x.children, lv + 1);
+    });
+  }
+  walk(roots, 1);
+  return lines.join('\n');
+}
+
+var seq = 0;
+function render() {
+  var ch = document.getElementById('chapter').value;
+  var kind = document.getElementById('kind').value;
+  var text = kind === 'mindmap' ? genMindmap(ch) : genFlow(ch);
+  document.getElementById('src').value = text;
+  document.getElementById('srcline').textContent = text.split('\n').length + ' 行 · ' + text.length + ' 字符';
+  var host = document.getElementById('diagram');
+  var id = 'mermaid-svg-' + (++seq);
+  mermaid.render(id, text).then(function (res) {
+    host.innerHTML = res.svg;
+    if (res.bindFunctions) res.bindFunctions(host);
+    document.getElementById('msg').innerHTML = '<b>编译成功</b>：' + (kind === 'mindmap' ? 'mindmap' : 'flowchart') +
+      '，共 ' + text.split('\n').length + ' 行图定义；可把左侧文本保存进 Git 做版本管理。';
+    document.getElementById('msg').className = 'note';
+  }).catch(function (err) {
+    host.innerHTML = '<div class="empty">该图类型在当前离线环境不可用，请切回 flowchart。</div>';
+    document.getElementById('msg').innerHTML = '<div class="note warn"><b>mindmap 不可用</b>：' +
+      KG.esc(String(err && err.message || err).slice(0, 180)) +
+      '。Mermaid 10 的 mindmap 属于可扩展图类型，UMD 构建在纯本地环境可能触发分包动态加载。flowchart 为核心语法，不受影响。</div>';
+  });
+}
+document.getElementById('render').addEventListener('click', render);
+document.getElementById('chapter').addEventListener('change', render);
+document.getElementById('kind').addEventListener('change', render);
+document.getElementById('copy').addEventListener('click', function () {
+  var t = document.getElementById('src').value;
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { KG.toast('图定义已复制'); });
+  else KG.toast('请手动选中文本框复制');
+});
+document.getElementById('dl').addEventListener('click', function () {
+  KG.download('运筹学图谱定义.mmd', document.getElementById('src').value, 'text/plain;charset=utf-8');
+  KG.toast('已下载 .mmd');
+});
+render();
+</script>
+</body>
+</html>

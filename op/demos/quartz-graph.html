@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quartz 全局/局部图谱 · 模板演示</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">模板演示</a> / Quartz</div>
+    <h1>Quartz · 全局 / 局部图谱 <span class="chip pink">★ 13,558 · MIT</span></h1>
+    <div class="sub">复刻 Quartz 官方 <code>docs/features/graph view.md</code> 定义的交互范式：<b>局部图谱（一跳邻域）/ 全局图谱、反向链接、悬停卡片预览、搜索</b>。</div>
+  </div>
+
+  <div class="card tight" style="margin-bottom:12px">
+    <div class="inline-controls">
+      <div><label class="field" style="margin:0"><span>视图模式</span><select id="mode"><option value="global">全局图谱（全部节点）</option><option value="local">局部图谱（一跳邻域）</option></select></label></div>
+      <div><label class="field" style="margin:0"><span>搜索笔记（节点）</span><input type="search" id="q" placeholder="输入名称后回车，例如：单纯形法"></label></div>
+      <div class="narrow btn-row" style="padding-bottom:2px"><button class="btn ghost sm" id="reset">回到全局</button></div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div><div id="graph"></div>
+      <div class="card tight" style="margin-top:12px"><div class="legend" id="legend"></div>
+        <div class="muted" style="margin-top:8px" id="info"></div></div></div>
+    <div class="card" id="side">
+      <div class="empty">点击图中节点，查看「笔记卡片」「反向链接」「出链」</div>
+    </div>
+  </div>
+
+  <div class="section-title">借鉴点说明</div>
+  <div class="grid g3">
+    <div class="card tight"><h3>局部 / 全局图谱</h3><p class="muted">官方定义：局部图谱显示与当前笔记相距至多一跳的节点，全局图谱显示全部节点与连接。</p></div>
+    <div class="card tight"><h3>反向链接</h3><p class="muted">知识图谱最容易被忽略的价值：不仅看"我指向谁"，还要看"谁指向我"。</p></div>
+    <div class="card tight"><h3>悬停卡片</h3><p class="muted">鼠标悬停节点即预览摘要，减少跳转成本；本项目用本地 D3 实现。</p></div>
+  </div>
+  <div class="note info">原始模板：<code>templates/quartz/quartz-5/docs/features/graph view.md</code>、<code>docs/features/backlinks.md</code>；Quartz v5 需 Node 构建，故本页以本地 D3 <b>借鉴实现</b>其交互，不改动原始源码。</div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../assets/vendor/d3.min.js"></script>
+<script src="../assets/js/kg-force.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'demos' }); KG.mountFooter(); KG.mountAuthNotice();
+var selected = null, g = null;
+
+function sideHTML(n) {
+  if (!n) return '<div class="empty">点击图中节点，查看「笔记卡片」「反向链接」「出链」</div>';
+  var rels = KG.relationsOf(n.id);
+  var inc = rels.filter(function (e) { return e.target === n.id; });
+  var out = rels.filter(function (e) { return e.source === n.id; });
+  function lines(list, dir) {
+    if (!list.length) return '<div class="muted">无</div>';
+    return '<ul class="list">' + list.map(function (e) {
+      var t = KG.byId[dir === 'in' ? e.source : e.target];
+      return '<li><a href="' + KG.nodeUrl(t.id) + '">' + KG.esc(t.name) + '</a> ' +
+        '<span class="chip" style="color:' + KG.relColor[e.relation] + '">' + e.relation + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  return '<div class="chip-row" style="margin-bottom:10px">' +
+    '<span class="chip" style="background:' + KG.color(n.chapter) + ';color:#fff;border:0">' + KG.esc(n.chapter) + '</span>' +
+    '<span class="chip ' + (n.type === '知识点' ? 'green' : 'purple') + '">' + n.type + '</span></div>' +
+    '<h3>笔记卡片：' + KG.esc(n.name) + '</h3>' +
+    '<p class="muted">' + (KG.esc(n.description) || '（知识单元无节点描述）') + '</p>' +
+    '<div class="chip-row">' + n.tags.map(function (t) { return '<span class="chip gray">' + KG.esc(t) + '</span>'; }).join('') +
+    (n.difficulty ? '<span class="chip orange">' + KG.esc(n.difficulty) + '</span>' : '') + '</div>' +
+    '<h4 style="margin-top:16px;color:var(--c-primary)">反向链接（谁指向我）· ' + inc.length + '</h4>' + lines(inc, 'in') +
+    '<h4 style="margin-top:14px;color:var(--c-primary)">出链（我指向谁）· ' + out.length + '</h4>' + lines(out, 'out') +
+    '<a class="btn ghost sm" style="margin-top:12px" href="' + KG.nodeUrl(n.id) + '">打开完整节点详情 →</a>';
+}
+
+function build() {
+  var mode = document.getElementById('mode').value;
+  var opts = { height: 560, onSelect: function (n) {
+    selected = n ? n.id : null;
+    document.getElementById('side').innerHTML = sideHTML(n);
+    if (mode === 'local') build();     // 局部模式：随选中节点重绘一跳邻域
+  }};
+  if (mode === 'local' && selected) {
+    var nb = KG.neighborIds(selected), ids = {}; ids[selected] = true;
+    Object.keys(nb).forEach(function (k) { ids[k] = true; });
+    opts.nodes = KG.data.nodes.filter(function (n) { return ids[n.id]; });
+    opts.links = KG.data.edges.filter(function (e) { return ids[e.source] && ids[e.target]; });
+  }
+  g = KGForce.create(document.getElementById('graph'), opts);
+  if (selected) g.select(selected);
+  var c = g.count();
+  document.getElementById('info').textContent =
+    (mode === 'local' ? '局部图谱' : '全局图谱') + '：' + c.nodes + ' 节点 / ' + c.links + ' 关系' +
+    (selected ? ' · 当前聚焦「' + KG.byId[selected].name + '」' : ' · 尚未选择节点');
+}
+
+document.getElementById('mode').addEventListener('change', build);
+document.getElementById('reset').addEventListener('click', function () {
+  selected = null; document.getElementById('mode').value = 'global'; document.getElementById('q').value = '';
+  document.getElementById('side').innerHTML = sideHTML(null); build();
+});
+document.getElementById('q').addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter') return;
+  var q = this.value.trim(); if (!q) return;
+  var hit = KG.data.nodes.find(function (n) { return n.name.indexOf(q) >= 0; });
+  if (!hit) { KG.toast('未找到该节点'); return; }
+  selected = hit.id;
+  document.getElementById('side').innerHTML = sideHTML(hit);
+  build();
+  KG.toast('已聚焦：' + hit.name);
+});
+document.getElementById('legend').innerHTML = KG.chapters.map(function (c) {
+  return '<span><i style="background:' + KG.color(c) + '"></i>' + KG.esc(c) + '</span>';
+}).join('');
+build();
+</script>
+</body>
+</html>

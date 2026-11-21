@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模板演示 · 课程知识图谱系统</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / 模板演示</div>
+    <h1>GitHub 模板特色功能演示 <span class="chip orange">5 个模板 · 同一份数据</span></h1>
+    <div class="sub">每个演示页都从 <code>data/course-kg.js</code> 读取运筹学 186 个节点、320 条关系；原始模板完整保留在 <code>templates/</code>。</div>
+  </div>
+
+  <div class="note info"><b>实现方式说明</b>：D3 / ECharts / Mermaid 三个演示直接使用本地化的真实库文件；Quartz 与 markmap 需要 Node 构建或运行时联网加载 CDN，为保证纯离线可运行，用本地 D3 <b>复刻其展示范式</b>（已在各页标注），原始仓库源码仍完整保留供查阅。详见 <a href="../docs/01_GitHub模板调研.md">模板调研</a>。</div>
+
+  <div class="grid g3" id="cards" style="margin-top:18px"></div>
+
+  <div class="section-title">原始数据与许可证</div>
+  <div class="card tight"><div class="scroll"><table class="tbl" id="tpl-table"></table></div>
+    <div class="muted" style="margin-top:10px">ZIP 快照在 <code>templates/_zips/</code>，解压目录保持仓库原结构；逐仓库许可证原文见各模板根目录 LICENSE 文件。</div>
+  </div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'demos' }); KG.mountFooter(); KG.mountAuthNotice();
+
+var demos = [
+  { key: 'd3', name: 'D3 · 力导向网络', stars: '113,892', license: 'ISC', color: '#2E5C8A', page: 'd3-force.html',
+    feature: '力模拟参数实时调节、节点半径映射关系数、拖拽回弹、邻接高亮', impl: '真实库 d3@7.9.0（本地 d3.min.js）', src: 'templates/d3/d3-main/' },
+  { key: 'mermaid', name: 'Mermaid · 图谱即文本', stars: '91,056', license: 'MIT', color: '#27AE60', page: 'mermaid-flow.html',
+    feature: 'flowchart / mindmap DSL、subgraph 分章、classDef 分色、图定义可复制可版本管理', impl: '真实库 mermaid@10.9.5（本地 UMD）', src: 'templates/mermaid/mermaid-develop/' },
+  { key: 'echarts', name: 'ECharts · 多布局关系图', stars: '67,697', license: 'Apache-2.0', color: '#E67E22', page: 'echarts-graph.html',
+    feature: 'force / circular 布局切换、图例筛选章节、roam 漫游、focus adjacency 邻接聚焦', impl: '真实库，直接引用原始模板 dist/echarts.min.js', src: 'templates/echarts/echarts-master/dist/' },
+  { key: 'quartz', name: 'Quartz · 全局/局部图谱', stars: '13,558', license: 'MIT', color: '#D4537E', page: 'quartz-graph.html',
+    feature: '局部图谱（一跳邻域）/ 全局图谱切换、反向链接清单、悬停卡片预览、站内搜索', impl: '借鉴实现（本地 D3 复刻交互范式）', src: 'templates/quartz/quartz-5/docs/features/graph view.md' },
+  { key: 'markmap', name: 'markmap · 大纲思维导图', stars: '13,229', license: 'MIT', color: '#7F77DD', page: 'markmap-outline.html',
+    feature: 'Markdown 大纲驱动、放射式分支、逐级折叠、缩放平移、点击展开节点说明', impl: '借鉴实现（本地 D3 放射布局）', src: 'templates/markmap/markmap-master/README.md' }
+];
+document.getElementById('cards').innerHTML = demos.map(function (d) {
+  return '<a class="tile" href="' + d.page + '">' +
+    '<div class="ico" style="background:' + d.color + '">' + (d.key === 'echarts' ? 'E' : d.key.slice(0, 1).toUpperCase()) + '</div>' +
+    '<h3>' + d.name + '</h3><p>' + d.feature + '</p>' +
+    '<div class="meta"><span class="chip">★ ' + d.stars + '</span> <span class="chip green">' + d.license + '</span><br>' + d.impl + '</div></a>';
+}).join('');
+
+document.getElementById('tpl-table').innerHTML =
+  '<thead><tr><th>模板</th><th>星标数</th><th>许可证</th><th>实现方式</th><th>原始文件位置</th></tr></thead><tbody>' +
+  demos.map(function (d) {
+    return '<tr><td><b>' + d.name + '</b></td><td>★ ' + d.stars + '</td><td>' + d.license + '</td><td>' + d.impl +
+      '</td><td class="wrap"><code>' + KG.esc(d.src) + '</code></td></tr>';
+  }).join('') + '</tbody>';
+</script>
+</body>
+</html>

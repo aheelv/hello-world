@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D3 力导向网络 · 模板演示</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">模板演示</a> / D3</div>
+    <h1>D3 · 力导向网络 <span class="chip">★ 113,892 · ISC</span></h1>
+    <div class="sub">展示 D3 模板的核心特色：<b>力模拟参数可调、视觉通道映射数据、拖拽与邻接高亮</b>。使用本地 <code>d3@7.9.0</code>。</div>
+  </div>
+
+  <div class="card tight" style="margin-bottom:12px">
+    <div class="inline-controls">
+      <div><label class="field" style="margin:0"><span>章节</span><select id="f-chapter"></select></label></div>
+      <div><label class="field" style="margin:0"><span>关系类型</span><select id="f-relation"></select></label></div>
+      <div><label class="field" style="margin:0"><span>斥力强度 <b id="v-charge">-165</b></span><input type="range" id="f-charge" min="-400" max="-40" step="10" value="-165"></label></div>
+      <div><label class="field" style="margin:0"><span>连线长度 <b id="v-dist">68</b></span><input type="range" id="f-dist" min="30" max="160" step="5" value="68"></label></div>
+      <div class="narrow btn-row" style="padding-bottom:2px"><button class="btn ghost sm" id="reset">恢复默认</button></div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div><div id="graph"></div>
+      <div class="card tight" style="margin-top:12px"><div class="legend" id="legend"></div>
+        <div class="muted" style="margin-top:8px" id="count"></div></div></div>
+    <div class="card" id="detail"><div class="empty">点击节点查看属性</div></div>
+  </div>
+
+  <div class="section-title">借鉴点说明</div>
+  <div class="grid g3">
+    <div class="card tight"><h3>视觉通道映射</h3><p class="muted">半径 ∝ √关系数，颜色 = 章节，深色描边 = 知识单元。这是 D3「数据驱动文档」的典型用法。</p></div>
+    <div class="card tight"><h3>力模拟可调</h3><p class="muted">滑杆直接修改 <code>forceManyBody.strength</code> 与 <code>forceLink.distance</code>，观察聚类变化。</p></div>
+    <div class="card tight"><h3>交互</h3><p class="muted">拖拽固定/释放、滚轮缩放、点击节点后仅高亮一跳邻域。</p></div>
+  </div>
+  <div class="note">原始模板：<code>templates/d3/d3-main/</code>（含 LICENSE、README、package.json）；运行时库：<code>assets/vendor/d3.min.js</code>。</div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script src="../assets/vendor/d3.min.js"></script>
+<script src="../assets/js/kg-force.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'demos' }); KG.mountFooter(); KG.mountAuthNotice();
+
+document.getElementById('f-chapter').innerHTML = KG.selectOptions(KG.chapters, '', '全部章节');
+document.getElementById('f-relation').innerHTML = KG.selectOptions(['前置', '后置', '关联'], '', '全部关系');
+var g = KGForce.create(document.getElementById('graph'), {
+  height: 570, charge: -165, linkDistance: 68,
+  onSelect: function (n) { document.getElementById('detail').innerHTML = KG.detailHTML(n); }
+});
+function apply() {
+  g.setFilter({
+    chapter: document.getElementById('f-chapter').value,
+    relation: document.getElementById('f-relation').value,
+    keyword: ''
+  });
+  var c = g.count();
+  document.getElementById('count').textContent = '当前显示 ' + c.nodes + ' 节点 / ' + c.links + ' 关系；半径范围 5—17px。';
+}
+document.getElementById('f-chapter').addEventListener('change', apply);
+document.getElementById('f-relation').addEventListener('change', apply);
+document.getElementById('f-charge').addEventListener('input', function () {
+  document.getElementById('v-charge').textContent = this.value; g.setForces({ charge: +this.value });
+});
+document.getElementById('f-dist').addEventListener('input', function () {
+  document.getElementById('v-dist').textContent = this.value; g.setForces({ linkDistance: +this.value });
+});
+document.getElementById('reset').addEventListener('click', function () {
+  document.getElementById('f-chapter').value = ''; document.getElementById('f-relation').value = '';
+  document.getElementById('f-charge').value = -165; document.getElementById('v-charge').textContent = '-165';
+  document.getElementById('f-dist').value = 68; document.getElementById('v-dist').textContent = '68';
+  g.setForces({ charge: -165, linkDistance: 68 }); apply(); g.resetZoom();
+});
+document.getElementById('legend').innerHTML = KG.chapters.map(function (c) {
+  return '<span><i style="background:' + KG.color(c) + '"></i>' + KG.esc(c) + '</span>';
+}).join('') + '<span><i style="background:#B9C7D6"></i>关系</span>';
+apply();
+</script>
+</body>
+</html>

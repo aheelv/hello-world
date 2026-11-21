@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>关系矩阵 · 通用课程知识图谱系统</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="container">
+  <div id="auth-notice"></div>
+  <div class="page-head">
+    <div class="crumb"><a href="../index.html">登录入口</a> / <a href="index.html">通用系统</a> / 关系矩阵</div>
+    <h1>章节关系矩阵 <span class="chip pink">邻接分析</span></h1>
+    <div class="sub">按「源节点所属章节 → 目标节点所属章节」统计 320 条关系；点击单元格查看该组关系的完整清单。</div>
+  </div>
+
+  <div class="grid g4" id="stats"></div>
+
+  <div class="section-title">章节 × 章节 关系热力矩阵</div>
+  <div class="card tight"><div class="scroll" style="max-height:none"><table class="tbl" id="matrix"></table></div>
+    <div class="muted" style="margin-top:10px">颜色越深表示该两章之间的先修/后续/关联关系越多；对角线为章内关系。</div>
+  </div>
+
+  <div class="section-title">关系清单 <span class="chip" id="list-label"></span></div>
+  <div class="card tight"><div class="inline-controls" style="margin-bottom:10px">
+      <div><label class="field" style="margin:0"><span>关系类型</span><select id="rel"></select></label></div>
+      <div><label class="field" style="margin:0"><span>关键词</span><input type="search" id="kw" placeholder="筛选节点名"></label></div>
+      <div class="narrow btn-row" style="padding-bottom:2px"><button class="btn ghost sm" id="clear">清除矩阵筛选</button></div>
+    </div>
+    <div class="scroll"><table class="tbl" id="edges"></table></div>
+  </div>
+</div>
+<div id="site-footer"></div>
+
+<script src="../data/course-kg.js"></script>
+<script src="../assets/js/kg-core.js"></script>
+<script>
+KG.init(window.COURSE_KG, '../');
+KG.mountHeader({ active: 'app' }); KG.mountFooter(); KG.mountAuthNotice();
+
+var chs = KG.chapters, cell = {}, max = 0;
+chs.forEach(function (a) { chs.forEach(function (b) { cell[a + '||' + b] = 0; }); });
+KG.data.edges.forEach(function (e) {
+  var a = KG.byId[e.source].chapter, b = KG.byId[e.target].chapter;
+  cell[a + '||' + b]++; max = Math.max(max, cell[a + '||' + b]);
+});
+var intra = 0, cross = 0;
+Object.keys(cell).forEach(function (k) { var p = k.split('||'); if (p[0] === p[1]) intra += cell[k]; else cross += cell[k]; });
+document.getElementById('stats').innerHTML = [
+  ['关系总数', KG.data.edges.length, 'var(--c-primary)'],
+  ['章内关系', intra, 'var(--c-green)'],
+  ['跨章关系', cross, 'var(--c-orange)'],
+  ['最大单元格', max, 'var(--c-pink)']
+].map(function (x) { return '<div class="card tight stat"><div class="num" style="color:' + x[2] + '">' + x[1] + '</div><div class="lbl">' + x[0] + '</div></div>'; }).join('');
+
+function shade(v) {
+  if (!v) return '#F2F5F8';
+  var alpha = .12 + .68 * (v / max);
+  return 'rgba(46,92,138,' + alpha.toFixed(2) + ')';
+}
+var short = function (s) { return s.length > 8 ? s.slice(0, 7) + '…' : s; };
+document.getElementById('matrix').innerHTML =
+  '<thead><tr><th>源＼目标</th>' + chs.map(function (c) { return '<th title="' + KG.esc(c) + '">' + KG.esc(short(c)) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+  chs.map(function (a) {
+    return '<tr><td><b>' + KG.esc(a) + '</b></td>' + chs.map(function (b) {
+      var v = cell[a + '||' + b];
+      return '<td class="cell" data-a="' + KG.esc(a) + '" data-b="' + KG.esc(b) + '" style="cursor:pointer;text-align:center;background:' + shade(v) +
+        ';font-weight:' + (v > max / 2 ? '700' : '400') + ';color:' + (v > max / 2 ? '#fff' : '#22303C') + '">' + (v || '·') + '</td>';
+    }).join('') + '</tr>';
+  }).join('') + '</tbody>';
+
+document.getElementById('rel').innerHTML = KG.selectOptions(['前置', '后置', '关联'], '', '全部类型');
+var picked = null;
+function listEdges() {
+  var rel = document.getElementById('rel').value, kw = document.getElementById('kw').value.trim();
+  var rows = KG.data.edges.filter(function (e) {
+    var s = KG.byId[e.source], t = KG.byId[e.target];
+    if (rel && e.relation !== rel) return false;
+    if (kw && (s.name + t.name).indexOf(kw) < 0) return false;
+    if (picked && (s.chapter !== picked.a || t.chapter !== picked.b)) return false;
+    return true;
+  });
+  document.getElementById('list-label').textContent = picked
+    ? (picked.a + ' → ' + picked.b) + ' · ' + rows.length + ' 条' : '全部 · ' + rows.length + ' 条';
+  document.getElementById('edges').innerHTML =
+    '<thead><tr><th>#</th><th>关系</th><th>源节点</th><th>目标节点</th><th>源章节</th><th>目标章节</th></tr></thead><tbody>' +
+    (rows.length ? rows.slice(0, 400).map(function (e, i) {
+      var s = KG.byId[e.source], t = KG.byId[e.target];
+      return '<tr><td>' + (i + 1) + '</td><td><span class="chip" style="color:' + KG.relColor[e.relation] + '">' + e.relation + '</span></td>' +
+        '<td><a href="' + KG.nodeUrl(s.id) + '">' + KG.esc(s.name) + '</a></td>' +
+        '<td><a href="' + KG.nodeUrl(t.id) + '">' + KG.esc(t.name) + '</a></td>' +
+        '<td>' + KG.esc(s.chapter) + '</td><td>' + KG.esc(t.chapter) + '</td></tr>';
+    }).join('') : '<tr><td colspan="6"><div class="empty">该单元格暂无关系</div></td></tr>') + '</tbody>';
+}
+KG.qsa('#matrix td.cell').forEach(function (td) {
+  td.addEventListener('click', function () {
+    var a = td.dataset.a, b = td.dataset.b;
+    picked = (picked && picked.a === a && picked.b === b) ? null : { a: a, b: b };
+    listEdges();
+  });
+});
+document.getElementById('rel').addEventListener('change', listEdges);
+var t; document.getElementById('kw').addEventListener('input', function () { clearTimeout(t); t = setTimeout(listEdges, 220); });
+document.getElementById('clear').addEventListener('click', function () {
+  picked = null; document.getElementById('rel').value = ''; document.getElementById('kw').value = ''; listEdges();
+});
+listEdges();
+</script>
+</body>
+</html>
