@@ -1,0 +1,43 @@
+name: Sync KG site into op/
+
+on:
+  push:
+    paths:
+      - 'op/.sync-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download site files from publish mirror
+        env:
+          BASE: https://kg-site-transfer.app.workbuddy.host
+          CODE: JENHPAJXYU
+        run: |
+          set -euo pipefail
+          count=0
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            enc=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$f")
+            mkdir -p "op/$(dirname "$f")"
+            curl -fsSL --retry 3 "$BASE/$enc?sharecode=$CODE" -o "op/$f"
+            count=$((count+1))
+          done < op/.filelist
+          echo "downloaded $count files"
+
+      - name: Commit synced files
+        run: |
+          git config user.name aheelv
+          git config user.email aheelv@qq.com
+          git add -A op
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "chore(kg): sync 49 op site files from publish mirror"
+            git push
+          fi
