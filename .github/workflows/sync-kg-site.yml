@@ -23,10 +23,15 @@ jobs:
           count=0
           while IFS= read -r f; do
             [ -n "$f" ] || continue
-            enc=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$f")
+            src="$f"
+            if [ "$f" = "templates/echarts/echarts-master/dist/echarts.min.js" ]; then
+              src="templates/echarts/echarts-master/echarts.min.js"
+            fi
+            enc=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$src")
             mkdir -p "op/$(dirname "$f")"
-            curl -fsSL --retry 3 "$BASE/$enc?sharecode=$CODE" -o "op/$f"
+            curl -fsSL --retry 3 --retry-all-errors "$BASE/$enc?sharecode=$CODE" -o "op/$f"
             count=$((count+1))
+            sleep 0.2
           done < op/.filelist
           echo "downloaded $count files"
 
